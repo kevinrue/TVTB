@@ -2,7 +2,7 @@
 title: Introduction to TVTB
 author:
     -   name: Kévin Rue-Albrecht
-        email: k.rue-albrecht@imperial.ac.uk
+        email: kevinrue67@gmail.com
         affiliation: Department of Medicine, Imperial College London,
             Hammersmith Campus, Du Cane Road, London, W12 0NN, UK
 date: "`r doc_date()`"
