@@ -1,9 +1,9 @@
 
 language: r
-r: devel
+#r: devel
 #use_bioc: true
 #bioc_required: true
-#r: bioc-devel
+r: bioc-devel
 
 os:
   - linux
@@ -18,6 +18,9 @@ branches:
   - devel
   - release-3.4
 
+sudo: false
+cache: packages
+
 before_install:
     - Rscript -e 'source(file = "http://bioconductor.org/biocLite.R");tryCatch(useDevel(devel = TRUE), error = function(err){message(err)})'
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then tlmgr install bera nowidow parnotes marginfix; fi
@@ -28,6 +31,7 @@ warnings_are_errors: false
 r_github_packages:
     - rstudio/shiny
     - rstudio/DT
+    - jimhester/covr
 
 r_build_args: --keep-empty-dirs --no-resave-data
 r_check_args: --no-vignettes --timings
