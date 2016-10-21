@@ -15,7 +15,6 @@ coverage:
 
     changes: true
 
-
 comment:
     layout: "header, diff, changes, suggestions"
     behavior: default

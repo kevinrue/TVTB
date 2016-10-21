@@ -1,8 +1,9 @@
 
 language: r
-use_bioc: true
-bioc_required: true
-r: bioc-release
+r: devel
+#use_bioc: true
+#bioc_required: true
+#r: bioc-devel
 
 os:
   - linux
@@ -14,7 +15,8 @@ os:
 branches:
   only:
   - master
-  - BiocReview
+  - devel
+  - release-3.4
 
 before_install:
     - Rscript -e 'source(file = "http://bioconductor.org/biocLite.R");tryCatch(useDevel(devel = TRUE), error = function(err){message(err)})'

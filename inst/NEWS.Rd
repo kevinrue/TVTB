@@ -1,11 +1,29 @@
 \name{TVTB-NEWS}
 \title{NEWS: The VCF Tool Box}
 
+\section{Changes in version 1.1.1 2016-10-20}{
+\subsection{Minor changes}{
+\itemize{
+\item Updates to \code{README}: weblinks, installation, unit tests.
+\item Branches tracked by Travis CI.
+\item Coverage: exclude \code{AllClasses.R}, \code{tSVE.R}.
+\item Four-space indents in \code{DESCRIPTION}.
+}
+}
+}
+
+\section{Changes in version 0.99.9 2016-10-14}{
+\subsection{Minor changes}{
+\itemize{
+\item Fixed outdated information in \emph{Introduction} vignette.
+}
+}
+}
+
 \section{Changes in version 0.99.8 2016-10-12}{
 \subsection{Minor changes}{
 \itemize{
-\item
-    Set vignette output format to \code{BiocStyle::html_document2}.
+\item Set vignette output format to \code{BiocStyle::html_document2}.
 }
 }
 }
@@ -13,8 +31,7 @@
 \section{Changes in version 0.99.7 2016-10-12}{
 \subsection{Minor changes}{
 \itemize{
-\item
-    Fixed a closign bracket in \code{NEWS} file.
+\item Fixed a closign bracket in \code{NEWS} file.
 }
 }
 }
@@ -35,8 +52,7 @@
 \section{Changes in version 0.99.5 2016-10-12}{
 \subsection{Bug fix}{
 \itemize{
-\item
-    Fixed \code{Collate:} field of the \code{DESCRIPTION} file.
+\item Fixed \code{Collate:} field of the \code{DESCRIPTION} file.
 }
 }
 }
@@ -67,8 +83,7 @@
 \section{Changes in version 0.99.2 2016-10-11}{
 \subsection{Bug fixes}{
 \itemize{
-\item
-    Use \code{suffix} accessor in \code{add*Frequencies} methods.
+\item Use \code{suffix} accessor in \code{add*Frequencies} methods.
 }
 }
 }
