@@ -2,11 +2,11 @@
 
 ## Software status
 
-| Resource:     | Bioconductor (devel) | Travis CI     |
-| :-----------: | :------------------: | :-----------: |
-| _Platforms:_  |      _Multiple_      |    _Linux_    |
-| R CMD check   | [![BioC-devel Build Status](http://bioconductor.org/shields/build/devel/bioc/TVTB.svg)](http://bioconductor.org/checkResults/3.5/bioc-LATEST/TVTB) | [![Travis-CI Build Status](https://travis-ci.org/kevinrue/TVTB.svg?branch=master)](https://travis-ci.org/kevinrue/TVTB) |
-| Test coverage | [![BioC-devel Coverage status](http://bioconductor.org/shields/coverage/devel/TVTB.svg)](https://codecov.io/github/Bioconductor-mirror/TVTB?branch=master) | [![Coverage Status](https://img.shields.io/codecov/c/github/kevinrue/TVTB/master.svg)](https://codecov.io/github/kevinrue/TVTB?branch=master) |
+|    Platform   | Bioconductor (release) |Bioconductor (devel) |   Travis CI   |
+| :-----------: | :--------------------: | :-----------------: | :-----------: |
+|       OS      |       _Multiple_       |      _Multiple_     |    _Linux_    |
+| R CMD check   | [![BioC-release Build Status](http://bioconductor.org/shields/build/release/bioc/TVTB.svg)](http://bioconductor.org/checkResults/3.4/bioc-LATEST/TVTB) | [![BioC-devel Build Status](http://bioconductor.org/shields/build/devel/bioc/TVTB.svg)](http://bioconductor.org/checkResults/3.5/bioc-LATEST/TVTB) | [![Travis-CI Build Status](https://travis-ci.org/kevinrue/TVTB.svg?branch=master)](https://travis-ci.org/kevinrue/TVTB) |
+| Test coverage | [![BioC-release Coverage status](http://bioconductor.org/shields/coverage/release/TVTB.svg)](https://codecov.io/github/Bioconductor-mirror/TVTB?branch=release-3.4) | [![BioC-devel Coverage status](http://bioconductor.org/shields/coverage/devel/TVTB.svg)](https://codecov.io/github/Bioconductor-mirror/TVTB?branch=master) | [![Coverage Status](https://img.shields.io/codecov/c/github/kevinrue/TVTB/master.svg)](https://codecov.io/github/kevinrue/TVTB?branch=master) |
 
 ## Description
 
