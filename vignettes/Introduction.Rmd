@@ -18,8 +18,9 @@ vignette: >
     %\VignetteIndexEntry{Introduction to TVTB}
     %\VignetteEngine{knitr::rmarkdown}
     %\VignetteEncoding{UTF-8}
-output: 
-    BiocStyle::pdf_document2
+output:
+    BiocStyle::pdf_document2:
+        toc_newpage: true
 bibliography:
     Introduction.bib
 ---
@@ -455,7 +456,7 @@ This section presents severeal ideas implemented in `r Biocpkg("TVTB")`.
 \bioccomment{
 Note that `ggplot` objects include the data used for plotting.
 Those data may be extracted, replaced, subsetted to produce plots and
-summary tables not yet implemented in the package.
+summary tables beyond those implemented in the package.
 }
 
 ## Counts of discrete Ensembl VEP predictions {#SummariseDiscrete}
@@ -480,9 +481,7 @@ opts_chunk$set(
 ```{r tCBPplot, message=FALSE}
 library(ggplot2)
 filterCADD <- VcfVepRules(exprs = list(
-    CADD_15 = expression(
-        as.numeric(CADD_PHRED) > 20 &
-            !is.na(CADD_PHRED))
+    CADD_20 = expression(as.numeric(CADD_PHRED) > 20)
     ))
 tCBPplot <- tabulateVepByPhenotype(
     vcf = vcf, phenoCol = "super_pop", vepCol = "Consequence",

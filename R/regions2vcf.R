@@ -5,11 +5,13 @@
 # Return the path to the VCF file corresponding to the chr
 chr2file <- function(chr, pattern, folder){
 
-    stopifnot(is.character(chr))
     stopifnot(dir.exists(folder))
 
+    # Convert numeric names to character
+    chr <- as.character(chr)
+
     if(!grepl(pattern = "%s", x = pattern)){
-        stop("\"%s\" not found in pattern")
+        stop("\"%s\" required in pattern")
     }
 
     vcfFiles <- list.files(
@@ -36,8 +38,8 @@ chr2file <- function(chr, pattern, folder){
         warning(sprintf("No VCF file matching pattern: %s", patternVcf))
         return(character())
     }else if(length(vcfPath) > 1){
-        stop(sprintf(
-            "More than one VCF file matching pattern: %s",
+        warning(sprintf(
+            "Multiple VCF files matching pattern: %s",
             patternVcf))
     }
 

@@ -6,6 +6,9 @@ getEdb <- function(x){
     return(get(x))
 }
 
+# If "," present, taken as the value separator and " " are trimmed
+# Otherwise, " " taken as the value separator
+# Returns an ensembldb::SeqendFilter of the appropriate type
 EnsDbFilter <- function(type, condition, value){
     ## split by "," if present
     if(length(grep(x = value, pattern = ",")) > 0){

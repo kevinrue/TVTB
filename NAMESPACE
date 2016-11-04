@@ -142,14 +142,19 @@ exportMethods(
 exportMethods(
     # Biostrings
     "type",
+
     # GenomicRanges
     "mcols",
+
     # Base
     "c",
+
     # S4Vectors
-    "eval", "evalSeparately", "subsetByFilter", "active",
+    "eval", "evalSeparately", "subsetByFilter", "active", "active<-",
+
     # SummarizedExperiment
     "colData", "colData<-",
+
     # VariantAnnotation
     "readVcf", "ScanVcfParam",
     "header", "header<-", "geno", "fixed", "info", "info<-"

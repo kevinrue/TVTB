@@ -11,28 +11,389 @@ source(file.path(
     system.file(package = "TVTB"),
     "shinyApp",
     "serverRoutines.R"))
+source("~/Dropbox/TVTB/inst/shinyApp/fileParseFunctions.R")
 
 shinyServer(function(input, output, clientData, session) {
 
-    # Genome annotation ----
+    # Import phenotype information ----
 
-    selectedPackage <- reactive({
+    # Path to phenotype file, or NULL
+    phenoFile <- reactive({
+        # Triggered by input$tryCatch
+        if (input$selectPheno > 0){
+            selected <- tryCatch(
+                file.choose(),
+                error = function(err){
+                    warning(geterrmessage())
+                    return(NULL)
+                })
+        } else {
+            return(NULL)
+        }
+
+        return(selected)
+    })
+
+    # DataFrame of imported phenotypes, or NULL
+    phenotypes <- reactive({
+        # Depends on phenoFile()
+        phenoFile <- phenoFile()
+
+        if (is.null(phenoFile))
+            return(NULL)
+        else {
+            message("Importing phenotypes ...")
+            rawData <- tryParsePheno(file = phenoFile)
+
+            validate(need(
+                all(dim(rawData) > c(0, 0)),
+                paste(
+                    "Phenotype file must have at least 1 row and 1 column",
+                    "with colnames and rownames")))
+        }
+
+        DataFrame(rawData)
+    })
+
+    # HTML summary of imported phenotypes
+    output$phenoFileSummary <- renderUI({
+        # Depends on phenotypes()
+
+        phenotypes <- phenotypes()
+
+        if (is.null(phenotypes))
+            return(Msgs[["phenotypes"]])
+
+        return(HTML(paste(
+            ncol(phenotypes),
+            "phenotypes in",
+            nrow(phenotypes),
+            "samples detected."
+        )))
+    })
+
+    # Column names available for selection from phenotypes
+    output$phenoCols <- renderUI({
+        # NOTE:
+        # phenotype view depends on the vcf(), not phenotypes()
+        # 1) users can easily look at their raw phenotypes separately
+        # 2) all analyses use data stored in the VCF object only
+
+        vcf <- vcf()
+        phenos <- colData(vcf)
 
         validate(need(
-            input$annotationPackage,
-            label = Msgs[["annotationPackage"]]))
-        validate(
-            need(
-                require(input$annotationPackage, character.only = TRUE),
-                message = "Cannot load EnsDb package. Invalid?"
-            ))
+            ncol(phenos) > 0,
+            ifelse(
+                is.null(phenotypes()),
+                Msgs[["colDataEmptyOK"]],
+                Msgs[["colDataEmptyImport"]])
+        ),
+        errorClass = "optional")
 
-        return (getEdb(input$annotationPackage))
+        selectInput(
+            "phenoCols", "Phenotypes",
+            choices = colnames(phenos),
+            selected = colnames(phenos)[1:5],
+            multiple = TRUE
+        )
+    })
+
+    # When phenotypes are updated in VCF, update the choices for plotting
+    observeEvent(vcf(), {
+        # Depends on vcf() & input$phenoAnalysed
+        pheno.choices <- c("None", colnames(colData(vcf())))
+
+        # If new phenotype files also contains the current phenotype,
+        # keep it active instead of resetting to the first choice
+        pheno.selected <- pheno.choices[
+            max(1, which(pheno.choices == input$phenoAnalysed))]
+
+        updateSelectInput(
+            session, "phenotype",
+            choices = pheno.choices,
+            selected = pheno.selected)
+    })
+
+    # Display structure of phenotypes attached to variants
+    output$phenotypesStructure <- renderPrint({
+        # Depends on vcf()
+        vcf <- vcf()
+        phenos <- SummarizedExperiment::colData(vcf)
+
+        validate(need(
+            ncol(phenos) > 0,
+            ifelse(
+                is.null(phenotypes()),
+                Msgs[["colDataEmptyOK"]],
+                Msgs[["colDataEmptyImport"]])
+            ),
+            errorClass = "optional")
+
+        str(phenos)
+    })
+
+    # Display table of phenotypes attached to variants
+    output$phenotypesSample <- DT::renderDataTable({
+        # Requires: input$phenoCols, vcf()
+        # Give time to initialise columns seletion widget
+        req(input$phenoCols)
+
+        # Display phenotypes attached to the VCF object
+        vcf <- vcf()
+        validate(need(vcf, Msgs[["vcf"]]))
+
+        # Make sure the selected
+        phenos <- SummarizedExperiment::colData(vcf)
+        validate(need(
+            all(input$phenoCols %in% colnames(phenos)),
+            "Invalid phenotypes selected: please refresh variants"))
+
+        DT::datatable(
+            as.data.frame(phenos[,input$phenoCols, drop = FALSE]),
+            options = list(
+                pageLength = 10,
+                searching = TRUE),
+            filter = "top")
+    })
+
+    # Define genomic ranges ----
+
+    # Path to BED file
+    bedFile <- reactive({
+        # Triggered by input$selectBed
+        if (input$selectBed > 0){
+            selected <- tryCatch(
+                file.choose(),
+                error = function(err){
+                    warning(geterrmessage())
+                    return(NULL)
+                })
+        } else {
+            return(NULL)
+        }
+
+        selected
+    })
+
+    # Import BED records, format as GRanges
+    genomicRanges <- reactive({
+        # Depends on input$regionInputMode
+        # Either...
+        # Requires: bedFile()
+        # Requires: input$ucscRegions
+        # Requires: input$ensDb.type, input$ensDb.condition, input$ensDb.value
+        switch (input$regionInputMode,
+                bed = {
+                    # use rtracklayer::import.bed to obtain GRanges
+                    bedFile <- bedFile()
+
+                    if (is.null(bedFile))
+                        return(NULL)
+                    else {
+                        message("Importing phenotypes ...")
+                        rawData <- tryParseBed(bedFile)
+                    }
+                },
+                ucsc = {
+                    # parse the string or return NULL
+                    if (input$ucscRegions == "")
+                        return(NULL)
+
+                    # NOTE: do not trim "chr", for future UCSC support
+                    inputTrimmed <- gsub(
+                        pattern = ",| ",
+                        replacement = "",
+                        x = input$ucscRegions)
+
+                    # Split the given string into individual regions
+                    inputSplit <- strsplit(
+                        x = inputTrimmed, split = ";")[[1]]
+
+                    # Ensure that all regions are UCSC-valid
+                    validate(need(
+                        all(
+                            sapply(
+                                X = inputSplit,
+                                FUN = function(x){
+                                    grepl(
+                                        pattern = "[[:alnum:]]+:[[:digit:]]+-[[:digit:]]+",
+                                        x = x)
+                                })
+                        ),
+                        Msgs[["invalidUcscRegions"]]),
+                        errorClass = "optional")
+
+                    rawData <- tryCatch({
+
+
+                        chrs <- as.numeric(gsub(
+                            pattern =
+                                "([[:alnum:]]*):[[:digit:]]*-[[:digit:]]*",
+                            replacement = "\\1",
+                            x = inputSplit))
+
+                        starts <- as.numeric(gsub(
+                            pattern =
+                                "[[:alnum:]]*:([[:digit:]]*)-[[:digit:]]*",
+                            replacement = "\\1",
+                            x = inputSplit))
+
+                        ends <- as.numeric(gsub(
+                            pattern =
+                                "[[:alnum:]]*:[[:digit:]]*-([[:digit:]]*)",
+                            replacement = "\\1",
+                            x = inputSplit))
+
+                        data.frame(
+                            V1 = chrs,
+                            V2 = starts,
+                            V3 = ends,
+                            stringsAsFactors = FALSE)
+                    },
+                    error = function(err){
+                        warning(geterrmessage())
+                        return(NULL)}
+                    ,
+                    warning = function(warn){
+                        warning(warn)
+                        return(NULL)
+                    })
+                },
+                EnsDb = {
+                    # use ensembldb query to obtain GRanges
+                    queryGenes <- queryGenes()
+
+                    if (is.null(queryGenes))
+                        return(NULL)
+
+                    rawData <- queryGenes # Re-use existing value!
+                }
+        )
+        # UCSC is converted to a data.frame which requires a few extra checks
+        validate(need(
+            class(rawData) %in% c("data.frame", "GRanges"),
+            "Invalid input"))
+
+        switch (class(rawData),
+                data.frame = {
+                    # Test the number of columns before trying to access them
+                    validate(need(
+                        all(dim(rawData) >= c(1, 3)),
+                        "BED file must have at least 1 row and 3 columns"))
+                    validate(
+                        need(
+                            all(
+                                rawData[,1] %in%
+                                    seqlevels(selectedPackage())),
+                            "First column contains invalid chromosome names"),
+                        need(
+                            is.numeric(rawData[,2]),
+                            "Second column is not numeric"),
+                        need(
+                            is.numeric(rawData[,3]),
+                            "Third column is not numeric"))
+
+                    return(
+                        GRanges(
+                            seqnames = rawData[,1],
+                            ranges = IRanges(
+                                start = rawData[,2],
+                                end = rawData[,3]))
+                    )
+                },
+                GRanges = {
+                    if (length(rawData) == 0)
+                        return(NULL)
+
+                    return(rawData)
+                }
+        )
+    })
+
+    # How many BED records detected, show first one.
+    output$rangesSummary <- renderUI({
+        # Depends on genomicRanges
+
+        genomicRanges <- genomicRanges()
+
+        if (is.null(genomicRanges))
+            return(HTML(Msgs[["genomicRanges"]]))
+
+        return(HTML(paste(
+            length(genomicRanges),
+            "BED record(s) detected.</br>",
+            "[",
+            as.character(head(x = seqnames(genomicRanges), n = 1)),
+            ":",
+            as.character(head(x = start(genomicRanges), n = 1)),
+            "-",
+            as.character(head(x = end(genomicRanges), n = 1)),
+            # "{",
+            # as.character(head(x = names(genomicRanges), n = 1)),
+            # "}",
+            " , ... ]"
+        )))
+    })
+
+    # Show BED records
+    output$rangesStructure <- renderPrint({
+
+        genomicRanges <- genomicRanges()
+
+        validate(need(
+            genomicRanges,
+            Msgs[["genomicRanges"]]),
+            errorClass = "optional")
+
+        str(genomicRanges)
+    })
+
+    output$rangesSample <- DT::renderDataTable({
+
+        genomicRanges <- genomicRanges()
+
+        validate(need(
+            genomicRanges,
+            Msgs[["genomicRanges"]]),
+            errorClass = "optional")
+
+        DT::datatable(
+            data = as.data.frame(genomicRanges),
+            options = list(
+                pageLength = 10,
+                searching = TRUE),
+            filter = "top")
+    })
+
+    # Genome annotation ----
+
+    # The EnsDb object
+    selectedPackage <- reactive({
+        # Depends on input$annotationPackage
+        validate(need(
+            input$annotationPackage,
+            Msgs[["annotationPackage"]]))
+
+        validate(need(
+            require(input$annotationPackage, character.only = TRUE),
+            "Failed loading annotation package."
+        ))
+
+        return(getEdb(input$annotationPackage))
+    })
+
+    genomeSeqinfo <- reactive({
+
+        selectedPackage <- selectedPackage()
+
+        seqinfo(selectedPackage)
     })
 
     # EnsDb ----
 
     output$ensembl_organism <- renderUI({
+        # Depends on selectedPackage
         edb <- selectedPackage()
 
         validate(need(edb, label = Msgs[["edb"]]))
@@ -45,6 +406,7 @@ shinyServer(function(input, output, clientData, session) {
     })
 
     output$ensembl_version <- renderUI({
+        # Depends on selectedPackage
         edb <- selectedPackage()
 
         validate(need(edb, label = Msgs[["edb"]]))
@@ -59,6 +421,7 @@ shinyServer(function(input, output, clientData, session) {
     })
 
     output$ensembl_genome <- renderUI({
+        # Depends on selectedPackage
         edb <- selectedPackage()
 
         validate(need(edb, label = Msgs[["edb"]]))
@@ -73,38 +436,38 @@ shinyServer(function(input, output, clientData, session) {
     })
 
     queryGenes <- reactive({
+        # Depends on: selectedPackage, ...
+        #   input$ensDb.type, input$ensDb.condition, input$ensDb.value
 
         edb <- selectedPackage()
 
-        validate(
-            need(input$ensDb.type, label = Msgs[["ensDb.type"]]),
-            need(input$ensDb.condition, label = Msgs[["ensDb.condition"]]),
-            need(input$ensDb.values, label = Msgs[["ensDb.values"]])
-        )
+        if (input$ensDb.value == "")
+            return(NULL)
 
         ensDbFilter = EnsDbFilter(
             type = input$ensDb.type,
             condition = input$ensDb.condition,
-            value = input$ensDb.values)
-
-        validate(need(ensDbFilter, Msgs[["ensDbFilter"]]))
+            value = input$ensDb.value)
 
         res <- genes(
             edb,
-            filter = ensDbFilter,
-            return.type = "data.frame")
+            filter = ensDbFilter)
 
         return(res)
     })
 
     output$ensDb.Genes <- DT::renderDataTable({
+        # Depends on: queryGenes
 
         queryGenes <- queryGenes()
 
-        validate(need(queryGenes, Msgs[["queryGenes"]]))
+        validate(need(
+            length(queryGenes) > 0,
+            "No genomic region to show."),
+            errorClass = "optional")
 
         DT::datatable(
-            data = queryGenes,
+            data = as.data.frame(queryGenes),
             options = list(
                 pageLength = 10,
                 searching = TRUE),
@@ -140,56 +503,85 @@ shinyServer(function(input, output, clientData, session) {
     #   }
     # })
 
-    genomeSeqinfo <- reactive({
-
-        edb <- getEdb(input$annotationPackage)
-        validate(need(edb, label = "annotationPackage"))
-
-        seqinfo(edb)
-    })
-
     # Session information ----
 
-    tParam <- reactive({
+    tparam <- reactive({
+        # Depends on: bpParam, refGenotypes, hetGenotypes, altGenotypes, ...
+        #   vepKey
 
         bpParam <- bpParam()
 
         validate(
-            need(input$refGenotypes, label = Msgs[["refGenotypes"]]),
-            need(input$hetGenotypes, label = Msgs[["hetGenotypes"]]),
-            need(input$altGenotypes, label = Msgs[["altGenotypes"]]),
-            need(bpParam, Msgs[["bpParam"]])
+            need(input$vepKey, Msgs[["vepKey"]]),
+            need(input$refGenotypes, Msgs[["refGenotypes"]]),
+            need(input$hetGenotypes, Msgs[["hetGenotypes"]]),
+            need(input$altGenotypes, Msgs[["altGenotypes"]])
         )
 
-        new(
+        return(new(
             Class = "TVTBparam",
             genos = list(
                 REF = input$refGenotypes,
                 HET = input$hetGenotypes,
                 ALT = input$altGenotypes),
-            aaf = "AAF", maf = "MAF",
-            vep = input$csqField,
+            aaf = "AAF",
+            maf = "MAF",
+            vep = input$vepKey,
             bp = bpParam
-        )
+        ))
     })
 
     output$TVTBsettings <- renderPrint({
-        tParam()
+        return(tparam())
+    })
+
+    output$generalSettings <- renderPrint({
+        return(list(
+            "phenoFile()" = phenoFile(),
+            regionInputMode = input$regionInputMode,
+            "bedFile()" = bedFile(),
+            ucscRegions = input$ucscRegions,
+            ensDb.type = input$ensDb.type,
+            ensDb.condition = input$ensDb.condition,
+            ensDb.value = input$ensDb.value,
+            vcfinputMode = input$vcfInputMode,
+            "singleVcf()" = singleVcf(),
+            vcfFolder = input$vcfFolder,
+            vcfPattern = input$vcfPattern,
+            vepKey = input$vepKey,
+            annotationPackage = input$annotationPackage,
+            vcfCols = input$vcfCols,
+            vcfInfoCols = input$vcfInfoCols,
+            vepCols = input$vepCols,
+            phenoCols = input$phenoCols,
+            genoNumRow = input$genoNumRow,
+            genoFirstRow = input$genoFirstRow,
+            genoNumCols = input$genoNumCols,
+            genoFirstCol = input$genoFirstCol,
+            vepAnalysed = input$vepAnalysed,
+            phenoAnalysed = input$phenoAnalysed,
+            unique2pheno = input$unique2pheno,
+            vepFacetKey = input$vepFacetKey,
+            vepFacets = input$vepFacets,
+            stackedPercentage = input$stackedPercentage
+        ))
     })
 
     output$advancedSettings <- renderPrint({
-        list(
-            csqPhenoUnique = input$csqPhenoUnique,
-            annotationPackage = input$annotationPackage,
-            legendText = input$legendText,
-            regionInputMode = input$regionInputMode,
-            stackedPercentage = input$stackedPercentage,
-            vcfInputMode = input$vcfInputMode,
+        return(list(
+            legendTextSize = input$legendTextSize,
+            xAxisAngle = input$xAxisAngle,
+            xAxisSize = input$xAxisSize,
             xAxisHjust = input$xAxisHjust,
             xAxisVjust = input$xAxisVjust,
-            xAxisAngle = input$xAxisAngle,
-            xAxisSize = input$xAxisSize
-        )
+            refGenotypes = input$refGenotypes,
+            hetGenotypes = input$hetGenotypes,
+            altGenotypes = input$altGenotypes,
+            yieldSize = input$yieldSize,
+            bpCores = input$bpCores,
+            bpCores = input$bpCores,
+            bpType = input$bpType
+        ))
     })
 
     output$sessionInfo <- renderPrint({
@@ -198,9 +590,9 @@ shinyServer(function(input, output, clientData, session) {
 
     # VCF folder  ----
 
-    # List of files detected
+    # Full content of selected folder
     vcfContent <- reactive({
-
+        # Depends on: vcfFolder
         validate(need(input$vcfFolder, label = Msgs[["vcfFolder"]]))
 
         validate(need(
@@ -210,9 +602,9 @@ shinyServer(function(input, output, clientData, session) {
         list.files(path = input$vcfFolder)
     })
 
-    # Easier to read for user
+    # Display full content of selected folder
     output$vcfContent <- DT::renderDataTable({
-
+        # Depends on vcfContent
         vcfContent <- vcfContent()
 
         validate(need(vcfContent, Msgs[["vcfContent"]]))
@@ -224,6 +616,7 @@ shinyServer(function(input, output, clientData, session) {
 
     ## List VCF files detected
     vcfFiles <- reactive({
+        # Depends on vcfContent, vcfPattern
 
         vcfContent <- vcfContent()
 
@@ -275,216 +668,25 @@ shinyServer(function(input, output, clientData, session) {
         ))
     })
 
-    # BED file import ----
-
-    bedFile <- reactive({
-
-        validate(need(input$selectVcf, Msgs[["selectBed"]]))
-
-        selected <- tryCatch(
-            file.choose(),
-            error = function(err){
-                warning(geterrmessage())
-            })
-
-        # Catch the error message if user cancelled file seletion pop-up
-        validate(need(
-            !grepl(pattern = selected, x = Msgs[["fileChooseCancelled"]]),
-            Msgs[["fileChooseCancelled"]]))
-
-        selected
-    })
-
-    # Import BED records, format as GRanges
-    bedRecords <- reactive({
-
-        switch (input$regionInputMode,
-                bed = {
-                    validate(need(input$bedFile, label = Msgs[["bedFile"]]))
-
-                    message("Importing BED records ...")
-                    rawData <- tryParseBed(input$bedFile$datapath)
-                },
-                ucsc = {
-
-                    validate(need(
-                        input$ucscRegions,
-                        label = Msgs[["ucscRegions"]]))
-                    inputTrimmed <- gsub(
-                        pattern = "chr|,| ",
-                        replacement = "",
-                        x = input$ucscRegions)
-
-                    validate(need(
-                        grepl(
-                            pattern =
-                                "([[:alnum:]]*:[[:digit:]]*-[[:digit:]]*;?)",
-                            x = inputTrimmed),
-                        label = Msgs[["ucscRegions"]]))
-                    rawData <- tryCatch({
-                        inputSplit <- strsplit(
-                            x = inputTrimmed, split = ";")[[1]]
-
-                        chrs <- as.numeric(gsub(
-                            pattern =
-                                "([[:alnum:]]*):[[:digit:]]*-[[:digit:]]*",
-                            replacement = "\\1",
-                            x = inputSplit))
-
-                        starts <- as.numeric(gsub(
-                            pattern =
-                                "[[:alnum:]]*:([[:digit:]]*)-[[:digit:]]*",
-                            replacement = "\\1",
-                            x = inputSplit))
-
-                        ends <- as.numeric(gsub(
-                            pattern =
-                                "[[:alnum:]]*:[[:digit:]]*-([[:digit:]]*)",
-                            replacement = "\\1",
-                            x = inputSplit))
-
-                        data.frame(V1 = chrs, V2 = starts, V3 = ends)
-                    },
-                    error = function(err){
-                        warning(geterrmessage())
-                        return(NULL)}
-                    ,
-                    warning = function(warn){
-                        warning(warn)
-                        return(NULL)
-                    })
-                },
-                EnsDb = {
-                    validate(need(
-                        input$ensDb.values,
-                        label = Msgs[["ensDb.values"]]))
-
-                    edb <- selectedPackage()
-
-                    ensDbFilter = EnsDbFilter(
-                        type = input$ensDb.type,
-                        condition = input$ensDb.condition,
-                        value = input$ensDb.values)
-
-                    validate(need(ensDbFilter, Msgs[["ensDbFilter"]]))
-
-                    rawData <- genes(
-                        edb,
-                        filter = ensDbFilter,
-                        return.type = "GRanges")
-                }
-        )
-
-        validate(need(
-            class(rawData) %in% c("data.frame", "GRanges"),
-            "Invalid input"))
-
-        switch (class(rawData),
-                data.frame = {
-                    # Test the number of columns before trying to access them
-                    validate(need(
-                        all(dim(rawData) >= c(1, 3)),
-                        "BED file must have at least 1 row and 3 columns"))
-                    validate(
-                        need(
-                            all(
-                                rawData[,1] %in%
-                                    seqlevels(EnsDb.Hsapiens.v75)),
-                            "First column contains invalid chromosomes"),
-                        need(
-                            is.numeric(rawData[,2]),
-                            "Second column is not numeric"),
-                        need(
-                            is.numeric(rawData[,3]),
-                            "Third column is not numeric"))
-
-                    return(
-                        GRanges(
-                            seqnames = rawData[,1],
-                            ranges = IRanges(
-                                start = rawData[,2],
-                                end = rawData[,3]))
-                    )
-                },
-                GRanges = {
-                    validate(need(
-                        length(rawData) > 0,
-                        "At least one region must be specified"
-                    ))
-
-                    return(rawData)
-                }
-        )
-    })
-
-    # How many BED records detected, show first one.
-    output$bedFileSummary <- renderUI({
-
-        bedRecords <- bedRecords()
-
-        validate(need(bedRecords, Msgs[["bedRecords"]]))
-
-        HTML(paste(
-            length(bedRecords),
-            "BED record(s) detected.</br>",
-            "[",
-            as.character(head(x = seqnames(bedRecords), n = 1)),
-            ":",
-            as.character(head(x = start(bedRecords), n = 1)),
-            "-",
-            as.character(head(x = end(bedRecords), n = 1)),
-            # "{",
-            # as.character(head(x = names(bedRecords), n = 1)),
-            # "}",
-            " , ... ]"
-        ))
-    })
-
-    # Show BED records
-    output$bedStructure <- renderPrint({
-
-        bedRecords <- bedRecords()
-
-        validate(need(bedRecords, Msgs[["bedRecords"]]))
-
-        str(bedRecords)
-    })
-
-    output$bedSample <- DT::renderDataTable({
-
-        bedRecords <- bedRecords()
-
-        validate(need(bedRecords, Msgs[["bedRecords"]]))
-
-        DT::datatable(
-            data = as.data.frame(bedRecords),
-            options = list(
-                pageLength = 10,
-                searching = TRUE),
-            filter = "top")
-    })
-
     # Select single VCF ----
 
     singleVcf <- reactive({
 
-        validate(need(input$selectVcf, Msgs[["selectVcf"]]))
-
-        selected <- tryCatch(
-            file.choose(),
-            error = function(err){
-                warning(geterrmessage())
-            })
-
-        # Catch the error message if user cancelled file seletion pop-up
-        validate(need(
-            !grepl(pattern = selected, x = Msgs[["fileChooseCancelled"]]),
-            Msgs[["fileChooseCancelled"]]))
+        if (input$selectVcf > 0){
+            selected <- tryCatch(
+                file.choose(),
+                error = function(err){
+                    warning(geterrmessage())
+                    return(NULL)
+                })
+        } else {
+            return(NULL)
+        }
 
         validate(
             need(
                 grepl(
-                    pattern = ".*\\.vcf\\.gz$",
+                    pattern = ".*\\.vcf(\\.gz)?$",
                     x = selected,
                     ignore.case = TRUE),
                 "File is not *.vcf.gz"))
@@ -493,9 +695,9 @@ shinyServer(function(input, output, clientData, session) {
         validate(
             need(
                 file.exists(tbiChrVcf),
-                sprintf("Tabixed VCF file not found: %s", tbiChrVcf)))
+                sprintf("Tabix index file does not exist: %s", tbiChrVcf)))
 
-        selected
+        return(selected)
     })
 
     output$selectedVcf <- renderText({
@@ -508,6 +710,219 @@ shinyServer(function(input, output, clientData, session) {
     })
 
     # Import VCF information ----
+
+    observeEvent(input$importVariants, {
+
+        updateActionButton(
+            session, "importVariants",
+            label = "Refresh variants", icon = icon("refresh"))
+
+    })
+
+    # Import Vcf object
+    vcf <- reactive({
+
+        # Only proceed if the variants should be refreshed
+        validate(need(
+            input$importVariants > 0,
+            Msgs[["importVariants"]]))
+
+        isolate({
+            vcfInputMode <- input$vcfInputMode
+            genomicRanges <- genomicRanges()
+            tparam <- tparam()
+            vepKey <- input$vepKey
+            genomeSeqinfo <- genomeSeqinfo()
+            yieldSize <- input$yieldSize
+
+            if (is.null(phenoFile())) {
+                phenotypes <- DataFrame()
+            } else {
+                phenotypes <- phenotypes()
+            }
+        })
+
+        validate(
+            need(vepKey, label = Msgs[["vepKey"]]),
+            need(genomeSeqinfo, Msgs[["genomeSeqinfo"]])
+        )
+
+        shiny::withProgress(
+            min = 0, max = 3, value = 1,
+            message = "Progress", detail = Tracking[["preprocessing"]],
+            {
+
+                # TODO: let user choose fixed/info/format keys to import
+                # for speed and memory
+                svp <- ScanVcfParam()
+
+                # Only import samples with phenotype information
+                if (nrow(phenotypes) > 0)
+                    vcfSamples(svp) <- rownames(phenotypes)
+
+                # Only import variants in targeted regions
+                if (length(genomicRanges) > 0)
+                    vcfWhich(svp) <- reduce(genomicRanges) # optimise import
+
+                # # Timing
+                # t1 <- Sys.time()
+
+                switch (
+                    vcfInputMode,
+                    SingleVcf = {
+
+                        isolate({singleVcf <- singleVcf()})
+                        validate(need(singleVcf, Msgs[["singleVcf"]]))
+
+                        shiny::incProgress(1, detail = Tracking[["singleVcf"]])
+
+                        vcf <- tryParseSingleVcf(
+                            file = singleVcf,
+                            svp = svp,
+                            yieldSize = yieldSize)
+                    },
+
+                    OnePerChr = {
+
+                        shiny::incProgress(1, detail = Tracking[["multiVcfs"]])
+
+                        isolate({
+                            vcfFolder <- input$vcfFolder
+                            vcfPattern <- input$vcfPattern
+                        })
+                        validate(need(singleVcf, Msgs[["singleVcf"]]))
+
+                        vcf <- tryParseMultipleVcf(
+                            folder = vcfFolder,
+                            pattern = vcfPattern,
+                            svp = svp,
+                            yieldSize = yieldSize,
+                            BPPARAM = bp(tparam))
+                    }
+                )
+
+                shiny::incProgress(1, detail = Tracking[["postprocessing"]])
+
+                validate(need(
+                    length(vcf) > 0,
+                    "No variant found in BED region(s)"))
+
+                if (nrow(phenotypes) == 0)
+                    phenotypes <- DataFrame(row.names = colnames(vcf))
+                SummarizedExperiment::colData(vcf) <- phenotypes
+            })
+
+        return(vcf)
+    })
+
+    output$vcfSummary <- renderUI({
+
+        vcf <- vcf()
+
+        # validate(need(vcf, "vcf"))
+
+        HTML(paste(
+            nrow(vcf),
+            "bi-allelic records and",
+            ncol(colData(vcf)),
+            "phenotypes in",
+            ncol(vcf),
+            "samples imported"
+        ))
+    })
+
+    output$vcfCols <- renderUI({
+
+        vcf <- vcf()
+
+        # validate(need(vcf, label = Msgs[["vcf"]]))
+
+        colChoices <- c(colnames(mcols(vcf)))
+
+        selectInput(
+            "vcfCols", "Meta-columns",
+            choices = colChoices,
+            selected = c(colChoices[1:min(4, length(colChoices))]),
+            multiple = TRUE
+        )
+    })
+
+    output$vcfRowRanges <- DT::renderDataTable({
+
+        vcf <- vcf()
+
+        # Give time to initialise widget
+        req(input$vcfCols)
+
+        cols <- which(colnames(mcols(vcf)) %in% input$vcfCols)
+
+        displayedTable <- cbind(
+            rownames = rownames(vcf),
+            as.data.frame(rowRanges(vcf)[, cols], row.names = NULL)
+        )
+
+        DT::datatable(
+            data = displayedTable,
+            options = list(
+                pageLength = 10,
+                searching = TRUE),
+            filter = "top")
+    })
+
+    output$vcfInfoCols <- renderUI({
+
+        vcf <- vcf()
+
+        # validate(need(vcf, label = Msgs[["vcf"]]))
+
+        # All columns except the VEP predictions
+        colChoices <- grep(
+            pattern = input$vepKey,
+            x = colnames(info(vcf)),
+            invert = TRUE,
+            value = TRUE)
+
+        selectInput(
+            "vcfInfoCols", "Meta-columns",
+            choices = colChoices,
+            selected = colChoices[1:min(5, length(colChoices))],
+            multiple = TRUE
+        )
+    })
+
+    output$vcfInfo <- DT::renderDataTable({
+
+        vcf <- vcf()
+
+        validate(need(
+            length(input$vcfInfoCols) > 0,
+            "No INFO key selected."
+        ))
+
+        cols <- which(colnames(info(vcf)) %in% input$vcfInfoCols)
+
+        DT::datatable(
+            data = as.data.frame(info(vcf)[, cols]),
+            options = list(
+                pageLength = 10,
+                searching = TRUE),
+            filter = "top")
+    })
+
+    output$vcf <- renderPrint({
+
+        vcf <- vcf()
+
+        validate(need(vcf, Msgs[["vcf"]]))
+
+        vcf
+    })
+
+    # Filter variants post-import ----
+
+    # TODO
+
+    # Filter variants ----
 
     mafRange <- reactive({
 
@@ -539,257 +954,6 @@ shinyServer(function(input, output, clientData, session) {
             " ]"
         ))
     })
-
-    # Import Vcf object
-    vcf <- reactive({
-
-        bedRecords <- bedRecords()
-        validate(need(bedRecords, Msgs[["bedRecords"]]))
-
-        # Only proceed if the variants should be refreshed
-        validate(need(
-            input$refreshVariants == "Active",
-            Msgs[["refreshVariants"]]))
-
-        if (all(mafRange() == c(0, 1))){
-            mafRange <- NULL
-        } else {
-            mafRange <- mafRange()
-        }
-
-        withProgress(
-            min = 0, max = 3, value = 0, message = "Progress", {
-
-                isolate({bpParam <- bpParam()})
-
-                csqField <- input$csqField
-                genomeSeqinfo <- genomeSeqinfo()
-                validate(
-                    need(csqField, label = Msgs[["csqField"]]),
-                    need(genomeSeqinfo, Msgs[["genomeSeqinfo"]])
-                )
-
-                incProgress(1, detail = Tracking[["checkPhenotypes"]])
-                if (is.null(input$phenoFile)) {
-                    phenotypes <- DataFrame()
-                } else {
-                    phenotypes <- phenotypes()
-                }
-                # Timing
-                t1 <- Sys.time()
-
-                switch (
-                    input$vcfInputMode,
-                    SingleVcf = {
-
-                        singleVcf <- singleVcf()
-                        validate(need(singleVcf, Msgs[["singleVcf"]]))
-                        incProgress(2, detail = Tracking[["singleVcf"]])
-
-                        vcf <- preprocessVariants(
-                            file = TabixFile(file = singleVcf),
-                            regions = bedRecords,
-                            param = tParam(),
-                            phenos = phenotypes)
-                    },
-                    OnePerChr = {
-                        bedChrs <- levels(seqnames(bedRecords))
-                        vcfFiles <- vcfFiles()
-
-                        validate(
-                            need(bedChrs, Msgs[["bedChrs"]]),
-                            need(
-                                input$vcfPattern,
-                                label = Msgs[["vcfPattern"]]))
-                        validate(need(
-                            grepl(pattern = "%s", x = input$vcfPattern),
-                            "VCF file pattern must contain \"%s\""
-                        ))
-
-                        incProgress(1, detail = Tracking[["multiPaths"]])
-                        vcfPaths <- tryCatch(
-                            sapply(
-                                X = bedChrs,
-                                FUN = chr2file,
-                                pattern = input$vcfPattern,
-                                folder = input$vcfFolder),
-                            error = function(err){
-                                warning(geterrmessage())
-                                return(NULL)
-                            },
-                            warning = function(warn){
-                                warning(warn)
-                                return(NULL)
-                            })
-
-                        validate(need(vcfPaths, Msgs[["vcfPaths"]]))
-
-                        # Wrap in tryCatch if not tabixed
-                        tfl <- tryCatch({TabixFileList(vcfPaths)},
-                                        error = function(err){
-                                            warning(geterrmessage())
-                                            return(NULL)
-                                        },
-                                        warning = function(warn){
-                                            warning(warn)
-                                            return(NULL)
-                                        })
-
-                        if (length(bedChrs) == 1){
-                            incProgress(2, detail = Tracking[["singleVcf"]])
-
-                            vcf <- preprocessVariants(
-                                file = tfl[[1]],
-                                regions = bedRecords,
-                                param = tParam(),
-                                phenos = phenotypes)
-
-                        } else {
-                            incProgress(1, detail = Tracking[["multiVcfs"]])
-                            vcfs <- tryCatch({
-                                bpmapply(
-                                    FUN = preprocessVariants,
-                                    chr = bedChrs,
-                                    file = tfl,
-                                    MoreArgs = list(
-                                        regions = bedRecords,
-                                        param = tParam(),
-                                        phenos = phenotypes),
-                                    BPPARAM = bpParam)
-                            },
-                            error = function(err){
-                                warning(geterrmessage())
-                                return(NULL)
-                            },
-                            warning = function(warn){
-                                warning(warn)
-                                return(NULL)
-                            })
-                            validate(need(vcfs, Msgs[["vcfs"]]))
-                            incProgress(1, detail = Tracking[["mergeVcfs"]])
-                            vcf <- do.call(rbind, vcfs)
-                        }
-
-                    }
-                )
-
-                validate(need(vcf, Msgs[["vcf"]]))
-
-                validate(need(
-                    length(vcf) > 0,
-                    "No variant found in BED region(s)"))
-            })
-        t2 <- Sys.time()
-        dt <- t2 - t1
-        message(sprintf(
-            "%i variants from %i region(s) imported in %.2f %s",
-            length(vcf),
-            length(bedRecords),
-            as.numeric(dt),
-            units(dt)))
-
-        vcf
-    })
-
-    output$vcfCols <- renderUI({
-
-        vcf <- vcf()
-
-        validate(need(vcf, label = Msgs[["vcf"]]))
-
-        colChoices <- c(colnames(mcols(vcf)))
-
-        selectInput(
-            "vcfCols", "Meta-columns",
-            choices = colChoices,
-            selected = c(colChoices[1:min(4, length(colChoices))]),
-            multiple = TRUE
-        )
-    })
-
-    output$vcfRowRanges <- DT::renderDataTable({
-
-        vcf <- vcf()
-
-        req(vcf, input$vcfCols)
-
-        cols <- which(colnames(mcols(vcf)) %in% input$vcfCols)
-
-        DT::datatable(
-            data = as.data.frame(rowRanges(vcf)[, cols]),
-            options = list(
-                pageLength = 10,
-                searching = TRUE),
-            filter = "top")
-    })
-
-    output$vcfInfoCols <- renderUI({
-
-        vcf <- vcf()
-
-        validate(need(vcf, label = Msgs[["vcf"]]))
-
-        # All columns except the VEP predictions
-        colChoices <- grep(
-            pattern = input$csqField,
-            x = colnames(info(vcf)),
-            invert = TRUE,
-            value = TRUE)
-
-        selectInput(
-            "vcfInfoCols", "Meta-columns",
-            choices = colChoices,
-            selected = colChoices[1:min(5, length(colChoices))],
-            multiple = TRUE
-        )
-    })
-
-    output$vcfInfo <- DT::renderDataTable({
-
-        vcf <- vcf()
-
-        validate(need(
-            length(input$vcfInfoCols) > 0,
-            "No data to show"
-        ))
-
-        cols <- which(colnames(info(vcf)) %in% input$vcfInfoCols)
-
-        DT::datatable(
-            data = as.data.frame(info(vcf)[, cols]),
-            options = list(
-                pageLength = 10,
-                searching = TRUE),
-            filter = "top")
-    })
-
-    output$vcf <- renderPrint({
-
-        vcf <- vcf()
-
-        validate(need(vcf, Msgs[["vcf"]]))
-
-        vcf
-    })
-
-    observeEvent(input$vcfInputMode, {
-
-        validate(need(input$bedFile, label = Msgs[["bedFile"]]))
-
-        updateTabsetPanel(session, "tabset.settings", selected = "BED")
-        updateTabsetPanel(session, "tabset.bed", selected = "Sample")
-    })
-
-    # Filter variants post-import ----
-
-    # TODO" at the moment variants are still filtered during import
-    # vcfFilters <- reactive({
-    #
-    #     .vcfFilters(
-    #         mafMin = input$maf.min,
-    #         mafMax = input$maf.max)
-    #
-    # })
 
     # Parse genotypes ----
 
@@ -986,63 +1150,56 @@ shinyServer(function(input, output, clientData, session) {
     # Parse VEP predictions ----
 
     # Show information about consequence field
-    output$csqStructure <- renderPrint({
+    output$vepStructure <- renderPrint({
 
         vcf <- vcf()
 
         validate(
             need(vcf, Msgs[["vcf"]]),
-            need(input$csqField, label = Msgs[["csqField"]]))
+            need(input$vepKey, label = Msgs[["vepKey"]]))
 
-        csq <- tryParseCsq(vcf = vcf, csqField = input$csqField)
+        csq <- tryParseCsq(vcf = vcf, vepKey = input$vepKey)
 
         validate(need(csq, Msgs[["csq"]]))
 
         str(csq)
     })
 
-    output$csqCols <- renderUI({
+    output$vepCols <- renderUI({
 
         vcf <- vcf()
 
         validate(
             need(vcf, Msgs[["vcf"]]),
-            need(input$csqField, Msgs[["csqField"]]))
+            need(input$vepKey, Msgs[["vepKey"]]))
 
-        csq <- tryParseCsq(vcf = vcf, csqField = input$csqField)
+        csq <- tryParseCsq(vcf = vcf, vepKey = input$vepKey)
 
-        validate(need(csq, Msgs[["csq"]]))
-
-        csqMcols <- mcols(csq)
-
-        validate(need(csqMcols, Msgs[["csqMcols"]]))
+        vepMcols <- mcols(csq)
 
         selectInput(
-            "csqCols", "Meta-columns",
-            choices = colnames(csqMcols),
-            selected = colnames(csqMcols)[1:5],
+            "vepCols", "Meta-columns",
+            choices = colnames(vepMcols),
+            selected = colnames(vepMcols)[1:5],
             multiple = TRUE)
     })
 
-    output$csqSample <- DT::renderDataTable({
+    output$vepSample <- DT::renderDataTable({
 
-        req(input$csqCols)
+        req(input$vepCols)
 
         vcf <- vcf()
 
         validate(
             need(vcf, Msgs[["vcf"]]),
-            need(input$csqField, Msgs[["csqField"]]))
+            need(input$vepKey, Msgs[["vepKey"]])
+            )
 
-        csq <- tryParseCsq(vcf = vcf, csqField = input$csqField)
+        csq <- tryParseCsq(vcf = vcf, vepKey = input$vepKey)
 
-        validate(need(csq, Msgs[["csq"]]))
+        vepMcols <- mcols(csq)
 
-        csqMcols <- mcols(csq)
-
-        validate(need(csqMcols, Msgs[["csqMcols"]]))
-
-        cols <- which(colnames(csqMcols) %in% input$csqCols)
+        cols <- which(colnames(vepMcols) %in% input$vepCols)
 
         DT::datatable(
             cbind(
@@ -1065,237 +1222,47 @@ shinyServer(function(input, output, clientData, session) {
 
         validate(
             need(vcf, Msgs[["vcf"]]),
-            need(input$csqField, label = Msgs[["csqField"]]))
+            need(input$vepKey, label = Msgs[["vepKey"]]))
 
-        csq <- tryParseCsq(vcf = vcf, csqField = input$csqField)
+        csq <- tryParseCsq(vcf = vcf, vepKey = input$vepKey)
 
         validate(need(csq, Msgs[["csq"]]))
 
-        csqMcols <- mcols(csq)
+        vepMcols <- mcols(csq)
 
-        csq.choices <- colnames(csqMcols)
+        vepFacetKey.choices <- colnames(vepMcols)
 
-        csq.default <- max(
+        # Initialise by order of preference if present:
+        # Consequence > Impact > First field
+        idx.default <- max(
             1,
-            head(
-                x = match(c("consequence","impact"), tolower(csq.choices)),
-                n = 1),
-            na.rm = TRUE)
+            head(x = na.omit(
+                match(
+                    x = c("consequence","impact"),
+                    table = tolower(vepFacetKey.choices)),
+                n = 1))
+            )
 
         updateSelectInput(
-            session, "variantCsq",
-            choices = csq.choices,
-            selected = csq.choices[csq.default])
+            session, "vepAnalysed",
+            choices = vepFacetKey.choices,
+            selected = vepFacetKey.choices[idx.default])
 
-        facet.choices <- c("None", csq.choices)
-
-        updateSelectInput(
-            session, "facet",
-            choices = facet.choices)
-    })
-
-    # Import phenotype information ----
-
-    phenotypes <- reactive({
-
-        validate(need(input$phenoFile, Msgs[["phenoFile"]]))
-
-        message("Importing phenotypes ...")
-
-        rawData <- read.table(
-            file = input$phenoFile$datapath,
-            header = TRUE, row.names = 1)
-
-        validate(need(
-            all(dim(rawData) > c(0, 0)),
-            paste(
-                "Phenotype file must have at least 1 row and 1 column",
-                "with colnames and rownames")))
-
-        DataFrame(rawData)
-    })
-
-    output$phenoCols <- renderUI({
-
-        phenos <- phenotypes()
-
-        validate(need(
-            nrow(phenos) > 0,
-            "No phenotype information")
-        )
-
-        selectInput(
-            "phenoCols", "Phenotypes",
-            choices = colnames(phenos),
-            selected = colnames(phenos)[1:5],
-            multiple = TRUE
-        )
-    })
-
-    # When phenotypes are updated, update the choices for plotting
-    observeEvent(vcf(), {
-
-        pheno.choices <- c("None", colnames(phenotypes()))
-
-        # If new phenotype files also contains the current phenotype,
-        # keep it active instead of resetting to the first choice
-        pheno.selected <- pheno.choices[
-            max(1, which(pheno.choices == input$phenotype))]
+        vepFacetKey.choices <- c("None", vepFacetKey.choices)
 
         updateSelectInput(
-            session, "phenotype",
-            choices = pheno.choices,
-            selected = pheno.selected)
-    })
-
-    output$phenoFileSummary <- renderUI({
-
-        phenos <- phenotypes()
-
-        validate(need(phenos, "phenos"))
-
-        HTML(paste(
-            ncol(phenos),
-            "phenotypes in",
-            nrow(phenos),
-            "samples detected."
-        ))
-    })
-
-    output$phenotypeStructure <- renderPrint({
-
-        phenos <- phenotypes()
-
-        validate(need(phenos, Msgs[["phenos"]]))
-
-        str(phenos)
-    })
-
-    output$phenotypesSample <- DT::renderDataTable({
-
-        req(input$phenoCols)
-
-        phenos <- phenotypes()
-
-        # req gives time to update data when new phenotype file provided
-        validate(need(phenos, Msgs[["phenos"]]))
-
-        req(all(input$phenoCols %in% colnames(phenos)))
-
-        DT::datatable(
-            as.data.frame(phenos[,input$phenoCols, drop = FALSE]),
-            options = list(
-                pageLength = 10,
-                searching = TRUE),
-            filter = "top")
+            session, "vepFacetKey",
+            choices = vepFacetKey.choices)
     })
 
     # Summarise consequences ----
 
-    csqTable <- reactive({
+    # Phenotype to summarise VEP: or NULL if "None"
+    varVepPlotPheno <- reactive({
 
-        vcf <- vcf()
-
-        validate(
-            need(vcf, Msgs[["vcf"]]),
-            need(input$csqField, label = Msgs[["csqField"]]),
-            need(input$variantCsq, label = Msgs[["variantCsq"]]),
-            need(input$facet, label = Msgs[["facet"]]))
-
-        if (input$facet != "None"){
-            req(input$csqFacets) # Give time to observeEvent
-            validate(need(
-                length(input$csqFacets) > 0,
-                "The plot must contain at least one facet"))
-        }
-
-        csq <- tryParseCsq(vcf = vcf, csqField = input$csqField)
-
-        validate(need(csq, Msgs[["csq"]]))
-
-        csqMcols <- mcols(csq)
-
-        validate(need(csqMcols, Msgs[["csqMcols"]]))
-
-        if (input$facet == "None"){
-            facet <- NULL
-        } else {
-            facet <- input$facet
-        }
-
-        # If no Phenotype file given or None are explicitely required
-        if (is.null(input$phenoFile) || input$phenotype == "None"){
-            message("Summarising predictions across all samples...")
-            # Note that facet may have been updated to NULL above
-            rawTable <- data.frame(
-                Prediction = csqMcols[,input$variantCsq],
-                facet = csqMcols[,facet],
-                Phenotype = "All")
-            # Do not rely on position as facet column is absent if NULL
-            colnames(rawTable) <- gsub(
-                "Prediction", input$variantCsq, colnames(rawTable))
-            colnames(rawTable) <- gsub(
-                "facet", input$facet, colnames(rawTable))
-        }
-        # If Phenotype file given AND one phenotype is selected
-        else {
-            message("Summarising prediction by phenotype: ", input$phenotype)
-            rawTable <- tabulateCsqByPhenotype(
-                vcf = vcf,
-                phenoCol = input$phenotype,
-                csqCol = input$variantCsq,
-                param = tParam(),
-                unique = input$csqPhenoUnique,
-                facet = facet,
-                plot = FALSE,
-                percentage = FALSE
-            )
-        }
-
-        if (input$facet != "None"){
-            rawTable <- rawTable[rawTable[,input$facet] %in% input$csqFacets,]
-            rawTable <- droplevels(rawTable)
-        }
-
-        validate(need(
-            nrow(rawTable) > 0,
-            "No data to show"))
-
-        rawTable
-    })
-
-    output$csqTableDecreasing <- DT::renderDataTable({
-
-        csqTable <- csqTable()
-
-        validate(need(csqTable, label = Msgs[["csqTable"]]))
-
-        csqTableTable <- as.data.frame(table(csqTable))
-
-        validate(need(csqTableTable, Msgs[["csqTableTable"]]))
-
-        csqTableTableDecreasing <- csqTableTable[
-            order(csqTableTable[,"Freq"], decreasing = TRUE),]
-
-        validate(need(
-            csqTableTableDecreasing,
-            Msgs[["csqTableTableDecreasing"]]))
-
-        DT::datatable(
-            csqTableTableDecreasing,
-            options = list(
-                pageLength = 20,
-                searching = TRUE),
-            filter = "top",
-            rownames = FALSE)
-    })
-
-    # Used by 2+ reactives, might as well have as a small reactive
-    varCsqPlotPheno <- reactive({
-
-        phenotype <- input$phenotype
-
-        validate(need(phenotype, label = Msgs[["phenotype"]]))
+        phenotype <- input$phenoAnalysed
+        # Give time to initialise the widget
+        req(phenotype)
 
         if (phenotype == "None"){
             return("Phenotype")
@@ -1304,128 +1271,164 @@ shinyServer(function(input, output, clientData, session) {
         }
     })
 
-    # Update list of facets if the faceting variable changes
-    observeEvent(input$facet, {
+    # Base of the ggplot summarising counts of VEP
+    vepTabulated <- reactive({
 
-        vcf <- vcf()
-
-        validate(
-            need(vcf, Msgs[["vcf"]]),
-            need(input$csqField, label = Msgs[["csqField"]]))
-
-        csq <- tryParseCsq(vcf = vcf, csqField = input$csqField)
-
-        validate(need(csq, Msgs[["csq"]]))
-
-        csqMcols <- mcols(csq)
-
-        if (input$facet != "None"){
-            facet.choices <- unique(csqMcols[,input$facet])
-        } else {
-            facet.choices <- c()
-        }
-
-            updateSelectInput(
-            session, "csqFacets",
-            choices = facet.choices,
-            selected = facet.choices)
-    })
-
-    # Plot consequence barplot ----
-
-    # Stacked bars classifying consequence of variants
-    output$variantsCsqBarplot <- renderPlot({
-        withProgress(min = 0, max = 3, message = "Progress", {
+        withProgress(min = 0, max = 2, message = "Progress", {
             incProgress(1, detail = Tracking[["calculate"]])
 
-            csqTable <- csqTable()
-            varCsqPlotPheno <- varCsqPlotPheno()
+            if (input$vepFacetKey != "None"){
+                req(input$vepFacets) # Give time to observeEvent
+                validate(need(
+                    length(input$vepFacets) > 0,
+                    "The plot must contain at least one facet"))
+            }
 
+            if (input$vepFacetKey == "None"){
+                vepFacetKey <- NULL
+            } else {
+                vepFacetKey <- input$vepFacetKey
+            }
+
+            vcf <- vcf()
+
+            if (input$phenoAnalysed == "None"){
+                colData(vcf)[,"Phenotype"] <- factor("All")
+                plotPhenotype <- "Phenotype"
+            } else {
+                plotPhenotype <- input$phenoAnalysed
+            }
+
+            varVepPlotPheno <- varVepPlotPheno()
+
+            # Give time to initialise the widgets
+
+            # req() causes hanging below
+            # Instead validate allows widgets to be initialised
             validate(
-                need(csqTable, Msgs[["csqTable"]]),
-                need(varCsqPlotPheno, Msgs[["varCsqPlotPheno"]]),
-                need(
-                    input$variantCsq != "",
-                    label = Msgs[["variantCsq"]]),
-                need(input$facet, label = Msgs[["facet"]]),
-                need(input$legendText, label = Msgs[["legendText"]]),
-                need(input$xAxisAngle, label = Msgs[["xAxisAngle"]]),
-                need(input$xAxisHjust, label = Msgs[["xAxisHjust"]]),
-                need(input$xAxisVjust, label = Msgs[["xAxisVjust"]]),
-                need(input$xAxisSize, label = Msgs[["xAxisSize"]]),
-                need(
-                    is.logical(input$stackedPercentage),
-                    label = Msgs[["stackedPercentage"]]))
+                need(input$vepAnalysed, Msgs[["vepAnalysed"]]),
+                need(input$vepFacetKey, Msgs[["vepFacetKey"]]),
+                need(input$legendTextSize, Msgs[["legendTextSize"]]),
+                need(input$xAxisAngle, Msgs[["xAxisAngle"]]),
+                need(input$xAxisHjust, Msgs[["xAxisHjust"]]),
+                need(input$xAxisVjust, Msgs[["xAxisVjust"]]),
+                need(input$xAxisSize, Msgs[["xAxisSize"]]),
+                need(input$stackedPercentage, Msgs[["stackedPercentage"]])
+                )
 
             incProgress(1, detail = Tracking[["ggplot"]])
 
-            gg <- ggplot(
-                data = csqTable,
-                mapping = aes_string(
-                    x = varCsqPlotPheno,
-                    fill = input$variantCsq)) +
+            gg <- tabulateVepByPhenotype(
+                vcf = vcf,
+                phenoCol = plotPhenotype,
+                vepCol = input$vepAnalysed,
+                param = tparam(),
+                unique = input$unique2pheno,
+                facet = vepFacetKey,
+                plot = TRUE,
+                percentage = input$stackedPercentage
+            )
+
+            if (input$vepFacetKey != "None"){
+                gg$data <- gg$data[
+                    gg$data[,input$vepFacetKey] %in% input$vepFacets,]
+                gg$data <- droplevels(gg$data)
+            }
+
+            return(gg)
+        })
+
+    })
+
+    # Stacked bars classifying consequence of variants
+    output$vepCountBarplot <- renderPlot({
+        withProgress(min = 0, max = 2, message = "Progress", {
+            incProgress(1, detail = Tracking[["calculate"]])
+
+            gg <- vepTabulated()
+
+            message("Plotting predictions...")
+            incProgress(1, detail = Tracking[["render"]])
+
+            gg <- gg +
                 theme(
                     axis.text = element_text(size = rel(1.5)),
                     axis.title = element_text(size = rel(1.5)),
-                    legend.text = element_text(size = rel(input$legendText)),
-                    legend.title = element_text(size = rel(input$legendText)),
+                    legend.text = element_text(size = rel(input$legendTextSize)),
+                    legend.title = element_text(size = rel(input$legendTextSize)),
                     axis.text.x = element_text(
                         angle = input$xAxisAngle,
                         hjust = input$xAxisHjust,
                         vjust = input$xAxisVjust,
                         size = rel(input$xAxisSize))
                 ) +
-                guides(
-                    fill = c("none", "legend")[input$legend + 1]
-                ) +
-                scale_x_discrete(drop = FALSE)
+                guides(fill = c("none", "legend")[input$legend + 1])
 
-            if (input$stackedPercentage){
-                gg <- gg +
-                    geom_bar(position = "fill")
-            } else {
-                gg <- gg + geom_bar()
-            }
-
-            if (input$facet != "None"){
-                gg <- gg + facet_wrap(facets = input$facet)
-            }
-
-            message("Plotting predictions...")
-            incProgress(1, detail = Tracking[["render"]])
-            gg
+            return(gg)
         })
     })
 
-    # Print the count of consequences in the area hovered.
-    output$varCsqCount <- renderUI({
+    vepTableCount <- reactive({
+        # Depeds on: vepTabulated, vepAnalysed
 
-        csqTable <- csqTable()
-        req(csqTable, input$plotVarClass_hover)
+        vepTabulated <- vepTabulated()$data
 
-        hover <- input$plotVarClass_hover
+        vepTable <- as.data.frame(table(vepTabulated))
+
+        return(vepTable)
+    })
+
+    # Table of VEP counts by phenotype level by VEP facet
+    output$vepTableDecreasing <- DT::renderDataTable({
+
+        vepTableCount <- vepTableCount()
+
+        vepTableDecreasing <- arrange(vepTableCount, desc(Freq))
+
+        DT::datatable(
+            vepTableDecreasing,
+            options = list(
+                pageLength = 20,
+                searching = TRUE),
+            filter = "top",
+            rownames = FALSE)
+    })
+
+    # Update list of VEP facets if the faceting variable changes
+    observeEvent(input$vepFacetKey, {
+
+        vcf <- vcf()
 
         validate(
-            need(
-                input$variantCsq != "",
-                label = Msgs[["variantCsq"]]),
-            need(csqTable, label = Msgs[["csqTable"]]))
-        if (input$facet == "None"){
-            csqTableTable <- as.data.frame(table(
-                csqTable[,c(
-                    input$variantCsq,
-                    hover$mapping$x)]))
+            need(vcf, Msgs[["vcf"]]),
+            need(input$vepKey, label = Msgs[["vepKey"]]))
+
+        csq <- tryParseCsq(vcf = vcf, vepKey = input$vepKey)
+
+        validate(need(csq, Msgs[["csq"]]))
+
+        vepMcols <- mcols(csq)
+
+        if (input$vepFacetKey != "None"){
+            vepFacets.choices <- unique(vepMcols[,input$vepFacetKey])
         } else {
-            csqTableTable <- as.data.frame(table(
-                csqTable[,c(
-                    input$variantCsq,
-                    hover$mapping$x,
-                    hover$mapping$panelvar1)]))
+            vepFacets.choices <- c()
         }
 
-        validate(need(csqTableTable, Msgs[["csqTableTable"]]))
+            updateSelectInput(
+            session, "vepFacets",
+            choices = vepFacets.choices,
+            selected = vepFacets.choices)
+    })
 
-        variantCsq <- input$variantCsq
+    # Print the count of consequences in the area hovered.
+    output$varVepCount <- renderUI({
+
+        vepTableCount <- vepTableCount()
+
+        req(vepTableCount, input$plotVarClass_hover)
+        hover <- input$plotVarClass_hover
+        vepAnalysed <- input$vepAnalysed
 
         # If not hovered, show empty values
         if (is.null(hover)){
@@ -1435,20 +1438,20 @@ shinyServer(function(input, output, clientData, session) {
         }
         else{
             # Identify the level of the phenotype (x axis)
-            x_lvls <- levels(csqTableTable[,hover$mapping$x])
+            x_lvls <- levels(vepTableCount[,hover$mapping$x])
             x_lvl <- x_lvls[round(hover$x)]
             # Identify the level of the variant category (y axis)
             filters <- data.frame(
-                pheno = csqTableTable[,hover$mapping$x] == x_lvl
+                pheno = vepTableCount[,hover$mapping$x] == x_lvl
             )
-            if (input$facet != "None"){
-                filters$facet <- csqTableTable[
+            if (input$vepFacetKey != "None"){
+                filters[,vepFacetKey] <- vepTableCount[
                     ,hover$mapping$panelvar1] == hover$panelvar1
             }
 
-            y_lvls <- csqTableTable[
+            y_lvls <- vepTableCount[
                 apply(X = filters, MARGIN = 1, FUN = all),
-                c(variantCsq, "Freq")]
+                c(vepAnalysed, "Freq")]
 
             # If in percentage mode, rescale the values
             if (input$stackedPercentage){
@@ -1465,8 +1468,8 @@ shinyServer(function(input, output, clientData, session) {
                 y_lvls[,"cumsum"] <- cumsum(y_lvls[,"Freq"])
                 y_lvls <- y_lvls[
                     y_lvls[,"cumsum"] >= input$plotVarClass_hover$y,]
-                y_lvl <- as.character(y_lvls[1, variantCsq])
-                countVarLevel <- y_lvls[y_lvls[,variantCsq] == y_lvl, "Freq"]
+                y_lvl <- as.character(y_lvls[1, vepAnalysed])
+                countVarLevel <- y_lvls[y_lvls[,vepAnalysed] == y_lvl, "Freq"]
                 countVarLevel <- ifelse(
                     input$stackedPercentage,
                     yes = sprintf(
@@ -1477,7 +1480,7 @@ shinyServer(function(input, output, clientData, session) {
 
         html1Start <- "<ul>"
         html2Facet <- ifelse(
-            input$facet == "None",
+            input$vepFacetKey == "None",
             yes = "",
             no = sprintf(
                 "<li>%s : <code>%s</code></li>",
@@ -1491,12 +1494,12 @@ shinyServer(function(input, output, clientData, session) {
         )
 
         if(is.null(y_lvl)){
-            html4Csq <- ""
+            html4Vep <- ""
             html5Value <- ""
         } else {
-            html4Csq <- sprintf(
+            html4Vep <- sprintf(
                 "<li>%s : <code>%s</code></li>",
-                variantCsq,
+                vepAnalysed,
                 y_lvl
             )
             html5Value <- ifelse(
@@ -1514,7 +1517,7 @@ shinyServer(function(input, output, clientData, session) {
         html6End <- "</ul>"
 
         HTML(paste(
-            html1Start, html2Facet, html3Pheno, html4Csq, html5Value, html6End,
+            html1Start, html2Facet, html3Pheno, html4Vep, html5Value, html6End,
             sep = ""))
     })
 
@@ -1524,14 +1527,13 @@ shinyServer(function(input, output, clientData, session) {
 
         if (input$doGenoHeatmap == 0)
             return()
-        validate(need(input$doGenoHeatmap > 0, Msgs[["doGenoHeatmap"]]))
 
         # Remove dependency on vcf reactive
         isolate({ vcf <- vcf() })
 
         validate(
             need(vcf, Msgs[["vcf"]]),
-            need(tParam(), label = Msgs[["tParam"]])
+            need(tparam(), label = Msgs[["tparam"]])
         )
 
         withProgress(min = 0, max = 3, message = "Progress", {
@@ -1540,7 +1542,7 @@ shinyServer(function(input, output, clientData, session) {
             genotypes <- geno(vcf)[["GT"]]
             validate(need(genotypes, Msgs[["genotypes"]]))
 
-            validGenotypes <- unlist(genos(tParam()))
+            validGenotypes <- unlist(genos(tparam()))
 
             genos.long <- melt(genotypes, value.name = "Genotype")
 
@@ -1548,7 +1550,7 @@ shinyServer(function(input, output, clientData, session) {
 
             genos.long[,"Genotype"] <- factor(
                 x = genos.long[,"Genotype"],
-                levels = unlist(genos(tParam()))
+                levels = unlist(genos(tparam()))
             )
 
             incProgress(1, detail = Tracking[["ggplot"]])
@@ -1607,20 +1609,30 @@ shinyServer(function(input, output, clientData, session) {
     })
 
     bpParam <- reactive({
+        # Give time to initialise the widget
+        req(input$bpConfig)
 
-        validate(need(input$bpConfig, label = Msgs[["bpConfig"]]))
+        # req() causes hanging below
+        # Instead validate allows widgets to be initialised
+        validate(
+            need(input$bpType, Msgs[["bpType"]]),
+            need(input$bpCores, Msgs[["bpCores"]]))
 
-        switch(
+        return(switch(
             input$bpConfig,
             SerialParam = SerialParam(),
             MulticoreParam = MulticoreParam(workers = input$bpCores),
             SnowParam = SnowParam(
-                workers = input$bpCores, type = input$bpType))
+                workers = input$bpCores, type = input$bpType)
+            ))
     })
 
     # Cleanup routine ----
 
     cancel.onSessionEnded <- session$onSessionEnded(function() {
+        # Reset original options
+        options(originalOptions)
+        # Maybe something more useful in the future
         return(TRUE)
     })
 })

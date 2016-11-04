@@ -7,7 +7,9 @@ stopifnot(
     require(VariantAnnotation),
     require(ensemblVEP),
     require(ggplot2),
-    require(DT)
+    require(DT),
+    require(reshape2),
+    require(dplyr)
 )
 
 message(
@@ -24,9 +26,9 @@ message(
 
 # Alphabetical order (ignoring ^default, ^choices, ^all, ...)
 GS <- list(
-    default.csq = "CSQ",
-    choices.csqCols = c(),
-    default.csqCols = c(),
+    default.vep = "CSQ",
+    choices.vepCols = c(),
+    default.vepCols = c(),
     default.refGenotypes = c("0|0"),
     default.hetGenotypes = c("0|1", "1|0"),
     default.altGenotypes = c("1|1"),
@@ -71,42 +73,27 @@ PS <- list(
 
 # Display settings ----
 
-csqCountHeight <- "500px"
+vepCountHeight <- "500px"
+
+# R session variables -----------------------------------------------------
+
+originalOptions <- options()
+options("width" = 120)
 
 # Messages ----------------------------------------------------------------
 
 # Alphabetical order (ignoring ^default, ^choices, ^all, ...)
 Msgs <- list(
     # Mandatory inputs
-    annotationPackage = "Annotation package",
-    hetGenotypes = "Heterozygote genotype(s)",
-    altGenotypes = "Alternative homozygote genotype(s)",
-    bedFile = "BED file",
-    bedRecords = "Genomic regions must be provided",
-    bpConfig = "BiocParallel configuration",
-    csqCols = "Fields of VEP predictions",
-    csqField = "VEP INFO field",
-    doGenoHeatmap = "Please click the button to generate/update the figure",
-    ensDb.type = "Type of the Ensembl filter",
-    ensDb.condition = "Condition of the Ensembl filter",
-    ensDb.values = "Values for the Ensembl filter",
-    facet = "Faceting VEP field",
-    genoFirstCol = "Index of first column in genotype matrix",
-    genoFirstRow = "Index of first row of genotype matrix",
-    genoNumCols = "Number of columns in genotype matrix",
-    genoNumRows = "Number of rows in genotype matrix",
+    annotationPackage = "An EnsDb annotation package must be selected.",
+    hetGenotypes = "Heterozygote genotype(s) must be defined.",
+    altGenotypes = "Alternative homozygote genotype(s) must be defined.",
+    vepKey = "INFO field of VEP prediction must be defined.",
+    vepFacet = "Faceting VEP field",
     maf.min = "Maximum minor allele frequency",
     maf.min = "Mimimum minor allele frequency",
-    phenoCols = "Phenotype fields",
-    phenotype = "Phenotype field",
-    refGenotypes = "Reference genotype(s)",
-    refreshVariants = "Please refresh variants",
-    selectBed = "Please select BED file using the 'Browse' button.",
-    selectVcf = "Please select VCF file using the 'Browse' button.",
-    stackedPercentage = "Stack percentage?",
-    ucscRegions = "UCSC-type region(s)",
-    variantCsq = "Variant prediction field",
-    vcfCols = "VCF columns",
+    refGenotypes = "Reference genotype(s) must be defined",
+    invalidUcscRegions = "Invalid UCSC-type input.",
     vcfFolder = "VCF folder",
     vcfPattern = "VCF pattern",
     xAxisAngle = "X axis angle",
@@ -115,22 +102,20 @@ Msgs <- list(
     xAxisSize = "X axis font size",
 
     # Optional inputs
-    phenoFile = "A Phenotype file may be provided",
+    importVariants = "Please import/refresh variants",
+    genomicRanges = "No genomic range defined. All variants considered.",
+    phenotypes = "No phenotypes defined. All samples considered.",
+    colDataEmptyOK = "No phenotype information available.",
+    colDataEmptyImport = paste(
+        "Phenotype information imported",
+        "but not attached to VCF.",
+        "Variants must be imported again to attach phenotype information."),
+    singleVcf = "Please select a VCF file",
 
     # Catch warnings/errors
-    vcf = "Impossible to read VCF file. See console.",
-    vcfs = "Impossible to read VCF file. See console.",
+    # vcf = "Impossible to read VCF file. See console.",
 
     # Calculated values (missing are likely bugs)
-    bedChrs = "bedChrs bug?",
-    bpParam = "bpParam bug?",
-    chrVcf = "chrVcf bug?",
-    csq = "csq bug?",
-    csqMcols = "csqMcols bug?",
-    csqTable = "csqTable bug?",
-    csqTableTable = "csqTableTable bug?",
-    csqTableTableDecreasing = "csqTableTableDecreasing bug?",
-    edb = "edb bug?",
     ensDbFilter = "Invalid EnsDb filter",
     genomeSeqinfo = "genomeSeqinfo bug?",
     genoSampleRanges.rows = "genoSampleRanges$rows bug?",
@@ -139,12 +124,10 @@ Msgs <- list(
     legendText = "legendText bug?",
     mafRange = "mafRange bug?",
     phenotypes = "phenotypes bug?",
-    phenos = "phenos bug?",
+    # phenos = "phenos bug?",
     queryGenes = "queryGenes bug?",
-    singleVcf = "singleVcf bug?",
     tfl = "tfl bug?",
-    tParam = "tParam bug?",
-    varCsqPlotX = "varCsqPlotX bug?",
+    tparam = "tparam bug?",
     vcfContent = "vcfContent bug?",
     vcfFiles = "vcfFiles bug?",
     vcfHeader = "vcfHeader bug?",
@@ -161,19 +144,14 @@ Tracking = list(
     calculate = "Crunching data...",
     ggplot = "Assembling plot (ggplot2)",
     render = "Rendering.",
-    checkPhenotypes = "Checking VCF samples against phenotype file",
+    preprocessing = "Pre-processing data",
+    postprocessing = "Post-processing data",
     singleVcf = "Importing from single VCF.",
-    multiPaths = "Checking paths to multiple VCFs",
-    multiVcfs = "Importing from multiple VCF files.",
-    mergeVcfs = "Merging multiple VCF objects"
+    multiVcfs = "Importing from multiple VCF files."
 )
 
 # EnsDb packages ----------------------------------------------------------
 
 ## list all packages...
-packs <- installed.packages()
+packs <- rownames(installed.packages())
 EnsDbPacks <- packs[grep(packs, pattern="^EnsDb")]
-
-# R session variables -----------------------------------------------------
-
-options("width" = 120)

@@ -1,8 +1,8 @@
 Package: TVTB
 Type: Package
 Title: TVTB: The VCF Tool Box
-Version: 0.1.20
-Date: 2016-08-11
+Version: 0.1.21
+Date: 2016-08-15
 Author: Kevin Rue-Albrecht
 Maintainer: Kevin Rue-Albrecht <kevinrue67@gmail.com>
 Description: The package provides functions to summarise and visualise
@@ -11,7 +11,7 @@ Description: The package provides functions to summarise and visualise
     the Shiny Variant Explorer (tSVE).
 License: Artistic-2.0
 Depends:
-    R (>= 3.3), methods, utils, stats, S4Vectors
+    R (>= 3.3), methods, utils, stats
 Imports:
     BiocGenerics,
     BiocParallel,
@@ -24,11 +24,12 @@ Imports:
     IRanges,
     reshape2,
     Rsamtools,
+    S4Vectors (>= 0.11.11),
     SummarizedExperiment,
     VariantAnnotation (>= 1.19.9)
 Suggests:
     EnsDb.Hsapiens.v75 (>= 0.99.7),
-    shiny (>= 0.13.2.9004),
+    shiny (>= 0.13.2.9005),
     DT (>= 0.1.67),
     rtracklayer,
     BiocStyle,

@@ -14,7 +14,7 @@ chr2file(chr, pattern, folder)
 
 \arguments{
     \item{chr}{
-Find VCF file matching \code{pattern} for chromosome \code{chr}.
+Chromosome name (\emph{e.g.} \code{seqnames}).
 }
     \item{pattern}{
 Pattern of VCF file names, including \code{"\%s"} as placeholder for the
@@ -26,7 +26,15 @@ Folder containing the VCF files.
 }
 
 \value{
-Path to the VCF file corresponding to the chromosome name.
+Path to the VCF file(s) corresponding to the chromosome name.
+}
+
+\section{Warning}{
+If no match is found, the method issues a warning in addition to returning
+an empty \code{character} vector.
+
+If multiple matches are found, the method issues a warning in addition to
+returning all file names as a \code{character} vector.
 }
 
 \author{
@@ -34,8 +42,10 @@ Kevin Rue-Albrecht
 }
 
 \seealso{
-\code{\linkS4class{ExpandedVCF}}.
+\code{\linkS4class{ExpandedVCF}}
+and \code{\link{seqnames,GRanges-method}}.
 }
+
 \examples{
 # Identify VCF file correponding to chromosome ----
 

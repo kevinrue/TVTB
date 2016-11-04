@@ -1,0 +1,8 @@
+
+.shiny-output-error-validation {
+        color: red;
+      }
+
+.shiny-output-error-optional {
+        color: gray;
+      }

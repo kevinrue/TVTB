@@ -7,7 +7,7 @@
 
 library(shiny)
 
-shinyUI(navbarPage(
+shinyUI(navbarPage(theme = "bootstrap.css",
 
     title = "tSVE",
     id = "tSVE",
@@ -15,19 +15,147 @@ shinyUI(navbarPage(
         title = "Input",
 
         tabPanel(
-            title = "Data",
+            title = "Phenotypes",
 
-            ## Keep for a possible header message
-            # fluidRow(
-            #     shiny::column(
-            #         width = 6, offset = 3,
-            #         p(
-            #             "Welcome. Please define general settings here.",
-            #             style = "font-family: 'Source Sans Pro';"
-            #         )
-            #     )
-            # ),
-            # hr(),
+            # Phenotype options ----
+
+            wellPanel(
+                h4("Phenotypes"),
+                hr(),
+
+                fluidRow(
+
+                    shiny::column(
+                        width = 2,
+                        p(strong("Phenotype file")),
+                        actionButton(
+                            "selectPheno", "Browse",
+                            icon = icon("file"), width = '100%')
+                    ),
+                    shiny::column(
+                        width = 4, offset = 6,
+                        strong("Summary"),
+                        htmlOutput("phenoFileSummary")
+                    )
+
+                )
+
+            )
+
+        ),
+
+        tabPanel(
+            title = "Region(s)",
+
+            # GRanges options ----
+            wellPanel(
+                h4("Genomic ranges"),
+                hr(),
+
+                fluidRow(
+
+                    shiny::column(
+                        width = 3,
+                        selectInput(
+                            "regionInputMode", "Region(s) input type",
+                            choices = GS[["choices.regionInputMode"]],
+                            selected = GS[["default.regionInputMode"]],
+                            width = '100%')
+                    ),
+
+                    shiny::column(
+                        width = 4, offset = 5,
+                        strong("Summary"),
+                        htmlOutput("rangesSummary")
+                    )
+
+                ),
+
+                fluidRow(
+
+                    conditionalPanel(
+                        condition = "input.regionInputMode == 'bed'",
+                        shiny::column(
+                            width = 2,
+                            br(),
+                            actionButton(
+                                "selectBed", "Browse",
+                                icon = icon("file"), width = '100%')
+                        )
+                    ),
+                    conditionalPanel(
+                        condition = "input.regionInputMode == 'ucsc'",
+                        shiny::column(
+                            width = 8,
+                            textInput(
+                                "ucscRegions", "UCSC-type region(s)",
+                                value = "",
+                                placeholder = paste(
+                                    "chr21:33,031,597-33,041,570",
+                                    "chr2:2,031,597-2,041,570",
+                                    "...",
+                                    sep = " ; "),
+                                width = "100%")
+                        )
+                    ),
+                    conditionalPanel(
+                        condition = "input.regionInputMode == 'EnsDb'",
+                            shiny::column(
+                                width = 2,
+                                selectInput(
+                                    "ensDb.type", NA,
+                                    choices = GS[["choices.ensDbType"]],
+                                    selected = GS[["default.ensDbType"]])
+                            ),
+                            shiny::column(
+                                width = 1,
+                                selectInput(
+                                    "ensDb.condition", NA,
+                                    choices = GS[["choices.ensDbFilters"]],
+                                    selected = GS[["default.ensDbFilters"]])
+                            ),
+                            shiny::column(
+                                2,
+                                textInput(
+                                    "ensDb.value", NA,
+                                    value = "",
+                                    placeholder = "IL17A,IL12B,...")
+                            ),
+                            shiny::column(
+                                width = 4, offset = 3,
+                                strong("Note"),
+                                p(
+                                    "For the ", code("like"), "filter",
+                                    "please use ", code("%"), "as wildcard."
+                                )
+                            )
+                        ,
+                        tabsetPanel(
+                            id = "ensDb.resultTab",
+                            selected = "Genes",
+
+                            tabPanel(
+                                title = 'Genes',
+                                DT::dataTableOutput("ensDb.Genes")
+                            )#, # TODO
+                            # tabPanel('Transcripts',
+                            #          dataTableOutput("Transcripts")
+                            # ),
+                            # tabPanel('Exons',
+                            #          dataTableOutput("Exons")
+                            # )
+                        )
+
+                    )
+
+                )
+
+            )
+
+        ),
+
+        tabPanel(
+            title = "Variants",
 
             # VCF options ----
 
@@ -54,17 +182,17 @@ shinyUI(navbarPage(
                                 "selectVcf", "Browse",
                                 icon = icon("file"), width = '100%')
                         ),
-                        strong("Summary"),
-                        br(),
                         shiny::column(
-                            width = 7,
+                            width = 4, offset = 3,
+                            strong("Summary"),
+                            br(),
                             textOutput("selectedVcf"),
                             # Wrap long file names
                             tags$head(tags$style(
                                 "#selectedVcf{
-                display:block;
-                word-wrap:break-word;
-                }"
+                                display:block;
+                                word-wrap:break-word;
+                                }"
                             ))
                         )
                     ),
@@ -115,32 +243,27 @@ shinyUI(navbarPage(
                     shiny::column(
                         width = 2,
                         textInput(
-                            "csqField", "VEP field",
-                            value = GS[["default.csq"]],
+                            "vepKey", "VEP field",
+                            value = GS[["default.vep"]],
                             placeholder = 'CSQ, ANN, ...'))
 
-                )
+                ),
 
-            ),
-
-            # Phenotype options ----
-
-            wellPanel(
-                h4("Phenotypes"),
-                hr(),
 
                 fluidRow(
 
+                    # VEP prediction INFO field ----
                     shiny::column(
-                        width = 3,
-                        fileInput(
-                            "phenoFile", "Phenotype file",
-                            accept = c("txt"))
+                        width = 2, offset = 5,
+                        actionButton(
+                            "importVariants", "Import variants",
+                            icon = icon("open", lib = "glyphicon")
+                        )
                     ),
                     shiny::column(
-                        width = 4, offset = 5,
+                        width = 4, offset = 1,
                         strong("Summary"),
-                        htmlOutput("phenoFileSummary")
+                        htmlOutput("vcfSummary")
                     )
 
                 )
@@ -167,24 +290,52 @@ shinyUI(navbarPage(
         ),
 
         tabPanel(
-            title = "Region(s)",
+            title = "Filters",
+            h4("Filters"),
+            hr(),
+            tags$span(
+                style="color:red",
+                tags$em("Temporarily disabled")),
 
-            fluidRow(
+            wellPanel(
+                fluidRow(
 
-                shiny::column(
-                    width = 2, offset = 5,
-                    radioButtons(
-                        "refreshVariants", "Refresh variants",
-                        choices = c("Paused", "Active"),
-                        selected = "Active", inline = TRUE)
+                    shiny::column(
+                        width = 2,
+                        numericInput(
+                            "maf.min", "Minimum MAF",
+                            value = 0 , min = 0, max = 0.5,
+                            step = 0.01)
+                    ),
+                    shiny::column(
+                        width = 2,
+                        numericInput(
+                            "maf.max", "Maximum MAF (e.g. 1e-6)",
+                            value = 0.5 , min = 0, max = 0.5,
+                            step = 0.01)
+                    ),
+                    shiny::column(
+                        width = 4
+                    ),
+                    shiny::column(
+                        width = 4,
+                        strong("Summary"),
+                        htmlOutput("mafRange")
+                    )
+
                 )
+            )
 
-            ),
+        ),
+
+        tabPanel(
+            title = "Annotations",
 
             # Genome annotation package ----
 
             wellPanel(
-
+                h4("Annotations"),
+                hr(),
                 fluidRow(
 
                     shiny::column(
@@ -220,134 +371,6 @@ shinyUI(navbarPage(
 
                 )
 
-            ),
-
-            # GRanges options ----
-            wellPanel(
-
-                fluidRow(
-
-                    shiny::column(
-                        width = 2,
-                        selectInput(
-                            "regionInputMode", "Region(s) input type",
-                            choices = GS[["choices.regionInputMode"]],
-                            selected = GS[["default.regionInputMode"]],
-                            width = '100%')
-                    ),
-                    shiny::column(
-                        width = 4, offset = 6,
-                        strong("Summary"),
-                        htmlOutput("bedFileSummary")
-                    )
-
-                ),
-
-                fluidRow(
-
-                    conditionalPanel(
-                        condition = "input.regionInputMode == 'bed'",
-                        shiny::column(
-                            width = 3,
-                            fileInput(
-                                "bedFile", "BED file",
-                                accept = c("bed"))
-                        )
-                    ),
-                    conditionalPanel(
-                        condition = "input.regionInputMode == 'ucsc'",
-                        shiny::column(
-                            width = 7,
-                            textInput(
-                                "ucscRegions", "UCSC-type region(s)",
-                                value = "",
-                                placeholder = paste(
-                                    "chr21:33,031,597-33,041,570",
-                                    "chr2:2,031,597-2,041,570",
-                                    "...",
-                                    sep = " ; "),
-                                width = "100%")
-                        )
-                    ),
-                    conditionalPanel(
-                        condition = "input.regionInputMode == 'EnsDb'",
-                        fluidRow(
-                            shiny::column(
-                                width = 2,
-                                selectInput(
-                                    "ensDb.type", NA,
-                                    choices = GS[["choices.ensDbType"]],
-                                    selected = GS[["default.ensDbType"]])
-                            ),
-                            shiny::column(
-                                width = 1,
-                                selectInput(
-                                    "ensDb.condition", NA,
-                                    choices = GS[["choices.ensDbFilters"]],
-                                    selected = GS[["default.ensDbFilters"]])
-                            ),
-                            shiny::column(
-                                2,
-                                textInput(
-                                    "ensDb.values", NA,
-                                    value = "",
-                                    placeholder = "IL17,IL12B,...")
-                            )
-                        ),
-                        tabsetPanel(
-                            id = "ensDb.resultTab",
-                            selected = "Genes",
-
-                            tabPanel(
-                                title = 'Genes',
-                                DT::dataTableOutput("ensDb.Genes")
-                            )#,
-                            # tabPanel('Transcripts',
-                            #          dataTableOutput("Transcripts")
-                            # ),
-                            # tabPanel('Exons',
-                            #          dataTableOutput("Exons")
-                            # )
-                        )
-
-                    )
-
-                )
-
-            )
-
-        ),
-
-        tabPanel(
-            title = "Filters",
-
-            wellPanel(
-                fluidRow(
-
-                    shiny::column(
-                        width = 2,
-                        numericInput(
-                            "maf.min", "Minimum MAF",
-                            value = 0 , min = 0, max = 0.5,
-                            step = 0.01)
-                    ),
-                    shiny::column(
-                        width = 2,
-                        numericInput(
-                            "maf.max", "Maximum MAF (e.g. 1e-6)",
-                            value = 0.5 , min = 0, max = 0.5,
-                            step = 0.01)
-                    ),
-                    shiny::column(
-                        width = 4
-                    ),
-                    shiny::column(
-                        width = 4,
-                        strong("Summary"),
-                        htmlOutput("mafRange")
-                    )
-
-                )
             )
 
         )
@@ -360,14 +383,14 @@ shinyUI(navbarPage(
         tabsetPanel(
             id = "tabset.views",
 
-            # BED view ----
+            # Genomic ranges view ----
             tabPanel(
-                title = "BED",
+                title = "Region(s)",
 
                 fluidRow(
                     shiny::column(
                         width = 12,
-                        DT::dataTableOutput("bedSample")
+                        DT::dataTableOutput("rangesSample")
                     )
                 )
 
@@ -425,7 +448,7 @@ shinyUI(navbarPage(
                     shiny::column(
                         width = 12,
                         wellPanel(
-                            uiOutput("csqCols")
+                            uiOutput("vepCols")
                         )
                     )
                 ),
@@ -433,7 +456,7 @@ shinyUI(navbarPage(
                 fluidRow(
                     shiny::column(
                         width = 12,
-                        DT::dataTableOutput("csqSample")
+                        DT::dataTableOutput("vepSample")
                     )
                 )
 
@@ -546,30 +569,30 @@ shinyUI(navbarPage(
                 width = 3,
 
                 selectInput(
-                    "variantCsq",
+                    "vepAnalysed",
                     "Variant effect prediction",
                     choices = c()
                 ),
 
                 selectInput(
-                    "phenotype",
+                    "phenoAnalysed",
                     "Phenotype field",
                     choices = c("None"),
                     selected = "None"
                 ),
 
                 conditionalPanel(
-                    condition = "input.phenotype != 'None'",
+                    condition = "input.phenoAnalysed != 'None'",
                     checkboxInput(
-                        "csqPhenoUnique",
+                        "unique2pheno",
                         "Unique to phenotype?",
                         value = FALSE
                     )
                 ),
 
                 selectInput(
-                    "facet",
-                    "Faceting field",
+                    "vepFacetKey",
+                    "VEP faceting key",
                     choices = c("None"),
                     selected = "None"
                 ),
@@ -577,7 +600,7 @@ shinyUI(navbarPage(
                 conditionalPanel(
                     condition = "input.facet != 'None'",
                     selectInput(
-                        "csqFacets",
+                        "vepFacets",
                         "Facets",
                         choices = c(),
                         selected = c(),
@@ -605,7 +628,7 @@ shinyUI(navbarPage(
                         sep = " && "
                     ),
                     sliderInput(
-                        "legendText", "Legend font size",
+                        "legendTextSize", "Legend font size",
                         value = 1.5, min = 0.1, max = 2, step = 0.1)
                 ),
 
@@ -639,18 +662,9 @@ shinyUI(navbarPage(
             ),
 
             mainPanel(
-                # fluidRow(
-                #     shiny::column(
-                #         width = 6, offset = 3,
-                #         p(
-                #             "Stacked bar chart.",
-                #             style = "font-family: 'Source Sans Pro';"
-                #         )
-                #     )
-                # ),
 
                 tabsetPanel(
-                    id = "csqCount",
+                    id = "vepCount",
 
                     tabPanel(
                         title = "Barplot",
@@ -659,8 +673,8 @@ shinyUI(navbarPage(
                             shiny::column(
                                 width = 12,
                                 plotOutput(
-                                    "variantsCsqBarplot",
-                                    height = csqCountHeight,
+                                    "vepCountBarplot",
+                                    height = vepCountHeight,
                                     hover = hoverOpts(
                                         "plotVarClass_hover",
                                         delayType = "debounce")
@@ -671,14 +685,14 @@ shinyUI(navbarPage(
                         fluidRow(
                             shiny::column(
                                 width = 12,
-                                htmlOutput("varCsqCount")
+                                htmlOutput("varVepCount")
                             )
                         )
                     ),
 
                     tabPanel(
                         title = "Table",
-                        DT::dataTableOutput("csqTableDecreasing")
+                        DT::dataTableOutput("vepTableDecreasing")
                     )
 
                 )
@@ -690,7 +704,7 @@ shinyUI(navbarPage(
     navbarMenu(
         title = "Settings",
 
-        # Advances settings view ----
+        # Advanced settings ----
 
         tabPanel(
             title = "Advanced",
@@ -771,7 +785,7 @@ shinyUI(navbarPage(
 
             tags$span(
                 style="color:red",
-                "Experimental"),
+                tags$em("Experimental")),
             tags$sup("1,2"),
 
             wellPanel(
@@ -817,7 +831,7 @@ shinyUI(navbarPage(
 
             p(
                 tags$sup("1"),
-                "Parallel workers validated on",
+                "Parallel workers succesfully tested on",
                 tags$code("Ubuntu"),
                 "and",
                 tags$code("Scientific Linux"),
@@ -826,13 +840,13 @@ shinyUI(navbarPage(
             p(
                 tags$sup("2"),
                 "Known issue on Mac OS X El Capitan:",
-                "App hangs while CPUs infinitely working at full speed."
+                "Application hangs while CPUs work infinitely at full speed."
             )
         )
 
     ),
 
-    # Session view ----
+    # Session settings view ----
 
     tabPanel(
         title = "Session",
@@ -851,13 +865,18 @@ shinyUI(navbarPage(
             ),
 
             tabPanel(
+                title = "General settings",
+                verbatimTextOutput("generalSettings")
+            ),
+
+            tabPanel(
                 title = "Advanced settings",
                 verbatimTextOutput("advancedSettings")
             ),
 
             tabPanel(
                 title = "BED",
-                verbatimTextOutput("bedStructure")
+                verbatimTextOutput("rangesStructure")
             ),
 
             tabPanel(
@@ -867,12 +886,12 @@ shinyUI(navbarPage(
 
             tabPanel(
                 title = "VEP",
-                verbatimTextOutput("csqStructure")
+                verbatimTextOutput("vepStructure")
             ),
 
             tabPanel(
                 title = "Phenotypes",
-                verbatimTextOutput("phenotypeStructure")
+                verbatimTextOutput("phenotypesStructure")
             ),
 
             tabPanel(

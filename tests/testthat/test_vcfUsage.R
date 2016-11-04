@@ -35,7 +35,11 @@ test_that("chr2file() returns appropriate values",{
         "character")
 
     # Even numeric chromosome should be given as character
-    expect_error(chr2file(chr = 2, pattern = vcfPattern, folder = vcfFolder))
+    expect_type(chr2file(
+        chr = 15,
+        pattern = vcfPattern,
+        folder = vcfFolder),
+        "character")
 
     # Pattern must contain %s
     expect_error(chr2file(
@@ -56,85 +60,9 @@ test_that("chr2file() returns appropriate values",{
         folder = file.path(system.file(package = "TVTB"), "R")))
 
     # Multiple
-    expect_error(chr2file(
+    expect_warning(chr2file(
         chr = "3",
         pattern = vcfPattern,
         folder = file.path(system.file(package = "TVTB"), "badexamples")))
 
 })
-
-# Import tests variants ----
-
-# svp <- ScanVcfParam(
-#     fixed = "ALT",
-#     info = "CSQ",
-#     geno = "GT",
-#     samples = character(),
-#     which = bedRegions)
-# vcf <- readVcf(file = tabixVcf, param = svp)
-# vcf <- expand(x = vcf, row.names = TRUE)
-# # Separate multi-allelic records into bi-allelic records
-# eVcf <- expand(x = vcf, row.names = TRUE)
-# # Disambiguate row.names from multi-allelic records
-# rownames(eVcf) <- paste(rownames(eVcf), mcols(eVcf)[,"ALT"], sep = "_")
-
-# addOverallFrequencies() ---
-
-# NOTE:
-#     Useful tests to spot a problem, but functionality implicitely tested when
-#     testing preprocessVariants(). No additional coverage
-
-# test_that("addOverallFrequencies() catches invalid inputs",{
-#
-#     expect_s4_class(
-#         addOverallFrequencies(
-#             vcf = vcf, ref = c("0|0"), het = c("0|1", "1|0"),
-#             alt = c("1|1")),
-#         "ExpandedVCF"
-#     )
-#
-#     vcfFreq <- addOverallFrequencies(
-#         vcf = vcf, ref = c("0|0"), het = c("0|1", "1|0"),
-#         alt = c("1|1"))
-#
-#     expect_type(
-#         info(vcfFreq)[,"REF"],
-#         "numeric"
-#     )
-#     expect_type(
-#         info(vcfFreq)[,"HET"],
-#         "numeric"
-#     )
-#     expect_type(
-#         info(vcfFreq)[,"ALT"],
-#         "numeric"
-#     )
-#     expect_type(
-#         info(vcfFreq)[,"AAF"],
-#         "numeric"
-#     )
-#     expect_type(
-#         info(vcfFreq)[,"MAF"],
-#         "numeric"
-#     )
-#
-# })
-
-
-# Add phenotype information ----
-
-# Add some phenotypes information necessary for the demo
-# colData(eVcf) <- phenotypes
-
-# addPhenotypeFrequencies() ----
-
-# test_that("addPhenotypeFrequencies() returns appropriate values",{
-#
-#     expect_s4_class(
-#         addPhenotypeFrequencies(
-#             vcf = eVcf, field = "super_pop",
-#             ref = c("0|0"), het = c("0|1"), alt = c("1|1")),
-#         "ExpandedVCF"
-#     )
-#
-# })
