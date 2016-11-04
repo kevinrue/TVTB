@@ -11,7 +11,7 @@ abstract:
     The VCF Tool Box (*TVTB*) provides functions to summarise and
     visualise genetic variation data stored in VCF files
     pre-processed by the Ensembl Variant Effect Predictor (VEP).
-    A Shiny web-application, the Shiny Variant Explorer (tSVE),
+    A Shiny web-application, the Shiny Variant Explorer (*tSVE*),
     provides a convenient interface to demonstrate
     those functionalities in a programming-free environment.
 vignette: >
@@ -36,7 +36,8 @@ The VCF Tool Box (`r Biocpkg("TVTB")`) offers functions
 to summarise and visualise genetic variation data
 stored in VCF files pre-processed by the
 Ensembl Variant Effect Predictor (VEP) [@RN1].
-A Shiny web-application, the Shiny Variant Explorer (tSVE),
+An [RStudio/Shiny](http://shiny.rstudio.com) web-application,
+the Shiny Variant Explorer (*tSVE*),
 provides a convenient interface to demonstrate those
 functionalities in a programming-free environment.
 
@@ -59,9 +60,10 @@ of an `ExpandedVCF` object
 **Counts of discrete Ensembl VEP predictions**
 
 * in levels of a given phenotype
-    + as a `data.frame` or a stacked `r Biocpkg("ggplot2")` `geom_bar`
+    + as a `data.frame` or a stacked `r Biocpkg("ggplot2")` `geom_bar` layer
+        of counts
     + optionally faceted by another Ensembl VEP prediction (*e.g.* `"Feature"`)
-    + `geom_bar` represented as stacked *percentage* of predictions
+    + `geom_bar` layer representing stacked *percentage* of predictions
 
 **Density of continuous Ensembl VEP predictions**
 
@@ -123,7 +125,7 @@ tparam <- TVTBparam(
 ```
 \bioccomment{
 In the future, add a second region to the `ranges` slot, to demonstrate
-relevant features (e.g. plots faceted by range).
+relevant features (e.g. plots faceted by genomic range).
 }
 
 `TVTBparam` objects have a convenient summary view:
@@ -199,7 +201,7 @@ In the future, genomic ranges may be used to produce summary statistics
 and plots faceted by range (e.g. burden).
 }
 
-The `r Biocpkg("VariantAnnotation")` `ScanVcfParam` class accepts
+Notably, the `r Biocpkg("VariantAnnotation")` `ScanVcfParam` class accepts
 `r Biocpkg("GenomicRanges")` `GRanges` objects
 (in the `which` slot) that describes
 the sequences and ranges to be queried from the VCF file.
@@ -211,7 +213,7 @@ phenotype information is essential to interpret and compare genetic variants
 between groups of samples
 (*e.g.* minor allele frequency in a group, burden of damaging variants).
 
-`ExpandedVCF` objects accepts phenotype information
+`ExpandedVCF` objects accept phenotype information
 (as `r Biocpkg("S4Vectors")` `DataFrame`) in the `colData` slot.
 This practice has the key advantage of keeping phenotype and genetic
 information synchronised through operation such as subsetting and re-ordering,
@@ -252,7 +254,7 @@ Of particular interest:
 ```{r ScanVcfParam}
 svp <- VariantAnnotation::ScanVcfParam(
     fixed = c("ALT", "QUAL", "FILTER"), # all fields: could be omitted
-    info = c(vep(tparam)), # an application of the TVTBparam class
+    info = vep(tparam), # an application of the TVTBparam class
     geno = "GT", # all fields: could be omitted in this case
     samples = rownames(phenotypes),
     which = ranges(tparam))
@@ -287,9 +289,9 @@ methods implemented in the `r Biocpkg("TVTB")` package.
 
 ## Adding overall frequencies {#FrequenciesOverall}
 
-For instance, the method `addOverallFrequencies` uses the definition of
+For instance, the method `addOverallFrequencies` uses the
 reference homozoygote (*REF*), heterozygote (*HET*),
-and homozygote alternate (*ALT*) genotypes stored in a `TVTBparam` object
+and homozygote alternate (*ALT*) genotypes defined in a `TVTBparam` object
 to obtain the count of each genotype in an `ExpandedVCF` object.
 Immediately thereafter, the method uses those counts to calculate
 alternate allele frequency (*AAF*) and minor allele frequency (*MAF*).
@@ -316,7 +318,7 @@ to overwrite existing INFO keys
 present in both the `header` or the `info` slots of the `ExpandedVCF` object.
 }
 
-## Adding frequencies in phenotype level {#FrequenciesPhenoLevel}
+## Adding frequencies in phenotype level(s) {#FrequenciesPhenoLevel}
 
 Similarly, the method `addPhenoLevelFrequencies` obtains the count of each
 genotype in samples associated with a given level of a given phenotype,
@@ -338,7 +340,9 @@ process within each phenotype:
 ```{r addFrequenciesPhenoLevel}
 initialInfo <- colnames(info(vcf))
 vcf <- addFrequencies(
-    vcf = vcf, phenos = list(super_pop = c("EUR", "AFR")),
+    vcf = vcf, phenos = list(
+        super_pop = c("EUR", "AFR"),
+        pop = c("GBR", "FIN", "MSL")),
     param = tparam, force = TRUE)
 setdiff(colnames(info(vcf)), initialInfo)
 ```
@@ -437,6 +441,7 @@ in the same way as `FilterRules` are evaluated in a given environment:
 summary(eval(expr = infoR, envir = vcf))
 summary(eval(expr = vcfRules, envir = vcf))
 summary(evalSeparately(expr = vcfRules, envir = vcf))
+evalSeparately(expr = vcfRules, envir = vcf)
 ```
 
 \bioccomment{
@@ -457,6 +462,8 @@ This section presents severeal ideas implemented in `r Biocpkg("TVTB")`.
 Note that `ggplot` objects include the data used for plotting.
 Those data may be extracted, replaced, subsetted to produce plots and
 summary tables beyond those implemented in the package.
+In particular, the associated web-application *tSVE* takes advantage of this
+point to avoid calling multiple times the same *TVTB* methods.
 }
 
 ## Counts of discrete Ensembl VEP predictions {#SummariseDiscrete}
@@ -497,13 +504,6 @@ tCBPplot <- tabulateVepByPhenotype(
 
 tCBPplot
 ```
-
-\fixme{
-Filter rules resulting in a combination of `NA` and `TRUE` throw an error
-(`NA` and `FALSE` return an acceptable overall `FALSE` result).
-The Bioconductor Core Team has been contacted to discuss the behaviour of
-the `eval` method in the presence of `NA` and `TRUE` test results.
-}
 
 ```{r optsTabulateReset, include=FALSE}
 opts_chunk$set(optChunkDefault)
@@ -567,6 +567,12 @@ densityVepByPhenotype(
         axis.text.y = element_text(angle = 270, hjust = 0.5)
     )
 ```
+
+\fixme{
+Offer a stacked dot-plot for situations like this one, whereby density lines
+display vertical lines of height 1 and rectangles of height 0.5 for phenotype
+levels showing only 1 or 2 variants, respectively.
+}
 
 ```{r optsDensityReset, include=FALSE}
 opts_chunk$set(optChunkDefault)
