@@ -34,7 +34,7 @@ A Shiny web-application, the Shiny Variant Explorer (tSVE),
 provides a convenient interface to demonstrate those
 functionalities in a programming-free environment.
 
-[^1]: See also: *ti voglio tanto bene* (Italian)
+[^1]: See also: *ti voglio tanto bene* (Italian).
 
 # Installation
 
@@ -90,7 +90,7 @@ tparam <- TVTBparam(
 ```
 \fixme{
 In the future, add a second region to the `ranges` slot, to demonstrate
-relevant features (*e.g.* plots faceted by range).
+relevant features (e.g. plots faceted by range).
 }
 
 `TVTBparam` objects have a convenient summary view:
@@ -238,7 +238,7 @@ interesting figures and summary tables may be obtained as soon as the first
 Currently, major `r Biocpkg("TVTB")` functionalities include:
 
 * Counting discrete Ensembl VEP predictions in levels of a phenotype
-    + as a `data.frame` or a stacked \CRANpkg{ggplot2} `geom_bar`
+    + as a `data.frame` or a stacked `r Biocpkg("ggplot2") `geom_bar`
     + counts faceted by another Ensembl VEP prediction (*e.g.* Feature)
     + `geom_bar` represented as stacked *percentage* of predictions
 * Density distribution of continuous Ensembl VEP predictions in levels of
@@ -255,7 +255,7 @@ Currently, major `r Biocpkg("TVTB")` functionalities include:
 ### Barplot
 
 The following chunk of code displays,
-for each affected genomic feature,
+for each genomic feature affected,
 the count of each Ensembl VEP prediction
 `"Consequence"` in each "super population"
 (*i.e.*, each level of the `"super_pop"` phenotype).
@@ -284,7 +284,8 @@ tCBPplot
 
 ### Table (data.frame)
 
-The same counts can also be summarised as a `data.frame`:
+The same counts can also be summarised as a `data.frame` using
+the option `plot=FALSE`:
 
 ```{r tCBPtableWide}
 tCBPwide <- tabulateCsqByPhenotype(
@@ -294,7 +295,7 @@ tCBPwide <- tabulateCsqByPhenotype(
     )
 ```
 
-From which only the subset corresponding to *missense variants* is shown here:
+of which only the subset corresponding to *missense variants* is shown here:
 
 ```{r tCBPtableWideSubset, eval=FALSE}
 subset(tCBPwide, Consequence == "missense_variant")
