@@ -10,20 +10,18 @@ Description: The package provides functions to summarise and visualise
   Functionalities are also demonstrated in a Shiny web-application.
 License: Artistic-2.0
 Depends:
-    R (>= 3.3), methods, utils, stats
+    R (>= 3.3), methods, utils, stats,
+    SummarizedExperiment, GenomicRanges, IRanges, S4Vectors
 Imports:
+    BiocGenerics,
     BiocParallel,
     Biostrings,
     ensembldb,
     ensemblVEP,
     ggplot2,
     GenomeInfoDb,
-    GenomicRanges,
-    IRanges,
     reshape2,
     Rsamtools,
-    SummarizedExperiment,
-    S4Vectors,
     VariantAnnotation
 Suggests:
     EnsDb.Hsapiens.v75 (>= 0.99.7),
@@ -73,5 +71,6 @@ Collates:
     variantsInSamples-methods.R,
     csqInPhenoLevel-methods.R,
     tabulateCsq-methods.R,
-    densityCsq-methods.R
+    densityCsq-methods.R,
+    show-methods.R
 VignetteBuilder: knitr
