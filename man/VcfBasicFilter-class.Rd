@@ -2,6 +2,8 @@
 \docType{class}
 
 % Class
+\alias{class:VcfBasicFilter}
+\alias{VcfBasicFilter-class}
 \alias{class:VcfFixedFilter}
 \alias{VcfFixedFilter-class}
 \alias{class:VcfInfoFilter}

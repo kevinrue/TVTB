@@ -56,8 +56,9 @@ importMethodsFrom(
     "scanVcfHeader", "ScanVcfParam",
     "readVcf", "geno", "samples",
     "expand",
-    "info", "header",
-    "info<-", "header<-", "mcols<-"
+    "fixed", "fixed<-",
+    "info", "info<-",
+     "header", "header<-"
 )
 importFrom(
     "VariantAnnotation",
@@ -137,5 +138,5 @@ exportClasses(
 
 exportMethods(
     "tSVEParam",
-    "VcfInfoFilter", "VcfFixedFilter", "VcfVepFilter"
+    "VcfInfoFilter", "VcfFixedFilter", "VcfVepFilter", "subsetVcf"
 )

@@ -1,3 +1,12 @@
+# subsetVcf ----
+
+setGeneric(
+    name = "subsetVcf",
+    signature = c("x", "filter", "param"),
+    def = function(x, filter, param, ...)
+        standardGeneric("subsetVcf")
+)
+
 # addOverallFrequencies ----
 
 setGeneric(

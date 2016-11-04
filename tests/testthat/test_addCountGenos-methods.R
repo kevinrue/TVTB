@@ -6,7 +6,7 @@ context("addCountGenos")
 extdata <- file.path(system.file(package = "tSVE"), "extdata")
 vcfFile <- file.path(extdata, "moderate.vcf")
 
-# Good and bad phenotype files
+# Phenotype file
 phenoFile <- file.path(extdata, "moderate_pheno.txt")
 
 tparam <- tSVEParam(
