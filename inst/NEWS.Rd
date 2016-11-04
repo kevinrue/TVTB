@@ -1,7 +1,23 @@
 \name{TVTB-NEWS}
 \title{NEWS: The VCF Tool Box}
 
-\section{Changes in version 1.1.3}{
+\section{Changes in version 1.1.4 2016-11-04}{
+
+\subsection{Bug fix}{
+\itemize{
+\item Bumped version number to try and update the Bioconductor GitHub mirror
+    to display the latest code instead of version \code{0.1.7}.
+}
+\subsection{Minor changes}{
+\itemize{
+\item Added \code{TVTB.Rproj} to tracked files.
+\item Deleted deprecated and misc files in \code{inst/}.
+\item Deleted commented lines from \code{AppVeyor} settings.
+}
+}
+}
+
+\section{Changes in version 1.1.3 2016-11-03}{
 
 \subsection{New features}{
 \itemize{

@@ -86,12 +86,11 @@ Currently, major functionalities in the `r Biocpkg("TVTB")` package include:
 
 The VCF Tool Box can be installed using the following code:
 
-```{r biocLite, eval=FALSE}
-# Currently:
-devtools::install_github("kevinrue/TVTB")
-# When hosted on Bioconductor:
-source("http://bioconductor.org/biocLite.R")
-biocLite("TVTB")
+```{r biocLite}
+if (interactive()){
+    source("http://bioconductor.org/biocLite.R")
+    biocLite("TVTB")
+}
 ```
 
 Once installed, the package can be loaded and attached as follows:
