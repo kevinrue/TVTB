@@ -1230,29 +1230,30 @@ shinyServer(function(input, output, clientData, session) {
 
         vepMcols <- mcols(csq)
 
-        vepFacetKey.choices <- colnames(vepMcols)
+        vepKey.choices <- colnames(vepMcols)
 
         # Initialise by order of preference if present:
         # Consequence > Impact > First field
-        idx.default <- max(
+        vepAnalysed.default <- max(
             1,
             head(x = na.omit(
                 match(
                     x = c("consequence","impact"),
-                    table = tolower(vepFacetKey.choices)),
-                n = 1))
+                    table = tolower(vepKey.choices)
+                    )
+                ), n = 1)
             )
 
         updateSelectInput(
             session, "vepAnalysed",
-            choices = vepFacetKey.choices,
-            selected = vepFacetKey.choices[idx.default])
+            choices = vepKey.choices,
+            selected = vepKey.choices[vepAnalysed.default])
 
-        vepFacetKey.choices <- c("None", vepFacetKey.choices)
+        vepKey.choices <- c("None", vepKey.choices)
 
         updateSelectInput(
             session, "vepFacetKey",
-            choices = vepFacetKey.choices)
+            choices = vepKey.choices)
     })
 
     # Summarise consequences ----
@@ -1444,11 +1445,14 @@ shinyServer(function(input, output, clientData, session) {
             filters <- data.frame(
                 pheno = vepTableCount[,hover$mapping$x] == x_lvl
             )
+            # Identify data for the panel (vepFacetKey) hovered
             if (input$vepFacetKey != "None"){
-                filters[,vepFacetKey] <- vepTableCount[
-                    ,hover$mapping$panelvar1] == hover$panelvar1
+                filters$vepFacetKey <- vepTableCount[
+                    ,hover$mapping$panelvar1] ==
+                    hover$panelvar1
             }
-
+            # Extract VEP counts for the panel hovered:
+            # matches x (phenotype level) and y (VEP level)
             y_lvls <- vepTableCount[
                 apply(X = filters, MARGIN = 1, FUN = all),
                 c(vepAnalysed, "Freq")]
