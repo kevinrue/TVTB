@@ -1,6 +1,15 @@
 \name{TVTB-NEWS}
 \title{NEWS: The VCF Tool Box}
 
+\section{Changes in version 0.99.9 2016-10-14}{
+\subsection{Minor changes}{
+\itemize{
+\item
+    Fixed outdated information in \emph{Introduction} vignette.
+}
+}
+}
+
 \section{Changes in version 0.99.8 2016-10-12}{
 \subsection{Minor changes}{
 \itemize{

@@ -184,7 +184,6 @@ In this example:
     + Accessor: `svp(x)`
     + Class: `ScanVcfParam`
     + `which` slot automatically populated with `reduce(unlist(ranges(x)))`
-    + `info` slot automatically populated with `vep(x)`
 
 Default values are provided for all slots except genotypes, as these may vary
 more frequently from one data set to another (*e.g.* phased, unphased,
@@ -238,8 +237,8 @@ as each `GRanges` in the `GRangesList` would represent a transcript,
 and each element in the `GRanges` would represent an exon.
 
 Furthermore, `TVTBparam` objects may be supplied as the `param`
-argument of the `r Biocpkg("VariantAnnotation")` `readVcf`. In this case,
-`TVTBparam` object is used to import variants overlapping
+argument of the `r Biocpkg("VariantAnnotation")` `readVcf`. In this case, the
+`TVTBparam` object is used to import only variants overlapping
 the relevant genomic regions.
 Moreover, the `readVcf` method also ensured that the `vep` slot of the
 `TVTBparam` object is present in the header of the VCF file.
@@ -297,11 +296,11 @@ svp(tparam)
 
 Of particular interest in the above chunk of code:
 
-* The [earlier](#ImportGRangesList) coercion of `TVTBparam` to `ScanVcfParam`
-    populated the `which` slot of `svp` with "reduced" (*i.e.* non-overlapping)
+* The `TVTBparam` constructor previously populated the `which` slot of `svp`
+    with "reduced" (*i.e.* non-overlapping)
     genomic ranges defined in the `ranges` slot.
-* Only the INFO key defined in the `vep` slot is imported
-* Only the matrix of called genotypes is imported
+* Only the INFO key defined in the `vep` slot will be imported
+* Only the matrix of called genotypes will be imported
 
 **Step 4:** Import and pre-process variants
 
