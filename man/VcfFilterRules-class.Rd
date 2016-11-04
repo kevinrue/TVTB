@@ -13,12 +13,16 @@
 % Accessor methods:
 \alias{type}
 \alias{type,VcfFilterRules-method}
+\alias{vep,VcfFilterRules-method}
 
 % Subsetter methods:
 \alias{[,VcfFilterRules,ANY,ANY,missing-method}
 \alias{[,VcfFilterRules,ANY,ANY,logical-method}
 \alias{[[,VcfFilterRules,ANY,ANY-method}
 \alias{[[<-,VcfFilterRules,ANY,ANY-method}
+
+% Combine methods:
+\alias{c,VcfFilterRules-method}
 
 % Evaluation:
 \alias{eval-methods}
@@ -41,8 +45,12 @@ In the following code snippets \code{x} is a \code{VcfFilterRules} object.
     \item{\code{type(x)}}{
     Gets the type of each filter stored in a \code{VcfFilterRules} object.
     }
-    And methods inherited from \code{S4Vectors::FilterRules} class.
+    \item{\code{vep(x)}}{
+    Gets the INFO key where the Ensembl VEP predictions to use for filtering
+    are stored.
+    }
 }
+And accessors inherited from \code{S4Vectors::FilterRules} class.
 }
 
 \section{Constructors}{
@@ -151,10 +159,10 @@ infoR <- VcfInfoRules(exprs = list(
     common = expression(MAF > 0.1), # minor allele frequency
     present = expression(ALT + HET > 0) # count of non-REF homozygotes
     ))
-# synonym to
+# ...is synonym to...
 infoR <- VcfInfoRules(exprs = list(
     common = expression(MAF > 0.1), # minor allele frequency
-    present = expression(ALT > 0 || HET > 0)
+    present = expression(ALT > 0 | HET > 0)
     ))
 infoR
 

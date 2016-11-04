@@ -50,7 +50,8 @@ VcfInfoRules <- function(exprs = list(), ..., active = TRUE){
 setMethod(
     f = "initialize",
     signature = c("VcfVepRules"),
-    definition = function(.Object, exprs = list(), ..., active = TRUE){
+    definition = function(
+        .Object, exprs = list(), ..., active = TRUE, vep = "CSQ"){
 
         parentRules <- FilterRules(exprs = exprs, ..., active = TRUE)
 
@@ -60,14 +61,16 @@ setMethod(
         .Object@elementMetadata <- slot(parentRules, "elementMetadata")
         .Object@metadata <- slot(parentRules, "metadata")
 
+        .Object@vep <- vep
+
         validObject(.Object)
         return(.Object)
     })
 
-VcfVepRules <- function(exprs = list(), ..., active = TRUE){
+VcfVepRules <- function(exprs = list(), ..., active = TRUE, vep = "CSQ"){
     new(
         Class = "VcfVepRules",
-        exprs = exprs, ..., active = active)
+        exprs = exprs, ..., active = active, vep = vep)
 }
 
 setMethod(
@@ -77,13 +80,16 @@ setMethod(
 
         filterList <- list(...)
 
-        parentRules <- do.call(c, filterList)
+        new.listData <- do.call(
+            c, lapply(filterList, function(x){slot(x, "listData")}))
+        new.active <- do.call(
+            c, lapply(filterList, function(x){slot(x, "active")}))
+        new.elementMetadata <- do.call(
+            c, lapply(filterList, function(x){slot(x, "elementMetadata")}))
 
-        .Object@listData <- slot(parentRules, "listData")
-        .Object@active <- slot(parentRules, "active")
-        .Object@elementType <- slot(parentRules, "elementType")
-        .Object@elementMetadata <- slot(parentRules, "elementMetadata")
-        .Object@metadata <- slot(parentRules, "metadata")
+        .Object@listData <- new.listData
+        .Object@active <- new.active
+        .Object@elementMetadata <- new.elementMetadata
 
         filterType <- unlist(lapply(
             X = filterList,
@@ -101,6 +107,27 @@ setMethod(
 
         .Object@type <- filterType
 
+        vepKey <- unique(na.exclude(unlist(lapply(
+            X = filterList,
+            FUN = function(x){
+                switch(
+                    class(x),
+                    VcfFixedRules = rep(NA_character_, length(x)),
+                    VcfInfoRules = rep(NA_character_, length(x)),
+                    VcfVepRules = vep(x),
+                    VcfFilterRules = slot(x, "vep"),
+                    stop("Invalid filter")
+                )
+            }
+        ))))
+
+        if (length(vepKey) > 1)
+            stop("Only a single vep key is allowed")
+        else if (length(vepKey) == 1)
+            .Object@vep <- vepKey
+        else
+            .Object@vep <- NA_character_
+
         validObject(.Object)
         return(.Object)
     })
@@ -113,6 +140,24 @@ setMethod(
     definition = function(x){
         # Apply filters to the fixed slot
         slot(x, "type")
+    }
+)
+
+setMethod(
+    f = "vep",
+    signature = c("VcfVepRules"),
+    definition = function(x){
+        # Apply filters to the fixed slot
+        slot(x, "vep")
+    }
+)
+
+setMethod(
+    f = "vep",
+    signature = c("VcfFilterRules"),
+    definition = function(x){
+        # Apply filters to the fixed slot
+        slot(x, "vep")
     }
 )
 
@@ -139,12 +184,12 @@ setMethod(
 # TODO info.key taken from TVTBParam
 .evalVepFilter <- function(expr, envir){
     csq <- parseCSQToGRanges(
-        x = envir, VCFRowID = rownames(envir), info.key = "CSQ")
+        x = envir, VCFRowID = rownames(envir), info.key = vep(expr))
     # Apply filters to the VEP predictions
     csqBoolean <- eval(expr = expr, envir = csq)
     # Index of variants with 1+ prediction passing the filter
     vcfPass <- mcols(csq)[csqBoolean,"VCFRowID", drop = TRUE]
-    # Does each variant have 1+ prediction passing the filter
+    # Mark each variant with 1+ prediction passing the filter
     vcfBoolean <- rep(FALSE, length(envir))
     vcfBoolean[vcfPass] <- TRUE
     return(vcfBoolean)
@@ -208,15 +253,20 @@ setMethod(
 
     filterType <- unique(type(x))
 
-    if(length(filterType) > 1)
+    if (length(filterType) > 1)
         return(x)
+    else if (length(filterType) == 0)
+        return(VcfFixedRules()) # a default empty filter
 
     listData <- slot(x, "listData")
 
     res <- switch (filterType,
         fixed = VcfFixedRules(exprs = listData, active = slot(x, "listData")),
         info = VcfInfoRules(exprs = listData, active = slot(x, "listData")),
-        vep = VcfVepRules(exprs = listData, active = slot(x, "listData")),
+        vep = VcfVepRules(
+            exprs = listData,
+            active = slot(x, "listData"),
+            vep = slot(x, "vep")),
         stop("Invalid type")
     )
 
@@ -362,5 +412,39 @@ setMethod(
     signature = c(from="VcfVepRules", to="VcfFilterRules"),
     definition = function(from, to){
         VcfFilterRules(from)
+    }
+)
+
+# Combine ----
+
+setMethod(
+    f = "c",
+    signature = c(x="VcfFixedRules"),
+    definition = function(x, ..., recursive = FALSE){
+        VcfFilterRules(x, ...)
+    }
+)
+
+setMethod(
+    f = "c",
+    signature = c(x="VcfInfoRules"),
+    definition = function(x, ..., recursive = FALSE){
+        VcfFilterRules(x, ...)
+    }
+)
+
+setMethod(
+    f = "c",
+    signature = c(x="VcfVepRules"),
+    definition = function(x, ..., recursive = FALSE){
+        VcfFilterRules(x, ...)
+    }
+)
+
+setMethod(
+    f = "c",
+    signature = c(x="VcfFilterRules"),
+    definition = function(x, ..., recursive = FALSE){
+        VcfFilterRules(x, ...)
     }
 )

@@ -58,10 +58,10 @@ TVTBparam <- setClass(
 
 )
 
-# VcfFilterRules ----
+# VcfFilterRules & Co. ----
 
-# TODO
-.valid.VcfBasicRules <- function(object){
+# TODO: any difference from FilterRules?
+.valid.VcfSlotRules <- function(object){
     return(TRUE)
 }
 
@@ -70,7 +70,7 @@ VcfFixedRules <- setClass(
 
     contains = "FilterRules",
 
-    validity = .valid.VcfBasicRules
+    validity = .valid.VcfSlotRules
 )
 
 
@@ -79,15 +79,27 @@ VcfInfoRules <- setClass(
 
     contains = "FilterRules",
 
-    validity = .valid.VcfBasicRules
+    validity = .valid.VcfSlotRules
 )
+
+.valid.VcfVepRules <- function(object){
+    errors <- c()
+
+    if (length(vep(object)) != 1)
+        errors <- c(errors, "length(vep(x)) must equal 1")
+
+    if (length(errors > 0))
+        return(errors)
+
+    return(TRUE)
+}
 
 VcfVepRules <- setClass(
     Class = "VcfVepRules",
-
+    slots = list(vep = "character"),
     contains = "FilterRules",
 
-    validity = .valid.VcfBasicRules
+    validity = .valid.VcfVepRules
 )
 
 .valid.VcfFilterRules <- function(object){
@@ -107,6 +119,9 @@ VcfVepRules <- setClass(
     if (length(rulesName) != length(unique(rulesName)))
         errors <- c(errors, "names must be unique")
 
+    if (length(vep(object)) != 1)
+        errors <- c(errors, "length(vep(x)) must equal 1")
+
     if (length(errors > 0))
         return(errors)
 
@@ -116,7 +131,9 @@ VcfVepRules <- setClass(
 
 VcfFilterRules <- setClass(
     Class = "VcfFilterRules",
-    slots = list(type = "character"),
+    slots = list(
+        type = "character",
+        vep = "character"),
     contains = "FilterRules",
 
     validity = .valid.VcfFilterRules

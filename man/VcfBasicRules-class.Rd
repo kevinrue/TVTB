@@ -23,11 +23,17 @@
 \alias{initialize,VcfVepRules-method}
 
 % Accessor methods:
+\alias{vep,VcfVepRules-method}
 
 % Subsetter methods:
 \alias{[[<-,VcfFixedRules,ANY,ANY-method}
 \alias{[[<-,VcfInfoRules,ANY,ANY-method}
 \alias{[[<-,VcfVepRules,ANY,ANY-method}
+
+% Combine methods:
+\alias{c,VcfFixedRules-method}
+\alias{c,VcfInfoRules-method}
+\alias{c,VcfVepRules-method}
 
 % Evaluation:
 \alias{eval,VcfFixedRules,ExpandedVCF-method}
@@ -53,7 +59,14 @@ or \code{VcfVepRules} class.
 }
 
 \section{Accessor methods}{
-Inherited from \code{S4Vectors::FilterRules} class.
+In the following code snippets \code{x} is a \code{VcfFilterRules} object.
+\describe{
+    \item{\code{vep(x)}}{
+    Gets the INFO key where the Ensembl VEP predictions to use for filtering
+    are stored.
+    }
+}
+And accessors inherited from \code{S4Vectors::FilterRules} class.
 }
 
 \section{Constructors}{
@@ -62,7 +75,7 @@ Inherited from \code{S4Vectors::FilterRules} class.
 
 \code{VcfInfoRules(exprs = list(), ..., active = TRUE)}
 
-\code{VcfVepRules(exprs = list(), ..., active = TRUE)}
+\code{VcfVepRules(exprs = list(), ..., active = TRUE, vep = "CSQ")}
 
 all construct an object of the corresponding class
 with the rules given in the list \code{exprs} or in \code{...}.

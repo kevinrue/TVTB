@@ -118,9 +118,7 @@ exportMethods(
     "hAlt", "hAlt<-",
     "carrier", "carrier<-",
     "vep", "vep<-",
-    "bp","bp<-",
-
-    "type"
+    "bp","bp<-"
 )
 
 #exportClassPattern("^.*$")
@@ -143,9 +141,11 @@ exportMethods(
 
 exportMethods(
      # S4Vectors
-    "eval", "evalSeparately", "subsetByFilter",
+    "eval", "evalSeparately", "subsetByFilter", "active",
     # Biostrings
-    "active",
+    "type",
     # VariantAnnotation
-    "readVcf", "ScanVcfParam"
+    "readVcf", "ScanVcfParam",
+    # Base
+    "c"
 )
