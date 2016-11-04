@@ -349,6 +349,124 @@ shinyUI(navbarPage(theme = "bootstrap.css",
     ),
 
     tabPanel(
+        title = "Filters",
+
+        tags$span(
+            style="color:red",
+            tags$em("In development. No effect.")),
+
+        wellPanel(
+            h4("Add filter"),
+            fluidRow(
+                shiny::column(
+                    width = 1,
+                    br(),
+                    actionButton(
+                        "addNewFilter", "Add filter",
+                        icon = icon("plus")
+                    )
+                ),
+                shiny::column(
+                    width = 1,
+                    selectInput(
+                        "newFilterClass", "Type",
+                        choices = GS[["vcfFilterClass.choices"]],
+                        selected = GS[["vcfFilterClass.default"]]
+                    )
+                ),
+                shiny::column(
+                    width = 1,
+                    checkboxInput(
+                        "newFilterActive", "Active?",
+                        value = TRUE
+                    )
+                ),
+                shiny::column(
+                    width = 8,
+                    textInput(
+                        "newFilterExpression", "Expression",
+                        placeholder = paste(
+                            "grepl(\"pass\", tolower(FILTER))",
+                            "ALT + HET > 0",
+                            "IMPACT %in% c(\"HIGH\", \"MODERATE\")",
+                            sep = " - or - "
+                        )
+                    )
+                )
+            ),
+            fluidRow(
+                shiny::column(
+                    width = 12,
+                    uiOutput("vcfFilterTest")
+                )
+            ),
+            fluidRow(
+                br(),
+                p(strong("Notes:")),
+                p(
+                    tags$sup("1"),
+                    "Filters are tested against variants to ensure the",
+                    "validity of filters. Therefore, variants must be loaded",
+                    strong("before"), "filters can be created."
+                ),
+                p(
+                    tags$sup("2"),
+                    "Currently, filters are not re-tested if variants are",
+                    "updated. If variants are refreshed, users should ensure",
+                    "filters remain valid, or remove filters manually."
+                ),
+                p(
+                    tags$sup("3"),
+                    "Users may ignore auto-correction of quotes in the",
+                    code("Expression"), "field. The application substitutes",
+                    "curly quotes (single and double) by their",
+                    "corresponding regular quotes (",
+                    em("i.e."), code("\""), "and", code("'"), ")"
+                )
+            )
+        ),
+        wellPanel(
+            fluidRow(
+                shiny::column(
+                    width = 4, offset = 1,
+                    strong("Summary"), br(),
+                    uiOutput("filtersSummary")
+                ),
+                shiny::column(
+                    width = 2,
+                    actionButton(
+                        "filterVariants", "Apply filters",
+                        icon = icon("filter"), width = "100%"
+                    )
+                ),
+                shiny::column(
+                    width = 4,
+                    strong("Summary"), br(),
+                    uiOutput("filteredVcfSummary")
+                )
+            )
+        ),
+        wellPanel(
+            fluidRow(
+                shiny::column(
+                    width = 1,
+                    strong("Class")
+                ),
+                shiny::column(
+                    width = 1,
+                    strong("Active?")
+                ),
+                shiny::column(
+                    width = 8,
+                    strong("Expression")
+                )
+            ),
+            br(),
+            uiOutput("vcfFilterControls")
+        )
+    ),
+
+    tabPanel(
         title = "Views",
 
         tabsetPanel(
@@ -526,124 +644,6 @@ shinyUI(navbarPage(theme = "bootstrap.css",
 
         )
 
-    ),
-
-    tabPanel(
-        title = "Filters",
-
-        tags$span(
-            style="color:red",
-            tags$em("In development. No effect.")),
-
-        wellPanel(
-            h4("Add filter"),
-            fluidRow(
-                shiny::column(
-                    width = 1,
-                    br(),
-                    actionButton(
-                        "addNewFilter", "Add filter",
-                        icon = icon("plus")
-                    )
-                ),
-                shiny::column(
-                    width = 1,
-                    selectInput(
-                        "newFilterClass", "Type",
-                        choices = GS[["vcfFilterClass.choices"]],
-                        selected = GS[["vcfFilterClass.default"]]
-                    )
-                ),
-                shiny::column(
-                    width = 1,
-                    checkboxInput(
-                        "newFilterActive", "Active?",
-                        value = TRUE
-                    )
-                ),
-                shiny::column(
-                    width = 8,
-                    textInput(
-                        "newFilterExpression", "Expression",
-                        placeholder = paste(
-                            "grepl(\"pass\", tolower(FILTER))",
-                            "ALT + HET > 0",
-                            "IMPACT %in% c(\"HIGH\", \"MODERATE\")",
-                            sep = " - or - "
-                        )
-                    )
-                )
-            ),
-            fluidRow(
-                shiny::column(
-                    width = 12,
-                    uiOutput("vcfFilterTest")
-                )
-            ),
-            fluidRow(
-                br(),
-                p(strong("Notes:")),
-                p(
-                    tags$sup("1"),
-                    "Filters are tested against variants to ensure the",
-                    "validity of filters. Therefore, variants must be loaded",
-                    strong("before"), "filters can be created."
-                ),
-                p(
-                    tags$sup("2"),
-                    "Currently, filters are not re-tested if variants are",
-                    "updated. If variants are refreshed, users should ensure",
-                    "filters remain valid, or remove filters manually."
-                ),
-                p(
-                    tags$sup("3"),
-                    "Users may ignore auto-correction of quotes in the",
-                    code("Expression"), "field. The application substitutes",
-                    "curly quotes (single and double) by their",
-                    "corresponding regular quotes (",
-                    em("i.e."), code("\""), "and", code("'"), ")"
-                )
-            )
-        ),
-        wellPanel(
-            fluidRow(
-                shiny::column(
-                    width = 4, offset = 1,
-                    strong("Summary"), br(),
-                    uiOutput("filtersSummary")
-                ),
-                shiny::column(
-                    width = 2,
-                    actionButton(
-                        "filterVariants", "Apply filters",
-                        icon = icon("filter"), width = "100%"
-                    )
-                ),
-                shiny::column(
-                    width = 4,
-                    strong("Summary"), br(),
-                    uiOutput("filteredVcfSummary")
-                )
-            )
-        ),
-        wellPanel(
-            fluidRow(
-                shiny::column(
-                    width = 1,
-                    strong("Class")
-                ),
-                shiny::column(
-                    width = 1,
-                    strong("Active?")
-                ),
-                shiny::column(
-                    width = 8,
-                    strong("Expression")
-                )
-            ),
-            br(),
-            uiOutput("vcfFilterControls")
-        )
     ),
 
     tabPanel(
