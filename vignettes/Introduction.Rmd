@@ -8,7 +8,7 @@ author:
 date: "`r doc_date()`"
 package: "`r pkg_ver('TVTB')`"
 abstract:
-    The VCF Tool Box (*TVTB*) provides S4classes and methods to filter,
+    The VCF Tool Box (*TVTB*) provides S4 classes and methods to filter,
     summarise and visualise genetic variation data stored in VCF files
     pre-processed by the Ensembl Variant Effect Predictor (VEP).
     A Shiny web-application, the Shiny Variant Explorer (*tSVE*),
@@ -32,7 +32,7 @@ optChunkDefault <- opts_chunk$get()
 
 # Introduction {#Introduction}
 
-The VCF Tool Box (`r Biocpkg("TVTB")`) offers novel S4 classes and methods
+The VCF Tool Box (`r Biocpkg("TVTB")`) offers S4 classes and methods
 to filter, summarise and visualise genetic variation data
 stored in VCF files pre-processed by the
 [Ensembl Variant Effect Predictor](http://www.ensembl.org/info/docs/tools/vep)
@@ -117,8 +117,8 @@ such as:
 * settings for parallel calculations
 
 \bioccomment{
-INFO key suffixes should be considered carefully to avoid overwriting
-data in INFO keys already present in the `VCF` object.
+INFO key suffixes should be considered carefully to avoid conflicts
+with INFO keys already present in the `VCF` object.
 }
 
 To reduce the burden of repetition during programming, and to 
@@ -134,14 +134,14 @@ tparam <- TVTBparam(
         REF = c("0|0"),
         HET = c("0|1", "1|0", "0|2", "2|0", "1|2", "2|1"),
         ALT = c("1|1", "2|2")),
-    ranges = GenomicRanges::GRanges(
+    ranges = GenomicRanges::GRanges( # optional
         seqnames = "15",
         IRanges::IRanges(
             start = 48413170, end = 48434757, names = "SLC24A5")),
-    aaf = "AAF", # default
-    maf = "MAF", # default
-    vep = "CSQ", # default
-    bp = BiocParallel::SerialParam()) # default
+    aaf = "AAF", # default (optional)
+    maf = "MAF", # default (optional)
+    vep = "CSQ", # default (optional)
+    bp = BiocParallel::SerialParam()) # default (optional)
 ```
 
 \fixme{
@@ -158,21 +158,21 @@ tparam
 In this example:
 
 * **Genotypes**
-    + homozygote reference genotype is encoded `0|0`
-        - counts of genotypes are stored in INFO keys suffixed with `REF`
+    + homozygote reference genotype is encoded `"0|0"`
+        - counts of genotypes are stored in INFO keys suffixed with `"REF"`
     + heterozygote genotypes are encoded as
-        `0|1`, `1|0`, `0|2`, `2|0`, `1|2`, and `2|1`
-        - counts of genotypes are stored in INFO keys suffixed with `HET`
-    + homozygote alternate  genotype is encoded `1|1`
-        - counts of genotypes are stored in INFO keys suffixed with `ALT`
+        `"0|1"`, `"1|0"`, `"0|2"`, `"2|0"`, `"1|2"`, and `"2|1"`
+        - counts of genotypes are stored in INFO keys suffixed with `"HET"`
+    + homozygote alternate  genotype is encoded `"1|1"`
+        - counts of genotypes are stored in INFO keys suffixed with `"ALT"`
 * **Genomic ranges**
-    + a gene-coding region on chromosome 15
+    + a gene-coding region on chromosome `"15"`
 * **Alternate allele frequency**
-    + stored in INFO keys suffixed with `AAF`
+    + stored in INFO keys suffixed with `"AAF"`
 * **Minor allele frequency**
-    + stored in INFO keys suffixed with `MAF`
+    + stored in INFO keys suffixed with `"MAF"`
 * **Ensembl VEP predictions**
-    + imported from INFO key `CSQ`
+    + imported from INFO key `"CSQ"`
 * **Parallel calculations**
     + turned off. Serial calculations are performed.
 
@@ -189,15 +189,15 @@ may be included in the package for the most common situations
 
 ## Genetic variants {#ImportVariants}
 
-Functionalities in `r Biocpkg("TVTB")` currently only support
+Functionalities in `r Biocpkg("TVTB")` support
 `CollapsedVCF` and `ExpandedVCF` objects
 (both extending the virtual class `VCF`) of the 
 `r Biocpkg("VariantAnnotation")` package.
 
 Typically, `CollapsedVCF` objects are produced by the
-`r Biocpkg("VariantAnnotation") `readVcf` method, and
-`ExpandedVCF` objects result of the
-`r Biocpkg("VariantAnnotation") `expand` method applied to
+`r Biocpkg("VariantAnnotation")` `readVcf` method after parsing a VCF file,
+and `ExpandedVCF` objects result of the
+`r Biocpkg("VariantAnnotation")` `expand` method applied to
 a `CollapsedVCF` object.
 
 `VCF` objects may include any information imported from VCF file(s)
@@ -220,10 +220,11 @@ the object should include at least the following information:
 
 * `colData(x)`: phenotypes
 
-\fixme{
-In the future, recommend `geno(x)[["GQ"]]`, if available.
+\bioccomment{
+In the future, `geno(x)[["GQ"]]` may be recommended, if available.
 This could enable consideration of individual genotypes on the basis
-of passing a genotype quality cut-off; for instance when counting genotypes.
+of passing a genotype quality cut-off; for instance when counting genotypes
+in phenotype levels.
 }
 
 ## Genomic ranges {#ImportGRanges}
@@ -235,13 +236,11 @@ and plots faceted by range (e.g. burden test; comparison of genomic regions).
 Genomic ranges could represent gene-coding regions, exons, promoters,
 *etc*.
 
-\bioccomment{
 In the meantime, users may store genomic ranges of interest in this slot,
 thereby reducing the number of objects in their workspace.
-For instance, the `VariantAnnotation` `ScanVcfParam` class accepts
-`GenomicRanges` `GRanges` objects (in the `which` slot) that describes the
-sequences and ranges to be queried from VCF file(s).
-}
+For instance, the `r Biocpkg("VariantAnnotation")` `ScanVcfParam` class
+accepts `r Biocpkg("GenomicRanges")` `GRanges` objects (in the `which` slot)
+that describes the sequences and ranges to be queried from VCF file(s).
 
 \fixme{
 The `ranges` slot of the `TVTBparam` class may actually be re-designed to
@@ -255,9 +254,9 @@ corresponding to a list of genes.
 ## Phenotypes {#ImportPhenotypes}
 
 Although `VCF` objects may exist without it,
-phenotype information is essential to interpret and compare genetic variants
+phenotype information is critical to interpret and compare genetic variants
 between groups of samples
-(*e.g.* minor allele frequency in a group, burden of damaging variants).
+(*e.g.* burden of damaging variants in different phenotype level).
 
 `VCF` objects accept phenotype information
 (as `r Biocpkg("S4Vectors")` `DataFrame`) in the `colData` slot.
@@ -285,7 +284,7 @@ phenotypes <- S4Vectors::DataFrame(
     read.table(file = phenoFile, header = TRUE, row.names = 1))
 ```
 
-**Step 2:** Define VCF file
+**Step 2:** Define VCF file imported
 
 ```{r vcfFile}
 vcfFile <- file.path(extdata, "chr15.phase3_integrated.vcf.gz")
@@ -305,7 +304,7 @@ svp <- VariantAnnotation::ScanVcfParam(
     info = vep(tparam), # an application of the TVTBparam class
     geno = "GT", # all fields: could be omitted in this case
     samples = rownames(phenotypes),
-    which = ranges(tparam))
+    which = ranges(tparam)) # another application of the TVTBparam class
 ```
 
 **Step 4:** Import and pre-process variants
