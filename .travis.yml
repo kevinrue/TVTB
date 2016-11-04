@@ -4,9 +4,27 @@ language: R
 r: bioc-devel
 cache: packages
 
-# pandoc_version: 1.17.1
+os:
+    - osx
+#    - linux
+
+pandoc_version: 1.17.1
 
 r_check_args: --no-build-vignettes
 
-bioc_packages: BiocInstaller
+bioc_packages:
+    BiocInstaller,
+    BiocParallel,
+    Biostrings,
+    ensembldb,
+    ensemblVEP,
+    ggplot2,
+    GenomeInfoDb,
+    GenomicRanges,
+    IRanges,
+    reshape2,
+    Rsamtools,
+    SummarizedExperiment,
+    S4Vectors,
+    VariantAnnotation
 r_github_packages: rstudio/DT
