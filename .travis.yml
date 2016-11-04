@@ -15,8 +15,6 @@ os:
 branches:
   only:
   - master
-  - devel
-  - release-3.4
 
 sudo: false
 cache: packages
