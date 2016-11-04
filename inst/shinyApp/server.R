@@ -904,17 +904,30 @@ shinyServer(function(input, output, clientData, session) {
             need(input$vepKey, label = Msgs[["vepKey"]]),
             need(input$refGenotypes, Msgs[["refGenotypes"]]),
             need(input$hetGenotypes, Msgs[["hetGenotypes"]]),
-            need(input$altGenotypes, Msgs[["altGenotypes"]])
+            need(input$altGenotypes, Msgs[["altGenotypes"]]),
+            need(input$refSuffix, Msgs[["refSuffix"]]),
+            need(input$hetSuffix, Msgs[["hetSuffix"]]),
+            need(input$altSuffix, Msgs[["altSuffix"]]),
+            need(input$aafSuffix, Msgs[["aafSuffix"]]),
+            need(input$mafSuffix, Msgs[["mafSuffix"]])
+        )
+
+        genos <- list(
+            REF = input$refGenotypes,
+            HET = input$hetGenotypes,
+            ALT = input$altGenotypes)
+
+        names(genos) <- c(
+            input$refSuffix,
+            input$hetSuffix,
+            input$altSuffix
         )
 
         return(new(
             Class = "TVTBparam",
-            genos = list(
-                REF = input$refGenotypes,
-                HET = input$hetGenotypes,
-                ALT = input$altGenotypes),
-            aaf = "AAF",
-            maf = "MAF",
+            genos = genos,
+            aaf = input$aafSuffix,
+            maf = input$mafSuffix,
             vep = input$vepKey,
             bp = bpParam
         ))

@@ -929,7 +929,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                                     width = 12,
                                     plotOutput(
                                         "vepCountBarplot",
-                                        height = vepCountHeight,
+                                        height = vepCountBarplotHeight,
                                         hover = hoverOpts(
                                             "plotVarClass_hover",
                                             delayType = "debounce")
@@ -1099,7 +1099,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                     shiny::column(
                         width = 4,
                         selectInput(
-                            "refGenotypes", "REF genotype(s)",
+                            "refGenotypes", "Reference homozygote genotype(s)",
                             choices = setdiff(
                                 GS[["all.genotypes"]],
                                 c(
@@ -1113,7 +1113,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                     shiny::column(
                         width = 4,
                         selectInput(
-                            "hetGenotypes", "ALT heterozygote genotype(s)",
+                            "hetGenotypes", "Heterozygote genotype(s)",
                             choices = setdiff(
                                 GS[["all.genotypes"]],
                                 c(
@@ -1127,7 +1127,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                     shiny::column(
                         width = 4,
                         selectInput(
-                            "altGenotypes", "ALT homozygote genotype(s)",
+                            "altGenotypes", "Alternate homozygote genotype(s)",
                             choices = setdiff(
                                 GS[["all.genotypes"]],
                                 c(
@@ -1138,8 +1138,59 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                         )
                     )
 
+                ),
+
+                fluidRow(
+                    shiny::column(
+                        width = 1,
+                        textInput(
+                            "refSuffix", "Suffix",
+                            value = GS[["default.refSuffix"]],
+                            placeholder = GS[["default.refSuffix"]]
+                        )
+                    ),
+                    shiny::column(
+                        width = 1, offset = 3,
+                        textInput(
+                            "hetSuffix", "Suffix",
+                            value = GS[["default.hetSuffix"]],
+                            placeholder = GS[["default.hetSuffix"]]
+                        )
+                    ),
+                    shiny::column(
+                        width = 1, offset = 3,
+                        textInput(
+                            "altSuffix", "Suffix",
+                            value = GS[["default.altSuffix"]],
+                            placeholder = GS[["default.altSuffix"]]
+                        )
+                    )
                 )
 
+            ),
+
+            wellPanel(
+                h4("INFO suffixes"),
+                hr(),
+
+                fluidRow(
+                    shiny::column(
+                        width = 3,
+                        textInput(
+                            "aafSuffix", "ALT allele freq.",
+                            value = GS[["default.aafSuffix"]],
+                            placeholder = GS[["default.aafSuffix"]]
+                        )
+                    ),
+                    shiny::column(
+                        width = 3,
+                        textInput(
+                            "mafSuffix", "Minor allele freq.",
+                            value = GS[["default.mafSuffix"]],
+                            placeholder = GS[["default.mafSuffix"]]
+                        )
+                    )
+                )
             ),
 
             wellPanel(

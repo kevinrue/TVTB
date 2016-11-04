@@ -22,16 +22,27 @@ message(
 # library(reshape2)
 # library(ensembldb)
 
+# Display settings ----
+
+vepCountBarplotHeight <- "500px"
+
+# R session variables -----------------------------------------------------
+
+originalOptions <- options()
+options("width" = 120)
+
 # General settings --------------------------------------------------------
 
-# Alphabetical order (ignoring ^default, ^choices, ^all, ...)
 GS <- list(
     default.vep = "CSQ",
-    choices.vepCols = c(),
-    default.vepCols = c(),
     default.refGenotypes = c("0|0"),
-    default.hetGenotypes = c("0|1", "1|0", "1|2", "2|1"),
+    default.hetGenotypes = c("0|1", "1|0", "0|2", "2|0", "1|2", "2|1"),
     default.altGenotypes = c("1|1", "2|2"),
+    default.refSuffix = "REF", # Reference homozygote
+    default.hetSuffix = "HET", # Heterozygote
+    default.altSuffix = "ALT", # Alternate homozyote
+    default.aafSuffix = "AAF", # Alternate allele frequency
+    default.mafSuffix = "MAF", # Minor allele frequency
     choices.ensDbType = list(
         "Gene name" = "Genename"),
     default.ensDbType = "gene",
@@ -40,7 +51,7 @@ GS <- list(
     all.genotypes = c(
         "0/0","0/1","1/0","1/1","./0","0/.","./1","1/.","./.",
         "0/2","2/0", "1/2", "2/1", "2/2", "./2", "2/.",
-        "0|0","0|1","1|0","1|1",".|0","0|.",".|1","1|.",
+        "0|0","0|1","1|0", "1|1",".|0","0|.",".|1","1|.",
         "0|2","2|0", "1|2", "2|1", "2|2", ".|2", "2|.",
         "0", "1", "2","."),
     choices.phenoCols = c(),
@@ -77,27 +88,16 @@ PS <- list(
     choices.bpType = c()
 )
 
-# Display settings ----
-
-vepCountHeight <- "500px"
-
-# R session variables -----------------------------------------------------
-
-originalOptions <- options()
-options("width" = 120)
-
 # Messages ----------------------------------------------------------------
 
 # Alphabetical order (ignoring ^default, ^choices, ^all, ...)
 Msgs <- list(
     # Mandatory inputs
-    annotationPackage = "An EnsDb annotation package must be selected.",
+    vepKey = "INFO field of VEP prediction must be defined.",
+    refGenotypes = "Reference genotype(s) must be defined",
     hetGenotypes = "Heterozygote genotype(s) must be defined.",
     altGenotypes = "Alternative homozygote genotype(s) must be defined.",
-    vepKey = "INFO field of VEP prediction must be defined.",
-    maf.min = "Maximum minor allele frequency",
-    maf.min = "Mimimum minor allele frequency",
-    refGenotypes = "Reference genotype(s) must be defined",
+    annotationPackage = "An EnsDb annotation package must be selected.",
     invalidUcscRegions = "Invalid UCSC-type input.",
     vcfFolder = "VCF folder",
     vcfPattern = "VCF pattern",
@@ -105,6 +105,13 @@ Msgs <- list(
     xAxisHjust = "X axis horizontal justification",
     xAxisVjust = "X axis vertical justification",
     xAxisSize = "X axis font size",
+
+    # INFO suffixes
+    refSuffix = "Suffix for REF allele data",
+    hetSuffix = "Suffix for HET allele data",
+    altSuffix = "Suffix for ALT allele data",
+    aafSuffix = "Suffix for ALT allele frequency",
+    mafSuffix = "Suffix for minor allele frequency",
 
     # Tabulate VEP by phenotype (TVBP)
     vepTVBP = "VEP field tabulated",
