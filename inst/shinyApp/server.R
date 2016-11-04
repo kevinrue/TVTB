@@ -319,18 +319,31 @@ shinyServer(function(input, output, clientData, session) {
                 aaf(tparam),
                 maf(tparam))
 
-            # Only proceed if none of the INFO keys are present
-            if (!any(suffixes %in% colnames(info(vcf)))){
-                message("Adding overall frequencies")
-                RV[["vcf"]] <- addOverallFrequencies(
-                    vcf = vcf,
-                    param = tparam(),
-                    force = TRUE # keep an eye on the console for warnings
-                )
-                RV[["latestPhenotypeFrequency"]] <- "Overall"
-                RV[["latestFrequenciesAdded"]] <- suffixes
-                RV[["latestFrequenciesRemoved"]] <- character()
-            }
+            withProgress(
+                max = 3,
+                value = 1,
+                message = "Progress",
+                detail = Tracking[["preprocessing"]],{
+                    # Only proceed if none of the INFO keys are present
+                    if (!any(suffixes %in% colnames(info(vcf)))){
+
+                        shiny::incProgress(
+                            amount = 1,
+                            detail = Tracking[["addFreqOverall"]])
+
+                        RV[["vcf"]] <- addOverallFrequencies(
+                            vcf = vcf,
+                            param = tparam(),
+                            force = TRUE # watch the console for warnings
+                        )
+                        RV[["latestPhenotypeFrequency"]] <- "Overall"
+                        RV[["latestFrequenciesAdded"]] <- suffixes
+                        RV[["latestFrequenciesRemoved"]] <- character()
+                    }
+                }
+            )
+
+
 
     })
 
@@ -349,18 +362,30 @@ shinyServer(function(input, output, clientData, session) {
                 aaf(tparam),
                 maf(tparam))
 
-            # Only proceed if all of the INFO keys are present
-            if (all(suffixes %in% colnames(info(vcf)))){
-                message("Removing overall frequencies")
-                RV[["vcf"]] <- dropInfo(
-                    vcf = vcf,
-                    key = suffixes,
-                    slot = "both"
-                )
-                RV[["latestPhenotypeFrequency"]] <- "Overall"
-                RV[["latestFrequenciesRemoved"]] <- suffixes
-                RV[["latestFrequenciesAdded"]] <- character()
-            }
+            withProgress(
+                max = 3,
+                value = 1,
+                message = "Progress",
+                detail = Tracking[["preprocessing"]],{
+
+                    shiny::incProgress(
+                        amount = 1,
+                        detail = Tracking[["rmFreqOverall"]])
+
+                    # Only proceed if all of the INFO keys are present
+                    if (all(suffixes %in% colnames(info(vcf)))){
+
+                        RV[["vcf"]] <- dropInfo(
+                            vcf = vcf,
+                            key = suffixes,
+                            slot = "both"
+                        )
+                        RV[["latestPhenotypeFrequency"]] <- "Overall"
+                        RV[["latestFrequenciesRemoved"]] <- suffixes
+                        RV[["latestFrequenciesAdded"]] <- character()
+                    }
+
+            })
 
         })
 
@@ -370,7 +395,8 @@ shinyServer(function(input, output, clientData, session) {
         handlerExpr = {
 
             withProgress(
-                max = 8,
+                max = 4,
+                value = 1,
                 message = "Progress",
                 detail = Tracking[["preprocessing"]],{
                     # Remove INFO keys for unticked boxes
@@ -406,7 +432,7 @@ shinyServer(function(input, output, clientData, session) {
 
                         shiny::incProgress(
                             amount = 1,
-                            detail = Tracking[["rmInfoData"]])
+                            detail = Tracking[["rmFreqPhenoLevel"]])
 
                         # Identify unticked phenoLevels present in vcf INFO
                         # (to remove)
@@ -456,14 +482,14 @@ shinyServer(function(input, output, clientData, session) {
                         RV[["latestFrequenciesRemoved"]] <- character()
                     }
 
-                    # Identify ticked phenoLevels absent in info slot
-                    # (to calculate)
                     if (length(selectedPhenoLevels) > 0){
 
                         shiny::incProgress(
                             amount = 1,
-                            detail = Tracking[["addInfoData"]])
+                            detail = Tracking[["addFreqPhenoLevel"]])
 
+                        # Identify ticked phenoLevels absent in info slot
+                        # (to calculate)
                         # 1) generate all keys expected for each phenoLevel
                         tickedPhenoLevelKeys <- sapply(
                             X = selectedPhenoLevels,

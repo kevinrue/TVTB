@@ -172,8 +172,10 @@ Tracking = list(
     render = "Rendering.",
 
     # INFO frequencies
-    rmInfoData = "Dropping phenotype-level frequencies",
-    addInfoData = "Calculating phenotype-level frequencies",
+    rmFreqPhenoLevel = "Dropping phenotype-level frequencies",
+    addFreqPhenoLevel = "Calculating phenotype-level frequencies",
+    rmFreqOverall = "Dropping overall frequencies",
+    addFreqOverall = "Calculating overall frequencies",
 
     # Imports
     singleVcf = "Importing from single VCF.",
