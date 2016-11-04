@@ -28,19 +28,22 @@
 
 \usage{
 \S4method{densityVepByPhenotype}{ExpandedVCF,TVTBparam}(
-        vcf, phenoCol, vepCol, param, ...,
+        vcf, phenoCol, vepCol, param, ..., filter = VcfFilterRules(),
         unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE)
 
 \S4method{densityVepByPhenotype}{ExpandedVCF,missing}(
         vcf, phenoCol, vepCol, alts, param = NULL, ...,
+        filter = VcfFilterRules(),
         unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE)
 
 \S4method{densityVepInPhenoLevel}{ExpandedVCF,TVTBparam}(
         level, vcf, phenoCol, vepCol, param, ...,
+        filter = VcfFilterRules(),
         unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE)
 
 \S4method{densityVepInPhenoLevel}{ExpandedVCF,missing}(
         level, vcf, phenoCol, vepCol, alts, param = NULL, ...,
+        filter = VcfFilterRules(),
         unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE)
 }
 
@@ -66,6 +69,12 @@ considered.
 }
     \item{...}{
 Additional arguments used to override \code{TVTBparam} slots.
+}
+    \item{filter}{
+Filter rules of class \code{VcfFixedRules}, \code{VcfInfoRules},
+\code{VcfVepRules}, or \code{VcfFilterRules}.
+The \code{S4Vectors::subsetByFilter} applies active filter rules
+to the \code{vcf} argument.
 }
     \item{unique}{
 If \code{TRUE}, consider only variants unique to the phenotype level
@@ -141,8 +150,8 @@ vcf <- VariantAnnotation::expand(vcf, row.names = TRUE)
 # Example usage ----
 
 densityVepInPhenoLevel(
-    level = "EUR", vcf = vcf, phenoCol = "super_pop", vepCol = "CADD_PHRED",
-    param = tparam)
+    level = "EUR", vcf = vcf, phenoCol = "super_pop",
+    vepCol = "CADD_PHRED", param = tparam)
 
 densityVepByPhenotype(
     vcf = vcf, phenoCol = "super_pop", vepCol = "CADD_PHRED",

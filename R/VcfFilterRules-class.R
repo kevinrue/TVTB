@@ -80,10 +80,10 @@ setMethod(
 
         filterList <- list(...)
 
-        new.listData <- do.call(
-            c, lapply(filterList, function(x){slot(x, "listData")}))
-        new.active <- do.call(
-            c, lapply(filterList, function(x){slot(x, "active")}))
+        new.listData <- as.list(do.call(
+            c, lapply(filterList, function(x){slot(x, "listData")})))
+        new.active <- as.logical(do.call(
+            c, lapply(filterList, function(x){slot(x, "active")})))
         new.elementMetadata <- do.call(
             c, lapply(filterList, function(x){slot(x, "elementMetadata")}))
 
@@ -105,9 +105,9 @@ setMethod(
                 }
             ))
 
-        .Object@type <- filterType
+        .Object@type <- as.character(filterType)
 
-        vepKey <- unique(na.exclude(unlist(lapply(
+        vepKey <- as.character(unique(unlist(lapply(
             X = filterList,
             FUN = function(x){
                 switch(
@@ -120,6 +120,9 @@ setMethod(
                 )
             }
         ))))
+
+        if (length(vepKey) > 0)
+            vepKey <- as.character(na.omit(vepKey))
 
         if (length(vepKey) > 1)
             stop("All VcfVepFilter objects must have the same vep slot")
@@ -218,6 +221,9 @@ setMethod(
     f = "eval",
     signature = c("VcfFilterRules", "ExpandedVCF"),
     definition = function(expr, envir){
+        if (length(expr) == 0)
+            return(rep(TRUE, length(envir)))
+
         # Apply each type of filter to the relevant slot
         resultList <- lapply(
             X = c("fixed", "info", "vep"),
@@ -250,6 +256,14 @@ setMethod(
             stop("invalid subsetting")
 
         if (!missing(i)) {
+            if (is.character(i)){
+                indexNames <- i
+                i <- match(indexNames, names(x))
+                iMissing <- which(is.na(i))
+                if (length(iMissing) > 0)
+                    stop(
+                        "names not found:",
+                        paste(indexNames[iMissing], collapse = ", "))}
             x@type <- slot(x, "type")[i]
             x <- callNextMethod(x, i)
         }
@@ -267,7 +281,7 @@ setMethod(
     if (length(filterType) > 1)
         return(x)
     else if (length(filterType) == 0)
-        return(VcfFixedRules()) # a default empty filter
+        return(VcfFilterRules()) # a default empty filter
 
     listData <- slot(x, "listData")
 
@@ -315,17 +329,27 @@ setMethod(
         if (!missing(j) || length(list(...)) > 0)
             stop("invalid subsetting")
 
-        # Mark new rules with corresponding type
-        x@type[[i]] <- switch(
-            class(value),
-            VcfFixedRules = "fixed",
-            VcfInfoRules = "info",
-            VcfVepRules = "vep",
-            VcfFilterRules = type(value),
-            stop("Invalid filter type")
-        )
-
         if (!missing(i)) {
+            # Convert name to index
+            if (is.character(i)){
+                indexName <- i
+                i <- match(indexName, names(x))
+                iMissing <- which(is.na(i))
+                if (length(iMissing) > 0)
+                    stop(
+                        "names not found:",
+                        paste(indexName[iMissing], collapse = ", "))}
+
+            # Mark new rules with corresponding type
+            x@type[[i]] <- switch(
+                class(value),
+                VcfFixedRules = "fixed",
+                VcfInfoRules = "info",
+                VcfVepRules = "vep",
+                VcfFilterRules = type(value),
+                stop("Invalid filter type")
+            )
+
             # New rules are active by default
             x@active[i] <- TRUE
             x@listData[i] <- slot(value, "listData")

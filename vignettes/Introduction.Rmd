@@ -524,8 +524,8 @@ For Ensembl VEP predictions on a continuous scale, it may be interesting to
 visualise the distribution of values as a density plot.
 In the following chunk of code, the density distribution of
 [CADD score](http://cadd.gs.washington.edu)
-(a tool for scoring the deleteriousness of genetic variants)
-is visualised for variant affecting each feature in each super-population:
+(a tool for scoring the deleteriousness of genetic variants) is visualised
+for missense variants affecting each feature in each super-population:
 
 ```{r optsDensitySet, include=FALSE}
 opts_chunk$set(
@@ -538,7 +538,7 @@ opts_chunk$set(
 ```{r dCBPplot, warning=FALSE}
 densityVepByPhenotype(
         vcf = vcf, phenoCol = "super_pop", vepCol = "CADD_PHRED",
-        param = tparam,
+        param = tparam, filter = vcfRules["missense"],
         unique = TRUE, facet = "Feature", plot = TRUE, popFreq = FALSE) +
     theme(
         legend.key.size = unit(1.2, "lines"),

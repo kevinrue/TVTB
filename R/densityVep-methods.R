@@ -5,13 +5,14 @@ setMethod(
     f = "densityVepByPhenotype",
     signature = c(vcf="ExpandedVCF", param="TVTBparam"),
     definition = function(
-        vcf, phenoCol, vepCol, param, ...,
+        vcf, phenoCol, vepCol, param, ..., filter = VcfFilterRules(),
         unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE){
 
         param <- .override.TVTBparam(param, ...)
 
         .densityVepByPhenotype(
             vcf = vcf, phenoCol = phenoCol, vepCol = vepCol, param = param,
+            filter = filter,
             unique = unique, facet = facet, plot = plot, popFreq = popFreq)
     }
 )
@@ -22,6 +23,7 @@ setMethod(
     signature = c(vcf="ExpandedVCF", param="missing"),
     definition = function(
         vcf, phenoCol, vepCol, alts, param = NULL, ...,
+        filter = VcfFilterRules(),
         unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE){
 
         .checkAlts(alts)
@@ -33,6 +35,7 @@ setMethod(
 
         .densityVepByPhenotype(
             vcf = vcf, phenoCol = phenoCol, vepCol = vepCol, param = param,
+            filter = filter,
             unique = unique, facet = facet, plot = plot, popFreq = popFreq)
     }
 )
@@ -44,14 +47,14 @@ setMethod(
     f = "densityVepInPhenoLevel",
     signature = c(vcf="ExpandedVCF", param="TVTBparam"),
     definition = function(
-        level, vcf, phenoCol, vepCol, param, ...,
+        level, vcf, phenoCol, vepCol, param, ..., filter = VcfFilterRules(),
         unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE){
 
         param <- .override.TVTBparam(param, ...)
 
         .densityVepInPhenoLevel(
             level = level, vcf = vcf, phenoCol = phenoCol, vepCol = vepCol,
-            param = param,
+            param = param, filter = filter,
             unique = unique, facet = facet, plot = plot, popFreq = popFreq)
     }
 )
@@ -62,6 +65,7 @@ setMethod(
     signature = c(vcf="ExpandedVCF", param="missing"),
     definition = function(
         level, vcf, phenoCol, vepCol, alts, param = NULL, ...,
+        filter = VcfFilterRules(),
         unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE){
 
         .checkAlts(alts)
@@ -73,7 +77,7 @@ setMethod(
 
         .densityVepInPhenoLevel(
             level = level, vcf = vcf, phenoCol = phenoCol, vepCol = vepCol,
-            param = param,
+            param = param, filter = filter,
             unique = unique, facet = facet, plot = plot, popFreq = popFreq)
     }
 )
@@ -92,11 +96,14 @@ setMethod(
 # Main methods ----
 
 .densityVepByPhenotype <- function(
-    vcf, phenoCol, vepCol, param,
+    vcf, phenoCol, vepCol, param, filter = VcfFilterRules(),
     unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE){
 
     phenos <- colData(vcf)
     pLevels <- levels(phenos[,phenoCol])
+
+    # Subset
+    vcf <- subsetByFilter(x = vcf, filter = filter)
 
     ggDataList <- bplapply(
         X = pLevels,
@@ -105,9 +112,10 @@ setMethod(
         phenoCol = phenoCol,
         vepCol = vepCol,
         param = param,
+        filter = VcfFilterRules(), # skip: already filtered above
         unique = unique,
         facet = facet,
-        plot = FALSE,
+        plot = FALSE, # skip: only collect data for each level, here
         popFreq = popFreq,
         BPPARAM = bp(param))
 
@@ -132,7 +140,7 @@ setMethod(
 }
 
 .densityVepInPhenoLevel <- function(
-    level, vcf, phenoCol, vepCol, param,
+    level, vcf, phenoCol, vepCol, param, filter = VcfFilterRules(),
     unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE){
 
     # Pass relevant namespaces to the parallel environment
@@ -142,6 +150,10 @@ setMethod(
 
     phenos <- colData(vcf)
     stopifnot(level %in% phenos[,phenoCol])
+
+    # Subset
+
+    vcf <- subsetByFilter(x = vcf, filter = filter)
 
     # Keep the desired consequence for those variants
     ggData <- .vepInPhenoLevel(
