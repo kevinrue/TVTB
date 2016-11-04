@@ -13,7 +13,7 @@ Description: The package provides S4 classes and methods to filter,
     are integrated and demonstrated in a Shiny web-application, the
     Shiny Variant Explorer (tSVE).
 License: Artistic-2.0
-Depends: R (>= 3.3), methods, utils, stats
+Depends: R (>= 3.4), methods, utils, stats
 Imports: BiocGenerics (>= 0.19.1), BiocParallel, Biostrings, ensembldb,
     ensemblVEP, GenomeInfoDb, GenomicRanges, ggplot2, IRanges (>=
     2.7.1), reshape2, Rsamtools, S4Vectors (>= 0.11.11),
