@@ -30,9 +30,6 @@ r_github_packages:
     - rstudio/shiny
     - rstudio/DT
     - jimhester/covr
-    #- Bioconductor-mirror/S4Vectors
-    #- Bioconductor-mirror/SummarizedExperiment
-    #- Bioconductor-mirror/Rsamtools
 
 r_build_args: --keep-empty-dirs --no-resave-data
 r_check_args: --no-vignettes --timings
