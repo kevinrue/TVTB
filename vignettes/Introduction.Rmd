@@ -317,7 +317,8 @@ present either in the `header` or the `info` slots of the `ExpandedVCF` object.
 
 ## Adding frequencies in phenotype level {#FrequenciesPhenoLevel}
 
-Similarly, the method `addPhenoLevelFrequencies` obtains the count of each genotype in samples associated with a given level of a given phenotype,
+Similarly, the method `addPhenoLevelFrequencies` obtains the count of each
+genotype in samples associated with a given level of a given phenotype,
 and stores the calculated values in INFO keys defined as 
 `<pheno>_<level>_<suffix>`, with suffixes defined in the `TVTBparam` object.
 
@@ -329,7 +330,8 @@ setdiff(colnames(info(vcf)), initialInfo)
 ```
 
 Notably, the `addOverallFrequencies` method is synonym to the `addFrequencies`
-method called with the argument `phenos` given as a list where `names` are phenotypes, and values are `character` vectors of levels to
+method called with the argument `phenos` given as a list where `names` are
+phenotypes, and values are `character` vectors of levels to
 process within each phenotype:
 
 ```{r addFrequenciesPhenoLevel}
@@ -359,16 +361,16 @@ To facilitate the definition of VCF filter rules, and their application to
 `FilterRules` class in four new classes of filter rules:
 
 |       Class       | Motivation                                              |
-| :--------------:  | :------------------------------------------------------ | 
+| :--------------:  | :------------------------------------------------------ |
 |  VcfFixedRules    | Filter rules applicable to the `fixed` slot of an       |
 |                   | `ExpandedVCF` object.                                   |
-|                   |                                                         | 
+|                   |                                                         |
 |   VcfInfoRules    | Filter rules applicable to the `info` slot of an        |
 |                   | `ExpandedVCF` object.                                   |
-|                   |                                                         | 
+|                   |                                                         |
 |   VcfVepRules     | Filter rules applicable to the Ensembl VEP predictions  |
 |                   | stored in a given INFO key of an `ExpandedVCF` object.  |
-|                   |                                                         | 
+|                   |                                                         |
 |  VcfFilterRules   | Combination of `VcfFixedRules`, `VcfInfoRules`, and     |
 |                   |  `VcfVepRules` applicable to an `ExpandedVCF` object.   |
 
