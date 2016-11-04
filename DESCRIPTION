@@ -32,7 +32,7 @@ Suggests:
     shiny (>= 0.13.2.9005),
     DT (>= 0.1.67),
     rtracklayer,
-    BiocStyle,
+    BiocStyle (>= 2.1.23),
     knitr (>= 1.12),
     rmarkdown,
     testthat,
