@@ -43,11 +43,7 @@ setMethod(
     f = "show",
     signature = "VcfFixedFilter",
     definition = function(object){
-        cat(sprintf(
-            "VcfFixedFilter: %s %s %s\n",
-            name(object),
-            condition(object),
-            deparse(value(object))))
+        cat("VcfFixedFilter:", as.character(object))
     }
 )
 
@@ -55,11 +51,7 @@ setMethod(
     f = "show",
     signature = "VcfInfoFilter",
     definition = function(object){
-        cat(sprintf(
-            "VcfInfoFilter: %s %s %s\n",
-            name(object),
-            condition(object),
-            deparse(value(object))))
+        cat("VcfInfoFilter:", as.character(object))
     }
 )
 
@@ -67,10 +59,26 @@ setMethod(
     f = "show",
     signature = "VcfVepFilter",
     definition = function(object){
-        cat(sprintf(
-            "VcfVepFilter: %s %s %s\n",
-            name(object),
-            condition(object),
-            deparse(value(object))))
+        cat("VcfVepFilter:", as.character(object))
+    }
+)
+
+setMethod(
+    f = "show",
+    signature = "VcfFilterList",
+    definition = function(object){
+        # TODO: "Active" column
+        cat("Index\tActive\tType\tFilter\n")
+        mapply(
+            FUN = function(idx, type, filter){
+                cat(sprintf(
+                    "%i.\t[x]\t%s\t%s\n",
+                    idx,
+                    type,
+                    as.character(filter)))
+                },
+            seq_along(filterRules(object)),
+            sapply(X = filterRules(object), FUN = filterType),
+            filterRules(object))
     }
 )

@@ -58,7 +58,7 @@ tSVEParam <- setClass(
 
 )
 
-# tSVEParam ----
+# VcfBasicFilter ----
 
 .valid.VcfBasicFilter <- function(object){
 
@@ -85,7 +85,8 @@ VcfBasicFilter <- setClass(
     slots = c(
         name = "character",
         condition = "character",
-        value = "ANY"
+        value = "ANY",
+        type = "character"
     ),
 
     validity = .valid.VcfBasicFilter
@@ -95,25 +96,31 @@ VcfBasicFilter <- setClass(
 VcfFixedFilter <- setClass(
     Class = "VcfFixedFilter",
 
-    contains = "VcfBasicFilter"
+    contains = "VcfBasicFilter",
+
+    prototype = list(type = "fixed")
 
 )
 
 VcfInfoFilter <- setClass(
     Class = "VcfInfoFilter",
 
-    contains = "VcfBasicFilter"
+    contains = "VcfBasicFilter",
+
+    prototype = list(type = "info")
 
 )
 
 VcfVepFilter <- setClass(
     Class = "VcfVepFilter",
 
-    contains = "VcfBasicFilter"
+    contains = "VcfBasicFilter",
+
+    prototype = list(type = "VEP")
 
 )
 
-#
+# VcfFilterList ----
 
 .valid.VcfFilterList <- function(object){
 
@@ -133,7 +140,7 @@ VcfVepFilter <- setClass(
         errors <- c(
             errors,
             paste(
-                "invalid filter type for filter(s): ",
+                "invalid filter class for filter(s): ",
                 paste(idxInvalid, sep = ", ")
                 )
             )

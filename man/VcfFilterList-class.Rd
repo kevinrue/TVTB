@@ -68,13 +68,17 @@ and \code{\link{parseCSQToGRanges,VCF-method}}.
 # Constructors ----
 
 vff <- VcfFixedFilter(name = "FILTER", condition = "==", value = "PASS")
+vff
 
 vif <- VcfInfoFilter(name = "MAF", condition = "<=", value = 1e-6)
+vif
 
 vvf <- VcfVepFilter(
     name = "IMPACT", condition = "\%in\%", value = c("MODERATE", "HIGH"))
+vvf
 
-vlist <- VcfFilterList(vff, vif, vff)
+vlist <- VcfFilterList(vff, vif, vvf)
+vlist
 
 # Accessors ----
 

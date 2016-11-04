@@ -69,9 +69,6 @@ and \code{\link{geno,VCF-method}}
 extdata <- file.path(system.file(package = "tSVE"), "extdata")
 vcfFile <- file.path(extdata, "moderate.vcf")
 
-# Phenotype file
-phenoFile <- file.path(extdata, "moderate_pheno.txt")
-
 tparam <- tSVEParam(
     genos = list(
         REF = "0|0",
@@ -79,7 +76,7 @@ tparam <- tSVEParam(
         ALT = "1|1"))
 
 vcf <- preprocessVariants(
-    file = vcfFile, param = tparam, phenos = phenoFile)
+    file = vcfFile, param = tparam)
 
 # Example usage ----
 

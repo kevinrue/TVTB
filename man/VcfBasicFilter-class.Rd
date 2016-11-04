@@ -33,45 +33,42 @@
 
 % Accessor methods:
 \alias{name}
+\alias{name<-}
+\alias{condition}
+\alias{condition<-}
+\alias{value}
+\alias{value<-}
+\alias{filterType}
+
 \alias{name,VcfFixedFilter-method}
-\alias{name<-}
 \alias{name<-,VcfFixedFilter,character-method}
-\alias{condition}
 \alias{condition,VcfFixedFilter-method}
-\alias{condition<-}
 \alias{condition<-,VcfFixedFilter,character-method}
-\alias{value}
 \alias{value,VcfFixedFilter-method}
-\alias{value<-}
 \alias{value<-,VcfFixedFilter-method}
+\alias{filterType,VcfFixedFilter-method}
 
-\alias{name}
 \alias{name,VcfInfoFilter-method}
-\alias{name<-}
 \alias{name<-,VcfInfoFilter,character-method}
-\alias{condition}
 \alias{condition,VcfInfoFilter-method}
-\alias{condition<-}
 \alias{condition<-,VcfInfoFilter,character-method}
-\alias{value}
 \alias{value,VcfInfoFilter-method}
-\alias{value<-}
 \alias{value<-,VcfInfoFilter-method}
+\alias{filterType,VcfInfoFilter-method}
 
-\alias{name}
 \alias{name,VcfVepFilter-method}
-\alias{name<-}
 \alias{name<-,VcfVepFilter,character-method}
-\alias{condition}
 \alias{condition,VcfVepFilter-method}
-\alias{condition<-}
 \alias{condition<-,VcfVepFilter,character-method}
-\alias{value}
 \alias{value,VcfVepFilter-method}
-\alias{value<-}
 \alias{value<-,VcfVepFilter-method}
+\alias{filterType,VcfVepFilter-method}
 
 % Other methods / functions
+\alias{as.character}
+\alias{as.character,VcfFixedFilter-method}
+\alias{as.character,VcfInfoFilter-method}
+\alias{as.character,VcfVepFilter-method}
 
 \title{VcfBasicFilter class objects}
 
@@ -101,6 +98,9 @@ In the following code snippets \code{x} is a \code{VcfBasicFilter} object.
     }
     \item{\code{value(x)}, \code{value(x) <- value}}{
     Gets or sets the target values of the filter.
+    }
+    \item{\code{filterType(x)}}{
+    Gets the type of filter.
     }
 }
 }
@@ -145,8 +145,9 @@ filt <- VcfVepFilter(
 
 # Accessors ----
 
-## Name, condition, and value stored in the VcfBasicFilter object
+## Name, condition, value, and type stored in the VcfBasicFilter object
 name(filt)
 condition(filt)
 value(filt)
+filterType(filt)
 }

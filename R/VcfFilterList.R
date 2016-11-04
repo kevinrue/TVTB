@@ -45,7 +45,7 @@ setReplaceMethod(
 )
 
 setReplaceMethod(
-    f = "filterRules", c("VcfFilterList", "VcfFixedList"),
+    f = "filterRules", c("VcfFilterList", "VcfFixedFilter"),
     function(x, value){
         slot(x, "filterRules") <- list(value)
         validObject(x)
@@ -54,7 +54,7 @@ setReplaceMethod(
 )
 
 setReplaceMethod(
-    f = "filterRules", c("VcfFilterList", "VcfInfoList"),
+    f = "filterRules", c("VcfFilterList", "VcfInfoFilter"),
     function(x, value){
         slot(x, "filterRules") <- list(value)
         validObject(x)
@@ -63,7 +63,7 @@ setReplaceMethod(
 )
 
 setReplaceMethod(
-    f = "filterRules", c("VcfFilterList", "VcfInfoList"),
+    f = "filterRules", c("VcfFilterList", "VcfInfoFilter"),
     function(x, value){
         slot(x, "filterRules") <- list(value)
         validObject(x)

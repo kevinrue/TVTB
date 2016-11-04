@@ -354,5 +354,12 @@ setGeneric(
     name = "filterRules<-",
     signature = c("x", "value"),
     def = function(x, value)
-        standardGeneric("filterRules")
+        standardGeneric("filterRules<-")
+)
+
+setGeneric(
+    name = "filterType",
+    signature = c("x"),
+    def = function(x)
+        standardGeneric("filterType")
 )

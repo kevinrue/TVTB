@@ -236,3 +236,59 @@ setReplaceMethod(
         return(x)
     }
 )
+
+setMethod(
+    f = "filterType",
+    signature = c("VcfFixedFilter"),
+    definition = function(x)
+        slot(x, "type")
+)
+
+setMethod(
+    f = "filterType",
+    signature = c("VcfInfoFilter"),
+    definition = function(x)
+        slot(x, "type")
+)
+
+setMethod(
+    f = "filterType",
+    signature = c("VcfVepFilter"),
+    definition = function(x)
+        slot(x, "type")
+)
+
+# as.character ----
+
+setMethod(
+    f = "as.character",
+    signature = c("VcfFixedFilter"),
+    definition = function(x){
+        paste(
+            name(x),
+            condition(x),
+            deparse(value(x)))
+    }
+)
+
+setMethod(
+    f = "as.character",
+    signature = c("VcfInfoFilter"),
+    definition = function(x){
+        paste(
+            name(x),
+            condition(x),
+            deparse(value(x)))
+    }
+)
+
+setMethod(
+    f = "as.character",
+    signature = c("VcfVepFilter"),
+    definition = function(x){
+        paste(
+            name(x),
+            condition(x),
+            deparse(value(x)))
+    }
+)
