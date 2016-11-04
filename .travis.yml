@@ -12,7 +12,5 @@ r_github_packages:
     - rstudio/DT
 after_success:
     - bash <(curl -s https://codecov.io/bash)
-r_build_args:
-    - "--keep-empty-dirs --no-resave-data"
-r_check_args:
-    - "--no-vignettes --timings"
+r_build_args: --keep-empty-dirs --no-resave-data
+r_check_args: --no-vignettes --timings
