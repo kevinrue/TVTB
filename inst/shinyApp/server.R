@@ -548,7 +548,7 @@ shinyServer(function(input, output, clientData, session) {
         bpParam <- bpParam()
 
         validate(
-            need(input$vepKey, Msgs[["vepKey"]]),
+            need(input$vepKey, label = Msgs[["vepKey"]]),
             need(input$refGenotypes, Msgs[["refGenotypes"]]),
             need(input$hetGenotypes, Msgs[["hetGenotypes"]]),
             need(input$altGenotypes, Msgs[["altGenotypes"]])
@@ -1066,10 +1066,15 @@ shinyServer(function(input, output, clientData, session) {
         quickFix <- gsub("[‘’]", "\'", quickFix)
 
         return(tryCatch({
+
             newFilter <- new(
                 Class = input$newFilterClass,
                 exprs = list(quickFix),
                 active = input$newFilterActive)
+
+            if (class(newFilter) == "VcfVepRules")
+                vep(newFilter) <- input$vepKey
+
             return(newFilter)},
             # warning = function(w) NULL,
             error = function(e) NULL
@@ -1500,7 +1505,10 @@ shinyServer(function(input, output, clientData, session) {
 
         validate(
             need(vcf, Msgs[["importVariants"]]),
-            need(input$vepKey, label = Msgs[["vepKey"]]))
+            need(
+                input$vepKey %in% colnames(info(vcf)),
+                Msgs[["vepKeyNotFound"]])
+        )
 
         csq <- tryParseCsq(vcf = vcf, vepKey = input$vepKey)
 
@@ -1514,7 +1522,10 @@ shinyServer(function(input, output, clientData, session) {
         vcf <- RV[["filteredVcf"]]
         validate(
             need(vcf, Msgs[["importVariants"]]),
-            need(input$vepKey, Msgs[["vepKey"]]))
+            need(
+                input$vepKey %in% colnames(info(vcf)),
+                Msgs[["vepKeyNotFound"]])
+            )
 
         csq <- tryParseCsq(vcf = vcf, vepKey = input$vepKey)
 
@@ -1534,8 +1545,10 @@ shinyServer(function(input, output, clientData, session) {
 
         validate(
             need(vcf, Msgs[["importVariants"]]),
-            need(input$vepKey, Msgs[["vepKey"]])
-            )
+            need(
+                input$vepKey %in% colnames(info(vcf)),
+                Msgs[["vepKeyNotFound"]])
+        )
 
         csq <- tryParseCsq(vcf = vcf, vepKey = input$vepKey)
 
@@ -1564,7 +1577,10 @@ shinyServer(function(input, output, clientData, session) {
 
         validate(
             need(vcf, Msgs[["importVariants"]]),
-            need(input$vepKey, label = Msgs[["vepKey"]]))
+            need(
+                input$vepKey %in% colnames(info(vcf)),
+                Msgs[["vepKeyNotFound"]])
+        )
 
         csq <- tryParseCsq(vcf = vcf, vepKey = input$vepKey)
 
@@ -1670,7 +1686,9 @@ shinyServer(function(input, output, clientData, session) {
         # Give time to filter variants
         req(vcf)
 
-        validate(need(input$vepKey, label = Msgs[["vepKey"]]))
+        validate(need(
+            input$vepKey %in% colnames(info(vcf)),
+            Msgs[["vepKeyNotFound"]]))
         csq <- tryParseCsq(vcf = vcf, vepKey = input$vepKey)
 
         validate(need(csq, Msgs[["csq"]]))
@@ -1965,7 +1983,9 @@ shinyServer(function(input, output, clientData, session) {
         # Give time to filter variants
         req(vcf)
 
-        validate(need(input$vepKey, label = Msgs[["vepKey"]]))
+        validate(need(
+            input$vepKey %in% colnames(info(vcf)),
+            Msgs[["vepKeyNotFound"]]))
         csq <- tryParseCsq(vcf = vcf, vepKey = input$vepKey)
 
         validate(need(csq, Msgs[["csq"]]))

@@ -147,7 +147,8 @@ Msgs <- list(
     vcfPaths = "No VCF file found for requested chromosome. See console.",
 
     # Specials
-    fileChooseCancelled = "file choice cancelled."
+    fileChooseCancelled = "file choice cancelled.",
+    vepKeyNotFound = "VEP key not found in INFO slot"
 )
 
 # Tracking messages -------------------------------------------------------
