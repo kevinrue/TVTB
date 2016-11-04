@@ -199,7 +199,7 @@ tparam <- TVTBparam(
 
 # Pre-process variants
 vcf <- VariantAnnotation::readVcf(file = vcfFile)
-vcf <- VariantAnnotation::expand(vcf)
+vcf <- VariantAnnotation::expand(vcf, row.names = TRUE)
 vcf <- addOverallFrequencies(vcf = vcf, param = tparam)
 
 # Applying filters to ExpandedVCF objects ----

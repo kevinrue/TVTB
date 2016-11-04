@@ -183,6 +183,7 @@ setMethod(
 
 # TODO info.key taken from TVTBParam
 .evalVepFilter <- function(expr, envir){
+    # This filter requires unique rownames in the ExpandedVCF
     if (any(duplicated(rownames(envir))))
         rownames(envir) <- paste(
             rownames(envir),
@@ -190,6 +191,9 @@ setMethod(
             sep = "_")
     if (any(duplicated(rownames(envir))))
         stop("<rownames(x)>_<ALT> is not unique")
+    # In case users called expand(..., row.names = FALSE)
+    if (is.null(rownames(envir)))
+        rownames(envir) <- 1:length(envir)
     csq <- parseCSQToGRanges(
         x = envir, VCFRowID = rownames(envir), info.key = vep(expr))
     # Apply filters to the VEP predictions

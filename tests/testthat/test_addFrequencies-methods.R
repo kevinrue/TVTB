@@ -18,9 +18,10 @@ tparam <- TVTBparam(
         HET = c("0|1", "1|0"),
         ALT = "1|1"))
 
+# Pre-process variants
 vcf <- VariantAnnotation::readVcf(file = vcfFile)
 colData(vcf) <- phenotypes
-vcf <- VariantAnnotation::expand(vcf)
+vcf <- VariantAnnotation::expand(vcf, row.names = TRUE)
 
 # Create a VCF object with a pre-existing INFO key
 

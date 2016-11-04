@@ -20,12 +20,8 @@ tparam <- TVTBparam(
 
 # Pre-process variants
 vcf <- VariantAnnotation::readVcf(file = vcfFile)
-# Add phenotype information necessary for the demo
 colData(vcf) <- phenotypes
-# Separate multi-allelic records into bi-allelic records
-vcf <- VariantAnnotation::expand(x = vcf, row.names = TRUE)
-# Disambiguate row.names from multi-allelic records
-rownames(vcf) <- paste(rownames(vcf), mcols(vcf)[,"ALT"], sep = "_")
+vcf <- VariantAnnotation::expand(vcf, row.names = TRUE)
 
 # Signatures ----
 
