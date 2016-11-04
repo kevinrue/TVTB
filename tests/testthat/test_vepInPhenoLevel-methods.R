@@ -23,11 +23,9 @@ vcf <- VariantAnnotation::expand(vcf, row.names = TRUE)
 test_that("vepInPhenoLevel() supports all signatures",{
 
     # ExpandedVCF, / implicitely tested by higher functions TODO:
-    expect_is(
-        vepInPhenoLevel(
-            vcf, "super_pop", "AFR", "CADD_PHRED",
-            unique = FALSE, facet = NULL),
-        "data.frame"
+    expect_s4_class(
+        vepInPhenoLevel(vcf, "super_pop", "AFR", "CADD_PHRED", FALSE),
+        "GRanges"
     )
 
 })
@@ -37,11 +35,9 @@ test_that("vepInPhenoLevel() supports all signatures",{
 test_that("vepInPhenoLevel() supports all signatures",{
 
     # ExpandedVCF, / implicitely tested by higher functions TODO:
-    expect_is(
-        vepInPhenoLevel(
-            vcf, "super_pop", "EUR", "CADD_PHRED",
-            unique = FALSE, facet = NULL),
-        "data.frame"
+    expect_s4_class(
+        vepInPhenoLevel(vcf, "super_pop", "AFR", "CADD_PHRED", FALSE),
+        "GRanges"
     )
 
 })

@@ -8,7 +8,6 @@
 % Constructors/Methods:
 \alias{TVTBparam}
 \alias{TVTBparam-methods}
-\alias{TVTBparam,Genotypes-method}
 \alias{initialize,TVTBparam-method}
 
 % Accessor methods:
@@ -61,7 +60,7 @@ package in a convenient format.
 }
 
 \usage{
-\S4method{TVTBparam}{Genotypes}(
+TVTBparam(
         genos, ranges = GRangesList(),
         aaf = "AAF", maf = "MAF", vep = "CSQ", bp = SerialParam(),
         svp = ScanVcfParam(which = reduce(unlist(ranges))))

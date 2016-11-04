@@ -3,13 +3,9 @@
 
 setMethod(
     "vepInPhenoLevel", c("ExpandedVCF"),
-    function(
-        vcf, phenoCol, level, vepCol,
-        unique = FALSE, facet = NULL){
+    function(vcf, phenoCol, level, vepCol, unique = FALSE){
 
-        return(.vepInPhenoLevel(
-            vcf, phenoCol, level, vepCol,
-            unique, facet))
+        return(.vepInPhenoLevel(vcf, phenoCol, level, vepCol, unique))
     }
 )
 
@@ -33,7 +29,6 @@ setMethod(
     stopifnot(length(level) == 1)
 
     stopifnot(is.character(vepCol))
-    stopifnot(length(vepCol) == 1)
 
     stopifnot(is.logical(unique))
     stopifnot(length(unique) == 1)
@@ -53,16 +48,6 @@ setMethod(
     # parse VEP predictions of variants in phenotype level (maybe no variant)
     csq <- parseCSQToGRanges(vcf[variantsIdx], info.key = vep(param))
 
-    # Extract requested predictions
-    if (length(csq) > 0){
-        # Keep the desired consequence(+facet) for those variants
-        vepFacet <- as.data.frame(mcols(csq[,c(vepCol, facet)]))
-        # Set column names (facet may be NULL)
-        colnames(vepFacet) <- c(vepCol, facet)
-        # Return the formatted table
-        return(vepFacet)
-    }
-
-    # If no VEP predictions/variants in phenotype level: empty data.frame
-    return(data.frame())
+    # Cannot selected columns of an empty GRanges
+    return(csq[,vepCol])
 }

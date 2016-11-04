@@ -2,13 +2,74 @@
 \title{NEWS: The VCF Tool Box}
 
 \section{Changes in version 1.1.3}{
+
+\subsection{New features}{
+\itemize{
+\item The \code{autodetectGenotypes} method creates or updates
+    the genotypes defined in the \code{TVTBparam} that is stored
+    in the \code{metadata} slot of a \code{VCF} object.
+\item The argument \code{autodetectGT} of the \code{readVcf} method may be
+    used to call the new \code{autodetectGenotypes} method immediately after
+    a \code{VCF} object is initialised from the parsed VCF file.
+}
+}
+
+\subsection{Major changes}{
+\itemize{
+\item \code{vepInPhenoLevel} returns a \code{GRanges} instead of a
+    \code{data.frame}; the key advantage is that \code{ranges} may have
+    non-unique \code{names}.
+\item \code{Genotypes} objects can now be initialised without specifying
+    \code{ref}, \code{het}, and \code{alt} genotype vectors (with a
+    \code{warning}).
+    A default \code{Genotypes} object is created with
+    \code{ref}, \code{het}, and \code{alt} slots set to \code{NA_character_}.
+    The new \code{autodetectGenotypes} method may be
+    used to populate those slots after variants are imported
+    (see \emph{New features} section).
+\item \code{TVTBparam} objects can now be initialised without supplying a
+    \code{Genotypes} object (with a \code{warning}).
+    A default \code{Genotypes} object is created (see above).
+\item Constructors for classes \code{Genotypes} and \code{TVTBparam} are now
+    high-level methods, \strong{not} S4 methods methods anymore.
+\item Default settings of the \emph{Shiny} app are stored as
+    an \code{environment} that can be overriden by arguments of the \code{tSVE}
+    method.
+\item \emph{Shiny} app stores more objects in \code{reactiveValues}.
+\item \emph{Shiny} app stores more error messages in \code{reactiveValues}
+    to better deal with optional inputs and better help users to resovle
+    sources of errors.
+}
+}
+
 \subsection{Minor changes}{
 \itemize{
-\item \emph{Shiny} app warns in console if no \code{EnsDb} package
-    installed/selected.
+\item The \code{show} method throws \code{warning} messages for
+    \code{TVTBparam} and \code{Genotypes} objects that have not fully defined
+    all genotypes.
+\item Better layout of badges in \code{README}.
+\item Non-reactive settings of the \emph{Shiny} app stored in hidden objects.
+\item Helper methodS \code{getEdb}, \code{tryParsePheno}, \code{tryParseBed},
+    \code{tryParseVcfHeader}, \code{tryParseMultipleVcf}, and
+    \code{tryParseSingleVcf} removed and integrated into the server side
+    of the \emph{Shiny} app.
+\item Massive cleaning of messages in the \code{global.R} file of the
+    \emph{Shiny} app.
+\item \code{GRanges}, \code{Genotypes}, and \code{Phenotypes} panels removed
+    from \code{Session} panel of the \emph{Shiny} app.
+\item Table reporting status of \code{BiocParallel} configurations of the
+    \emph{Shiny} app on various system stored as an RDS file.
+\item \emph{Shiny} app displays a warning at the top of the screen if the
+    genotypes are not fully defined.
+\item Tab width of \emph{Shiny} files set to \code{2}.
 \item Branches tracked by Travis CI.
+\item Added a couple of files in \code{inst/badexamples} folder.
+\item Added YAML file for \emph{AppVeyor}.
+\item Added \code{pander} in \code{Suggests} section of \code{DESCRIPTION},
+    to render vignette tables.
 }
 }
+
 }
 
 \section{Changes in version 1.1.2 2016-10-21}{

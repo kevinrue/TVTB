@@ -1,18 +1,15 @@
 
 # Constructors ----
 
-# ref=character,het=character,alt=character ----
-
-setMethod(
-    "Genotypes", c("character", "character", "character"),
-    function(ref, het, alt, suffix = c(ref="REF", het="HET", alt="ALT")){
-        return(new(
-            "Genotypes",
-            ref = ref, het = het, alt = alt,
-            suffix = suffix[c("ref", "het", "alt")]
-        ))
-    }
-)
+Genotypes <- function(
+    ref = NA_character_, het = NA_character_, alt = NA_character_,
+    suffix = c(ref="REF", het="HET", alt="ALT")){
+    return(new(
+        "Genotypes",
+        ref = ref, het = het, alt = alt,
+        suffix = suffix[c("ref", "het", "alt")]
+    ))
+}
 
 # Accessor ----
 

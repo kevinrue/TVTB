@@ -13,19 +13,22 @@ test_that("Constructor produce a valid object",{
 genotypes <- Genotypes("0/0", c("0/1", "1/0"), "1/1")
 
 # Validity checks ----
+#
+# test_that("Genotypes must have lengths > 0", {
+#
+#     # Now allowed to be character(0)
+#     expect_error(Genotypes(character(), c("0/1", "1/0"), "1/1"))
+#     expect_error(Genotypes("0/0", character(), "1/1"))
+#     expect_error(Genotypes("0/0", c("0/1", "1/0"), character()))
+#
+#
+# })
 
-test_that("Genotypes must have lengths > 0", {
+test_that("Suffixes must be named ref, het, and alt", {
 
-    expect_error(Genotypes(character(), c("0/1", "1/0"), "1/1"))
+  expect_error(Genotypes("0/0", c("0/1", "1/0"), "1/1", c("REF", "HET")))
 
-    expect_error(Genotypes("0/0", character(), "1/1"))
-
-    expect_error(Genotypes("0/0", c("0/1", "1/0"), character()))
-
-    expect_error(Genotypes("0/0", c("0/1", "1/0"), "1/1", c("REF", "HET")))
-
-    expect_error(Genotypes("0/0", c("0/1", "1/0"), "1/1",c("REF", "HET", NA)))
-
+  expect_error(Genotypes("0/0", c("0/1", "1/0"), "1/1",c("REF", "HET", NA)))
 })
 
 # Accessors ----
@@ -94,7 +97,7 @@ test_that("Setters return valid values", {
 
 test_that("Overlapping genotypes are not allowed",{
 
-    expect_error(Genotypes("0/0", c("0/1", "0/0"), "1/1"))
+    expect_warning(Genotypes("0/0", c("0/1", "0/0"), "1/1"))
 
 })
 

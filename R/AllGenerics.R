@@ -1,10 +1,10 @@
 
-# Genotypes class ----
+# autodetectGenotypes ----
 
 setGeneric(
-    "Genotypes", signature = c("ref", "het", "alt"),
-    function(ref, het, alt, suffix = c(ref="REF", het="HET", alt="ALT"))
-        standardGeneric("Genotypes")
+    "autodetectGenotypes", signature = c("vcf"),
+    function(vcf)
+        standardGeneric("autodetectGenotypes")
 )
 
 # dropInfo ----
@@ -68,22 +68,11 @@ setGeneric(
 
 setGeneric(
     "vepInPhenoLevel", signature = c("vcf"),
-    function(
-        vcf, phenoCol, level, vepCol,
-        unique = FALSE, facet = NULL)
+    function(vcf, phenoCol, level, vepCol, unique = FALSE)
         standardGeneric("vepInPhenoLevel")
 )
 
 # TVTBparam class ----
-
-setGeneric(
-    "TVTBparam", signature = "genos",
-    function(
-        genos, ranges = GRangesList(),
-        aaf = "AAF", maf = "MAF", vep = "CSQ", bp = SerialParam(),
-        svp = ScanVcfParam(which = reduce(unlist(ranges))))
-        standardGeneric("TVTBparam")
-)
 
 setGeneric(
     "genos", signature = "x",

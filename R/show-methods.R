@@ -3,6 +3,7 @@
 setMethod(
     "show", "Genotypes",
     function(object){
+        validObject(object)
         cat("Class: Genotypes\n")
         cat(sprintf(
             "  @ref (hom. ref.): \"%s\" {%s}\n",
@@ -28,6 +29,7 @@ setMethod(
         cat("class: TVTBparam\n")
         cat(  "@genos: class: Genotypes\n")
         g <- object@genos
+        validObject(g)
         cat(sprintf(
             "    @ref (hom. ref.): \"%s\" {%s}\n",
             suffix(g)["ref"],

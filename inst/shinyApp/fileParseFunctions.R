@@ -1,21 +1,4 @@
 
-tryParsePheno <- function(file){
-    message("Parsing ", file," as GRanges ...")
-
-    rawData <- tryCatch(
-        read.table(file = file, header = TRUE, row.names = 1),
-        warning = function(warn){
-            warning(warn)
-            return(NULL)},
-        error = function(err){
-            warning(geterrmessage())
-            return(NULL)
-        }
-    )
-
-    return(rawData)
-}
-
 tryParseCsq <- function(vcf, vepKey){
 
     message("Parsing ", vepKey," to GRanges ...")
@@ -25,43 +8,6 @@ tryParseCsq <- function(vcf, vepKey){
             x = vcf,
             VCFRowID = rownames(vcf),
             info.key = vepKey),
-        warning = function(warn){
-            warning(warn)
-            return(NULL)},
-        error = function(err){
-            warning(geterrmessage())
-            return(NULL)
-        }
-    )
-
-    return(rawData)
-}
-
-tryParseBed <- function(bed){
-    message("Parsing ", bed," as GRanges ...")
-
-    rawData <- tryCatch(
-        rtracklayer::import.bed(con = bed),
-        warning = function(warn){
-            warning(warn)
-            return(NULL)},
-        error = function(err){
-            warning(geterrmessage())
-            return(NULL)
-        }
-    )
-
-    return(rawData)
-}
-
-tryParseVcfHeader <- function(file){
-    if (is.null(file))
-        return(NULL)
-
-    message("Parsing header of ", file, " ...")
-
-    rawData <- tryCatch(
-        VariantAnnotation::scanVcfHeader(file = file),
         warning = function(warn){
             warning(warn)
             return(NULL)},
@@ -181,43 +127,4 @@ parseSingleVcf <- function(
     vcf <- VariantAnnotation::expand(vcf, row.names = TRUE)
 
     return(vcf)
-}
-
-tryParseMultipleVcf <- function(
-    folder, pattern, param,
-    yieldSize = NA_integer_,
-    BPPARAM = BiocParallel::SerialParam()){
-
-    rawData <- tryCatch(
-        parseMultipleVcf(
-            folder, pattern, param = param, yieldSize = yieldSize),
-        warning = function(warn){
-            warning(warn)
-            return(NULL)},
-        error = function(err){
-            warning(geterrmessage())
-            return(NULL)
-        }
-    )
-
-    return(rawData)
-}
-
-tryParseSingleVcf <- function(file, param, yieldSize = NA_integer_){
-
-    rawData <- tryCatch(
-        parseSingleVcf(
-            file = file,
-            param = param,
-            yieldSize = yieldSize),
-        warning = function(warn){
-            warning(warn)
-            return(NULL)},
-        error = function(err){
-            warning(geterrmessage())
-            return(NULL)
-        }
-    )
-
-    return(rawData)
 }

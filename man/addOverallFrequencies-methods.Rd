@@ -66,6 +66,11 @@ INFO fields for genotype counts and allele frequencies.
 See \emph{Details}.
 }
 
+\section{Warning}{
+A \code{warning} message is issued if genotypes are not fully defined in the
+\code{TVTBparam}.
+}
+
 \author{
 Kevin Rue-Albrecht
 }

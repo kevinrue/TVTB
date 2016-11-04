@@ -7,15 +7,13 @@
 \alias{vepInPhenoLevel-methods}
 \title{VEP predictions of variants observed in samples}
 \description{
-Considers only variants observed (uniquey) in samples associated with a given
-phenotype level, and tabulates the corresponding values for a given VEP
-prediction field.
+Returns VEP predictions for variants observed (uniquey) in samples associated
+with a given phenotype level.
 }
 
 \usage{
 \S4method{vepInPhenoLevel}{ExpandedVCF}(
-    vcf, phenoCol, level, vepCol,
-    unique = FALSE, facet = NULL)
+    vcf, phenoCol, level, vepCol, unique = FALSE)
 }
 
 \arguments{
@@ -33,34 +31,35 @@ Phenotype level; only variants observed in at least one sample will be
 considered.
 }
     \item{vepCol}{
-VEP prediction field; Name of a metadata column in
+VEP prediction fields; \code{character} vector of metadata columns in
 \code{ensemblVEP::parseCSQToGRanges(vcf)}.
 }
     \item{unique}{
 If \code{TRUE}, consider only variants unique to the phenotype level
 (\emph{i.e.} absent from all other phenotype levels).
 }
-    \item{facet}{
-Name of a metadata column in \code{ensemblVEP::parseCSQToGRanges(vcf)}.
-Additional VEP field appended as an additional column to the
-\code{data.frame} returned. If \code{plot=TRUE}, this field will be used to
-create one sub-plot for each level of the faceting field.
-
-If available, \code{"Feature"} is a recommended value for this argument,
-as VEP typically produce one prediction per variant per feature.
-}
 }
 
 \value{
-A \code{data.frame} in long format including one row
-for each VEP prediction associated with a variant
+A \code{GRanges} including all VEP predictions associated with a variant
 seen in at least one sample (heterozygote or alternate homozygote)
 associated with the phenotype level.
-The \code{data.frame} contains at least one column for the VEP prediction
+The \code{GRanges} contains at least one column for the VEP prediction
 value.
-An additional column containing another VEP prediction field may be added
+Additional columns containing another VEP prediction field may be added
 using the \code{facet} argument.
 }
+
+\section{Note}{
+If available, \code{"Feature"} is a recommended value for this argument,
+as VEP typically produce one prediction per variant per feature.
+}
+
+\section{Warning}{
+A \code{warning} message is issued if genotypes are not fully defined in the
+\code{TVTBparam}.
+}
+
 \author{
 Kevin Rue-Albrecht
 }
@@ -94,8 +93,7 @@ vcf <- VariantAnnotation::expand(vcf, row.names = TRUE)
 
 # Example usage ----
 
-vepInPhenoLevel(vcf, "super_pop", "AFR", "CADD_PHRED")
+vepInPhenoLevel(vcf, "super_pop", "AFR", c("CADD_PHRED", "Feature", "IMPACT"))
 }
 
 \keyword{methods}
-

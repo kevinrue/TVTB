@@ -35,6 +35,7 @@ setMethod(
 .checkPLFInfo <- function(vcf, pheno, level, force){
 
     param <- metadata(vcf)[["TVTBparam"]]
+    validObject(param@genos)
 
     # Collate the INFO key suffixes
     keySuffixes <- suffix(param)

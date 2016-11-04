@@ -28,6 +28,11 @@ importMethodsFrom(
     "seqnames", "seqinfo", "seqlevels")
 
 importFrom(
+    "limma",
+    "strsplit2"
+)
+
+importFrom(
     "Rsamtools",
     "TabixFile")
 importMethodsFrom(
@@ -93,6 +98,8 @@ export("tSVE")
 # S4 ----
 
 exportMethods(
+    "autodetectGenotypes",
+
     "countGenos", "addCountGenos",
 
     "addFrequencies", "addOverallFrequencies", "addPhenoLevelFrequencies",
@@ -117,18 +124,16 @@ exportMethods(
 
 #exportClassPattern("^.*$")
 exportClasses(
-    "TVTBparam",
+    "TVTBparam", "Genotypes",
     "VcfFixedRules", "VcfInfoRules", "VcfVepRules", "VcfFilterRules"
 )
 
 # Constructors ----
 
 # Default methods
-export("VcfFixedRules", "VcfInfoRules", "VcfVepRules", "VcfFilterRules")
-
-# S4method wrapper
-exportMethods(
-    "TVTBparam", "Genotypes"
+export(
+    "TVTBparam", "Genotypes",
+    "VcfFixedRules", "VcfInfoRules", "VcfVepRules", "VcfFilterRules"
 )
 
 # Re-export useful methods defined in other packages ----

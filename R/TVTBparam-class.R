@@ -1,24 +1,19 @@
 
 # Constructors ----
 
-# genos=Genotypes ----
+TVTBparam <- function(
+    genos = Genotypes(), ranges = GRangesList(),
+    aaf = "AAF", maf = "MAF", vep = "CSQ", bp = SerialParam(),
+    svp = ScanVcfParam(which = reduce(unlist(ranges)))){
 
-setMethod(
-    "TVTBparam", "Genotypes",
-    function(
-        genos, ranges = GRangesList(),
-        aaf = "AAF", maf = "MAF", vep = "CSQ", bp = SerialParam(),
-        svp = ScanVcfParam(which = reduce(unlist(ranges)))){
+    # Support objects coercible to GRangesList
+    ranges <- as(ranges, "GRangesList")
 
-        # Support objects coercible to GRangesList
-        ranges <- as(ranges, "GRangesList")
-
-        return(new(
-            Class = "TVTBparam",
-            genos = genos, ranges = ranges,
-            aaf = aaf, maf = maf, vep = vep, bp = bp, svp = svp))
-    }
-)
+    return(new(
+        Class = "TVTBparam",
+        genos = genos, ranges = ranges,
+        aaf = aaf, maf = maf, vep = vep, bp = bp, svp = svp))
+}
 
 # Getters and Setters ----
 

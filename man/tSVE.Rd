@@ -10,9 +10,19 @@ The Shiny Variant Explorer (tSVE) web-application
 This function starts the interactive \code{tSVE} shiny web-application that
 allows to interactively load and visualise genetic variants and their
 Ensembl Variant Effect Predictor (VEP) predictions using the package methods.
+All arguments after the \dots set default values for the application
+(\emph{e.g.} widgets).
 }
 \usage{
-    tSVE(...)
+tSVE(
+    ...,
+    refGT = "0|0",
+    hetGT = c("0|1", "1|2", "0|2", "1|0", "2|1", "2|0"),
+    altGT = c("1|1", "2|2"),
+    vepKey = "CSQ",
+    refSuffix = "REF", hetSuffix = "HET", altSuffix = "ALT",
+    aafSuffix = "AAF", mafSuffix = "MAF"
+)
 }
 
 \arguments{
@@ -20,10 +30,40 @@ Ensembl Variant Effect Predictor (VEP) predictions using the package methods.
 Additional arguments passed to the \code{\link[shiny]{runApp}} function
 from the \code{shiny} package.
 }
+    \item{refGT}{
+Default homozygote reference genotypes.
+}
+    \item{hetGT}{
+Default heterozygote genotypes.
+}
+    \item{altGT}{
+Default homozygote alternate genotypes.
+}
+    \item{vepKey}{
+Default INFO key for the VEP prediction field.
+}
+    \item{refSuffix}{
+Default INFO key suffix used to store the data for homozygote reference
+genotypes.
+}
+    \item{hetSuffix}{
+Default INFO key suffix used to store the data for heterozygote genotypes.
+}
+    \item{altSuffix}{
+Default INFO key suffix used to store the data for homozygote alternate
+genotypes.
+}
+    \item{aafSuffix}{
+Default INFO key suffix used to store the data for alternate allele frequency.
+}
+    \item{mafSuffix}{
+Default INFO key suffix used to store the data for minor allele frequency.
+}
+
 }
 
 \references{
-Interface to \code{EnsDb} adapted from \code{ensembldb}.
+Interface to \code{EnsDb} adapted from the \code{ensembldb} package.
 }
 \value{
 Not applicable (yet).

@@ -21,6 +21,11 @@ test_that("Constructors produce a valid object",{
         "TVTBparam"
     )
 
+    expect_s4_class(
+        TVTBparam(),
+        "TVTBparam"
+    )
+
 })
 
 # Conflict of suffixes ----
@@ -176,8 +181,8 @@ test_that("Setters return valid values",{
 
 test_that("Setters catch invalid inputs",{
 
-    expect_error(
-        alt(tparam) <- character()
+    expect_warning(
+        alt(tparam) <- NA_character_
     )
 
     expect_error(

@@ -11,8 +11,9 @@ abstract: >
     Currently, `VCF` objects of the `r Biocpkg("VariantAnnotation")` package
     may be subsetted by indices or names of variant records.
     The `r Biocpkg("TVTB")` package extends `FilterRules` of the
-    `r Biocpkg("S4Vectors")` package to provide filter rules applicable to
-    `VCF` objects. These new classes of filter rules provide containers
+    `r Biocpkg("S4Vectors")` package to provide filter rules readily applicable
+    to individual slots of `VCF` objects.
+    These new classes of filter rules provide containers
     for powerful expressions and functions to facilitate filtering of variants
     using combinations of filters applicable to FIXED fields, INFO fields,
     and Ensembl VEP predictions stored in a given INFO field of VCF files.
@@ -54,19 +55,36 @@ applicable to information stored in the distinct slots of `VCF`
 objects (*i.e.* `CollapsedVCF` and `ExpandedVCF` classes),
 as described below:
 
-|       Class       | Motivation                                              |
-| :--------------:  | :------------------------------------------------------ |
-| `VcfFixedRules`   | Filter rules applicable to the `fixed` slot of a        |
-|                   | `VCF` object.                                           |
-|                   |                                                         |
-|  `VcfInfoRules`   | Filter rules applicable to the `info` slot of a         |
-|                   | `VCF` object.                                           |
-|                   |                                                         |
-|  `VcfVepRules`    | Filter rules applicable to the Ensembl VEP predictions  |
-|                   | stored in a given INFO key of a `VCF` object.          |
-|                   |                                                         |
-| `VcfFilterRules`  | Combination of `VcfFixedRules`, `VcfInfoRules`, and     |
-|                   |  `VcfVepRules` applicable to a `VCF` object.            |
+```{r filterRulesMotivation, echo=FALSE, results='asis'}
+motivations <- data.frame(
+    Class = c(
+        "`VcfFixedRules`", "`VcfInfoRules`", "`VcfVepRules`",
+        "`VcfFilterRules`"
+    ),
+    Motivation=c(
+        sprintf(
+            "Filter rules applied to the `%s` slot of a `VCF` object.",
+            c("fixed", "info")),
+        paste(
+            "Filter rules applied to the Ensembl VEP predictions",
+            "stored in a given INFO key of a `VCF` object."),
+        paste(
+            "Combination of `VcfFixedRules`, `VcfInfoRules`, and",
+            "`VcfVepRules` applicable to a `VCF` object."
+        )
+    )
+)
+pander::pandoc.table(
+    motivations,
+    paste(
+        "Motivation for each of the new classes extending `FilterRules`,
+        to define VCF filter rules."
+    ),
+    style = "multiline",
+    split.cells = c(15, 45),
+    split.tables = c(Inf)
+)
+```
 
 Table: Motivation for each of the new classes extending `FilterRules`
 to define *VCF filter rules*.
@@ -74,7 +92,7 @@ to define *VCF filter rules*.
 Note that `FilterRules` objects themselves are applicable to `VCF` objects,
 with two important difference from the above specialised classes:
 
-* Expressions must explicitely refer to the `VCF` slots
+* Expressions must explicitely refer to the different `VCF` slots
 * As a consequence, a single expression can refer to fields from different
     `VCF` slots, for instance:
 
@@ -274,7 +292,7 @@ the `evcf` object itself to access its number of columns
 
 ## Functions in filter rules {#FunctionFilter}
 
-It may be more convenient to define filters as a `function` objects.
+It may be more convenient to define filters as `function` objects.
 For instance, the chunk of code below:
 
 * first, defines a function that:

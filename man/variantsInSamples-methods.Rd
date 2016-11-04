@@ -35,9 +35,16 @@ If \code{TRUE}, consider only variants \emph{unique} to the phenotype level
 }
 
 \value{
-An \code{integer} vector of indices indicating which variants are observed
-in at least one non-reference genotype in the given group of samples.
+An named \code{integer} vector of indices indicating the name and index of
+variants that are (uniquely) observed in at least one non-reference genotype
+in the given group of samples.
 }
+
+\section{Warning}{
+A \code{warning} message is issued if genotypes are not fully defined in the
+\code{TVTBparam}.
+}
+
 \author{
 Kevin Rue-Albrecht
 }
@@ -71,7 +78,7 @@ vcf <- VariantAnnotation::expand(vcf, row.names = TRUE)
 
 variantsInSamples(
     vcf,
-    which(SummarizedExperiment::colData(vcf)[,"super_pop"]=="EUR"))
+    which(SummarizedExperiment::colData(vcf)[,"super_pop"] == "EUR"))
 }
 
 \keyword{methods}

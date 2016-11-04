@@ -15,12 +15,12 @@ Description: The package provides S4 classes and methods to filter,
 License: Artistic-2.0
 Depends: R (>= 3.4), methods, utils, stats
 Imports: BiocGenerics (>= 0.19.1), BiocParallel, Biostrings, ensembldb,
-    ensemblVEP, GenomeInfoDb, GenomicRanges, ggplot2, IRanges (>=
+    ensemblVEP, GenomeInfoDb, GenomicRanges, ggplot2,  limma, IRanges (>=
     2.7.1), reshape2, Rsamtools, S4Vectors (>= 0.11.11),
     SummarizedExperiment, VariantAnnotation (>= 1.19.9)
 Suggests: EnsDb.Hsapiens.v75 (>= 0.99.7), shiny (>= 0.13.2.9005), DT
     (>= 0.1.67), rtracklayer, BiocStyle (>= 2.1.23), knitr (>=
-    1.12), rmarkdown, testthat, covr
+    1.12), rmarkdown, testthat, covr, pander
 biocViews: Software, Genetics, GeneticVariability, GenomicVariation,
     DataRepresentation, GUI, Genetics, DNASeq, WholeGenome,
     Visualization, MultipleComparison, DataImport,
@@ -28,7 +28,7 @@ biocViews: Software, Genetics, GeneticVariability, GenomicVariation,
     SequenceMatching
 Collate: tSVE.R AllClasses.R AllGenerics.R Genotypes-class.R
     TVTBparam-class.R VcfFilterRules-class.R countGenos-methods.R
-    addCountGenos-methods.R addFrequencies-methods.R
+    autodetectGenotypes.R addCountGenos-methods.R addFrequencies-methods.R
     addOverallFrequencies-methods.R
     addPhenoLevelFrequencies-methods.R dropInfo.R readVcf-methods.R
     variantsInSamples-methods.R vepInPhenoLevel-methods.R

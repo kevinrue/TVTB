@@ -8,7 +8,6 @@
 % Constructors/Methods:
 \alias{Genotypes}
 \alias{Genotypes-methods}
-\alias{Genotypes,character,character,character-method}
 \alias{initialize,Genotypes-method}
 
 % Accessor methods:
@@ -36,33 +35,31 @@ The \code{Genotypes} class stores genotype definitions in a convenient format.
 }
 
 \usage{
-\S4method{Genotypes}{character,character,character}(
-    ref, het, alt, suffix = c(ref="REF", het="HET", alt="ALT"))
+Genotypes(
+    ref = NA_character_, het = NA_character_, alt = NA_character_,
+    suffix = c(ref="REF", het="HET", alt="ALT"))
 }
 
 \section{Accessor methods}{
 In the following code snippets \code{x} is a \code{Genotypes} object.
 \describe{
     \item{\code{ref(x)}, \code{ref(x) <- value}}{
-    Gets or sets the \code{character} vector
-    that declares homozygote reference genotypes.
+    Gets or sets the vector that declares homozygote reference genotypes.
     }
     \item{\code{het(x)}, \code{het(x) <- value}}{
-    Gets or sets the \code{character} vector
-    that declares heterozygote genotypes.
+    Gets or sets the vector that declares heterozygote genotypes.
     }
     \item{\code{alt(x)}, \code{alt(x) <- value}}{
-    Gets or sets the \code{character} vector
-    that declares homozygote alternate genotypes.
+    Gets or sets the vector that declares homozygote alternate genotypes.
     }
     \item{\code{genos(x)}}{
-    Gets a \code{character} vector of concatenated
+    Gets a vector of concatenated
     homozygote reference, heterozygote, and homozygote alternate genotypes.
     See also \code{ref}, \code{het}, \code{alt}, and \code{carrier}
     accessors.
     }
     \item{\code{carrier(x)}}{
-    Gets a \code{character} vectors of concatenated
+    Gets a vector of concatenated
     heterozygote and homozygote alternate genotypes.
     See also \code{het} and \code{alt} accessors.
     }
@@ -102,6 +99,11 @@ A \code{Genotypes} object that contains genotype definitions.
 }
 
 \details{
+Genotypes may be initialised as \code{NA_character_} and updated from an
+imported \code{VCF} object using the
+\code{\link[=autodetectGenotypes,VCF-method]{autodetectGenotypes}} method.
+This may be useful if genotype encodings are not known beforehand.
+
 For each \emph{suffix} stored in the \code{Genotypes} object, \code{TVTB}
 may store data in the \code{VCF} object under the INFO keys defined as follows:
 \describe{

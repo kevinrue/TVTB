@@ -1,5 +1,8 @@
 
 .checkParam <- function(param, file, ...){
+    # Warn user (particularly if genotypes overlap)
+    validObject(param@genos)
+
     vh <- scanVcfHeader(file)
 
     phenoSamples <- rownames(colData)
@@ -26,21 +29,29 @@
 
 setMethod(
     "readVcf", c("character", "TVTBparam"),
-    function(file, genome, param, ..., colData = DataFrame()){
-        .readVcf(file, genome, param, ..., colData = colData)
+    function(
+        file, genome, param, ..., colData = DataFrame(), autodetectGT = FALSE){
+        .readVcf(
+            file, genome, param, ..., colData = colData,
+            autodetectGT = autodetectGT
+        )
     }
 )
 
 setMethod(
     "readVcf", c("TabixFile", "TVTBparam"),
-    function(file, genome, param, ..., colData = DataFrame()){
-        .readVcf(file, genome, param, colData = colData, ...)
+    function(
+        file, genome, param, ..., colData = DataFrame(), autodetectGT = FALSE){
+        .readVcf(
+            file, genome, param, ..., colData = colData,
+            autodetectGT = autodetectGT)
     }
 )
 
 # Main method ----
 
-.readVcf <- function(file, genome, param, ..., colData = DataFrame()){
+.readVcf <- function(
+    file, genome, param, ..., colData = DataFrame(), autodetectGT = FALSE){
 
     # Check TVTBparam and coerce to ScanVcfParam
     SVP <- .checkParam(param, file, ...)
@@ -65,6 +76,10 @@ setMethod(
     }
 
     metadata(vcf)[["TVTBparam"]] <- param
+
+    if (autodetectGT){
+        vcf <- .autodetectGenotypes(vcf)
+    }
 
     return(vcf)
 }

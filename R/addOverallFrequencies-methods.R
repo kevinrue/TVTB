@@ -17,6 +17,7 @@ setMethod(
 
     stopifnot("TVTBparam" %in% names(metadata(vcf)))
     param <- metadata(vcf)[["TVTBparam"]]
+    validObject(param@genos)
 
     infoKeys <- suffix(param)
 

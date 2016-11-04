@@ -1,10 +1,3 @@
-
-# Load the appropriate EnsDb package and return the annotation object
-getEdb <- function(x){
-    stopifnot(requireNamespace(x))
-    return(get(x, envir = asNamespace(x)))
-}
-
 # Instantiate a BasicFilter of the appropriate class
 EnsDbFilter <- function(type, condition, value){
 

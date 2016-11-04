@@ -5,21 +5,34 @@
 
     errors <- c()
 
-    if (length(object@ref) == 0){
-        errors <- c(errors, "length(ref) > 0 is not TRUE")
+    # Only warn if genotypes overlap
+    if (length(genos(object)) != length(unique(genos(object)))){
+        warning("genotype values overlap")
+        # errors <- c(errors, "genotype values must not overlap")
     }
 
-    if (length(object@het) == 0){
-        errors <- c(errors, "length(het) > 0 is not TRUE")
+    if (length(ref(object)) == 0){
+        warning("No homozygote reference genotypes defined.")
     }
 
-    if (length(object@alt) == 0){
-        errors <- c(errors, "length(alt) > 0 is not TRUE")
+    if (length(het(object)) == 0){
+        warning("No heterozygote genotypes defined.")
     }
 
-    allgenos <- c(object@ref, object@het, object@alt)
-    if (sum(lengths(allgenos)) != length(unique(allgenos))){
-        errors <- c(errors, "suffix values must not overlap")
+    if (length(alt(object)) == 0){
+        warning("No homozygote alternate genotypes defined.")
+    }
+
+    if (any(is.na(ref(object)))){
+        warning("NA present in homozygote reference genotypes.")
+    }
+
+    if (any(is.na(het(object)))){
+        warning("NA present in heterozygote genotypes.")
+    }
+
+    if (any(is.na(alt(object)))){
+        warning("NA present in homozygote alternate genotypes.")
     }
 
     if (any(is.na(match(c("ref", "het", "alt"), names(object@suffix))))){

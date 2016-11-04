@@ -23,6 +23,7 @@ setMethod(
 
     stopifnot("TVTBparam" %in% names(metadata(vcf)))
     param <- metadata(vcf)[["TVTBparam"]]
+    validObject(param@genos)
 
     # Convert sample names to indices: required to select the others later
     if (is.character(samples)){
@@ -39,25 +40,25 @@ setMethod(
     genosSamples <- genos[,samples]
 
     # Count how many samples carry the variant
-    countGenoWithPheno <- apply(
+    genoWithPheno <- apply(
         genosSamples, 1, function(x){
-            sum(x %in% unlist(carrier(param)))})
+            sum(x %in% unlist(carrier(param))) > 0})
 
     # If all other sample have to be non-carrier (i.e. unique to samples)
     if (unique){
         # Genotype of other samples
         genosOtherSamples <- genos[,-samples]
         # Count how many samples carry the variant
-        countGenoWithoutPheno <- apply(
+        genoWithoutPheno <- apply(
             genosOtherSamples, 1, function(x){
                 sum(x %in% unlist(carrier(param))) > 0})
-        # Keep only the variants unique to samples (>0 in samples, 0 in others)
-        variantsIdx <- which(
-            (countGenoWithPheno / countGenoWithoutPheno) == Inf)
-    } else {
-        # Otherwise, keep all the variants seen in samples
-        variantsIdx <- which(countGenoWithPheno > 0)
+        print(genoWithPheno)
+        print(genoWithoutPheno)
+        print(genoWithPheno & !genoWithoutPheno)
+        # Keep only the variants unique to samples
+        return(which(genoWithPheno & !genoWithoutPheno)
+        )
     }
-
-    return(variantsIdx)
+    # Otherwise, keep all the variants seen in samples
+    return(which(genoWithPheno))
 }

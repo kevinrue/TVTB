@@ -20,15 +20,18 @@ invalidVepParam <- TVTBparam(
 
 test_that("method supports all signature", {
 
+    # file=character
     expect_s4_class(
-        readVcf(vcfFile, param = tparam, colData = phenotypes),
+        readVcf(
+            vcfFile, param = tparam, colData = phenotypes,
+            autodetectGT = TRUE),
         "CollapsedVCF"
     )
 
+    # file=TabixFile
     expect_s4_class(
         readVcf(
-            Rsamtools::TabixFile(vcfFile),
-            param = tparam,
+            Rsamtools::TabixFile(vcfFile), param = tparam,
             colData = phenotypes),
         "CollapsedVCF"
     )
