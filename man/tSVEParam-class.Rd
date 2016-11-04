@@ -237,39 +237,39 @@ gr <- GenomicRanges::GRanges(
     ranges = IRanges::IRanges(
         start = 48413170, end = 48434757, names = "SLC24A5"))
 
-tParam <- tSVEParam(genos = genotypes, ranges = gr)
+tparam <- tSVEParam(genos = genotypes, ranges = gr)
 
 # Accessors ----
 
 ## Homozygote reference, heterozygote, and alternate heterozygote genotypes
 ## stored in the tSVEParam object returned by the genos() accessor.
-genos(tParam)
+genos(tparam)
 
 ## Genomic ranges stored in the tSVEParam object returned by the ranges()
 ## accessor.
-ranges(tParam)
+ranges(tparam)
 
 ## Individual genotypes can be extracted with hRef(), het(), hAlt() accessors.
-hRef(tParam)
-het(tParam)
-hAlt(tParam)
+hRef(tparam)
+het(tparam)
+hAlt(tparam)
 
 ## Their individual INFO key suffixes can be extracted with names() applied to
 ## the above accessors.
-names(hRef(tParam))
-names(het(tParam))
-names(hAlt(tParam))
+names(hRef(tparam))
+names(het(tparam))
+names(hAlt(tparam))
 
 ## Heterozygote, and alternate heterozygote genotypes are
 ## returned by the carrier() accessor.
-carrier(tParam)
-names(carrier(tParam))
+carrier(tparam)
+names(carrier(tparam))
 
 ## INFO key suffix of alternate/minor allele frequency returned by the aaf()
 ## and maf() accessors.
-aaf(tParam)
-maf(tParam)
+aaf(tparam)
+maf(tparam)
 
 ## INFO key of the VEP predictions returned by the vep() accessor.
-vep(tParam)
+vep(tparam)
 }
