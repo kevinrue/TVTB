@@ -18,32 +18,29 @@ shinyServer(function(input, output, clientData, session) {
     # Reactive values ----
 
     RV <- reactiveValues(
+        # Path to phenotype file
+        phenoFile = NULL,
+        # VCF filter rules
         vcfFilters = VcfFilterRules()
     )
 
     # Import phenotype information ----
 
-    # Path to phenotype file, or NULL
-    phenoFile <- reactive({
-        # Triggered by input$tryCatch
-        if (input$selectPheno > 0){
-            selected <- tryCatch(
+    observeEvent(
+        eventExpr = input$selectPheno,
+        handlerExpr = {
+            RV[["phenoFile"]] <- tryCatch(
                 file.choose(),
                 error = function(err){
                     warning(geterrmessage())
                     return(NULL)
                 })
-        } else {
-            return(NULL)
-        }
-
-        return(selected)
     })
 
     # DataFrame of imported phenotypes, or NULL
     phenotypes <- reactive({
-        # Depends on phenoFile()
-        phenoFile <- phenoFile()
+        # Depends on phenoFile
+        phenoFile <- RV[["phenoFile"]]
 
         if (is.null(phenoFile))
             return(NULL)
@@ -86,6 +83,7 @@ shinyServer(function(input, output, clientData, session) {
         # 2) all analyses use data stored in the VCF object only
 
         vcf <- vcf()
+
         phenos <- colData(vcf)
 
         validate(need(
@@ -116,7 +114,7 @@ shinyServer(function(input, output, clientData, session) {
             max(1, which(pheno.choices == input$phenoAnalysed))]
 
         updateSelectInput(
-            session, "phenotype",
+            session, "phenoAnalysed",
             choices = pheno.choices,
             selected = pheno.selected)
     })
@@ -543,7 +541,7 @@ shinyServer(function(input, output, clientData, session) {
 
     output$generalSettings <- renderPrint({
         return(list(
-            "phenoFile()" = phenoFile(),
+            phenoFile = RV[["phenoFile"]],
             regionInputMode = input$regionInputMode,
             "bedFile()" = bedFile(),
             ucscRegions = input$ucscRegions,
@@ -741,7 +739,7 @@ shinyServer(function(input, output, clientData, session) {
             genomeSeqinfo <- genomeSeqinfo()
             yieldSize <- input$yieldSize
 
-            if (is.null(phenoFile())) {
+            if (is.null(RV[["phenoFile"]])) {
                 phenotypes <- DataFrame()
             } else {
                 phenotypes <- phenotypes()
