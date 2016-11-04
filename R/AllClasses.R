@@ -9,11 +9,8 @@
     if (is.null(names(g)))
         errors <- c(errors, "names(genos) must not be NULL")
 
-    if (any(sapply(g, class) != "character"))
-        errors <- c(errors, "All three genos values must be character vectors")
-
     if (sum(lengths(g)) != length(unique(unlist(g))))
-        stop("genos values must not overlap")
+        errors <- c(errors, "genos values must not overlap")
 
     if (length(carrier(object)) != 2)
         errors <- c(errors, "length(carrier) must equal 2")
@@ -24,10 +21,13 @@
     if (length(maf(object)) != 1)
         errors <- c(errors, "length(maf) must equal 1")
 
-    if (length(vep(object)))
+    if (length(vep(object)) != 1)
         errors <- c(errors, "length(vep) must equal 1")
 
-    NULL
+    if (length(errors > 0))
+        return(errors)
+
+    return(TRUE)
 }
 
 
@@ -55,7 +55,6 @@ tSVEParam <- setClass(
         # TODO: GQ, MAF, ...
     ),
 
-    validity=.valid.tSVEParam
+    validity = .valid.tSVEParam
 
 )
-
