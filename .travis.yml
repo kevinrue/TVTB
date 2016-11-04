@@ -9,23 +9,10 @@ os:
     - linux
 
 r_check_args: --no-build-vignettes
+use_bioc: true
 bioc_use_devel: true
 
 before_install:
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then tlmgr install bera nowidow parnotes; fi
 
-bioc_packages:
-    BiocParallel,
-    Biostrings,
-    ensembldb,
-    ensemblVEP,
-    GenomeInfoDb,
-    GenomicRanges,
-    ggplot2,
-    IRanges,
-    reshape2,
-    Rsamtools,
-    S4Vectors,
-    SummarizedExperiment,
-    VariantAnnotation
 #r_github_packages: rstudio/DT
