@@ -72,7 +72,7 @@ setMethod(
         mapply(
             FUN = function(idx, active, type, filter){
                 cat(sprintf(
-                    "%i.\t[x]\t%s\t%s\n",
+                    "%i.\t[%s]\t%s\t%s\n",
                     idx,
                     ifelse(active, "x", " "),
                     type,
