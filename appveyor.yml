@@ -23,18 +23,17 @@ environment:
       R_BUILD_ARGS: "--keep-empty-dirs --no-resave-data"
 
 branches:
-  # whitelist
   only:
     - master
 
 cache:
-  - packages
+  #- packages
 
 build_script:
   - travis-tool.sh install_bioc_deps
   - Rscript -e 'BiocInstaller::biocValid(fix=TRUE)'
-  - Rscript -e 'print(c);showMethods("c", classes = "GenomicRanges", includeDefs = TRUE)'
-  - Rscript -e 'library(GenomicRanges);print(c);showMethods("c", classes = "GenomicRanges", includeDefs = TRUE)'
+  - Rscript -e 'print(c);showMethods(\"c\", classes = \"GenomicRanges\", includeDefs = TRUE)'
+  - Rscript -e 'library(GenomicRanges);print(c);showMethods(\"\c", classes = \"GenomicRanges\", includeDefs = TRUE)'
   #- travis-tool.sh install_bioc ensemblVEP EnsDb.Hsapiens.v75
 
 test_script:
