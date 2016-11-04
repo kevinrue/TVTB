@@ -23,8 +23,7 @@ vignette: >
     %\VignetteEngine{knitr::rmarkdown}
     %\VignetteEncoding{UTF-8}
 output:
-    BiocStyle::pdf_document2:
-        toc_newpage: true
+    BiocStyle::pdf_document
 bibliography:
     TVTB.bib
 ---

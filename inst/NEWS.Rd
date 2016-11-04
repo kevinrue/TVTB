@@ -1,6 +1,17 @@
 \name{TVTB-NEWS}
 \title{NEWS: The VCF Tool Box}
 
+\section{Changes in version 0.99.6 2016-10-12}{
+\subsection{Experimental changes}{
+\itemize{
+\item
+    Replaced \code{BiocStyle::pdf_document2() by
+    \code{BiocStyle::pdf_document(); the former fails at the \code{pandoc}
+    step of vignette production, the latter does not.
+}
+}
+}
+
 \section{Changes in version 0.99.5 2016-10-12}{
 \subsection{Bug fix}{
 \itemize{
