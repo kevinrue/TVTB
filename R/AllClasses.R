@@ -11,27 +11,21 @@
         # errors <- c(errors, "genotype values must not overlap")
     }
 
-    if (length(ref(object)) == 0){
+    if (length(object@ref) == 0){
         warning("No homozygote reference genotypes defined.")
-    }
-
-    if (length(het(object)) == 0){
-        warning("No heterozygote genotypes defined.")
-    }
-
-    if (length(alt(object)) == 0){
-        warning("No homozygote alternate genotypes defined.")
-    }
-
-    if (any(is.na(ref(object)))){
+    } else if (any(is.na(object@ref))){
         warning("NA present in homozygote reference genotypes.")
     }
 
-    if (any(is.na(het(object)))){
+    if (length(object@het) == 0){
+        warning("No heterozygote genotypes defined.")
+    } else if (any(is.na(object@het))){
         warning("NA present in heterozygote genotypes.")
     }
 
-    if (any(is.na(alt(object)))){
+    if (length(object@alt) == 0){
+        warning("No homozygote alternate genotypes defined.")
+    } else if (any(is.na(object@alt))){
         warning("NA present in homozygote alternate genotypes.")
     }
 

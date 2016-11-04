@@ -891,7 +891,10 @@ shinyUI(navbarPage(
             fluidRow(
               column(
                 width = 12,
-                plotOutput("heatmapGenotype", height = .genoHeatmapPlotHeight)
+                plotOutput(
+                  "heatmapGenotype",
+                  height = get("genoHeatmap.height", .tSVE)
+                )
               )
             ),
 
@@ -1125,16 +1128,17 @@ shinyUI(navbarPage(
         fluidRow(
           column(
             width = 12,
+            h1("Platforms tested"),
             DT::dataTableOutput("parallelReport")
           )
         )
       ),
       tags$h4(
         "Notes",
-        tags$li(
-          "Report"
-        ),
-        tags$li(
+        tags$ul(
+          tags$li(
+            "Report"
+          ), br(),
           tags$ul(
             tags$li(
               tags$strong("Hang:"),
@@ -1142,6 +1146,7 @@ shinyUI(navbarPage(
             )
           )
         )
+
       )
 
     )

@@ -19,7 +19,6 @@ stopifnot(
 # TODO: plot currently disabled
 # .vepCountBarPlotHeight <- "500px"
 # .vepDensityPlotHeight <- "500px"
-.genoHeatmapPlotHeight <- "500px"
 
 # R session variables -----------------------------------------------------
 

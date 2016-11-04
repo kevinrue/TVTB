@@ -1177,8 +1177,8 @@ shinyServer(function(input, output, clientData, session) {
   observeEvent(
     RV[["TVTBparam"]],
     {
-      if (!is.null(RV[["VCF"]])){ # "TVTBparam" %in% names(metadata(RV[["VCF"]]))
-        TVTB::metadata(RV[["VCF"]])[["TVTBparam"]] <- RV[["TVTBparam"]]
+      if (!is.null(RV[["VCF"]])){
+        S4Vectors::metadata(RV[["VCF"]])[["TVTBparam"]] <- RV[["TVTBparam"]]
       }
     }
   )
@@ -1263,7 +1263,7 @@ shinyServer(function(input, output, clientData, session) {
 
   output$vcfMetadata <- renderPrint({
     validate(need(is.null(Errors[["VCF"]]), Errors[["VCF"]]))
-    return(metadata(RV[["VCF"]]))
+    return(S4Vectors::metadata(RV[["VCF"]]))
   })
 
   # VCF folder  ----
@@ -1544,10 +1544,6 @@ shinyServer(function(input, output, clientData, session) {
                   RV[["TVTBparam"]],
                   input$yieldSize
                 ),
-                warning = function(warn){
-                  Errors[["VCF"]] <- warn
-                  return(NULL)
-                },
                 error = function(err){
                   Errors[["VCF"]] <- geterrmessage()
                   return(NULL)
@@ -1567,10 +1563,6 @@ shinyServer(function(input, output, clientData, session) {
                   RV[["TVTBparam"]],
                   input$yieldSize
                 ),
-                warning = function(warn){
-                  Errors[["VCF"]] <- warn
-                  return(NULL)
-                },
                 error = function(err){
                   Errors[["VCF"]] <- geterrmessage()
                   return(NULL)
@@ -2185,7 +2177,9 @@ shinyServer(function(input, output, clientData, session) {
     RV[["VCF"]],
     {
 
-      RV[["GT.all"]] <- na.exclude(unique(c(geno(RV[["VCF"]])[["GT"]])))
+      RV[["GT.all"]] <- na.exclude(unique(c(
+        VariantAnnotation::geno(RV[["VCF"]])[["GT"]]
+      )))
       g.OK <- grep("[[:digit:]][/|][[:digit:]]", RV[["GT.all"]], value=TRUE)
       RV[["GT.autoRef"]] <- grep("(0/0)|(0\\|0)", g.OK, value = TRUE)
 
