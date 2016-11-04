@@ -16,8 +16,7 @@ environment:
   global:
     WARNINGS_ARE_ERRORS: 1
     _R_CHECK_FORCE_SUGGESTS_: 0
-    R_ARCH: x64
-    USE_RTOOLS: true ## to be able to use Remotes (i.e. non-CRAN sources)
+    # USE_RTOOLS: true ## to be able to use Remotes (i.e. non-CRAN sources)
 
   matrix:
     - R_VERSION: devel
@@ -41,6 +40,7 @@ environment:
   #- C:\RLibrary
 
 build_script:
+  - echo Current directory=%CD%
   - travis-tool.sh install_bioc_deps
   #- Rscript -e 'BiocInstaller::biocValid(fix=TRUE)'
   #- Rscript -e 'print(c);showMethods(\"c\", classes = \"GenomicRanges\", includeDefs = TRUE)'
