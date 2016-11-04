@@ -1623,6 +1623,8 @@ shinyServer(function(input, output, clientData, session) {
                 vepFacetKey <- input$vepFacetKey
             }
 
+            validate(need(vcf(), Msgs[["importVariants"]]))
+
             vcf <- RV[["filteredVcf"]]
 
             validate(need(
