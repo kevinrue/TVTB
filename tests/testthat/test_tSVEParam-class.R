@@ -8,6 +8,15 @@ genotypes <- list(
     ALT = c("1|1")
 )
 
+genotypesNoName <- genotypes
+names(genotypesNoName) <- NULL
+
+genotypesPartiallyNamed <- genotypes
+names(genotypesPartiallyNamed)[2] <- ""
+
+genotypesOverlapping <- genotypes
+genotypesOverlapping[[2]] <- genotypesOverlapping[[1]]
+
 gr <- GenomicRanges::GRanges(
     seqnames = "15", ranges = IRanges(
         start = 48413170,
@@ -29,6 +38,41 @@ test_that("Constructors produce a valid object",{
             het = genotypes[["HET"]],
             alt = genotypes[["ALT"]]),
         "tSVEParam"
+    )
+
+})
+
+test_that("Constructors adds default genotype labels if missing",{
+
+    expect_s4_class(
+        tSVEParam(genos = genotypesNoName),
+        "tSVEParam"
+    )
+
+})
+
+# Invalid constructor inputs ----
+
+test_that("Three genotypes are required",{
+
+    expect_error(
+        tSVEParam(genos = genotypes[1:2])
+    )
+
+})
+
+test_that("Partially named genotypes are not allowed",{
+
+    expect_error(
+        tSVEParam(genos = genotypesPartiallyNamed)
+    )
+
+})
+
+test_that("Overlapping genotypes are not allowed",{
+
+    expect_error(
+        tSVEParam(genos = genotypesOverlapping)
     )
 
 })
@@ -101,6 +145,11 @@ test_that("Setters return valid values",{
     )
 
     expect_type(
+        genos(tparam) <- genotypesNoName,
+        "list"
+    )
+
+    expect_type(
         names(genos(tparam)) <- LETTERS[1:3],
         "character"
     )
@@ -111,13 +160,28 @@ test_that("Setters return valid values",{
     )
 
     expect_type(
+        hRef(tparam) <- "0/0",
+        "character"
+    )
+
+    expect_type(
         het(tparam) <- list(het = c("0/1", "1/0")),
         "list"
     )
 
     expect_type(
+        het(tparam) <- c("0/1", "1/0"),
+        "character"
+    )
+
+    expect_type(
         hAlt(tparam) <- list(alt = "1/1"),
         "list"
+    )
+
+    expect_type(
+        hAlt(tparam) <- c("1/1"),
+        "character"
     )
 
     expect_type(
@@ -145,6 +209,28 @@ test_that("Setters return valid values",{
     expect_type(
         maf(tparam) <- "VEP",
         "character"
+    )
+
+})
+
+# Invalid setters inputs ----
+
+test_that("Setters catch invalid inputs",{
+
+    expect_error(
+        genos(tparam) <- genotypesPartiallyNamed
+    )
+
+    expect_error(
+        aaf(tparam) <- c("aaf", "maf")
+    )
+
+    expect_error(
+        maf(tparam) <- c("aaf", "maf")
+    )
+
+    expect_error(
+        vep(tparam) <- c("aaf", "maf", "vep")
     )
 
 })

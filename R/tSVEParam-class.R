@@ -104,6 +104,7 @@ setMethod(
     genos,
     ranges = GRanges(),
     aaf = "AAF", maf = "MAF", vep = "CSQ", bp = SerialParam()){
+
     new(
         Class = "tSVEParam",
         genos = genos, ranges = ranges,
@@ -128,8 +129,8 @@ setMethod(
     }
 
     # hRef, het, hAlt must be character vectors
-    if (any(sapply(x, class) != "character"))
-        stop("All genos values must be character vectors")
+    # if (any(sapply(x, class) != "character"))
+    #     stop("All genos values must be character vectors")
 
     # cannot overlap
     if (sum(lengths(x)) != length(unique(unlist(x))))
@@ -152,12 +153,20 @@ setReplaceMethod(
 
         .checkGenos(x = value, length = 3)
 
+        # Must be all named, or none
+        if (is.null(names(value)))
+            names(value) <- names(slot(x, "genos"))
+        else {
+            if (any(names(value) == ""))
+                stop("All elements of genos must be named, or none")
+        }
+
         slot(x, "genos") <- value
         x
     }
 )
 
-### genos
+### ranges
 setMethod(
     f = "ranges",
     signature = c("tSVEParam"),
@@ -184,8 +193,8 @@ setMethod(
 setReplaceMethod(
     f = "aaf", c("tSVEParam", "character"),
     function(x, value){
-        if (length(x) != 1)
-            stop("length(x) must equal 1")
+        if (length(value) != 1)
+            stop("length(value) must equal 1")
         slot(x, "aaf") <- value
         x
     }
@@ -202,8 +211,8 @@ setMethod(
 setReplaceMethod(
     f = "maf", c("tSVEParam", "character"),
     function(x, value){
-        if (length(x) != 1)
-            stop("length(x) must equal 1")
+        if (length(value) != 1)
+            stop("length(value) must equal 1")
         slot(x, "maf") <- value
         x
     }
@@ -241,11 +250,12 @@ setReplaceMethod(
 
         .checkGenos(x = value, length = 1)
 
-        # For unnamed elements, use current value
-        if (names(value) == "")
-            names(value) <- names(slot(x, "hRef"))
-
         slot(x, "genos")[1] <- value
+
+        # If named, overwrite existing name
+        if (!is.null(names(value)))
+            names(slot(x, "genos")[1]) <- names(value)
+
         x
     }
 )
@@ -272,11 +282,12 @@ setReplaceMethod(
 
         .checkGenos(x = value, length = 1)
 
-        # For unnamed elements, use current value
-        if (names(value) == "")
-            names(value) <- names(slot(x, "het"))
-
         slot(x, "genos")[2] <- value
+
+        # If named, overwrite existing name
+        if (!is.null(names(value)))
+            names(slot(x, "genos")[2]) <- names(value)
+
         x
     }
 )
@@ -303,11 +314,12 @@ setReplaceMethod(
 
         .checkGenos(x = value, length = 1)
 
-        # For unnamed elements, use current value
-        if (names(value) == "")
-            names(value) <- names(slot(x, "hAlt"))
-
         slot(x, "genos")[3] <- value
+
+        # If named, overwrite existing name
+        if (!is.null(names(value)))
+            names(slot(x, "genos")[3]) <- names(value)
+
         x
     }
 )
@@ -325,7 +337,7 @@ setMethod(
     f = "carrier",
     signature = c("tSVEParam"),
     definition = function(x)
-        c(slot(x, "genos")[2:3])
+        slot(x, "genos")[2:3]
 )
 
 setReplaceMethod(
@@ -333,8 +345,23 @@ setReplaceMethod(
     function(x, value){
 
         .checkGenos(x = value, length = 2)
+        # If unnamed, use current names
+        if (is.null(names(value)))
+            names(value) <- names(slot(x, "carrier"))
+        else{
+            if (any(names(value) == ""))
+                stop("All elements of genos must be named, or none")
+        }
+
+        # If named, overwrite existing name
+        if (!is.null(names(value)))
+            if (any(names(value) == ""))
+                stop("All elements of genos must be named, or none")
+            else
+                names(slot(x, "genos")[2:3]) <- names(value)
 
         slot(x, "genos")[2:3] <- value
+
         x
     }
 )
