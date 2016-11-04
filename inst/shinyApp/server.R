@@ -2780,8 +2780,8 @@ shinyServer(function(input, output, clientData, session) {
 
             genotypes <- VariantAnnotation::geno(vcf)[["GT"]]
             validate(need(genotypes, Msgs[["genotypes"]]))
-
-            validGenotypes <- unlist(TVTB::genos(tparam())) # TODO: not used?
+            # TODO: use validGenotypes to set other GT to NA
+            validGenotypes <- unlist(TVTB::genos(tparam()))
             # Currently, all genotypes found in data are considered
             # Potentially, undesired genotypes could be considered NAs
             genos.long <- reshape2::melt(genotypes, value.name = "Genotype")
