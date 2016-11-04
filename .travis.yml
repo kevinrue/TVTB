@@ -1,19 +1,10 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 
-language: R
-r: bioc-devel
+language: r
 cache: packages
-
-os:
-    - osx
-    - linux
-
-r_check_args: --no-build-vignettes
-use_bioc: true
-bioc_use_devel: true
-
-before_install:
-    - R CMD Rscript -e 'source(file = "http://bioconductor.org/biocLite.R");useDevel(devel=TRUE)'
-    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then tlmgr install bera nowidow parnotes; fi
-
-#r_github_packages: rstudio/DT
+warnings_are_errors: false
+r: bioc-devel
+r_github_packages:
+  - jimhester/covr
+after_success:
+  - Rscript -e 'covr::codecov()'
