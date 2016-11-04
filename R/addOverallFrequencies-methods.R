@@ -47,7 +47,7 @@ setMethod(
         } else{
             stop(
                 "INFO keys already present: ",
-                paste(colnames(info(vcf))[matches], sep = ", "))
+                paste(colnames(info(vcf))[matches], collapse = ", "))
         }
 
     return(vcf)
