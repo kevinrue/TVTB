@@ -21,7 +21,11 @@ shinyServer(function(input, output, clientData, session) {
         # Path to phenotype file
         phenoFile = NULL,
         # VCF filter rules
-        vcfFilters = VcfFilterRules()
+        vcfFilters = VcfFilterRules(),
+        # VCF keys
+        fixedKeys = NULL,
+        infoKeys = NULL,
+        genoKeys = NULL
     )
 
     # Import phenotype information ----
@@ -93,6 +97,7 @@ shinyServer(function(input, output, clientData, session) {
         # 2) all analyses use data stored in the VCF object only
 
         vcf <- RV[["filteredVcf"]]
+        validate(need(vcf, Msgs[["importVariants"]]))
 
         phenos <- colData(vcf)
 
@@ -155,7 +160,7 @@ shinyServer(function(input, output, clientData, session) {
 
         # Display phenotypes attached to the VCF object
         vcf <- RV[["filteredVcf"]]
-        validate(need(vcf, Msgs[["vcf"]]))
+        validate(need(vcf, Msgs[["importVariants"]]))
 
         # Make sure the selected
         phenos <- SummarizedExperiment::colData(vcf)
@@ -728,6 +733,93 @@ shinyServer(function(input, output, clientData, session) {
         singleVcf
     })
 
+    # Define ScanVcfParam ----
+
+    # Identify available fields in header of (first) VCF file
+    observe({
+        # Depends on input mode, but also change of VCF files
+        vcfInputMode <- input$vcfInputMode
+
+        vcfHeader <- switch (
+            vcfInputMode,
+            SingleVcf = {
+
+                singleVcf <- singleVcf()
+                tryParseVcfHeader(file = singleVcf)
+            },
+            OnePerChr = {
+
+                vcfFiles <- vcfFiles()
+                tryParseVcfHeader(file = file.path(
+                    input$vcfFolder,
+                    vcfFiles[[1]]))
+
+            }
+        )
+
+        if (is.null(vcfHeader)){
+            RV[["fixedKeys"]] <- NA
+            RV[["infoKeys"]] <- NA
+            RV[["genoKeys"]] <- NA
+        } else {
+            RV[["fixedKeys"]] <- names(fixed(vcfHeader))
+            RV[["infoKeys"]] <- grep(
+                pattern = input$vepKey,
+                x = c(rownames(info(vcfHeader))),
+                invert = TRUE,
+                value = TRUE)
+            # All keys except "GT" (required)
+            RV[["genoKeys"]] <- grep(
+                pattern = "GT",
+                x = c(rownames(geno(vcfHeader))),
+                invert = TRUE,
+                value = TRUE)
+        }
+
+        # On update, select all fixed fields by default (may change)
+        updateSelectInput(
+            session, "vcfFixedKeys",
+            choices = RV[["fixedKeys"]], selected = RV[["fixedKeys"]]
+        )
+
+        # On update, select all INFO fields by default (may change)
+        updateSelectInput(
+            session, "vcfInfoKeys",
+            choices = RV[["infoKeys"]], selected = RV[["infoKeys"]]
+        )
+
+        # On update, select all FORMAT fields by default (may change)
+        updateSelectInput(
+            session, "vcfFormatKeys",
+            choices = RV[["genoKeys"]], selected = RV[["genoKeys"]]
+        )
+
+    })
+
+    observeEvent(
+        eventExpr = input$tickAllInfo,
+        handlerExpr = {
+
+            updateSelectInput(
+                session, "vcfInfoKeys",
+                choices = RV[["infoKeys"]], selected = RV[["infoKeys"]]
+            )
+
+        }
+    )
+
+    observeEvent(
+        eventExpr = input$untickAllInfo,
+        handlerExpr = {
+
+            updateSelectInput(
+                session, "vcfInfoKeys",
+                choices = RV[["infoKeys"]], selected = c()
+            )
+
+        }
+    )
+
     # Import VCF information ----
 
     observeEvent(input$importVariants, {
@@ -753,6 +845,14 @@ shinyServer(function(input, output, clientData, session) {
             vepKey <- input$vepKey
             genomeSeqinfo <- genomeSeqinfo()
             yieldSize <- input$yieldSize
+            fixedKeys <- input$vcfFixedKeys
+            if (length(fixedKeys) == 0)
+                fixedKeys <- NA
+            infoKeys <- c(input$vcfInfoKeys, input$vepKey)
+
+            genoKeys <- input$vcfFormatKeys
+            if (length(genoKeys) == 0)
+                genoKeys <- "GT" # Mandatory
 
             if (is.null(RV[["phenoFile"]])) {
                 phenotypes <- DataFrame()
@@ -773,7 +873,11 @@ shinyServer(function(input, output, clientData, session) {
 
                 # TODO: let user choose fixed/info/format keys to import
                 # for speed and memory
-                svp <- ScanVcfParam()
+                svp <- ScanVcfParam(
+                    fixed = fixedKeys,
+                    info = infoKeys,
+                    geno = genoKeys
+                )
 
                 # Only import samples with phenotype information
                 if (nrow(phenotypes) > 0)
@@ -783,10 +887,11 @@ shinyServer(function(input, output, clientData, session) {
                 if (length(genomicRanges) > 0)
                     vcfWhich(svp) <- reduce(genomicRanges) # optimise import
 
+
                 # # Timing
                 # t1 <- Sys.time()
 
-                switch (
+                vcf <- switch (
                     vcfInputMode,
                     SingleVcf = {
 
@@ -795,10 +900,11 @@ shinyServer(function(input, output, clientData, session) {
 
                         shiny::incProgress(1, detail = Tracking[["singleVcf"]])
 
-                        vcf <- tryParseSingleVcf(
+                        tryParseSingleVcf(
                             file = singleVcf,
                             svp = svp,
-                            yieldSize = yieldSize)
+                            yieldSize = yieldSize
+                        )
                     },
 
                     OnePerChr = {
@@ -811,12 +917,13 @@ shinyServer(function(input, output, clientData, session) {
                         })
                         validate(need(singleVcf, Msgs[["singleVcf"]]))
 
-                        vcf <- tryParseMultipleVcf(
+                        tryParseMultipleVcf(
                             folder = vcfFolder,
                             pattern = vcfPattern,
                             svp = svp,
                             yieldSize = yieldSize,
-                            BPPARAM = bp(tparam))
+                            BPPARAM = bp(tparam)
+                        )
                     }
                 )
 
@@ -828,7 +935,8 @@ shinyServer(function(input, output, clientData, session) {
 
                 if (nrow(phenotypes) == 0)
                     phenotypes <- DataFrame(row.names = colnames(vcf))
-                SummarizedExperiment::colData(vcf) <- phenotypes
+
+                colData(vcf) <- phenotypes
             })
 
         return(vcf)
@@ -837,8 +945,7 @@ shinyServer(function(input, output, clientData, session) {
     output$vcfSummary <- renderUI({
         # Summary of raw variants
         vcf <- vcf()
-
-        # validate(need(vcf, "vcf"))
+        validate(need(vcf, Msgs[["importVariants"]]))
 
         return(tagList(
                 code(nrow(vcf)), "bi-allelic records and",
@@ -850,8 +957,7 @@ shinyServer(function(input, output, clientData, session) {
     output$vcfCols <- renderUI({
 
         vcf <- RV[["filteredVcf"]]
-
-        # validate(need(vcf, label = Msgs[["vcf"]]))
+        validate(need(vcf, Msgs[["importVariants"]]))
 
         colChoices <- c(colnames(mcols(vcf)))
 
@@ -889,8 +995,7 @@ shinyServer(function(input, output, clientData, session) {
     output$vcfInfoCols <- renderUI({
 
         vcf <- RV[["filteredVcf"]]
-
-        # validate(need(vcf, label = Msgs[["vcf"]]))
+        validate(need(vcf, Msgs[["importVariants"]]))
 
         # All columns except the VEP predictions
         colChoices <- grep(
@@ -908,8 +1013,14 @@ shinyServer(function(input, output, clientData, session) {
     })
 
     output$vcfInfo <- DT::renderDataTable({
-
+        req(input$vcfInfoCols)
         vcf <- RV[["filteredVcf"]]
+
+        validate(need(
+            ncol(info(vcf())) > 1, # At least one non-VEP column
+            "No INFO data imported."
+        ),
+        errorClass = "optional")
 
         validate(need(
             length(input$vcfInfoCols) > 0,
@@ -935,8 +1046,7 @@ shinyServer(function(input, output, clientData, session) {
     output$vcf <- renderPrint({
 
         vcf <- vcf()
-
-        validate(need(vcf, Msgs[["vcf"]]))
+        validate(need(vcf, Msgs[["importVariants"]]))
 
         vcf
     })
@@ -1121,7 +1231,7 @@ shinyServer(function(input, output, clientData, session) {
 
         vcf <- vcf()
 
-        validate(need(vcf, Msgs[["vcf"]]))
+        validate(need(vcf, Msgs[["importVariants"]]))
 
         genotypes <- geno(vcf)[["GT"]]
         validate(need(genotypes, Msgs[["genotypes"]]))
@@ -1133,7 +1243,7 @@ shinyServer(function(input, output, clientData, session) {
 
         vcf <- RV[["filteredVcf"]]
 
-        validate(need(vcf, Msgs[["vcf"]]))
+        validate(need(vcf, Msgs[["importVariants"]]))
 
         genotypes <- geno(vcf)[["GT"]]
         validate(need(genotypes, Msgs[["genotypes"]]))
@@ -1152,7 +1262,7 @@ shinyServer(function(input, output, clientData, session) {
 
         vcf <- RV[["filteredVcf"]]
 
-        validate(need(vcf, Msgs[["vcf"]]))
+        validate(need(vcf, Msgs[["importVariants"]]))
 
         genotypes <- geno(vcf)[["GT"]]
         validate(need(genotypes, Msgs[["genotypes"]]))
@@ -1171,7 +1281,7 @@ shinyServer(function(input, output, clientData, session) {
 
         vcf <- RV[["filteredVcf"]]
 
-        validate(need(vcf, Msgs[["vcf"]]))
+        validate(need(vcf, Msgs[["importVariants"]]))
 
         genotypes <- geno(vcf)[["GT"]]
         validate(need(genotypes, Msgs[["genotypes"]]))
@@ -1189,8 +1299,7 @@ shinyServer(function(input, output, clientData, session) {
         req(input$genoNumRows)
 
         vcf <- RV[["filteredVcf"]]
-
-        validate(need(vcf, Msgs[["vcf"]]))
+        validate(need(vcf, Msgs[["importVariants"]]))
 
         genotypes <- geno(vcf)[["GT"]]
         validate(need(genotypes, Msgs[["genotypes"]]))
@@ -1315,7 +1424,7 @@ shinyServer(function(input, output, clientData, session) {
         vcf <- vcf()
 
         validate(
-            need(vcf, Msgs[["vcf"]]),
+            need(vcf, Msgs[["importVariants"]]),
             need(input$vepKey, label = Msgs[["vepKey"]]))
 
         csq <- tryParseCsq(vcf = vcf, vepKey = input$vepKey)
@@ -1328,9 +1437,8 @@ shinyServer(function(input, output, clientData, session) {
     output$vepCols <- renderUI({
 
         vcf <- RV[["filteredVcf"]]
-
         validate(
-            need(vcf, Msgs[["vcf"]]),
+            need(vcf, Msgs[["importVariants"]]),
             need(input$vepKey, Msgs[["vepKey"]]))
 
         csq <- tryParseCsq(vcf = vcf, vepKey = input$vepKey)
@@ -1345,13 +1453,12 @@ shinyServer(function(input, output, clientData, session) {
     })
 
     output$vcfVep <- DT::renderDataTable({
-
         req(input$vepCols)
 
         vcf <- RV[["filteredVcf"]]
 
         validate(
-            need(vcf, Msgs[["vcf"]]),
+            need(vcf, Msgs[["importVariants"]]),
             need(input$vepKey, Msgs[["vepKey"]])
             )
 
@@ -1381,7 +1488,7 @@ shinyServer(function(input, output, clientData, session) {
         vcf <- RV[["filteredVcf"]]
 
         validate(
-            need(vcf, Msgs[["vcf"]]),
+            need(vcf, Msgs[["importVariants"]]),
             need(input$vepKey, label = Msgs[["vepKey"]]))
 
         csq <- tryParseCsq(vcf = vcf, vepKey = input$vepKey)
@@ -1572,6 +1679,7 @@ shinyServer(function(input, output, clientData, session) {
         vepMcols <- mcols(csq)
 
         if (input$vepFacetKey != "None"){
+
             vepFacets.choices <- unique(vepMcols[,input$vepFacetKey])
         } else {
             vepFacets.choices <- c()
@@ -1608,6 +1716,7 @@ shinyServer(function(input, output, clientData, session) {
             )
             # Identify data for the panel (vepFacetKey) hovered
             if (input$vepFacetKey != "None"){
+
                 filters$vepFacetKey <- vepTableCount[
                     ,hover$mapping$panelvar1] ==
                     hover$panelvar1
@@ -1697,7 +1806,7 @@ shinyServer(function(input, output, clientData, session) {
         isolate({ vcf <- RV[["filteredVcf"]] })
 
         validate(
-            need(vcf, Msgs[["vcf"]]),
+            need(vcf, Msgs[["importVariants"]]),
             need(tparam(), label = Msgs[["tparam"]])
         )
 

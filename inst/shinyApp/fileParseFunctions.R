@@ -54,6 +54,26 @@ tryParseBed <- function(bed){
     return(rawData)
 }
 
+tryParseVcfHeader <- function(file){
+    if (is.null(file))
+        return(NULL)
+
+    message("Parsing header of ", file, " ...")
+
+    rawData <- tryCatch(
+        scanVcfHeader(file = file),
+        warning = function(warn){
+            warning(warn)
+            return(NULL)},
+        error = function(err){
+            warning(geterrmessage())
+            return(NULL)
+        }
+    )
+
+    return(rawData)
+}
+
 tryParseMultipleVcf <- function(
     folder, pattern, svp = ScanVcfParam(), yieldSize = NA_integer_,
     BPPARAM = BiocParallel::SerialParam()){
@@ -202,3 +222,4 @@ parseSingleVcf <- function(
 
     return(vcf)
 }
+

@@ -170,7 +170,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
             # VCF options ----
 
             wellPanel(
-                h4("Variants"),
+                h4("VCF file(s)"),
                 hr(),
 
                 fluidRow(
@@ -245,26 +245,91 @@ shinyUI(navbarPage(theme = "bootstrap.css",
 
                     )
 
-                ),
+                )
+
+            ),
+
+            wellPanel(
+                h4("VCF scan parameters"),
+                hr(),
 
                 fluidRow(
 
-                    # VEP prediction INFO field ----
+                    # ScanVcfParam ----
+
+                    # FIXED fields
+                    shiny::column(
+                        width = 2,
+                        selectInput(
+                            "vcfFixedKeys", "Fixed fields",
+                            choices = c(), selected = c(),
+                            multiple = TRUE)
+                    ),
+
+                    # INFO fields (except VEP)
+                    shiny::column(
+                        width = 6,
+                        fluidRow(
+                            shiny::column(
+                                width = 12,
+                            selectInput(
+                                "vcfInfoKeys", "INFO fields",
+                                choices = c(), selected = c(),
+                                multiple = TRUE)
+                            )
+                        ),
+                        fluidRow(
+                            shiny::column(
+                                width = 2,
+                                actionButton(
+                                    "tickAllInfo", "Select all",
+                                    icon = icon("check-square-o"))
+                            ),
+                            shiny::column(
+                                width = 2,
+                                actionButton(
+                                    "untickAllInfo", "Deselect all",
+                                    icon = icon("square-o"))
+                            ),
+                            shiny::column(
+                                width = 7, offset = 1,
+                                strong("Note:"),
+                                "VEP field implicitely required"
+                            )
+                        )
+
+                    ),
+
+
+                    # VEP prediction INFO field
                     shiny::column(
                         width = 2,
                         textInput(
-                            "vepKey", "VEP field",
+                            "vepKey", "VEP field (INFO)",
                             value = GS[["default.vep"]],
-                            placeholder = 'CSQ, ANN, ...'))
+                            placeholder = 'CSQ, ANN, ...')
+                    ),
 
-                ),
+                    # FORMAT fields
+                    shiny::column(
+                        width = 2,
+                        selectInput(
+                            "vcfFormatKeys", "FORMAT fields",
+                            choices = c(), selected = c(), # TODO ScanVcfParam
+                            multiple = TRUE),
+                        strong("Note:"), "\"GT\" implicitely required"
+                    )
 
+                )
+            ),
 
+            wellPanel(
                 fluidRow(
 
                     # VEP prediction INFO field ----
                     shiny::column(
                         width = 2, offset = 5,
+                        br(),
                         actionButton(
                             "importVariants", "Import variants",
                             icon = icon("open", lib = "glyphicon")
@@ -277,7 +342,6 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                     )
 
                 )
-
             ),
 
             hr(),
@@ -718,7 +782,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                     ),
                     sliderInput(
                         "legendTextSize", "Legend font size",
-                        value = 1.5, min = 0.1, max = 2, step = 0.1)
+                        value = 1, min = 0.1, max = 2, step = 0.1)
                 ),
 
                 conditionalPanel(
