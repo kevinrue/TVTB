@@ -25,14 +25,14 @@ shinyUI(navbarPage(theme = "bootstrap.css",
 
                 fluidRow(
 
-                    shiny::column(
+                    column(
                         width = 2,
                         p(strong("Phenotype file")),
                         actionButton(
                             "selectPheno", "Browse",
                             icon = icon("file"), width = '100%')
                     ),
-                    shiny::column(
+                    column(
                         width = 6,
                         strong("File"), br(),
                         uiOutput("phenoFile"),
@@ -44,7 +44,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                             }"
                             ))
                     ),
-                    shiny::column(
+                    column(
                         width = 4,
                         strong("Summary"), br(),
                         htmlOutput("phenoFileSummary")
@@ -52,7 +52,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
 
                 ),
                 fluidRow(
-                    shiny::column(
+                    column(
                         width = 2,
                         br(),
                         actionButton(
@@ -75,7 +75,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
 
                 fluidRow(
 
-                    shiny::column(
+                    column(
                         width = 2,
                         selectInput(
                             "grangesInputMode", "Input type",
@@ -84,7 +84,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                             width = '100%')
                     ),
 
-                    shiny::column(
+                    column(
                         width = 4, offset = 6,
                         strong("Summary"),
                         htmlOutput("rangesSummary")
@@ -97,14 +97,14 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                     conditionalPanel(
                         condition = "input.grangesInputMode == 'bed'",
                         fluidRow(
-                            shiny::column(
+                            column(
                                 width = 2,
                                 br(),
                                 actionButton(
                                     "selectBed", "Browse",
                                     icon = icon("file"), width = '100%')
                             ),
-                            shiny::column(
+                            column(
                                 width = 6,
                                 strong("File"), br(),
                                 uiOutput("bedFile")
@@ -113,12 +113,12 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                             tags$head(tags$style(
                                 "#bedFile{
                             display:block;
-                            word-wrap:break-word;
+                           scanVcfHeader word-wrap:break-word;
                             }"
                             ))
                         ),
                         fluidRow(
-                            shiny::column(
+                            column(
                                 width = 2,
                                 br(),
                                 actionButton(
@@ -129,7 +129,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                     ),
                     conditionalPanel(
                         condition = "input.grangesInputMode == 'ucsc'",
-                        shiny::column(
+                        column(
                             width = 8,
                             textInput(
                                 "ucscRanges", "UCSC-type genomic ranges",
@@ -141,7 +141,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                                     sep = " ; "),
                                 width = "100%")
                         ),
-                        shiny::column(
+                        column(
                             width = 2,
                             br(),
                             actionButton(
@@ -151,34 +151,34 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                     ),
                     conditionalPanel(
                         condition = "input.grangesInputMode == 'EnsDb'",
-                        shiny::column(
+                        column(
                             width = 2,
                             selectInput(
                                 "ensDb.type", NA,
                                 choices = GS[["choices.ensDbType"]],
                                 selected = GS[["default.ensDbType"]])
                         ),
-                        shiny::column(
+                        column(
                             width = 1,
                             selectInput(
                                 "ensDb.condition", NA,
                                 choices = GS[["choices.ensDbFilters"]],
                                 selected = GS[["default.ensDbFilters"]])
                         ),
-                        shiny::column(
+                        column(
                             2,
                             textInput(
                                 "ensDb.value", NA,
                                 value = "",
                                 placeholder = "SLC24A5,IL17A,...")
                         ),
-                        shiny::column(
+                        column(
                             width = 2,
                             actionButton(
                                 "demoEnsDb", "Sample input",
                                 icon = icon("font"), width = '100%')
                         ),
-                        shiny::column(
+                        column(
                             width = 4, offset = 1,
                             strong("Note"),
                             p(
@@ -221,7 +221,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
 
                 fluidRow(
 
-                    shiny::column(
+                    column(
                         width = 2,
                         selectInput(
                             "vcfInputMode", "VCF input type",
@@ -231,21 +231,21 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                     ),
                     conditionalPanel(
                         condition = "input.vcfInputMode == 'SingleVcf'",
-                        shiny::column(
+                        column(
                             width = 2,
                             br(),
                             actionButton(
                                 "selectVcf", "Browse",
                                 icon = icon("file"), width = '100%')
                         ),
-                        shiny::column(
+                        column(
                             width = 2,
                             br(),
                             actionButton(
                                 "demoVcf", "Sample file",
                                 icon = icon("file-text"), width = '100%')
                         ),
-                        shiny::column(
+                        column(
                             width = 4, offset = 2,
                             strong("Summary"),
                             br(),
@@ -261,7 +261,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                     ),
                     conditionalPanel(
                         condition = "input.vcfInputMode == 'OnePerChr'",
-                        shiny::column(
+                        column(
                             width = 6,
                             textInput(
                                 "vcfFolder", "Folder of VCF files",
@@ -269,7 +269,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                                 width = '100%',
                                 placeholder = "./extdata")
                         ),
-                        shiny::column(
+                        column(
                             width = 4,
                             strong("Summary"),
                             htmlOutput("vcfFolderSummary")
@@ -284,7 +284,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                         condition = "input.vcfInputMode == 'OnePerChr'",
                         fluidRow(
 
-                            shiny::column(
+                            column(
                                 width = 6, offset = 2,
                                 textInput(
                                     "vcfPattern",
@@ -314,10 +314,10 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                     # ScanVcfParam ----
 
                     # INFO fields (except VEP)
-                    shiny::column(
+                    column(
                         width = 8,
                         fluidRow(
-                            shiny::column(
+                            column(
                                 width = 12,
                             selectInput(
                                 "vcfInfoKeys", "INFO fields",
@@ -326,19 +326,19 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                             )
                         ),
                         fluidRow(
-                            shiny::column(
+                            column(
                                 width = 2,
                                 actionButton(
                                     "tickAllInfo", "Select all",
                                     icon = icon("check-square-o"))
                             ),
-                            shiny::column(
+                            column(
                                 width = 2,
                                 actionButton(
                                     "untickAllInfo", "Deselect all",
                                     icon = icon("square-o"))
                             ),
-                            shiny::column(
+                            column(
                                 width = 7, offset = 1,
                                 strong("Note:"),
                                 "VEP field implicitely required"
@@ -349,7 +349,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
 
 
                     # VEP prediction INFO field
-                    shiny::column(
+                    column(
                         width = 2,
                         textInput(
                             "vepKey", "VEP field (INFO)",
@@ -358,7 +358,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                     ),
 
                     # FORMAT fields
-                    shiny::column(
+                    column(
                         width = 2,
                         selectInput(
                             "vcfFormatKeys", "FORMAT fields",
@@ -374,7 +374,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                 fluidRow(
 
                     # VEP prediction INFO field ----
-                    shiny::column(
+                    column(
                         width = 2, offset = 5,
                         br(),
                         actionButton(
@@ -382,7 +382,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                             icon = icon("open", lib = "glyphicon")
                         )
                     ),
-                    shiny::column(
+                    column(
                         width = 4, offset = 1,
                         strong("Summary"),
                         htmlOutput("vcfSummary")
@@ -394,13 +394,13 @@ shinyUI(navbarPage(theme = "bootstrap.css",
             hr(),
 
             fluidRow(
-                shiny::column(
+                column(
                     width = 6,
                     h4("Contents of folder"),
                     hr(),
                     DT::dataTableOutput("vcfContent")
                 ),
-                shiny::column(
+                column(
                     width = 6,
                     h4("VCF files in folder"),
                     hr(),
@@ -420,7 +420,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                 hr(),
                 fluidRow(
 
-                    shiny::column(
+                    column(
                         width = 3,
                         selectInput(
                             "annotationPackage",
@@ -429,7 +429,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                             width = '100%')
                     ),
 
-                    shiny::column(
+                    column(
                         3,
                         strong("EnsDb annotation"),
                         htmlOutput("ensembl_organism"),
@@ -437,7 +437,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                         htmlOutput("ensembl_genome")
                     ),
 
-                    shiny::column(
+                    column(
                         width = 6,
                         strong("Note"),
                         p(
@@ -466,11 +466,11 @@ shinyUI(navbarPage(theme = "bootstrap.css",
 
         wellPanel(
             fluidRow(
-                shiny::column(
+                column(
                     width = 2,
                     strong("Latest changes:")
                 ),
-                shiny::column(
+                column(
                     width = 10,
                     uiOutput("latestFrequenciesCalculated")
                 )
@@ -480,7 +480,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
         wellPanel(
             fluidRow(
                 h4("Overall frequencies"), hr(),
-                shiny::column(
+                column(
                     width = 1, offset = 1,
                     actionButton(
                         "addOverallFrequencies", "Add",
@@ -488,7 +488,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
 
                     )
                 ),
-                shiny::column(
+                column(
                     width = 1,
                     actionButton(
                         "removeOverallFrequencies", "Remove",
@@ -501,7 +501,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
         wellPanel(
             fluidRow(
                 h4("Frequencies in phenotype levels"), hr(),
-                shiny::column(
+                column(
                     width = 2,
                     selectInput(
                         "phenoAddFrequencies",
@@ -509,7 +509,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                         choices = c()
                     )
                 ),
-                shiny::column(
+                column(
                     width = 2, offset = 1,
                     actionButton(
                         "tickAllPhenoLevelsFreq",
@@ -524,7 +524,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                         width = "100%"
                     )
                 ),
-                shiny::column(
+                column(
                     width = 2, offset = 1,
                     br(),
                     actionButton(
@@ -534,7 +534,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                 )
             ),
             fluidRow(
-                shiny::column(
+                column(
                     width = 12,
                     checkboxGroupInput(
                         "phenoLevelFreqCheckboxes", "Phenotype levels",
@@ -554,7 +554,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
         wellPanel(
             h4("Add filter"),
             fluidRow(
-                shiny::column(
+                column(
                     width = 1,
                     br(),
                     actionButton(
@@ -562,7 +562,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                         icon = icon("plus")
                     )
                 ),
-                shiny::column(
+                column(
                     width = 1,
                     selectInput(
                         "newFilterClass", "Type",
@@ -570,14 +570,14 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                         selected = GS[["vcfFilterClass.default"]]
                     )
                 ),
-                shiny::column(
+                column(
                     width = 1,
                     checkboxInput(
                         "newFilterActive", "Active?",
                         value = TRUE
                     )
                 ),
-                shiny::column(
+                column(
                     width = 8,
                     textInput(
                         "newFilterExpression", "Expression",
@@ -591,7 +591,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                 )
             ),
             fluidRow(
-                shiny::column(
+                column(
                     width = 12,
                     uiOutput("vcfFilterTest")
                 )
@@ -624,19 +624,19 @@ shinyUI(navbarPage(theme = "bootstrap.css",
         ),
         wellPanel(
             fluidRow(
-                shiny::column(
+                column(
                     width = 4, offset = 1,
                     strong("Summary"), br(),
                     uiOutput("filtersSummary")
                 ),
-                shiny::column(
+                column(
                     width = 2,
                     actionButton(
                         "filterVariants", "Apply filters",
                         icon = icon("filter"), width = "100%"
                     )
                 ),
-                shiny::column(
+                column(
                     width = 4,
                     strong("Summary"), br(),
                     uiOutput("filteredVcfSummary")
@@ -645,15 +645,15 @@ shinyUI(navbarPage(theme = "bootstrap.css",
         ),
         wellPanel(
             fluidRow(
-                shiny::column(
+                column(
                     width = 1,
                     strong("Class")
                 ),
-                shiny::column(
+                column(
                     width = 1,
                     strong("Active?")
                 ),
-                shiny::column(
+                column(
                     width = 8,
                     strong("Expression")
                 )
@@ -663,7 +663,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
         ),
         wellPanel(
             fluidRow(
-                shiny::column(
+                column(
                     width = 12,
                     verbatimTextOutput("vcfRules")
                 )
@@ -682,7 +682,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                 title = "Genomic ranges",
 
                 fluidRow(
-                    shiny::column(
+                    column(
                         width = 12,
                         DT::dataTableOutput("rangesSample")
                     )
@@ -695,7 +695,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                 title = "Variants",
 
                 fluidRow(
-                    shiny::column(
+                    column(
                         width = 12,
                         wellPanel(
                             uiOutput("vcfCols")
@@ -704,7 +704,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                 ),
 
                 fluidRow(
-                    shiny::column(
+                    column(
                         width = 12,
                         DT::dataTableOutput("vcfRowRanges")
                     )
@@ -717,7 +717,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                 title = "INFO",
 
                 fluidRow(
-                    shiny::column(
+                    column(
                         width = 12,
                         wellPanel(
                             uiOutput("vcfInfoCols")
@@ -726,7 +726,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                 ),
 
                 fluidRow(
-                    shiny::column(
+                    column(
                         width = 12,
                         DT::dataTableOutput("vcfInfo")
                     )
@@ -739,7 +739,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                 title = "VEP",
 
                 fluidRow(
-                    shiny::column(
+                    column(
                         width = 12,
                         wellPanel(
                             uiOutput("vepCols")
@@ -748,7 +748,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                 ),
 
                 fluidRow(
-                    shiny::column(
+                    column(
                         width = 12,
                         DT::dataTableOutput("vcfVep")
                     )
@@ -761,7 +761,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                 title = "Phenotypes",
 
                 fluidRow(
-                    shiny::column(
+                    column(
                         width = 12,
                         wellPanel(
                             uiOutput("phenoCols")
@@ -770,7 +770,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                 ),
 
                 fluidRow(
-                    shiny::column(
+                    column(
                         width = 12,
                         DT::dataTableOutput("phenotypesSample")
                     )
@@ -787,11 +787,11 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                         title = "Matrix",
                         fluidRow(
                             wellPanel(
-                                shiny::column(
+                                column(
                                     width = 6,
                                     uiOutput("genoNumRows")
                                 ),
-                                shiny::column(
+                                column(
                                     width = 6,
                                     uiOutput("genoFirstRow")
                                 )
@@ -799,18 +799,18 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                         ),
                         fluidRow(
                             wellPanel(
-                                shiny::column(
+                                column(
                                     width = 6,
                                     uiOutput("genoNumCols")
                                 ),
-                                shiny::column(
+                                column(
                                     width = 6,
                                     uiOutput("genoFirstCol")
                                 )
                             )
                         ),
                         fluidRow(
-                            shiny::column(
+                            column(
                                 width = 12,
                                 tableOutput("genotypesSample")
                             )
@@ -830,7 +830,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                         ),
 
                         fluidRow(
-                            shiny::column(
+                            column(
                                 width = 12,
                                 plotOutput("heatmapGenotype")
                             )
@@ -847,7 +847,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                                     )
                                 ),
                                 tags$li(
-                                    "All genotypes codes found in the data",
+                                    "Only genotypes codes found in the data",
                                     "are listed in the legend, irrespective",
                                     "of those defined in the",
                                     tags$strong("Advanced settings"), "."
@@ -992,7 +992,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                             title = "Barplot",
 
                             fluidRow(
-                                shiny::column(
+                                column(
                                     width = 12,
                                     plotOutput(
                                         "vepCountBarplot",
@@ -1005,7 +1005,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                             ),
 
                             fluidRow(
-                                shiny::column(
+                                column(
                                     width = 12,
                                     htmlOutput("varVepCount")
                                 )
@@ -1141,7 +1141,10 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                 ),
 
                 mainPanel( # width = 8
-                    plotOutput("vepDensityPlot")
+                    plotOutput(
+                        outputId = "vepDensityPlot",
+                        height = vepDensityplotHeight,
+                        )
                 )
 
             ) #sideBarLayout
@@ -1163,7 +1166,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                 hr(),
 
                 fluidRow(
-                    shiny::column(
+                    column(
                         width = 4,
                         selectInput(
                             "refGenotypes", "Reference homozygote genotype(s)",
@@ -1177,7 +1180,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                         )
                     ),
 
-                    shiny::column(
+                    column(
                         width = 4,
                         selectInput(
                             "hetGenotypes", "Heterozygote genotype(s)",
@@ -1191,7 +1194,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                         )
                     ),
 
-                    shiny::column(
+                    column(
                         width = 4,
                         selectInput(
                             "altGenotypes", "Alternate homozygote genotype(s)",
@@ -1208,7 +1211,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                 ),
 
                 fluidRow(
-                    shiny::column(
+                    column(
                         width = 1,
                         textInput(
                             "refSuffix", "Suffix",
@@ -1216,7 +1219,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                             placeholder = GS[["default.refSuffix"]]
                         )
                     ),
-                    shiny::column(
+                    column(
                         width = 1, offset = 3,
                         textInput(
                             "hetSuffix", "Suffix",
@@ -1224,7 +1227,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                             placeholder = GS[["default.hetSuffix"]]
                         )
                     ),
-                    shiny::column(
+                    column(
                         width = 1, offset = 3,
                         textInput(
                             "altSuffix", "Suffix",
@@ -1241,7 +1244,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                 hr(),
 
                 fluidRow(
-                    shiny::column(
+                    column(
                         width = 3,
                         textInput(
                             "aafSuffix", "ALT allele freq.",
@@ -1249,7 +1252,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                             placeholder = GS[["default.aafSuffix"]]
                         )
                     ),
-                    shiny::column(
+                    column(
                         width = 3,
                         textInput(
                             "mafSuffix", "Minor allele freq.",
@@ -1266,7 +1269,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
 
                 fluidRow(
 
-                    shiny::column(
+                    column(
                         width = 2,
                         numericInput(
                             "yieldSize", "VCF yield size (100-100^3)",
@@ -1293,7 +1296,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                 hr(),
                 fluidRow(
 
-                    shiny::column(
+                    column(
                         width = 3,
                         numericInput(
                             "bpCores", "Cores",
@@ -1301,7 +1304,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                             min = 1, max = PS[["default.bpCores"]], step = 1)
                     ),
 
-                    shiny::column(
+                    column(
                         width = 3,
                         selectInput(
                             "bpConfig", "Cluster configuration",
@@ -1314,7 +1317,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
 
                     conditionalPanel(
                         condition = "input.bpConfig != 'SerialParam'",
-                        shiny::column(
+                        column(
                             width = 3,
                             selectInput(
                                 "bpType", "Cluster type",

@@ -95,7 +95,6 @@ export("tSVE")
 
 export("chr2file")
 
-
 # S4 ----
 
 exportMethods(

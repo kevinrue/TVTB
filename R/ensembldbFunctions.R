@@ -2,8 +2,8 @@
 ## Based on the given EnsDb package name it loads the library and returns
 ## the object.
 getEdb <- function(x){
-    require(x, character.only = TRUE)
-    return(get(x))
+    stopifnot(requireNamespace(x))
+    return(get(x = x, envir = asNamespace(x)))
 }
 
 # If "," present, taken as the value separator and " " are trimmed

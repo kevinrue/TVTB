@@ -20,12 +20,12 @@ shinyServer(function(input, output, clientData, session) {
         # Path to phenotype file
         phenoFile = NULL,
         # VCF filter rules
-        vcfFilters = VcfFilterRules(),
+        vcfFilters = TVTB::VcfFilterRules(),
         # VCF keys
         infoKeys = NULL,
         genoKeys = NULL,
         # GRanges
-        genomicRanges = GRanges(),
+        genomicRanges = GenomicRanges::GRanges(),
         # VCF files
         singleVcf = NULL
     )
@@ -79,7 +79,7 @@ shinyServer(function(input, output, clientData, session) {
                     "with colnames and rownames")))
         }
 
-        DataFrame(rawData)
+        return(S4Vectors::DataFrame(rawData))
     })
 
     # HTML summary of imported phenotypes
@@ -92,9 +92,9 @@ shinyServer(function(input, output, clientData, session) {
             return(Msgs[["phenotypes"]])
 
         return(tagList(
-            code(ncol(phenotypes)),
+            code(S4Vectors::ncol(phenotypes)),
             "phenotypes in",
-            code(nrow(phenotypes)),
+            code(S4Vectors::nrow(phenotypes)),
             "samples."
         ))
     })
@@ -109,7 +109,7 @@ shinyServer(function(input, output, clientData, session) {
         vcf <- RV[["vcf"]]
         validate(need(vcf, Msgs[["importVariants"]]))
 
-        phenos <- colData(vcf)
+        phenos <- SummarizedExperiment::colData(vcf)
 
         validate(need(
             ncol(phenos) > 0,
@@ -131,7 +131,9 @@ shinyServer(function(input, output, clientData, session) {
     # When phenotypes are updated in VCF, update the choices for plotting
     observeEvent(RV[["filteredVcf"]], {
         # Depends on RV[["filteredVcf"]] & input$phenoTVBP
-        pheno.choices <- c("None", colnames(colData(RV[["filteredVcf"]])))
+        pheno.choices <- c(
+            "None",
+            colnames(SummarizedExperiment::colData(RV[["filteredVcf"]])))
 
         # If new phenotype files also contains the current phenotype,
         # keep it active instead of resetting to the first choice
@@ -193,7 +195,7 @@ shinyServer(function(input, output, clientData, session) {
         vcf <- RV[["filteredVcf"]]
         validate(need(vcf, Msgs[["importVariants"]]))
 
-        # Make sure the selected
+        # Make sure the selected fields are present in data
         phenos <- SummarizedExperiment::colData(vcf)
         validate(need(
             all(input$phenoCols %in% colnames(phenos)),
@@ -216,7 +218,7 @@ shinyServer(function(input, output, clientData, session) {
             vcf <- RV[["vcf"]]
 
             # phenotypes
-            phenos <- colData(vcf)
+            phenos <- SummarizedExperiment::colData(vcf)
 
             updateSelectInput(
                 session, "phenoAddFrequencies",
@@ -235,18 +237,18 @@ shinyServer(function(input, output, clientData, session) {
             validate(need(vcf, Msgs[["importVariants"]]))
 
             # phenotypes
-            phenos <- colData(vcf)
+            phenos <- SummarizedExperiment::colData(vcf)
             phenoNames <- colnames(phenos)
             phenoLevels <- levels(phenos[,input$phenoAddFrequencies])
 
             ## pre-tick phenoLevels already calculated
-            infoCols <- colnames(info(vcf))
+            infoCols <- colnames(VariantAnnotation::info(vcf))
             # phenoLevels already calculated have all suffixes present
             tparam <- tparam()
             suffixes <- c(
-                names(genos(tparam)),
-                aaf(tparam),
-                maf(tparam))
+                names(TVTB::genos(tparam)),
+                TVTB::aaf(tparam),
+                TVTB::maf(tparam))
 
             levelsPresent <- sapply(
                 X = phenoLevels,
@@ -287,7 +289,7 @@ shinyServer(function(input, output, clientData, session) {
             req(vcf)
 
             # phenotypes
-            phenos <- colData(vcf)
+            phenos <- SummarizedExperiment::colData(vcf)
             phenoNames <- colnames(phenos)
             choices <- levels(phenos[,input$phenoAddFrequencies])
 
@@ -326,9 +328,9 @@ shinyServer(function(input, output, clientData, session) {
             # collect all INFO keys
             tparam <- tparam()
             suffixes <- c(
-                names(genos(tparam)),
-                aaf(tparam),
-                maf(tparam))
+                names(TVTB::genos(tparam)),
+                TVTB::aaf(tparam),
+                TVTB::maf(tparam))
 
             withProgress(
                 max = 3,
@@ -336,13 +338,15 @@ shinyServer(function(input, output, clientData, session) {
                 message = "Progress",
                 detail = Tracking[["preprocessing"]],{
                     # Only proceed if none of the INFO keys are present
-                    if (!any(suffixes %in% colnames(info(vcf)))){
+                    if (!any(
+                        suffixes %in%
+                        colnames(VariantAnnotation::info(vcf)))){
 
-                        shiny::incProgress(
+                        incProgress(
                             amount = 1,
                             detail = Tracking[["addFreqOverall"]])
 
-                        RV[["vcf"]] <- addOverallFrequencies(
+                        RV[["vcf"]] <- TVTB::addOverallFrequencies(
                             vcf = vcf,
                             param = tparam(),
                             force = TRUE # watch the console for warnings
@@ -369,9 +373,9 @@ shinyServer(function(input, output, clientData, session) {
             # collect all INFO keys
             tparam <- tparam()
             suffixes <- c(
-                names(genos(tparam)),
-                aaf(tparam),
-                maf(tparam))
+                names(TVTB::genos(tparam)),
+                TVTB::aaf(tparam),
+                TVTB::maf(tparam))
 
             withProgress(
                 max = 3,
@@ -379,14 +383,15 @@ shinyServer(function(input, output, clientData, session) {
                 message = "Progress",
                 detail = Tracking[["preprocessing"]],{
 
-                    shiny::incProgress(
+                    incProgress(
                         amount = 1,
                         detail = Tracking[["rmFreqOverall"]])
 
                     # Only proceed if all of the INFO keys are present
-                    if (all(suffixes %in% colnames(info(vcf)))){
+                    if (all(
+                        suffixes %in% colnames(VariantAnnotation::info(vcf)))){
 
-                        RV[["vcf"]] <- dropInfo(
+                        RV[["vcf"]] <- TVTB::dropInfo(
                             vcf = vcf,
                             key = suffixes,
                             slot = "both"
@@ -420,18 +425,18 @@ shinyServer(function(input, output, clientData, session) {
                     # Info in VCF
                     vcf <- RV[["vcf"]]
                     req(vcf)
-                    vcfInfoCols <- colnames(info(vcf))
+                    vcfInfoCols <- colnames(VariantAnnotation::info(vcf))
 
                     # Phenotype levels available
-                    phenos <- colData(vcf)
+                    phenos <- SummarizedExperiment::colData(vcf)
                     choices <- levels(phenos[,input$phenoAddFrequencies])
 
                     # pre1) collect all suffixes (to check existence of fields)
                     tparam <- tparam()
                     suffixes <- c(
-                        names(genos(tparam)),
-                        aaf(tparam),
-                        maf(tparam))
+                        names(TVTB::genos(tparam)),
+                        TVTB::aaf(tparam),
+                        TVTB::maf(tparam))
 
                     # pre2) identify unticked phenoLevels
 
@@ -441,7 +446,7 @@ shinyServer(function(input, output, clientData, session) {
 
                     if (length(phenoLevelsUnticked) > 0){
 
-                        shiny::incProgress(
+                        incProgress(
                             amount = 1,
                             detail = Tracking[["rmFreqPhenoLevel"]])
 
@@ -480,7 +485,7 @@ shinyServer(function(input, output, clientData, session) {
                             message(
                                 "Removing INFO keys for levels: ",
                                 paste(phenoLevelsUnticked, collapse = ", "))
-                        RV[["vcf"]] <- dropInfo(
+                        RV[["vcf"]] <- TVTB::dropInfo(
                             vcf = RV[["vcf"]],
                             key = phenoLevelKeysRemove,
                             slot = "both")
@@ -495,7 +500,7 @@ shinyServer(function(input, output, clientData, session) {
 
                     if (length(selectedPhenoLevels) > 0){
 
-                        shiny::incProgress(
+                        incProgress(
                             amount = 1,
                             detail = Tracking[["addFreqPhenoLevel"]])
 
@@ -537,7 +542,7 @@ shinyServer(function(input, output, clientData, session) {
                             message(
                                 "Adding INFO keys for levels: ",
                                 paste(phenoLevelsAdd, collapse = ", "))
-                        RV[["vcf"]] <- addFrequencies(
+                        RV[["vcf"]] <- TVTB::addFrequencies(
                             vcf = vcf,
                             phenos = phenosAdd,
                             param = tparam(),
@@ -663,12 +668,12 @@ shinyServer(function(input, output, clientData, session) {
         eventExpr = RV[["bedFile"]],
         handlerExpr = {
 
-            stopifnot(require(rtracklayer))
+            stopifnot(requireNamespace("rtracklayer"))
             # use rtracklayer::import.bed to obtain GRanges
             bedFile <- RV[["bedFile"]]
 
             if (is.null(bedFile)){
-                RV[["GRangesBED"]] <- GRanges()
+                RV[["GRangesBED"]] <- GenomicRanges::GRanges()
                 return()
             }
 
@@ -678,7 +683,7 @@ shinyServer(function(input, output, clientData, session) {
             validate(need(rawData, "Invalid input"))
 
             if (length(rawData) == 0)
-                RV[["GRangesBED"]] <- GRanges()
+                RV[["GRangesBED"]] <- GenomicRanges::GRanges()
             else
                 RV[["GRangesBED"]] <- rawData
         }
@@ -691,7 +696,7 @@ shinyServer(function(input, output, clientData, session) {
 
             # parse the string or return NULL
             if (input$ucscRanges == ""){
-                RV[["GRangesUCSC"]] <- GRanges()
+                RV[["GRangesUCSC"]] <- GenomicRanges::GRanges()
                 return()
             }
 
@@ -775,14 +780,14 @@ shinyServer(function(input, output, clientData, session) {
             queryGenes <- queryGenes()
 
             if (is.null(queryGenes)){
-                RV[["GRangesEnsDb"]] <- GRanges()
+                RV[["GRangesEnsDb"]] <- GenomicRanges::GRanges()
                 return()
             }
 
             validate(need(queryGenes, "Invalid input"))
 
             if (length(queryGenes) == 0)
-                RV[["GRangesEnsDb"]] <- GRanges()
+                RV[["GRangesEnsDb"]] <- GenomicRanges::GRanges()
             else
                 RV[["GRangesEnsDb"]] <- queryGenes
         }
@@ -845,11 +850,17 @@ shinyServer(function(input, output, clientData, session) {
         return(tagList(
             code(length(genomicRanges)), "genomic range(s)", br(),
             "[",
-            as.character(head(x = seqnames(genomicRanges), n = 1)),
+            as.character(head(
+                x = GenomeInfoDb::seqnames(genomicRanges),
+                n = 1)),
             ":",
-            as.character(head(x = start(genomicRanges), n = 1)),
+            as.character(head(
+                x = BiocGenerics::start(genomicRanges),
+                n = 1)),
             "-",
-            as.character(head(x = end(genomicRanges), n = 1)),
+            as.character(head(
+                x = BiocGenerics::end(genomicRanges),
+                n = 1)),
             # "{",
             # as.character(head(x = names(genomicRanges), n = 1)),
             # "}",
@@ -866,13 +877,8 @@ shinyServer(function(input, output, clientData, session) {
             !is.null(genomicRanges),
             Msgs[["noGenomicRanges"]]),
             errorClass = "optional")
-        validate(need(
-            !is.na(genomicRanges),
-            Msgs[["invalidGenomicRanges"]]),
-            errorClass = "optional")
 
-
-        str(genomicRanges)
+        return(str(genomicRanges))
     })
 
     output$rangesSample <- DT::renderDataTable({
@@ -883,17 +889,13 @@ shinyServer(function(input, output, clientData, session) {
             !is.null(genomicRanges),
             Msgs[["noGenomicRanges"]]),
             errorClass = "optional")
-        validate(need(
-            !is.na(genomicRanges),
-            Msgs[["invalidGenomicRanges"]]),
-            errorClass = "optional")
 
-        DT::datatable(
+        return(DT::datatable(
             data = as.data.frame(genomicRanges),
             options = list(
                 pageLength = 10,
                 searching = TRUE),
-            filter = "top")
+            filter = "top"))
     })
 
     # Genome annotation ----
@@ -906,18 +908,18 @@ shinyServer(function(input, output, clientData, session) {
             Msgs[["annotationPackage"]]))
 
         validate(need(
-            require(input$annotationPackage, character.only = TRUE),
+            requireNamespace(input$annotationPackage),
             "Failed loading annotation package."
         ))
 
-        return(getEdb(input$annotationPackage))
+        return(TVTB::getEdb(input$annotationPackage))
     })
 
     genomeSeqinfo <- reactive({
 
         selectedEnsDb <- selectedEnsDb()
 
-        seqinfo(selectedEnsDb)
+        return(ensembldb::seqinfo(selectedEnsDb))
     })
 
     # EnsDb ----
@@ -930,7 +932,7 @@ shinyServer(function(input, output, clientData, session) {
 
         HTML(paste(
             tags$strong("Organism:"),
-            organism(edb))
+            ensembldb::organism(edb))
         )
 
     })
@@ -941,7 +943,7 @@ shinyServer(function(input, output, clientData, session) {
 
         validate(need(edb, label = Msgs[["edb"]]))
 
-        md <- metadata(edb)
+        md <- ensembldb::metadata(edb)
         rownames(md) <- md$name
 
         HTML(paste(
@@ -956,7 +958,7 @@ shinyServer(function(input, output, clientData, session) {
 
         validate(need(edb, label = Msgs[["edb"]]))
 
-        md <- metadata(edb)
+        md <- ensembldb::metadata(edb)
         rownames(md) <- md$name
 
         HTML(paste(
@@ -974,12 +976,12 @@ shinyServer(function(input, output, clientData, session) {
         if (input$ensDb.value == "")
             return(NULL)
 
-        ensDbFilter = EnsDbFilter(
+        ensDbFilter = TVTB::EnsDbFilter(
             type = input$ensDb.type,
             condition = input$ensDb.condition,
             value = input$ensDb.value)
 
-        res <- genes(
+        res <- ensembldb::genes(
             edb,
             filter = ensDbFilter)
 
@@ -1288,13 +1290,13 @@ shinyServer(function(input, output, clientData, session) {
         } else {
             RV[["infoKeys"]] <- grep(
                 pattern = input$vepKey,
-                x = c(rownames(info(vcfHeader))),
+                x = c(rownames(VariantAnnotation::info(vcfHeader))),
                 invert = TRUE,
                 value = TRUE)
             # All keys except "GT" (required)
             RV[["genoKeys"]] <- grep(
                 pattern = "GT",
-                x = c(rownames(geno(vcfHeader))),
+                x = c(rownames(VariantAnnotation::geno(vcfHeader))),
                 invert = TRUE,
                 value = TRUE)
         }
@@ -1366,7 +1368,7 @@ shinyServer(function(input, output, clientData, session) {
                 genoKeys <- "GT" # Mandatory
 
             if (is.null(RV[["phenoFile"]])) {
-                phenotypes <- DataFrame()
+                phenotypes <- S4Vectors::DataFrame()
             } else {
                 phenotypes <- phenotypes()
             }
@@ -1376,24 +1378,26 @@ shinyServer(function(input, output, clientData, session) {
                 need(genomeSeqinfo, Msgs[["genomeSeqinfo"]])
             )
 
-            shiny::withProgress(
+            withProgress(
                 min = 0, max = 3, value = 1,
                 message = "Progress", detail = Tracking[["preprocessing"]],
                 {
 
                     # NOTE: ALL FIXED fields imported
-                    svp <- ScanVcfParam(
+                    svp <- VariantAnnotation::ScanVcfParam(
                         info = infoKeys,
                         geno = genoKeys
                     )
 
                     # Only import samples with phenotype information
                     if (nrow(phenotypes) > 0)
-                        vcfSamples(svp) <- rownames(phenotypes)
+                        VariantAnnotation::vcfSamples(svp) <-
+                            rownames(phenotypes)
 
                     # Only import variants in targeted GRanges
                     if (length(genomicRanges) > 0)
-                        vcfWhich(svp) <- reduce(genomicRanges) # optimise import
+                        VariantAnnotation::vcfWhich(svp) <-
+                            GenomicRanges::reduce(genomicRanges)
 
 
                     # # Timing
@@ -1406,7 +1410,7 @@ shinyServer(function(input, output, clientData, session) {
                             isolate({singleVcf <- RV[["singleVcf"]]})
                             validate(need(singleVcf, Msgs[["singleVcf"]]))
 
-                            shiny::incProgress(
+                            incProgress(
                                 amount = 1, detail = Tracking[["singleVcf"]])
 
                             tryParseSingleVcf(
@@ -1418,7 +1422,7 @@ shinyServer(function(input, output, clientData, session) {
 
                         OnePerChr = {
 
-                            shiny::incProgress(
+                            incProgress(
                                 amount = 1, detail = Tracking[["multiVcfs"]])
 
                             isolate({
@@ -1433,12 +1437,12 @@ shinyServer(function(input, output, clientData, session) {
                                 pattern = vcfPattern,
                                 svp = svp,
                                 yieldSize = yieldSize,
-                                BPPARAM = bp(tparam)
+                                BPPARAM = TVTB::bp(tparam)
                             )
                         }
                     )
 
-                    shiny::incProgress(
+                    incProgress(
                         amount = 1, detail = Tracking[["postprocessing"]])
 
                     validate(need(
@@ -1446,13 +1450,14 @@ shinyServer(function(input, output, clientData, session) {
                         "No variant found in BED region(s)"))
 
                     if (nrow(phenotypes) == 0)
-                        phenotypes <- DataFrame(row.names = colnames(vcf))
+                        phenotypes <- S4Vectors::DataFrame(
+                            row.names = colnames(vcf))
 
-                    colData(vcf) <- phenotypes
+                    SummarizedExperiment::colData(vcf) <- phenotypes
                 })
 
             # Clean header of INFO fields not imported
-            vcf <- dropInfo(vcf = vcf)
+            vcf <- TVTB::dropInfo(vcf = vcf)
 
             # Store ExpandedVCF object in list of reactive values
             RV[["vcf"]] <- vcf
@@ -1468,7 +1473,7 @@ shinyServer(function(input, output, clientData, session) {
 
         return(tagList(
                 code(nrow(vcf)), "bi-allelic records and",
-                code(ncol(colData(vcf))), "phenotypes",
+                code(ncol(SummarizedExperiment::colData(vcf))), "phenotypes",
                 "in", code(ncol(vcf)), "samples"
         ))
     })
@@ -1479,7 +1484,7 @@ shinyServer(function(input, output, clientData, session) {
         vcf <- RV[["vcf"]]
         validate(need(vcf, Msgs[["importVariants"]]))
 
-        colChoices <- c(colnames(mcols(vcf)))
+        colChoices <- c(colnames(S4Vectors::mcols(vcf)))
 
         selectInput(
             "vcfCols", "Meta-columns",
@@ -1497,11 +1502,14 @@ shinyServer(function(input, output, clientData, session) {
         # Give time to initialise widget
         req(input$vcfCols)
 
-        cols <- which(colnames(mcols(vcf)) %in% input$vcfCols)
+        cols <- which(colnames(S4Vectors::mcols(vcf)) %in% input$vcfCols)
 
         displayedTable <- cbind(
             rownames = rownames(vcf),
-            as.data.frame(rowRanges(vcf)[, cols], row.names = NULL)
+            as.data.frame(
+                SummarizedExperiment::rowRanges(vcf)[, cols],
+                row.names = NULL
+            )
         )
 
         DT::datatable(
@@ -1520,17 +1528,21 @@ shinyServer(function(input, output, clientData, session) {
         validate(need(vcf, Msgs[["importVariants"]]))
 
         validate(need(
-            ncol(info(vcf)) > 1, # VEP field are an implicite field
+            # VEP field are an implicite field
+            ncol(VariantAnnotation::info(vcf)) > 1,
             "No INFO field available."),
             errorClass = "optional"
         )
 
-        validate(need(ncol(info(vcf)) > 0, Msgs[["importVariants"]]))
+        validate(need(
+            ncol(VariantAnnotation::info(vcf)) > 0,
+            Msgs[["importVariants"]])
+        )
 
         # All columns except the VEP predictions
         colChoices <- grep(
             pattern = input$vepKey,
-            x = colnames(info(vcf)),
+            x = colnames(VariantAnnotation::info(vcf)),
             invert = TRUE,
             value = TRUE)
 
@@ -1548,7 +1560,8 @@ shinyServer(function(input, output, clientData, session) {
         vcf <- RV[["filteredVcf"]]
 
         validate(need(
-            ncol(info(RV[["vcf"]])) > 1, # At least one non-VEP column
+            # At least one non-VEP column
+            ncol(VariantAnnotation::info(RV[["vcf"]])) > 1,
             "No INFO data imported."
         ),
         errorClass = "optional")
@@ -1558,13 +1571,15 @@ shinyServer(function(input, output, clientData, session) {
             "No INFO key selected."
         ))
 
-        cols <- which(colnames(info(vcf)) %in% input$vcfInfoCols)
+        cols <- which(
+            colnames(VariantAnnotation::info(vcf)) %in% input$vcfInfoCols
+        )
 
         DT::datatable(
             data = cbind(
                 rownames = rownames(vcf),
                 as.data.frame(
-                    info(vcf)[, cols, drop = FALSE],
+                    VariantAnnotation::info(vcf)[, cols, drop = FALSE],
                     row.names = NULL)
             ),
             rownames = FALSE,
@@ -1602,7 +1617,7 @@ shinyServer(function(input, output, clientData, session) {
                 active = input$newFilterActive)
 
             if (class(newFilter) == "VcfVepRules")
-                vep(newFilter) <- input$vepKey
+                TVTB::vep(newFilter) <- input$vepKey
 
             return(newFilter)},
             # warning = function(w) NULL,
@@ -1661,7 +1676,7 @@ shinyServer(function(input, output, clientData, session) {
 
         names(newFilter) <- paste0("rule", input$addNewFilter)
 
-        newRules <- VcfFilterRules(
+        newRules <- TVTB::VcfFilterRules(
             RV[["vcfFilters"]],
             newFilter)
 
@@ -1683,12 +1698,12 @@ shinyServer(function(input, output, clientData, session) {
             FUN = function(filterIndex){
                 fluidRow(
                     # type
-                    shiny::column(
+                    column(
                         width = 1,
-                        code(type(vcfFilters)[filterIndex])
+                        code(TVTB::type(vcfFilters)[filterIndex])
                     ),
                     # active
-                    shiny::column(
+                    column(
                         width = 1,
                         checkboxInput(
                             inputId = gsub(
@@ -1696,15 +1711,15 @@ shinyServer(function(input, output, clientData, session) {
                                 "active",
                                 names(vcfFilters)[filterIndex]),
                             label = NULL,
-                            value = active(vcfFilters)[filterIndex])
+                            value = S4Vectors::active(vcfFilters)[filterIndex])
                     ),
                     # expression
-                    shiny::column(
+                    column(
                         width = 8,
                         code(as.character(vcfFilters[filterIndex][[1]]))
                     ),
                     # remove
-                    shiny::column(
+                    column(
                         width = 1,
                         actionButton(
                             inputId = gsub(
@@ -1753,7 +1768,7 @@ shinyServer(function(input, output, clientData, session) {
         # Match status to rule order
         idx <- match(names(vcfRules), names(rulesStatus))
         # Update the active status
-        active(vcfRules) <- as.logical(rulesStatus)[idx]
+        S4Vectors::active(vcfRules) <- as.logical(rulesStatus)[idx]
         # Update in the reactiveValues
         RV[["vcfFilters"]] <- vcfRules
     })
@@ -1793,7 +1808,7 @@ shinyServer(function(input, output, clientData, session) {
 
         # Remove rules
         if (length(removeIdx) > 0)
-            RV[["vcfFilters"]] <- VcfFilterRules(vcfRules[-removeIdx])
+            RV[["vcfFilters"]] <- TVTB::VcfFilterRules(vcfRules[-removeIdx])
     })
 
     # Updates filteredVcf using raw VCF and VcfFilterRules
@@ -1807,7 +1822,9 @@ shinyServer(function(input, output, clientData, session) {
         isolate({vcfFilters <- RV[["vcfFilters"]]})
 
         # Store the filtered VCF in the reativeValues
-        RV[["filteredVcf"]] <- subsetByFilter(x = vcf, filter = vcfFilters)
+        RV[["filteredVcf"]] <- S4Vectors::subsetByFilter(
+            x = vcf, filter = vcfFilters
+        )
     })
 
     output$filteredVcfSummary <- renderUI({
@@ -1821,7 +1838,8 @@ shinyServer(function(input, output, clientData, session) {
 
         return(tagList(
             code(length(filteredVcf)), "bi-allelic records and",
-            code(ncol(colData(filteredVcf))), "phenotypes in",
+            code(ncol(SummarizedExperiment::colData(filteredVcf))),
+            "phenotypes in",
             code(ncol(filteredVcf)), "samples filtered"
         ))
     })
@@ -1830,7 +1848,7 @@ shinyServer(function(input, output, clientData, session) {
         vcfFilters <- RV[["vcfFilters"]]
 
         return(tagList(
-            code(sum(active(vcfFilters))), "active filters",
+            code(sum(S4Vectors::active(vcfFilters))), "active filters",
             "( of", code(length(vcfFilters)), ")"
             ))
 
@@ -1845,7 +1863,7 @@ shinyServer(function(input, output, clientData, session) {
 
         validate(need(vcf, Msgs[["importVariants"]]))
 
-        genotypes <- geno(vcf)[["GT"]]
+        genotypes <- VariantAnnotation::geno(vcf)[["GT"]]
         validate(need(genotypes, Msgs[["genotypes"]]))
 
         str(genotypes)
@@ -1858,7 +1876,7 @@ shinyServer(function(input, output, clientData, session) {
 
         validate(need(vcf, Msgs[["importVariants"]]))
 
-        genotypes <- geno(vcf)[["GT"]]
+        genotypes <- VariantAnnotation::geno(vcf)[["GT"]]
         validate(need(genotypes, Msgs[["genotypes"]]))
 
         sliderInput(
@@ -1878,7 +1896,7 @@ shinyServer(function(input, output, clientData, session) {
 
         validate(need(vcf, Msgs[["importVariants"]]))
 
-        genotypes <- geno(vcf)[["GT"]]
+        genotypes <- VariantAnnotation::geno(vcf)[["GT"]]
         validate(need(genotypes, Msgs[["genotypes"]]))
 
         isolate({newValue <- max(1, input$genoFirstCol, na.rm = TRUE)})
@@ -1900,7 +1918,7 @@ shinyServer(function(input, output, clientData, session) {
 
         validate(need(vcf, Msgs[["importVariants"]]))
 
-        genotypes <- geno(vcf)[["GT"]]
+        genotypes <- VariantAnnotation::geno(vcf)[["GT"]]
         validate(need(genotypes, Msgs[["genotypes"]]))
 
         sliderInput(
@@ -1921,7 +1939,7 @@ shinyServer(function(input, output, clientData, session) {
         vcf <- RV[["filteredVcf"]]
         validate(need(vcf, Msgs[["importVariants"]]))
 
-        genotypes <- geno(vcf)[["GT"]]
+        genotypes <- VariantAnnotation::geno(vcf)[["GT"]]
         validate(need(genotypes, Msgs[["genotypes"]]))
 
         isolate({newValue <- max(1, input$genoFirstRow, na.rm = TRUE)})
@@ -1955,7 +1973,7 @@ shinyServer(function(input, output, clientData, session) {
             cols = rep(input$genoFirstCol, 2) + c(0, input$genoNumCols - 1)
         )
 
-        genotypes <- geno(vcf)[["GT"]]
+        genotypes <- VariantAnnotation::geno(vcf)[["GT"]]
         validate(need(genotypes, Msgs[["genotypes"]]))
 
         rows <- seq(genoSampleRanges$rows[1], genoSampleRanges$rows[2])
@@ -2048,7 +2066,7 @@ shinyServer(function(input, output, clientData, session) {
         validate(need(vcf, Msgs[["importVariants"]]))
         # If it exists, check that vepKey exist in INFO fields
         validate(need(
-            input$vepKey %in% colnames(info(vcf)),
+            input$vepKey %in% colnames(VariantAnnotation::info(vcf)),
             Msgs[["vepKeyNotFound"]]
         ))
 
@@ -2067,13 +2085,13 @@ shinyServer(function(input, output, clientData, session) {
         validate(need(vcf, Msgs[["importVariants"]]))
         # If it exists, check that vepKey exist in INFO fields
         validate(need(
-            input$vepKey %in% colnames(info(vcf)),
+            input$vepKey %in% colnames(VariantAnnotation::info(vcf)),
             Msgs[["vepKeyNotFound"]]
         ))
 
         csq <- tryParseCsq(vcf = vcf, vepKey = input$vepKey)
 
-        vepMcols <- mcols(csq)
+        vepMcols <- S4Vectors::mcols(csq)
 
         selectInput(
             "vepCols", "Meta-columns",
@@ -2091,13 +2109,13 @@ shinyServer(function(input, output, clientData, session) {
         validate(
             need(vcf, Msgs[["importVariants"]]),
             need(
-                input$vepKey %in% colnames(info(vcf)),
+                input$vepKey %in% colnames(VariantAnnotation::info(vcf)),
                 Msgs[["vepKeyNotFound"]])
         )
 
         csq <- tryParseCsq(vcf = vcf, vepKey = input$vepKey)
 
-        vepMcols <- mcols(csq)
+        vepMcols <- S4Vectors::mcols(csq)
 
         cols <- which(colnames(vepMcols) %in% input$vepCols)
 
@@ -2125,7 +2143,7 @@ shinyServer(function(input, output, clientData, session) {
         validate(
             need(vcf, Msgs[["importVariants"]]),
             need(
-                input$vepKey %in% colnames(info(vcf)),
+                input$vepKey %in% colnames(VariantAnnotation::info(vcf)),
                 Msgs[["vepKeyNotFound"]])
         )
 
@@ -2133,7 +2151,7 @@ shinyServer(function(input, output, clientData, session) {
 
         validate(need(csq, Msgs[["csq"]]))
 
-        vepMcols <- mcols(csq)
+        vepMcols <- S4Vectors::mcols(csq)
 
         vepKey.choices <- colnames(vepMcols)
 
@@ -2236,13 +2254,13 @@ shinyServer(function(input, output, clientData, session) {
             req(vcf)
 
             validate(need(
-                input$vepKey %in% colnames(info(vcf)),
+                input$vepKey %in% colnames(VariantAnnotation::info(vcf)),
                 Msgs[["vepKeyNotFound"]]))
             csq <- tryParseCsq(vcf = vcf, vepKey = input$vepKey)
 
             validate(need(csq, Msgs[["csq"]]))
 
-            vepMcols <- mcols(csq)
+            vepMcols <- S4Vectors::mcols(csq)
 
             # Initialise to avoid crash
             facetsSelected <- NULL
@@ -2303,7 +2321,7 @@ shinyServer(function(input, output, clientData, session) {
             # Special case of phenotype "None"
             isolate({phenoTVBP <- input$phenoTVBP})
             if (phenoTVBP == "None"){
-                colData(vcf)[,"Phenotype"] <- factor("All")
+                SummarizedExperiment::colData(vcf)[,"Phenotype"] <- factor("All")
                 plotPhenotype <- "Phenotype"
             } else {
                 plotPhenotype <- phenoTVBP
@@ -2319,7 +2337,7 @@ shinyServer(function(input, output, clientData, session) {
 
             incProgress(1, detail = Tracking[["ggplot"]])
 
-            gg <- tabulateVepByPhenotype(
+            gg <- TVTB::tabulateVepByPhenotype(
                 vcf = vcf,
                 phenoCol = plotPhenotype,
                 vepCol = vepTVBP,
@@ -2362,18 +2380,22 @@ shinyServer(function(input, output, clientData, session) {
             incProgress(1, detail = Tracking[["render"]])
 
             gg <- gg +
-                theme(
-                    axis.text = element_text(size = rel(1.5)),
-                    axis.title = element_text(size = rel(1.5)),
-                    legend.text = element_text(size = rel(legendTextSize)),
-                    legend.title = element_text(size = rel(legendTextSize)),
-                    axis.text.x = element_text(
+                ggplot2::theme(
+                    axis.text = ggplot2::element_text(
+                        size = ggplot2::rel(1.5)),
+                    axis.title = ggplot2::element_text(
+                        size = ggplot2::rel(1.5)),
+                    legend.text = ggplot2::element_text(
+                        size = ggplot2::rel(legendTextSize)),
+                    legend.title = ggplot2::element_text(
+                        size = ggplot2::rel(legendTextSize)),
+                    axis.text.x = ggplot2::element_text(
                         angle = xAxisAngle,
                         hjust = xAxisHjust,
                         vjust = xAxisVjust,
-                        size = rel(xAxisSize))
+                        size = ggplot2::rel(xAxisSize))
                 ) +
-                guides(fill = c("none", "legend")[legend + 1])
+                ggplot2::guides(fill = c("none", "legend")[legend + 1])
 
             return(gg)
         })
@@ -2394,7 +2416,7 @@ shinyServer(function(input, output, clientData, session) {
 
         vepTableCount <- vepTableCount()
 
-        vepTableDecreasing <- arrange(vepTableCount, desc(Freq))
+        vepTableDecreasing <- dplyr::arrange(vepTableCount, desc(Freq))
 
         DT::datatable(
             vepTableDecreasing,
@@ -2536,13 +2558,13 @@ shinyServer(function(input, output, clientData, session) {
         req(vcf)
 
         validate(need(
-            input$vepKey %in% colnames(info(vcf)),
+            input$vepKey %in% colnames(VariantAnnotation::info(vcf)),
             Msgs[["vepKeyNotFound"]]))
         csq <- tryParseCsq(vcf = vcf, vepKey = input$vepKey)
 
         validate(need(csq, Msgs[["csq"]]))
 
-        vepMcols <- mcols(csq)
+        vepMcols <- S4Vectors::mcols(csq)
 
         # Select a subset of VEP facets
         if (input$vepFacetKeyDVBP != "None"){
@@ -2603,7 +2625,7 @@ shinyServer(function(input, output, clientData, session) {
             # Special case of phenotype "None"
             isolate({phenoDVBP <- input$phenoDVBP})
             if (input$phenoDVBP == "None"){
-                colData(vcf)[,"Phenotype"] <- factor("All")
+                SummarizedExperiment::colData(vcf)[,"Phenotype"] <- factor("All")
                 plotPhenotype <- "Phenotype"
             } else {
                 plotPhenotype <- phenoDVBP
@@ -2618,7 +2640,7 @@ shinyServer(function(input, output, clientData, session) {
 
             incProgress(1, detail = Tracking[["ggplot"]])
 
-            gg <- densityVepByPhenotype(
+            gg <- TVTB::densityVepByPhenotype(
                 vcf = vcf,
                 phenoCol = plotPhenotype,
                 vepCol = vepDVBP,
@@ -2660,15 +2682,21 @@ shinyServer(function(input, output, clientData, session) {
             incProgress(1, detail = Tracking[["render"]])
 
             gg <- gg +
-                theme(
-                    axis.text = element_text(size = rel(1.5)),
-                    axis.title = element_text(size = rel(1.5)),
-                    legend.text = element_text(size = rel(legendTextSize)),
-                    legend.title = element_text(size = rel(legendTextSize)),
-                    axis.text.x = element_text(size = rel(xAxisSize)),
-                    axis.text.y = element_text(size = rel(yAxisSize))
+                ggplot2::theme(
+                    axis.text = ggplot2::element_text(
+                        size = ggplot2::rel(1.5)),
+                    axis.title = ggplot2::element_text(
+                        size = ggplot2::rel(1.5)),
+                    legend.text = ggplot2::element_text(
+                        size = ggplot2::rel(legendTextSize)),
+                    legend.title = ggplot2::element_text(
+                        size = ggplot2::rel(legendTextSize)),
+                    axis.text.x = ggplot2::element_text(
+                        size = ggplot2::rel(xAxisSize)),
+                    axis.text.y = ggplot2::element_text(
+                        size = ggplot2::rel(yAxisSize))
                 ) +
-                guides(fill = c("none", "legend")[legend + 1])
+                ggplot2::guides(fill = c("none", "legend")[legend + 1])
 
             return(gg)
         })
@@ -2693,33 +2721,41 @@ shinyServer(function(input, output, clientData, session) {
         withProgress(min = 0, max = 3, message = "Progress", {
             incProgress(1, detail = Tracking[["calculate"]])
 
-            genotypes <- geno(vcf)[["GT"]]
+            genotypes <- VariantAnnotation::geno(vcf)[["GT"]]
             validate(need(genotypes, Msgs[["genotypes"]]))
 
-            validGenotypes <- unlist(genos(tparam())) # TODO: not used?
+            validGenotypes <- unlist(TVTB::genos(tparam())) # TODO: not used?
             # Currently, all genotypes found in data are considered
             # Potentially, undesired genotypes could be considered NAs
-            genos.long <- melt(genotypes, value.name = "Genotype")
+            genos.long <- reshape2::melt(genotypes, value.name = "Genotype")
 
             colnames(genos.long)[1:2] <- c("Variants", "Samples")
 
             genos.long[,"Genotype"] <- factor(
                 x = genos.long[,"Genotype"],
-                levels = unlist(genos(tparam()))
+                levels = unlist(TVTB::genos(tparam()))
             )
 
             incProgress(1, detail = Tracking[["ggplot"]])
-            gg <- ggplot(
+            gg <- ggplot2::ggplot(
                 data = genos.long,
-                mapping = aes(Samples, Variants)
+                mapping = ggplot2::aes(Samples, Variants)
             ) +
-                geom_tile(aes(fill = Genotype, colour = Genotype)) +
-                scale_fill_discrete(drop = TRUE) + # TODO: give choice (widget)
-                scale_colour_discrete(drop = TRUE) + # tie with widget above
-                theme(
-                    axis.text = element_blank(),
-                    axis.title = element_text(size = rel(1.5)),
-                    axis.ticks = element_blank()
+                ggplot2::geom_tile(
+                    ggplot2::aes(
+                        fill = Genotype,
+                        colour = Genotype
+                    )
+                ) +
+                # TODO: give choice (widget)
+                ggplot2::scale_fill_discrete(drop = TRUE) +
+                # tie with widget above
+                ggplot2::scale_colour_discrete(drop = TRUE) +
+                ggplot2::theme(
+                    axis.text = ggplot2::element_blank(),
+                    axis.title = ggplot2::element_text(
+                        size = ggplot2::rel(1.5)),
+                    axis.ticks = ggplot2::element_blank()
                 )
 
             message("Plotting heatmap of genotypes...")
@@ -2752,8 +2788,8 @@ shinyServer(function(input, output, clientData, session) {
                     selected = "FORK")
                 updateNumericInput(
                     session, "bpCores",
-                    value = multicoreWorkers(),
-                    min = 1, max = detectCores())
+                    value = BiocParallel::multicoreWorkers(),
+                    min = 1, max = parallel::detectCores())
             },
             SnowParam = {
                 updateSelectInput(
@@ -2761,8 +2797,8 @@ shinyServer(function(input, output, clientData, session) {
                     choices = c("SOCK", "MPI", "FORK"))
                 updateNumericInput(
                     session, "bpCores",
-                    value = snowWorkers(),
-                    min = 1, max = detectCores())
+                    value = BiocParallel::snowWorkers(),
+                    min = 1, max = parallel::detectCores())
             })
     })
 
@@ -2779,9 +2815,10 @@ shinyServer(function(input, output, clientData, session) {
 
         return(switch(
             input$bpConfig,
-            SerialParam = SerialParam(),
-            MulticoreParam = MulticoreParam(workers = input$bpCores),
-            SnowParam = SnowParam(
+            SerialParam = BiocParallel::SerialParam(),
+            MulticoreParam = BiocParallel::MulticoreParam(
+                workers = input$bpCores),
+            SnowParam = BiocParallel::SnowParam(
                 workers = input$bpCores, type = input$bpType)
             ))
     })

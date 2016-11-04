@@ -4,12 +4,13 @@
 
 validateDataFrameGRanges <- function(rawData, EnsDbPkg){
 
+    # base::dim called, as rawData is data.frame
     if (!all(dim(rawData) >= c(1, 3))){
         warning("BED file must have at least 1 row and 3 columns")
         return(NULL)
     }
 
-    if (!all(rawData[,1] %in% seqlevels(EnsDbPkg))){
+    if (!all(rawData[,1] %in% ensembldb::seqlevels(EnsDbPkg))){
         warning("First column contains invalid chromosome names")
         return(NULL)
     }
@@ -29,9 +30,9 @@ validateDataFrameGRanges <- function(rawData, EnsDbPkg){
         return(NULL)
     }
 
-    return(GRanges(
+    return(GenomicRanges::GRanges(
         seqnames = rawData[,1],
-        ranges = IRanges(
+        ranges = IRanges::IRanges(
             start = rawData[,2],
             end = rawData[,3]
         )

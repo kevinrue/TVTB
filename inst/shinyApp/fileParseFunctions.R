@@ -21,7 +21,7 @@ tryParseCsq <- function(vcf, vepKey){
     message("Parsing ", vepKey," to GRanges ...")
 
     rawData <- tryCatch(
-        parseCSQToGRanges(
+        ensemblVEP::parseCSQToGRanges(
             x = vcf,
             VCFRowID = rownames(vcf),
             info.key = vepKey),
@@ -41,7 +41,7 @@ tryParseBed <- function(bed){
     message("Parsing ", bed," as GRanges ...")
 
     rawData <- tryCatch(
-        import.bed(con = bed),
+        rtracklayer::import.bed(con = bed),
         warning = function(warn){
             warning(warn)
             return(NULL)},
@@ -61,46 +61,7 @@ tryParseVcfHeader <- function(file){
     message("Parsing header of ", file, " ...")
 
     rawData <- tryCatch(
-        scanVcfHeader(file = file),
-        warning = function(warn){
-            warning(warn)
-            return(NULL)},
-        error = function(err){
-            warning(geterrmessage())
-            return(NULL)
-        }
-    )
-
-    return(rawData)
-}
-
-tryParseMultipleVcf <- function(
-    folder, pattern, svp = ScanVcfParam(), yieldSize = NA_integer_,
-    BPPARAM = BiocParallel::SerialParam()){
-
-    rawData <- tryCatch(
-        parseMultipleVcf(
-            folder, pattern, svp = svp, yieldSize = yieldSize),
-        warning = function(warn){
-            warning(warn)
-            return(NULL)},
-        error = function(err){
-            warning(geterrmessage())
-            return(NULL)
-        }
-    )
-
-    return(rawData)
-}
-
-tryParseSingleVcf <- function(
-    file, svp = ScanVcfParam(), yieldSize = NA_integer_){
-
-    rawData <- tryCatch(
-        parseSingleVcf(
-            file = file,
-            svp = svp,
-            yieldSize = yieldSize),
+        VariantAnnotation::scanVcfHeader(file = file),
         warning = function(warn){
             warning(warn)
             return(NULL)},
@@ -114,20 +75,22 @@ tryParseSingleVcf <- function(
 }
 
 parseMultipleVcf<- function(
-    folder, pattern, svp = ScanVcfParam(),
-    yieldSize = NA_integer_, BPPARAM = BiocParallel::SerialParam()){
+    folder, pattern,
+    svp = VariantAnnotation::ScanVcfParam(),
+    yieldSize = NA_integer_,
+    BPPARAM = BiocParallel::SerialParam()){
 
     # Timing
     t1 <- Sys.time()
 
     # Extract gr
-    gr <- vcfWhich(svp)
+    gr <- VariantAnnotation::vcfWhich(svp)
 
     # If there is at least a targeted region
     if (length(gr) > 0){
 
         # Identify the targeted chromosomes
-        chrs <- unique(names(unlist(gr)))
+        chrs <- unique(names(BiocGenerics::unlist(gr)))
 
         # Identify the corresponding files
         vcfFiles <- sapply(
@@ -153,7 +116,7 @@ parseMultipleVcf<- function(
             message(sprintf(
                 "%i variants from %i region(s) imported in %.2f %s",
                 length(vcf),
-                length(vcfWhich(svp)),
+                length(VariantAnnotation::vcfWhich(svp)),
                 as.numeric(dt),
                 units(dt)))
             return(vcf)
@@ -176,7 +139,7 @@ parseMultipleVcf<- function(
     ## 2. no genomic range was given: all vcfFiles in the folder are imported
     message("Parsing ", length(vcfFiles), " VCF files ...")
     # Import from each file in parallel (already ExpandedVCF)
-    vcfs <- bplapply(
+    vcfs <- BiocParallel::bplapply(
         X = vcfFiles,
         FUN = parseSingleVcf,
         svp = svp,
@@ -197,7 +160,7 @@ parseMultipleVcf<- function(
     message(sprintf(
         "%i variants from %i region(s) in %i file(s) imported in %.2f %s",
         length(vcf),
-        length(vcfWhich(svp)),
+        length(VariantAnnotation::vcfWhich(svp)),
         length(vcfFiles),
         as.numeric(dt),
         units(dt)))
@@ -206,13 +169,15 @@ parseMultipleVcf<- function(
 }
 
 parseSingleVcf <- function(
-    file, svp = ScanVcfParam(), yieldSize = NA_integer_){
+    file,
+    svp = VariantAnnotation::ScanVcfParam(),
+    yieldSize = NA_integer_){
     message("Parsing VCF file: ", file, " ...")
-    tf <- TabixFile(file)
+    tf <- Rsamtools::TabixFile(file)
 
     # scanTabix: 'yieldSize(file)' must be 'NA_integer_' when range specified
-    if (length(vcfWhich(svp)) > 0)
-        yieldSize(tf) <- NA_integer_
+    if (length(VariantAnnotation::vcfWhich(svp)) > 0)
+        Rsamtools::yieldSize(tf) <- NA_integer_
 
     # Import variants
     vcf <- VariantAnnotation::readVcf(file = tf, param = svp)
@@ -223,3 +188,45 @@ parseSingleVcf <- function(
     return(vcf)
 }
 
+tryParseMultipleVcf <- function(
+    folder, pattern,
+    svp = VariantAnnotation::ScanVcfParam(),
+    yieldSize = NA_integer_,
+    BPPARAM = BiocParallel::SerialParam()){
+
+    rawData <- tryCatch(
+        parseMultipleVcf(
+            folder, pattern, svp = svp, yieldSize = yieldSize),
+        warning = function(warn){
+            warning(warn)
+            return(NULL)},
+        error = function(err){
+            warning(geterrmessage())
+            return(NULL)
+        }
+    )
+
+    return(rawData)
+}
+
+tryParseSingleVcf <- function(
+    file,
+    svp = VariantAnnotation::ScanVcfParam(),
+    yieldSize = NA_integer_){
+
+    rawData <- tryCatch(
+        parseSingleVcf(
+            file = file,
+            svp = svp,
+            yieldSize = yieldSize),
+        warning = function(warn){
+            warning(warn)
+            return(NULL)},
+        error = function(err){
+            warning(geterrmessage())
+            return(NULL)
+        }
+    )
+
+    return(rawData)
+}

@@ -1,15 +1,15 @@
 
 stopifnot(
-    require(TVTB),
-    require(BiocParallel),
-    require(Rsamtools),
-    require(VariantAnnotation),
-    require(ensembldb),
-    require(ensemblVEP),
-    require(ggplot2),
-    require(DT),
-    require(reshape2),
-    require(dplyr)
+    requireNamespace("BiocParallel"),
+    requireNamespace("dplyr"),
+    requireNamespace("DT"),
+    requireNamespace("ensembldb"),
+    requireNamespace("ensemblVEP"),
+    requireNamespace("ggplot2"),
+    requireNamespace("reshape2"),
+    requireNamespace("Rsamtools"),
+    requireNamespace("TVTB"),
+    requireNamespace("VariantAnnotation")
 )
 
 message(
@@ -25,6 +25,7 @@ message(
 # Display settings ----
 
 vepCountBarplotHeight <- "500px"
+vepDensityplotHeight <- "500px"
 
 # R session variables -----------------------------------------------------
 
