@@ -7,7 +7,7 @@
 \docType{methods}
 \alias{addPhenoLevelFrequencies-methods}
 \title{
-Genotypes counts and allele frequencies for a given phenotype level
+Genotypes and allele frequencies for a given phenotype level
 }
 
 \description{
