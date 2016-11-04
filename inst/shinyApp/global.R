@@ -2,7 +2,6 @@
 stopifnot(
     require(TVTB),
     require(BiocParallel),
-    require(rtracklayer),
     require(Rsamtools),
     require(VariantAnnotation),
     require(ensembldb),
@@ -57,12 +56,12 @@ GS <- list(
         "0", "1", "2","."),
     choices.phenoCols = c(),
     default.phenoCols = c(),
-    choices.regionInputMode = list(
+    choices.grangesInputMode = list(
         "BED file" = "bed",
         "UCSC browser" = "ucsc",
         "EnsDb package" = "EnsDb"
     ),
-    default.regionInputMode = c("BedFile"),
+    default.grangesInputMode = c("bed"),
     choices.vcfCols = c(),
     default.vcfCols = c(),
     default.vcfFolder = system.file("extdata", package = "TVTB"),
@@ -99,7 +98,7 @@ Msgs <- list(
     hetGenotypes = "Heterozygote genotype(s) must be defined.",
     altGenotypes = "Alternative homozygote genotype(s) must be defined.",
     annotationPackage = "An EnsDb annotation package must be selected.",
-    invalidUcscRegions = "Invalid UCSC-type input.",
+    invalidUcscRanges = "Invalid UCSC-type input.",
     vcfFolder = "VCF folder",
     vcfPattern = "VCF pattern",
     xAxisAngle = "X axis angle",

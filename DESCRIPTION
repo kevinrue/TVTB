@@ -1,12 +1,15 @@
 Package: TVTB
 Type: Package
 Title: TVTB: The VCF Tool Box
-Version: 0.1.26
-Date: 2016-08-25
+Version: 0.1.27
+Date: 2016-08-26
 Author: Kevin Rue-Albrecht
 Maintainer: Kevin Rue-Albrecht <kevinrue67@gmail.com>
 Description: The package provides S4 classes and methods to filter,
     summarise and visualise genetic variation data stored in VCF files.
+    In particular, the package extends the FilterRules class (S4Vectors
+    package) to define news classes of filter rules applicable to the various
+    slots of `VCF` objects.
     Functionalities are integrated and demonstrated in a Shiny web-application,
     the Shiny Variant Explorer (tSVE).
 License: Artistic-2.0

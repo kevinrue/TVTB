@@ -50,7 +50,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
         ),
 
         tabPanel(
-            title = "Region(s)",
+            title = "Genomic ranges",
 
             # GRanges options ----
             wellPanel(
@@ -62,9 +62,9 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                     shiny::column(
                         width = 2,
                         selectInput(
-                            "regionInputMode", "Region(s) input type",
-                            choices = GS[["choices.regionInputMode"]],
-                            selected = GS[["default.regionInputMode"]],
+                            "grangesInputMode", "Input type",
+                            choices = GS[["choices.grangesInputMode"]],
+                            selected = GS[["default.grangesInputMode"]],
                             width = '100%')
                     ),
 
@@ -79,7 +79,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                 fluidRow(
 
                     conditionalPanel(
-                        condition = "input.regionInputMode == 'bed'",
+                        condition = "input.grangesInputMode == 'bed'",
                         shiny::column(
                             width = 2,
                             br(),
@@ -94,11 +94,11 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                         )
                     ),
                     conditionalPanel(
-                        condition = "input.regionInputMode == 'ucsc'",
+                        condition = "input.grangesInputMode == 'ucsc'",
                         shiny::column(
                             width = 8,
                             textInput(
-                                "ucscRegions", "UCSC-type region(s)",
+                                "ucscRanges", "UCSC-type genomic ranges",
                                 value = "",
                                 placeholder = paste(
                                     "chr21:33,031,597-33,041,570",
@@ -109,7 +109,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                         )
                     ),
                     conditionalPanel(
-                        condition = "input.regionInputMode == 'EnsDb'",
+                        condition = "input.grangesInputMode == 'EnsDb'",
                             shiny::column(
                                 width = 2,
                                 selectInput(
@@ -129,7 +129,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                                 textInput(
                                     "ensDb.value", NA,
                                     value = "",
-                                    placeholder = "IL17A,IL12B,...")
+                                    placeholder = "SLC24A5,IL17A,...")
                             ),
                             shiny::column(
                                 width = 4, offset = 3,
@@ -412,18 +412,10 @@ shinyUI(navbarPage(theme = "bootstrap.css",
             fluidRow(
                 shiny::column(
                     width = 2,
-                    br(),
-                    actionButton(
-                        "buttonFrequencies", "Refresh",
-                        icon = icon("refresh"), width = "100%"
-                    )
-                ),
-                shiny::column(
-                    width = 8,
                     strong("Latest changes:")
                 ),
                 shiny::column(
-                    width = 8,
+                    width = 10,
                     uiOutput("latestFrequenciesCalculated")
                 )
             )
@@ -477,6 +469,14 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                         "untickAllPhenoLevelsFreq",
                         "Deselect all",
                         icon = icon("square-o")
+                    )
+                ),
+                shiny::column(
+                    width = 2, offset = 1,
+                    br(),
+                    actionButton(
+                        "buttonFrequencies", "Refresh",
+                        icon = icon("refresh"), width = "100%"
                     )
                 )
             ),
@@ -626,7 +626,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
 
             # Genomic ranges view ----
             tabPanel(
-                title = "Region(s)",
+                title = "Genomic ranges",
 
                 fluidRow(
                     shiny::column(

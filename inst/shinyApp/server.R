@@ -617,13 +617,14 @@ shinyServer(function(input, output, clientData, session) {
 
     # Import BED records, format as GRanges
     genomicRanges <- reactive({
-        # Depends on input$regionInputMode
+        # Depends on input$grangesInputMode
         # Either...
         # Requires: bedFile()
-        # Requires: input$ucscRegions
+        # Requires: input$ucscRanges
         # Requires: input$ensDb.type, input$ensDb.condition, input$ensDb.value
-        switch (input$regionInputMode,
+        switch (input$grangesInputMode,
                 bed = {
+                    stopifnot(require(rtracklayer))
                     # use rtracklayer::import.bed to obtain GRanges
                     bedFile <- bedFile()
 
@@ -636,14 +637,14 @@ shinyServer(function(input, output, clientData, session) {
                 },
                 ucsc = {
                     # parse the string or return NULL
-                    if (input$ucscRegions == "")
+                    if (input$ucscRanges == "")
                         return(NULL)
 
                     # NOTE: do not trim "chr", for future UCSC support
                     inputTrimmed <- gsub(
                         pattern = ",| ",
                         replacement = "",
-                        x = input$ucscRegions)
+                        x = input$ucscRanges)
 
                     # Split the given string into individual regions
                     inputSplit <- strsplit(
@@ -660,7 +661,7 @@ shinyServer(function(input, output, clientData, session) {
                                         x = x)
                                 })
                         ),
-                        Msgs[["invalidUcscRegions"]]),
+                        Msgs[["invalidUcscRanges"]]),
                         errorClass = "optional")
 
                     rawData <- tryCatch({
@@ -901,7 +902,7 @@ shinyServer(function(input, output, clientData, session) {
 
         validate(need(
             length(queryGenes) > 0,
-            "No genomic region to show."),
+            "No genomic range to show."),
             errorClass = "optional")
 
         DT::datatable(
@@ -989,9 +990,9 @@ shinyServer(function(input, output, clientData, session) {
     output$generalSettings <- renderPrint({
         return(list(
             phenoFile = RV[["phenoFile"]],
-            regionInputMode = input$regionInputMode,
+            grangeInputMode = input$grangeInputMode,
             "bedFile()" = bedFile(),
-            ucscRegions = input$ucscRegions,
+            ucscRanges = input$ucscRanges,
             ensDb.type = input$ensDb.type,
             ensDb.condition = input$ensDb.condition,
             ensDb.value = input$ensDb.value,
@@ -1290,7 +1291,7 @@ shinyServer(function(input, output, clientData, session) {
                     if (nrow(phenotypes) > 0)
                         vcfSamples(svp) <- rownames(phenotypes)
 
-                    # Only import variants in targeted regions
+                    # Only import variants in targeted GRanges
                     if (length(genomicRanges) > 0)
                         vcfWhich(svp) <- reduce(genomicRanges) # optimise import
 
@@ -1349,6 +1350,10 @@ shinyServer(function(input, output, clientData, session) {
                     colData(vcf) <- phenotypes
                 })
 
+            # Clean header of INFO fields not imported
+            vcf <- dropInfo(vcf = vcf)
+
+            # Store ExpandedVCF object in list of reactive values
             RV[["vcf"]] <- vcf
 
         }

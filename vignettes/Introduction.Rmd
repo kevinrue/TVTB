@@ -11,6 +11,9 @@ abstract:
     The VCF Tool Box (*TVTB*) provides S4 classes and methods to filter,
     summarise and visualise genetic variation data stored in VCF files
     pre-processed by the Ensembl Variant Effect Predictor (VEP).
+    In particular, the package extends the *FilterRules* class (*S4Vectors*
+    package) to define news classes of filter rules applicable to the various
+    slots of `VCF` objects.
     A Shiny web-application, the Shiny Variant Explorer (*tSVE*),
     provides a convenient interface to demonstrate
     those functionalities integrated in a programming-free environment.

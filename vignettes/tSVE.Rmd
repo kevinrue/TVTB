@@ -1,0 +1,418 @@
+---
+title: The Shiny Variant Explorer
+author:
+    -   name: Kévin Rue-Albrecht
+        email: k.rue-albrecht@imperial.ac.uk
+        affiliation: Department of Medicine, Imperial College London,
+            Hammersmith Campus, Du Cane Road, London, W12 0NN, UK
+date: "`r doc_date()`"
+package: "`r pkg_ver('BiocStyle')`"
+abstract: >
+    RStudio/Shiny web-application demonstrating the functionalities of
+    the *TVTB* package integrated in a programming-free environment.
+vignette: >
+    %\VignetteIndexEntry{The Shiny Variant Explorer}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}
+output: 
+    BiocStyle::pdf_document2:
+        toc_newpage: true
+bibliography:
+    TVTB.bib
+---
+
+# Preliminary notes {#Preliminary}
+
+The Shiny Variant Explorer (*tSVE*) was primarily developped to demonstrate
+features implemented in the `r Biocpkg("TVTB")`.
+As a result, a few important considerations should be made
+to clarify what should and should **not** be expected from the 
+web-application:
+
+* It is technically not feasible to offer in a web-interface the same degree
+    of flexibility as the command-line environment (*e.g.* `...`[^1]).
+* Greater control over the input and output data is possible at the
+    command-line (*e.g.* refinement `ggplot` objects,
+    definition of custom genomic ranges)
+* Requests for new feature should apply to the package first.
+    Only features relevant to the package functionalities
+    may be made available in the web-application.
+* Figures (`ggplot`) are currently the only output that can be exported from
+    the web-application (using the web browser
+    "Download image", "Copy image", or equivalent context menu item).
+    In the future, action buttons may be added to export tables (`data.frame`).
+* This vignette is largely static as the web-application may only be used
+    in an interactive session.
+* First-time users are encouraged to follow this vignette
+    sequentially (*i.e* without skipping sections),
+    as it takes users through the sequence of actions of a typical analysis
+
+[^1]: The `...` argument is called "ellipsis".
+
+# Pre-requisites {#Prerequisites}
+
+The *Shiny Variant Explorer* suggests a few additional package dependencies
+relative to the package, to support relevant forms of data input and display.
+
+**Input**
+
+* The `r Biocpkg("ensembldb")` package and relevant `EnsDb`[^2] annotation
+    package are required if using that interface to query genomic ranges
+* The `r Biocpkg("rtracklayer")` package is required if a BED file is used
+    to provide genomic ranges
+
+[^2]: In the future, the web-application may also
+    support `TxDb` and `OrganismDb` annotation packages.
+
+Certain [sections](#InputEnsDb) of this vignette require that the
+`r Biocpkg("EnsDb.Hsapiens.v75")` package be installed.
+This can be done with the following chunk of code:
+
+```{r EnsDb.Hsapiens.v75, message=FALSE}
+if (!require(EnsDb.Hsapiens.v75, quietly = TRUE))
+    biocLite("EnsDb.Hsapiens.v75")
+```
+
+**Display**
+
+* The latest version of the `r Githubpkg("rstudio/DT")` package is recommended
+    to benefit from the latest developments (*e.g.* column filters inactivated
+    if a single value exist in that column; version `>=0.2.2`)
+* The `r Githubpkg("rstudio/shiny")` package is required for all Shiny
+    web-applications
+
+# Launching the Shiny Variant Explorer {#Launch}
+
+The `TVTB::tSVE()` method launches the web-application.
+
+# Overall layout of the web-application {#OverallLayout}
+
+The web-application is generally implemented as a web-page
+with a top level navigation bar organised 
+from left to right to reflect progression through a typicaly analysis,
+with the exception of the last two menu items **Settings** and **Session**,
+which may be useful to check and update at any point.
+
+Here is a brief overview of the menu items:
+
+* **Input**
+    + Control the samples, phenotypes, genomic ranges, and VCF fields
+        imported.
+    + An `EnsDb` annotation package may be selected to use the associated
+        database interface.
+* **Frequencies**
+    + Add and remove INFO fields that contain calculated genotype counts
+        and allele frequencies.
+    + Counts and frequencies can be obtained overall (*i.e.* across all
+        samples), or within individual phenotype levels.
+* **Filters**
+    + Define and apply *VCF filter rules* (detailed in a separate vignette).
+* **Views**
+    + Display and examine major objects of the analysis and their slots
+* **Plots**
+    + Display and refine data plots
+* **Settings**
+    + Control advanced parameters of the analysis
+* **Session**
+    + Display session information and other relevant information
+
+# Input panel {#Input}
+
+The **Input** panel controls the major input parameters of the analysis,
+including phenotypes (and therefore samples), genomic ranges, and fields
+to import from VCF file(s).
+Those inputs are useful to import only data of interest, as well as
+to limit memory usage and duration of the calculations.
+
+## Phenotypes {#InputPhenotypes}
+
+Phenotypes are critical to define groups of samples that may be compared
+in summary statistics, tables, and plots.
+Moreover, phenotypes also implicitely define the set of samples required
+in the analysis (usually including unique sample identifiers as `rownames`).
+
+The web-application accepts phenotypes stored in text files, with the
+following requirements:
+
+* Fields must be delimited by "white space" (default of `read.table`)
+* The first column of the file must contain unique sample identifiers
+* The first row of the file must phenotype names, as syntactically valid
+    `colnames`
+
+When provided, phenotypes will be used to import from VCF file(s)
+only genotypes for the corresponding samples identifiers.
+Moreover, an error will be raised if any of the sample identifiers present
+in the phenotypes is absent from the VCF file(s).
+
+Note that the web-application does not *absolutely* require phenotype
+information. In the absence of phenotype information, all samples are imported
+from VCF file(s).
+
+> **Action**:
+> 
+> * Click on the *Browse* action button
+> * Navigate to the *extdata* folder of the *TVTB* installation directory
+> * Select the file *integrated_samples.txt*
+
+**Notes**
+
+* The `r Biocpkg("TVTB")` installation directory can be identified
+using the following command in an *R* session:
+
+```{r systemFile, results='hide'}
+system.file("extdata", package = "TVTB")
+```
+
+* The file selection window that is open by the action button browses
+    files on the server side.
+    + This is only relevant if the package/web-application is run on a remote
+        server
+    + If the web-application is run locally, this does not make any difference
+
+## Genomic ranges {#InputGRanges}
+
+Genomic ranges are critical to import only variants in
+targeted genomic regions or features (*e.g.* genes, transcripts, exons),
+as well as to limit memory usage and duration of calculations.
+
+The Shiny Variant Explorer currently supports three types of input to define
+genomic ranges:
+
+* BED file
+* UCSC-style text field
+* `EnsDb` annotation packages
+
+Currently, the web-application uses genomic ranges solely
+to query the corresponding variants from VCF file(s).
+In the future, those genomic ranges may also be used to produce
+faceted summary statistics and plots.
+
+**Notes**:
+
+* The web-application does not *absolutely* require genomic ranges.
+In the absence of genomic ranges, all variants are imported from VCF file(s).
+*Use with caution!*
+* The active genomic ranges are only taken from the currently selected input
+    mode
+
+### BED file {#InputBED}
+
+If a BED file is supplied, the web-application parses it using the
+`rtracklayer::import.bed` method.
+Therefore the file must respect the
+[BED file format](https://genome.ucsc.edu/FAQ/FAQformat.html#format1)
+guidelines.
+
+> **Action**:
+> 
+> * Click on the *Browse* action button
+> * Navigate to the *extdata* folder of the *TVTB* installation directory
+> * Select the file *SLC24A5.bed*
+
+**Notes**:
+
+* The BED file defines the same genomic range
+    that was used to extract variant from the 
+    [1000 Genomes Project](http://www.1000genomes.org) Phase 3
+    release VCF file used in this vignette (see section
+    [Variants](#InputVariants)).
+* The file selection window that is open by the action button browses
+    files on the server side (see [Phenotypes](#InputPhenotypes) section
+    above).
+
+### UCSC format {#InputUCSC}
+
+Sequence names (*i.e.* chromosomes), start, and end positions of one or more
+genomic ranges may be defined in the text field,
+with individual regions separated by `";"`.
+
+> **Action**:
+> 
+> * Paste `15:48413169-48434869` in the text field
+
+### Ensembl-based annotation packages {#InputEnsDb}
+
+Currently, genomic ranges encoding only gene-coding regions may be retrieved
+from an Ensembl-based database.
+This feature was adapted from the web-application implemented in the
+`r Biocpkg("ensembldb")` package.
+
+\bioccomment{
+In the future, the interface to query transcript and exons annotations
+may be added to the web-application.
+}
+
+\fixme{
+Genomic feature located on contigs may cause problems when working
+with one VCF per chromosome.
+In the future, an option may be added to ignore contigs.
+}
+
+> **Action**:
+> 
+> * Paste `SLC24A5` in the text field
+
+## Variants {#InputVariants}
+
+At the core of the `r Biocpkg("TVTB")` package, variants must be imported from
+one or more VCF file(s), optionally annotated by the
+[Ensembl Variant Effect Predictor](http://www.ensembl.org/info/docs/tools/vep)
+(VEP)[@RN1].
+
+Considering the large size of most VCF file(s), it is common practice to
+split genetic variants into multiple files, each containing variants
+in a single chromosome.
+The Shiny Variant Explorer supports two situations:
+
+* all variants are stored in a single VCF file ("Single-VCF" mode)
+* variants are split into one file per sequence, with the requirement that
+    files be named with a pattern including the sequence name
+    (identical to the `seqnames` slot of the genomic ranges described
+    [above](#InputGRanges) ("Multi-VCF mode").
+
+In addition, VCF files can store a plethora of information in their various
+fields. It is often useful to select only a subset of fields relevant for
+a particular analysis, to limit memory usage during an analysis.
+The application uses the
+`r Biocpkg("VariantAnnotation")` `scanVcfHeader` to parse the header of
+the VCF file (*Single-VCF* mode) or the first VCF file (*Multi-VCF* mode),
+to display the list of available fields that users may choose to import.
+A few considerations must be made:
+
+* The web-application requires that Ensembl VEP predictions be present in the
+    INFO field
+* The web-application requires that the `"GT"` key be present in the
+    FORMAT field
+
+### Single-VCF mode {#SingleVCF}
+
+This mode display an action button that must be used to select the VCF file
+from which to import variants.
+
+> **Action**:
+> 
+> * Click on the *Browse* action button
+> * Navigate to the *extdata* folder of the *TVTB* installation directory
+> * Select the file *chr15.phase3_integrated.vcf.gz*
+
+### Multi-VCF mode {#MultiVCF}
+
+This mode requires two pieces of information:
+
+* The path to the folder that contains one or more VCF file(s)
+* The naming pattern of VCF file(s), with the following requirement:
+    + The pattern must include `"%s"` to declare the emplacement of the
+        sequence (*i.e.* chromosome) name in the pattern
+
+Note that a summary of VCF file(s) detected using the given the folder and
+pattern is displayed on the right, to help users determine whether the
+parameters are correct. In addition, the content of the given folder is
+displayed at the bottom of the page, beside the same content filtered for
+the VCF file naming pattern.
+
+> **Action**:
+> 
+> *None*. The text fields should already be filled with default values,
+> pointing to the single example VCF file (a subset of chromosome 15).
+
+### VCF scan parameters {#scanVcfParam}
+
+This panel allows users to select the INFO and FORMAT fields to import
+(in the `info` and `geno` slots of the `VCF` object, respectively).
+
+It is important to note that the `FORMAT/GT` and `INFO/<vep>` fields---where
+`<vep>` stands for the INFO key where Ensembl VEP predictions are stored---are
+implicetly imported from the VCF.
+Similarly, the mandatory FIXED fields `CHROM`, `POS`, `ID`, `REF`, `ALT`,
+`QUAL`, and `FILTER` are automatically imported to populate
+the `rowRanges` slot of the `VCF` object.
+
+> **Action**:
+> 
+> * Click the *Deselect all* action button under the **INFO fields** 
+>     selection input to import only the INFO/CSQ and FORMAT/GT fields.
+> * Click the *Import variants* action button
+>
+> A summary of variants, phenotypes, and samples imported will appear beside
+> the action button.
+
+## EnsDb Annotation packages {#EnsDbPkg}
+
+This panel allows users to select an pre-installed `EnsDb` annotation package.
+Currently, annotation packages are only used to query gene-coding regions
+which are then used to import from VCF file(s) variants
+only in those genomic ranges.
+
+> **Action**:
+> 
+> * If none of the `EnsDb` packages are installed, it will simply not be
+>     possible to use the `ensembl` interface of the *Genomic ranges* input
+>     tab.
+> * If the `EnsDb.Hsapiens.v75` package is the only `EnsDb` packages installed,
+>     no action is required; the package should already be pre-selected.
+> * If the `EnsDb.Hsapiens.v75` package is **not** the only `EnsDb` packages
+>     installed, users should select it in the list of choices.
+
+# Frequencies panel {#Frequencies}
+
+This panel demonstrates the use of three functions implemented in the
+`r Biocpkg("TVTB")` package, namely `addFrequencies`, `addOverallFrequencies`,
+and `addPhenoLevelFrequencies`.
+
+## Overall frequencies {#OverallFrequencies}
+
+This panel allows users to *Add* and *Remove* INFO fields
+that contain genotype counts
+(*i.e.* homozygote reference, heterozygote, homozygote alternate)
+and allele frequencies
+(*i.e.* alternate allele frequency, minor allele frequency)
+calculated across all the samples and variants imported.
+The web-application uses the homozygote reference, heterozygote,
+and homozygote alternate genotypes defined in the **Advanced settings**
+panel.
+
+Importantly, the name of the INFO keys that are used to store
+the calculated values can be defined in the **Advanced settings** panel.
+
+> **Action**:
+> 
+> * Click the *Add* action button
+> * See the *Latest changes* message update at the top of the screen.
+
+\fixme{
+Add cross-references to the "Advanced settings" section when it is written.
+}
+
+## Phenotype-level frequencies {#PhenoLevelFrequencies}
+
+This panel allows users to *Refresh* the list of INFO fields
+that contain genotype counts and allele frequencies
+calculated within groups of samples associated with
+various levels of a given phenotype.
+
+> **Action**:
+> 
+> * Select *super_pop* in the list of phenotypes
+> * Click the *Select all* action button
+> * Click the *Refresh* action button
+> * See the *Latest changes* message update at the top of the screen.
+
+# VCF filter rules {#VcfFilterRules}
+
+One of the flagship features of the `r Biocpkg("TVTB")` package
+are the *VCF filter rules*, extending the
+`r Biocpkg("S4Vectors")` `FilterRules` class to new classes of filter rules
+that can be evaluated within environments defined by the various slots
+of `VCF` objects.
+
+# Session info {#SessionInfo}
+
+Here is the output of `sessionInfo()` on the system on which this
+document was compiled:
+
+```{r sessionInfo}
+sessionInfo()
+```
+
+[R]: http://r-project.org
+[RStudio]: http://www.rstudio.com/
