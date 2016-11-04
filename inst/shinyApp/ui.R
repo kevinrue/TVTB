@@ -406,10 +406,6 @@ shinyUI(navbarPage(theme = "bootstrap.css",
     tabPanel(
         title = "Filters", icon = icon("filter"),
 
-        tags$span(
-            style="color:red",
-            tags$em("In development. No effect.")),
-
         wellPanel(
             h4("Add filter"),
             fluidRow(
@@ -724,7 +720,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                     width = 3,
 
                     actionButton(
-                        "countVep", "Apply",
+                        "buttonTVBP", "Apply",
                         icon = icon("picture"), width = "100%"
                     ), hr(),
 
@@ -742,25 +738,25 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                     ),
 
                     conditionalPanel(
-                        condition = "input.phenoAnalysed != 'None'",
+                        condition = "input.phenoTVBP != 'None'",
                         checkboxInput(
-                            "unique2pheno",
+                            "unique2phenoTVBP",
                             "Unique to phenotype?",
                             value = FALSE
                         )
                     ),
 
                     selectInput(
-                        "vepFacetKey",
+                        "vepFacetKeyTVBP",
                         "VEP faceting key",
                         choices = c("None"),
                         selected = "None"
                     ),
 
                     conditionalPanel(
-                        condition = "input.facet != 'None'",
+                        condition = "input.facetTVBP != 'None'",
                         selectInput(
-                            "vepFacets",
+                            "vepFacetsTVBP",
                             "Facets",
                             choices = c(),
                             selected = c(),
@@ -769,51 +765,57 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                     ),
 
                     checkboxInput(
-                        "stackedPercentage",
+                        "stackedPercentageTVBP",
                         "Show as percentage?",
                         value = FALSE
                     ),
 
-                    checkboxInput("advanced", "Advanced controls", value = FALSE),
+                    checkboxInput(
+                        "advancedTVBP",
+                        "Advanced controls",
+                        value = FALSE),
 
                     conditionalPanel(
-                        condition = "input.advanced == true",
-                        checkboxInput("legend", "Show legend", value = TRUE)
+                        condition = "input.advancedTVBP == true",
+                        checkboxInput(
+                            "legendTVBP",
+                            "Show legend",
+                            value = TRUE)
                     ),
 
                     conditionalPanel(
                         condition = paste(
-                            "input.advanced == true",
-                            "input.legend == true",
+                            "input.advancedTVBP == true",
+                            "input.legendTVBP == true",
                             sep = " && "
                         ),
                         sliderInput(
-                            "legendTextSize", "Legend font size",
+                            "legendTextSizeTVBP", "Legend font size",
                             value = 1, min = 0.1, max = 2, step = 0.1)
                     ),
 
                     conditionalPanel(
-                        condition = "input.advanced == true",
+                        condition = "input.advancedTVBP == true",
                         sliderInput(
-                            "xAxisAngle",
+                            "xAxisAngleTVBP",
                             "Angle of X labels",
                             min = 0, max = 90, value = 0, step = 5
                         ),
 
                         sliderInput(
-                            "xAxisSize",
+                            "xAxisSizeTVBP",
                             "Relative size of X text",
                             value = 1, min = 0.1, max = 2, step = .1
                         ),
 
                         sliderInput(
-                            "xAxisVjust",
+                            "xAxisVjustTVBP",
                             "Vertical just. of X labels",
                             min = 0, max = 1, value = 0.5, step = 0.1
                         ),
 
                         sliderInput(
-                            "xAxisHjust",
+                            "xAxisHjustTVBP",
                             "Horiz. just. of X labels",
                             min = 0, max = 1, value = 0.5, step = 0.1
                         )

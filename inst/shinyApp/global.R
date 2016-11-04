@@ -108,7 +108,8 @@ Msgs <- list(
 
     # Tabulate VEP by phenotype (TVBP)
     vepTVBP = "VEP field tabulated",
-    vepFacetKey = "Faceting VEP field",
+    vepFacetKeyTVBP = "Faceting VEP field",
+    stackedPercentageTVBP = "Stack percentage?",
 
     # Optional inputs
     importVariants = "Please import/refresh variants.",

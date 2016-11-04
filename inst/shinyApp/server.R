@@ -586,20 +586,20 @@ shinyServer(function(input, output, clientData, session) {
             genoFirstCol = input$genoFirstCol,
             vepTVBP = input$vepTVBP,
             phenoTVBP = input$phenoTVBP,
-            unique2pheno = input$unique2pheno,
-            vepFacetKey = input$vepFacetKey,
-            vepFacets = input$vepFacets,
-            stackedPercentage = input$stackedPercentage
+            unique2phenoTVBP = input$unique2phenoTVBP,
+            vepFacetKeyTVBP = input$vepFacetKeyTVBP,
+            vepFacetsTVBP = input$vepFacetsTVBP,
+            stackedPercentageTVBP = input$stackedPercentageTVBP
         ))
     })
 
     output$advancedSettings <- renderPrint({
         return(list(
-            legendTextSize = input$legendTextSize,
-            xAxisAngle = input$xAxisAngle,
-            xAxisSize = input$xAxisSize,
-            xAxisHjust = input$xAxisHjust,
-            xAxisVjust = input$xAxisVjust,
+            legendTextSizeTVBP = input$legendTextSizeTVBP,
+            xAxisAngleTVBP = input$xAxisAngleTVBP,
+            xAxisSizeTVBP = input$xAxisSizeTVBP,
+            xAxisHjustTVBP = input$xAxisHjustTVBP,
+            xAxisVjustTVBP = input$xAxisVjustTVBP,
             refGenotypes = input$refGenotypes,
             hetGenotypes = input$hetGenotypes,
             altGenotypes = input$altGenotypes,
@@ -1566,7 +1566,7 @@ shinyServer(function(input, output, clientData, session) {
 
         # Initialise by order of preference if present:
         # Current selection > Consequence > Impact > First field
-        vepTVBP.default <- max(
+        vep.default <- max(
             1,
             head(x = na.omit(
                 match(
@@ -1579,7 +1579,7 @@ shinyServer(function(input, output, clientData, session) {
         updateSelectInput(
             session, "vepTVBP",
             choices = vepKey.choices,
-            selected = vepKey.choices[vepTVBP.default])
+            selected = vepKey.choices[vep.default])
 
         vepKey.choices <- c("None", vepKey.choices)
 
@@ -1589,14 +1589,14 @@ shinyServer(function(input, output, clientData, session) {
             1,
             head(x = na.omit(
                 match(
-                    x = c(input$vepFacetKey),
+                    x = c(input$vepFacetKeyTVBP),
                     table = vepKey.choices
                 )
             ), n = 1)
         )
 
         updateSelectInput(
-            session, "vepFacetKey",
+            session, "vepFacetKeyTVBP",
             choices = vepKey.choices,
             selected = vepKey.choices[vepFacetKey.selected])
     })
@@ -1622,15 +1622,15 @@ shinyServer(function(input, output, clientData, session) {
 
         # Update only on button click
         validate(need(
-            input$countVep,
+            input$buttonTVBP,
             "Please click \"Apply\" to apply parameters."))
 
         isolate({
-            vepFacetKey <- input$vepFacetKey
-            vepFacets <- input$vepFacets
+            vepFacetKey <- input$vepFacetKeyTVBP
+            vepFacets <- input$vepFacetsTVBP
             vepTVBP <- input$vepTVBP
-            stackedPercentage <- input$stackedPercentage
-            unique2pheno <- input$unique2pheno
+            stackedPercentage <- input$stackedPercentageTVBP
+            unique2pheno <- input$unique2phenoTVBP
         })
 
         withProgress(min = 0, max = 2, message = "Progress", {
@@ -1667,8 +1667,10 @@ shinyServer(function(input, output, clientData, session) {
             varVepPlotPheno <- varVepPlotPheno()
             validate(
                 need(vepTVBP, Msgs[["vepTVBP"]]),
-                need(vepFacetKey, Msgs[["vepFacetKey"]]),
-                need(stackedPercentage, Msgs[["stackedPercentage"]])
+                need(vepFacetKey, Msgs[["vepFacetKeyTVBP"]]),
+                need(
+                    is.logical(stackedPercentage),
+                    Msgs[["stackedPercentageTVBP"]])
                 )
 
             incProgress(1, detail = Tracking[["ggplot"]])
@@ -1704,12 +1706,12 @@ shinyServer(function(input, output, clientData, session) {
             gg <- vepTabulated()
 
             isolate({
-                legendTextSize <- input$legendTextSize
-                xAxisAngle <- input$xAxisAngle
-                xAxisHjust <- input$xAxisHjust
-                xAxisVjust <- input$xAxisVjust
-                xAxisSize <- input$xAxisSize
-                legend <- input$legend
+                legendTextSize <- input$legendTextSizeTVBP
+                xAxisAngle <- input$xAxisAngleTVBP
+                xAxisHjust <- input$xAxisHjustTVBP
+                xAxisVjust <- input$xAxisVjustTVBP
+                xAxisSize <- input$xAxisSizeTVBP
+                legend <- input$legendTVBP
             })
 
             message("Plotting predictions...")
@@ -1760,7 +1762,7 @@ shinyServer(function(input, output, clientData, session) {
     })
 
     # Update list of VEP facets if the faceting variable changes
-    observeEvent(eventExpr = input$vepFacetKey, handlerExpr = {
+    observeEvent(eventExpr = input$vepFacetKeyTVBP, handlerExpr = {
         # Raw variants must exist
         validate(need(vcf(), Msgs[["importVariants"]]))
 
@@ -1775,8 +1777,8 @@ shinyServer(function(input, output, clientData, session) {
 
         vepMcols <- mcols(csq)
 
-        if (input$vepFacetKey != "None"){
-            vepFacets.choices <- unique(vepMcols[,input$vepFacetKey])
+        if (input$vepFacetKeyTVBP != "None"){
+            vepFacets.choices <- unique(vepMcols[,input$vepFacetKeyTVBP])
         } else {
             vepFacets.choices <- c()
         }
@@ -1784,9 +1786,9 @@ shinyServer(function(input, output, clientData, session) {
         # Initialise to avoid crash
         facetsSelected <- NULL
         # Keep previous selection if possible
-        if (length(input$vepFacets) > 0)
+        if (length(input$vepFacetsTVBP) > 0)
             facetsSelected <- na.omit(match(
-                x = input$vepFacets,
+                x = input$vepFacetsTVBP,
                 table = vepFacets.choices
             ))
 
@@ -1795,7 +1797,7 @@ shinyServer(function(input, output, clientData, session) {
             facetsSelected <- 1:length(vepFacets.choices)
 
         updateSelectInput(
-            session, "vepFacets",
+            session, "vepFacetsTVBP",
             choices = vepFacets.choices,
             selected = vepFacets.choices[facetsSelected])
     })
@@ -1824,9 +1826,9 @@ shinyServer(function(input, output, clientData, session) {
                 pheno = vepTableCount[,hover$mapping$x] == x_lvl
             )
             # Identify data for the panel (vepFacetKey) hovered
-            if (input$vepFacetKey != "None"){
+            if (input$vepFacetKeyTVBP != "None"){
 
-                filters$vepFacetKey <- vepTableCount[
+                filters$vepFacetKeyTVBP <- vepTableCount[
                     ,hover$mapping$panelvar1] ==
                     hover$panelvar1
             }
@@ -1837,7 +1839,7 @@ shinyServer(function(input, output, clientData, session) {
                 c(vepTVBP, "Freq")]
 
             # If in percentage mode, rescale the values
-            if (input$stackedPercentage){
+            if (input$stackedPercentageTVBP){
                 y_lvls[,"Freq"] <- y_lvls[,"Freq"] / sum(y_lvls[,"Freq"])
             }
 
@@ -1854,7 +1856,7 @@ shinyServer(function(input, output, clientData, session) {
                 y_lvl <- as.character(y_lvls[1, vepTVBP])
                 countVarLevel <- y_lvls[y_lvls[,vepTVBP] == y_lvl, "Freq"]
                 countVarLevel <- ifelse(
-                    input$stackedPercentage,
+                    input$stackedPercentageTVBP,
                     yes = sprintf(
                         "%.1f%%", 100 * countVarLevel),
                     no = as.character(countVarLevel))
@@ -1863,7 +1865,7 @@ shinyServer(function(input, output, clientData, session) {
 
         html1Start <- "<ul>"
         html2Facet <- ifelse(
-            input$vepFacetKey == "None",
+            input$vepFacetKeyTVBP == "None",
             yes = "",
             no = sprintf(
                 "<li>%s : <code>%s</code></li>",
@@ -1886,7 +1888,7 @@ shinyServer(function(input, output, clientData, session) {
                 y_lvl
             )
             html5Value <- ifelse(
-                input$stackedPercentage,
+                input$stackedPercentageTVBP,
                 yes = sprintf(
                     "<li>Percentage : <code>%s</code></li>",
                     countVarLevel,
