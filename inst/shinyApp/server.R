@@ -37,6 +37,16 @@ shinyServer(function(input, output, clientData, session) {
                 })
     })
 
+    output$phenoFile <- renderText({
+
+        phenoFile <- RV[["phenoFile"]]
+
+        return(ifelse(
+            is.null(phenoFile),
+            "No file provided.",
+            phenoFile))
+    })
+
     # DataFrame of imported phenotypes, or NULL
     phenotypes <- reactive({
         # Depends on phenoFile
@@ -67,12 +77,12 @@ shinyServer(function(input, output, clientData, session) {
         if (is.null(phenotypes))
             return(Msgs[["phenotypes"]])
 
-        return(HTML(paste(
-            ncol(phenotypes),
+        return(tagList(
+            code(ncol(phenotypes)),
             "phenotypes in",
-            nrow(phenotypes),
-            "samples detected."
-        )))
+            code(nrow(phenotypes)),
+            "samples."
+        ))
     })
 
     # Column names available for selection from phenotypes
@@ -178,6 +188,15 @@ shinyServer(function(input, output, clientData, session) {
         }
 
         selected
+    })
+
+    output$bedFile <- renderText({
+        bedFile <- bedFile()
+
+        return(ifelse(
+            is.null(bedFile),
+            "No file provided.",
+            bedFile))
     })
 
     # Import BED records, format as GRanges
@@ -324,9 +343,8 @@ shinyServer(function(input, output, clientData, session) {
         if (is.null(genomicRanges))
             return(HTML(Msgs[["genomicRanges"]]))
 
-        return(HTML(paste(
-            length(genomicRanges),
-            "BED record(s) detected.</br>",
+        return(tagList(
+            code(length(genomicRanges)), "genomic range(s)", br(),
             "[",
             as.character(head(x = seqnames(genomicRanges), n = 1)),
             ":",
@@ -337,7 +355,7 @@ shinyServer(function(input, output, clientData, session) {
             # as.character(head(x = names(genomicRanges), n = 1)),
             # "}",
             " , ... ]"
-        )))
+        ))
     })
 
     # Show BED records
@@ -663,12 +681,9 @@ shinyServer(function(input, output, clientData, session) {
 
         validate(need(vcfFiles, "vcfFiles"))
 
-        HTML(paste(
-            length(vcfFiles),
-            "VCF.GZ file(s) detected.</br>",
-            "[",
-            basename(head(x = vcfFiles, n = 1)),
-            " , ... ]"
+        return(tagList(
+            code(length(vcfFiles)), "VCF.GZ file(s) detected", br(),
+            "[", basename(head(x = vcfFiles, n = 1)), " , ... ]"
         ))
     })
 
@@ -825,13 +840,10 @@ shinyServer(function(input, output, clientData, session) {
 
         # validate(need(vcf, "vcf"))
 
-        HTML(paste(
-            nrow(vcf),
-            "bi-allelic records and",
-            ncol(colData(vcf)),
-            "phenotypes in",
-            ncol(vcf),
-            "samples imported"
+        return(tagList(
+                code(nrow(vcf)), "bi-allelic records and",
+                code(ncol(colData(vcf))), "phenotypes",
+                "in", code(ncol(vcf)), "samples"
         ))
     })
 
@@ -1011,7 +1023,7 @@ shinyServer(function(input, output, clientData, session) {
         countFilters <- length(vcfFilters)
 
         if (countFilters == 0)
-            return(p("No filter."))
+            return(p("No filter.", align = "center"))
 
         return(lapply(
             X = 1:countFilters,
@@ -1062,6 +1074,42 @@ shinyServer(function(input, output, clientData, session) {
         active(vcfRules) <- as.logical(rulesActive)
         # Update in the reactiveValues
         RV[["vcfFilters"]] <- vcfRules
+    })
+
+    observe({
+        # Depend on the actionButton *and* the vcf object
+        # makes filtered variants synonym to raw variants in absence of filters
+        input$filterVariants
+        vcf <- vcf()
+
+        # Do not update when filters change, wait for actionButton/vcf
+        isolate({vcfFilters <- RV[["vcfFilters"]]})
+
+        # Store the filtered VCF in the reativeValues
+        RV[["filteredVcf"]] <- subsetByFilter(x = vcf, filter = vcfFilters)
+    })
+
+    output$filteredVcfSummary <- renderUI({
+        filteredVcf <- RV[["filteredVcf"]]
+
+        validate(need(vcf(), Msgs[["importVariants"]]))
+        validate(need(filteredVcf, Msgs[["filteredVcf"]]))
+
+        return(tagList(
+            code(length(filteredVcf)), "bi-allelic records and",
+            code(ncol(colData(filteredVcf))), "phenotypes in",
+            code(ncol(filteredVcf)), "samples filtered"
+        ))
+    })
+
+    output$filtersSummary <- renderUI({
+        vcfFilters <- RV[["vcfFilters"]]
+
+        return(tagList(
+            code(sum(active(vcfFilters))), "active filters",
+            "( of", code(length(vcfFilters)), ")"
+            ))
+
     })
 
     # Parse genotypes ----

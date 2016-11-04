@@ -33,8 +33,13 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                             icon = icon("file"), width = '100%')
                     ),
                     shiny::column(
-                        width = 4, offset = 6,
-                        strong("Summary"),
+                        width = 6,
+                        strong("File"), br(),
+                        uiOutput("phenoFile")
+                    ),
+                    shiny::column(
+                        width = 4,
+                        strong("Summary"), br(),
                         htmlOutput("phenoFileSummary")
                     )
 
@@ -55,7 +60,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                 fluidRow(
 
                     shiny::column(
-                        width = 3,
+                        width = 2,
                         selectInput(
                             "regionInputMode", "Region(s) input type",
                             choices = GS[["choices.regionInputMode"]],
@@ -64,7 +69,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                     ),
 
                     shiny::column(
-                        width = 4, offset = 5,
+                        width = 4, offset = 6,
                         strong("Summary"),
                         htmlOutput("rangesSummary")
                     )
@@ -81,6 +86,11 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                             actionButton(
                                 "selectBed", "Browse",
                                 icon = icon("file"), width = '100%')
+                        ),
+                        shiny::column(
+                            width = 6,
+                            strong("File"), br(),
+                            uiOutput("bedFile")
                         )
                     ),
                     conditionalPanel(
@@ -598,16 +608,37 @@ shinyUI(navbarPage(theme = "bootstrap.css",
         wellPanel(
             fluidRow(
                 shiny::column(
+                    width = 4, offset = 1,
+                    strong("Summary"), br(),
+                    uiOutput("filtersSummary")
+                ),
+                shiny::column(
+                    width = 2,
+                    actionButton(
+                        "filterVariants", "Apply filters",
+                        icon = icon("filter"), width = "100%"
+                    )
+                ),
+                shiny::column(
+                    width = 4,
+                    strong("Summary"), br(),
+                    uiOutput("filteredVcfSummary")
+                )
+            )
+        ),
+        wellPanel(
+            fluidRow(
+                shiny::column(
                     width = 1,
                     strong("Class")
                 ),
                 shiny::column(
-                    width = 8,
-                    strong("Expression")
-                ),
-                shiny::column(
                     width = 1,
                     strong("Active?")
+                ),
+                shiny::column(
+                    width = 8,
+                    strong("Expression")
                 )
             ),
             br(),

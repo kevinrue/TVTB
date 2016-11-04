@@ -108,7 +108,7 @@ Msgs <- list(
     xAxisSize = "X axis font size",
 
     # Optional inputs
-    importVariants = "Please import/refresh variants",
+    importVariants = "Please import/refresh variants.",
     genomicRanges = "No genomic range defined. All variants considered.",
     phenotypes = "No phenotypes defined. All samples considered.",
     colDataEmptyOK = "No phenotype information available.",
@@ -122,6 +122,7 @@ Msgs <- list(
     # vcf = "Impossible to read VCF file. See console.",
 
     # Calculated values (missing are likely bugs)
+    filteredVcf = "Please filter variants.",
     ensDbFilter = "Invalid EnsDb filter",
     genomeSeqinfo = "genomeSeqinfo bug?",
     genoSampleRanges.rows = "genoSampleRanges$rows bug?",
