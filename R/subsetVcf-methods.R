@@ -9,13 +9,9 @@ setMethod(
         if (!name(filter) %in% colnames(fixed(x)))
             stop(name(filter), " not in fixed(x)")
 
-        if (is.character(value(filter))){
-            value(filter) <- sprintf("\"%s\"", value(filter))
-        }
-
         testCmd <- parse(text = sprintf(
-            "fixed(x)[,\"%s\"] %s %s",
-            name(filter),
+            "fixed(x)[,%s] %s %s",
+            deparse(name(filter)),
             condition(filter),
             deparse(value(filter))))
 
@@ -36,13 +32,9 @@ setMethod(
         if (!name(filter) %in% colnames(info(x)))
             stop(name(filter), " not in info(x)")
 
-        if (is.character(value(filter))){
-            value(filter) <- sprintf("\"%s\"", value(filter))
-        }
-
         testCmd <- parse(text = sprintf(
-            "info(x)[,\"%s\"] %s %s",
-            name(filter),
+            "info(x)[,%s] %s %s",
+            deparse(name(filter)),
             condition(filter),
             deparse(value(filter))))
 
@@ -88,8 +80,7 @@ setMethod(
     csq <- parseCSQToGRanges(
         x = x, VCFRowID = rownames(x), info.key = vep(param))
 
-    stopifnot(is.logical(vep))
-
+    # stopifnot(is.logical(vep))
     # TODO: optionally subset predictions to those passing filters
     # Requires parsingCsqToGRanges, but then... GRangesToCsq!
     # if (vep){
@@ -148,9 +139,16 @@ setMethod(
 )
 
 .subsetVcfFilterList <- function(x, filter, param, vep){
-    # Just pass on to the S4 method :-)
-    for (f in filter){
-        x <- subsetVcf(x = x, filter = filter, param = param, vep = vep)
+
+    for (basicFilter in filterRules(filter)){
+        x <- switch (class(basicFilter),
+            VcfFixedFilter = subsetVcf(
+                x = x, filter = basicFilter),
+            VcfInfoFilter = subsetVcf(
+                x = x, filter = basicFilter),
+            VcfVepFilter = subsetVcf(
+                x = x, filter = basicFilter, param = param, vep = vep)
+        )
     }
 
     return(x)

@@ -334,6 +334,13 @@ setGeneric(
         standardGeneric("value<-")
 )
 
+setGeneric(
+    name = "filterType",
+    signature = c("x"),
+    def = function(x)
+        standardGeneric("filterType")
+)
+
 # VcfFilterList class ----
 
 setGeneric(
@@ -341,11 +348,4 @@ setGeneric(
 
     def = function(...)
         standardGeneric("VcfFilterList")
-)
-
-setGeneric(
-    name = "filterType",
-    signature = c("x"),
-    def = function(x)
-        standardGeneric("filterType")
 )

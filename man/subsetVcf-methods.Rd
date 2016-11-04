@@ -104,7 +104,7 @@ infoFilter <- VcfInfoFilter(name = "MAF", condition = ">", value = 0.1)
 subsetVcf(x = vcf, filter = infoFilter)
 
 vepFilter <- VcfVepFilter(
-    name = "IMPACT", condition = "\%in\%", value = c("MODERATE", "HIGH"))
+    name = "Consequence", condition = "\%in\%", value = c("missense_variant"))
 subsetVcf(x = vcf, filter = vepFilter, param = tparam, vep = FALSE)
 
 listFilter <- VcfFilterList(fixedFilter, infoFilter, vepFilter)
