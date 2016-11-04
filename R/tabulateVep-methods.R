@@ -17,31 +17,6 @@ setMethod(
     }
 )
 
-## param = missing
-setMethod(
-    f = "tabulateVepByPhenotype",
-    signature = c(vcf="ExpandedVCF", param="missing"),
-    definition = function(
-        vcf, phenoCol, vepCol, alts, param = NULL, ...,
-        filter = VcfFilterRules(),
-        unique = FALSE, facet = NULL, plot = FALSE, percentage = FALSE){
-
-        if (length(alts) < 2)
-            stop(
-                "length(alts) must be >= 2: ",
-                "Heterozygote and Homozygote alternate genotypes")
-        # ref will not be used
-        param <- TVTBparam(genos = list("", alts[1], alts[2:length(alts)]))
-        # Additional TVTBparam overriden
-        param <- .override.TVTBparam(param, ...)
-
-        .tabulateVepByPhenotype(
-            vcf = vcf, phenoCol = phenoCol, vepCol = vepCol, param = param,
-            filter = filter, unique = unique, facet = facet, plot = plot,
-            percentage = percentage)
-    }
-)
-
 ### InPhenoLevel() ----
 
 ## param = TVTBparam
@@ -52,31 +27,6 @@ setMethod(
         level, vcf, phenoCol, vepCol, param, ..., filter = VcfFilterRules(),
         unique = FALSE, facet = NULL, plot = FALSE, percentage = FALSE){
 
-        param <- .override.TVTBparam(param, ...)
-
-        .tabulateVepInPhenoLevel(
-            level = level, vcf = vcf, phenoCol = phenoCol, vepCol = vepCol,
-            filter = filter, param, unique = unique, facet = facet,
-            plot = plot, percentage = percentage)
-    }
-)
-
-## param = TVTBparam
-setMethod(
-    f = "tabulateVepInPhenoLevel",
-    signature = c(vcf="ExpandedVCF", param="missing"),
-    definition = function(
-        level, vcf, phenoCol, vepCol, alts, param = NULL, ...,
-        filter = VcfFilterRules(),
-        unique = FALSE, facet = NULL, plot = FALSE, percentage = FALSE){
-
-        if (length(alts) < 2)
-            stop(
-                "length(alts) must be >= 2: ",
-                "Heterozygote and Homozygote alternate genotypes")
-        # ref will not be used
-        param <- TVTBparam(genos = list("", alts[1], alts[2:length(alts)]))
-        # Additional TVTBparam overriden
         param <- .override.TVTBparam(param, ...)
 
         .tabulateVepInPhenoLevel(

@@ -58,8 +58,8 @@ setGeneric(
 
 setGeneric(
     name = "variantsInSamples",
-    signature = c("vcf", "samples", "param"),
-    def = function(vcf, samples, param, ..., unique = FALSE)
+    signature = c("vcf", "param"),
+    def = function(vcf, param, samples = 1:ncol(vcf), ..., unique = FALSE)
         standardGeneric("variantsInSamples")
 )
 

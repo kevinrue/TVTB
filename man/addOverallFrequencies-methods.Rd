@@ -2,7 +2,6 @@
 
 \alias{addOverallFrequencies}
 \alias{addOverallFrequencies,ExpandedVCF,TVTBparam-method}
-\alias{addOverallFrequencies,ExpandedVCF,missing-method}
 
 \docType{methods}
 \alias{addOverallFrequencies-methods}
@@ -15,7 +14,8 @@ Overall genotypes counts and allele frequencies
 Adds dataset-wide genotypes counts
 (reference homozygote, heterozygote, and alternate homozygote)
 and allele frequencies (alternate and minor)
-as \emph{INFO} fields in an \code{ExpandedVCF} object.
+as INFO fields in an \code{ExpandedVCF} object.
+Counts and frequencies may be calculated across all samples.
 Multiple genotypes can be counted toward a single
 frequency (\emph{e.g.} combined \code{c("0/0", "0|0")} for
 homozygote reference genotypes).
@@ -24,9 +24,6 @@ homozygote reference genotypes).
 \usage{
 \S4method{addOverallFrequencies}{ExpandedVCF,TVTBparam}(
     vcf, param, ..., force = FALSE)
-
-\S4method{addOverallFrequencies}{ExpandedVCF,missing}(
-    vcf, ref, het, alt, ..., force = FALSE)
 }
 
 \arguments{
@@ -36,23 +33,12 @@ homozygote reference genotypes).
     \item{param}{
 \code{TVTBparam} object that contains recurrent parameters.
 }
-    \item{ref}{
-\code{character} vector of valid reference homozygote genotypes (\emph{e.g.}
-    \code{c("0|0", "0/0")}).
-}
-    \item{het}{
-\code{character} vector of valid heterozygote genotypes (\emph{e.g.}
-    \code{c("0|1", "0/1")}).
-}
-    \item{alt}{
-\code{character} vector of valid alternate homozygote genotypes (\emph{e.g.}
-    \code{c("1|1", "1/1")}).
-}
     \item{...}{
-Additional arguments used to override \code{TVTBparam} slots.
+Additional arguments used to override \code{TVTBparam} slots (\emph{e.g.}
+\code{ref}, \code{het}, \code{alt}).
 }
     \item{force}{
-If \code{TRUE}, \emph{INFO} fields header and data are overwritten.
+If \code{TRUE}, INFO fields header and data are overwritten.
 
 If \code{FALSE}, an error is thrown if any field already exists.
 }
@@ -60,10 +46,10 @@ If \code{FALSE}, an error is thrown if any field already exists.
 
 \details{
 Genotypes and frequencies are calculated across all the
-samples in the \code{ExpandedVCF} object, and stored in \emph{INFO} fields
+samples in the \code{ExpandedVCF} object, and stored in INFO fields
 named according to settings stored in the \code{TVTBparam} object (see below).
 
-The \code{param} object controls the name of \emph{INFO} fields as
+The \code{param} object controls the key of INFO fields as
 follows:
 \describe{
     \item{\code{names(hRef(param))}}{
@@ -77,15 +63,11 @@ follows:
     \item{\code{maf(param)}}{
         Minor allele frequency}
 }
-Alternatively, if \code{param} is not provided, the following default
-values are used respectively:
-\code{REF}, \code{HET}, \code{ALT}, \code{AAF}, \code{MAF}.
-
 }
 
 \value{
 \code{ExpandedVCF} object including additional
-\emph{INFO} fields for genotype counts and allele frequencies.
+INFO fields for genotype counts and allele frequencies.
 See \emph{Details}.
 }
 

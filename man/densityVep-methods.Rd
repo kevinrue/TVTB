@@ -6,10 +6,7 @@
 \alias{densityVepInPhenoLevel}
 
 \alias{densityVepByPhenotype,ExpandedVCF,TVTBparam-method}
-\alias{densityVepByPhenotype,ExpandedVCF,missing-method}
-
 \alias{densityVepInPhenoLevel,ExpandedVCF,TVTBparam-method}
-\alias{densityVepInPhenoLevel,ExpandedVCF,missing-method}
 
 \docType{methods}
 \alias{densityVep-methods}
@@ -32,20 +29,8 @@
         unique = FALSE, facet = NULL, plot = FALSE, pattern = NULL,
         layer = "density+dotplot")
 
-\S4method{densityVepByPhenotype}{ExpandedVCF,missing}(
-        vcf, phenoCol, vepCol, alts, param = NULL, ...,
-        filter = VcfFilterRules(),
-        unique = FALSE, facet = NULL, plot = FALSE, pattern = NULL,
-        layer = "density+dotplot")
-
 \S4method{densityVepInPhenoLevel}{ExpandedVCF,TVTBparam}(
         level, vcf, phenoCol, vepCol, param, ...,
-        filter = VcfFilterRules(),
-        unique = FALSE, facet = NULL, plot = FALSE, pattern = NULL,
-        layer = "density+dotplot")
-
-\S4method{densityVepInPhenoLevel}{ExpandedVCF,missing}(
-        level, vcf, phenoCol, vepCol, alts, param = NULL, ...,
         filter = VcfFilterRules(),
         unique = FALSE, facet = NULL, plot = FALSE, pattern = NULL,
         layer = "density+dotplot")
@@ -62,10 +47,8 @@ Name of a column in \code{pheno}.
 Name of a metadata column in \code{ensemblVEP::parseCSQToGRanges(vcf)}.
 }
     \item{param}{
-\code{TVTBparam} object that contains recurrent parameters.
-}
-    \item{alts}{
-Character vector of alternate genotypes (both heterozygote and homozygote).
+\code{TVTBparam} object that contains recurrent parameters (\emph{e.g.}
+\code{het}, \code{alt}).
 }
     \item{level}{
 Phenotype level; only variants observed in at least one sample will be
@@ -91,7 +74,7 @@ Additional VEP field appended as an additional column to the
 create one sub-plot for each level of the faceting field.
 
 If available, \code{"Feature"} is a recommended value for this argument,
-as VEP typically produce one prediction per variant per feature.
+as teh Ensembl VEP typically produces one prediction per variant per feature.
 }
     \item{plot}{
 If \code{TRUE}, return a \code{ggplot} object.
@@ -104,8 +87,8 @@ can be provided to extract a substring that must
 be coercible to \code{numeric}.
 
 For instance, the patterns
-\code{"[[:alpha:]]*:(.*)"} and \code{".*:(.*)"} can both extract
-the population allele frequency \code{0.008}
+\code{"[[:alpha:]]*:(.*)"} and \code{".*:(.*)"} are both valid
+patterns to extract the population allele frequency \code{0.008}
 from a value stored in the form \code{"A:0.008"}
 (more generally, \code{allele:frequency}).
 A single pair of round brackets \code{()} is expected
@@ -124,11 +107,23 @@ without any layer.
 \value{
 \describe{
 \item{\code{densityVepByPhenotype}}{
-    A \code{ggplot} object representing the density of a given VEP prediction
-    field (coerced to \code{numeric}) in each level of a given phenotype.}
+    \code{plot=TRUE}: A \code{ggplot} object representing the density of a
+    given VEP prediction field (coerced to \code{numeric} after optional
+    pattern extraction) in each level of a given phenotype.
+
+    \code{plot=FALSE}: A \code{data.frame} in long format including one row per
+    variant seen in at least one sample (heterozygote or alternate homozygote)
+    associated with each phenotype level.
+    The \code{data.frame} contains at least one column for the VEP prediction
+    value coerced to \code{numeric} after the optional pattern extraction,
+    and one column for the phenotype level. An additional column
+    containing another VEP prediction field may be added using the \code{facet}
+    argument.}
+
 \item{\code{densityVepInPhenoLevel}}{
-    Similarly, a \code{ggplot} object, for a single level of a given
-    phenotype.}
+    Similarly to \code{tabulateVepByPhenotype} above, either a \code{ggplot}
+    object or a \code{data.frame} in long format, for a single level of
+    a given phenotype.}
 }
 }
 \author{

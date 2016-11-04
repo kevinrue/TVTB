@@ -19,31 +19,6 @@ setMethod(
     }
 )
 
-## param = missing
-setMethod(
-    f = "densityVepByPhenotype",
-    signature = c(vcf="ExpandedVCF", param="missing"),
-    definition = function(
-        vcf, phenoCol, vepCol, alts, param = NULL, ...,
-        filter = VcfFilterRules(),
-        unique = FALSE, facet = NULL, plot = FALSE, pattern = NULL,
-        layer = "density+dotplot"){
-
-        .checkAlts(alts)
-
-        # ref will not be used
-        param <- TVTBparam(genos = list("", alts[1], alts[2:length(alts)]))
-        # Additional parameters overriden
-        param <- .override.TVTBparam(param, ...)
-
-        .densityVepByPhenotype(
-            vcf = vcf, phenoCol = phenoCol, vepCol = vepCol, param = param,
-            filter = filter,
-            unique = unique, facet = facet, plot = plot, pattern = pattern,
-            layer = layer)
-    }
-)
-
 #### InPhenoLevel() ----
 
 ## param = TVTBparam
@@ -64,42 +39,6 @@ setMethod(
             layer = layer)
     }
 )
-
-## param = missing
-setMethod(
-    f = "densityVepInPhenoLevel",
-    signature = c(vcf="ExpandedVCF", param="missing"),
-    definition = function(
-        level, vcf, phenoCol, vepCol, alts, param = NULL, ...,
-        filter = VcfFilterRules(),
-        unique = FALSE, facet = NULL, plot = FALSE, pattern = NULL,
-        layer = "density+dotplot"){
-
-        .checkAlts(alts)
-
-        # ref will not be used
-        param <- TVTBparam(genos = list("", alts[1], alts[2:length(alts)]))
-        # Additional parameters overriden
-        param <- .override.TVTBparam(param, ...)
-
-        .densityVepInPhenoLevel(
-            level = level, vcf = vcf, phenoCol = phenoCol, vepCol = vepCol,
-            param = param, filter = filter,
-            unique = unique, facet = facet, plot = plot, pattern = pattern,
-            layer = layer)
-    }
-)
-
-# Helpers ----
-
-.checkAlts <- function(alts){
-    if (length(alts) < 2)
-        stop(
-            "length(alts) must be >= 2: ",
-            "Heterozygote and Homozygote alternate genotypes")
-
-    return(TRUE)
-}
 
 # Main methods ----
 

@@ -50,16 +50,6 @@ test_that("addPhenoLevelFrequencies supports all signatures",{
         "ExpandedVCF"
     )
 
-    # \alias{addPhenoLevelFrequencies,ExpandedVCF,missing-method}
-    expect_s4_class(
-        addPhenoLevelFrequencies(
-            vcf = vcf, pheno = "pop", level = "GBR",
-            ref = unlist(hRef(tparam), use.names = FALSE),
-            het = unlist(het(tparam), use.names = FALSE),
-            alt = unlist(hAlt(tparam), use.names = FALSE)),
-        "ExpandedVCF"
-    )
-
 })
 
 # .checkInputsPLF ----

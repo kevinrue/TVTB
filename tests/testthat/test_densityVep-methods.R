@@ -37,15 +37,6 @@ test_that("densityVep* supports all signatures",{
         "data.frame"
     )
 
-    expect_is(
-        densityVepByPhenotype(
-            vcf = vcf,
-            phenoCol = "super_pop",
-            vepCol = "CADD_PHRED",
-            alts = unlist(carrier(tparam))),
-        "data.frame"
-    )
-
     ## InPhenoLevel
     expect_is(
         densityVepInPhenoLevel(
@@ -55,30 +46,6 @@ test_that("densityVep* supports all signatures",{
             vepCol = "CADD_PHRED",
             param = tparam),
         "data.frame"
-    )
-
-    expect_is(
-        densityVepInPhenoLevel(
-            level = "GBR",
-            vcf = vcf,
-            phenoCol = "pop",
-            vepCol = "CADD_PHRED",
-            alts = unlist(carrier(tparam))),
-        "data.frame"
-    )
-
-})
-
-# .checkAlts ----
-
-test_that(".checkAlts catches invalid inputs", {
-
-    expect_error(
-        densityVepByPhenotype(
-            vcf = vcf,
-            phenoCol = "super_pop",
-            vepCol = "CADD_PHRED",
-            alts = "0|1")
     )
 
 })

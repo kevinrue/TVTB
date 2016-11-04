@@ -1,10 +1,7 @@
 \name{variantsInSamples-methods}
 
 \alias{variantsInSamples}
-\alias{variantsInSamples,ExpandedVCF,numeric,TVTBparam-method}
-\alias{variantsInSamples,ExpandedVCF,numeric,missing-method}
-\alias{variantsInSamples,ExpandedVCF,character,TVTBparam-method}
-\alias{variantsInSamples,ExpandedVCF,character,missing-method}
+\alias{variantsInSamples,ExpandedVCF,TVTBparam-method}
 
 \docType{methods}
 \alias{variantsInSamples-methods}
@@ -15,17 +12,11 @@ group.
 }
 
 \usage{
-\S4method{variantsInSamples}{ExpandedVCF,numeric,TVTBparam}(
-    vcf, samples, param, ..., unique = FALSE)
+\S4method{variantsInSamples}{ExpandedVCF,TVTBparam}(
+    vcf, param, samples = 1:ncol(vcf), ..., unique = FALSE)
 
-\S4method{variantsInSamples}{ExpandedVCF,character,TVTBparam}(
-    vcf, samples, param, ..., unique = FALSE)
-
-\S4method{variantsInSamples}{ExpandedVCF,numeric,missing}(
-    vcf, samples, alts, unique = FALSE)
-
-\S4method{variantsInSamples}{ExpandedVCF,character,missing}(
-    vcf, samples, alts, unique = FALSE)
+\S4method{variantsInSamples}{ExpandedVCF,TVTBparam}(
+    vcf, param, samples = 1:ncol(vcf), ..., unique = FALSE)
 }
 
 \arguments{
@@ -33,18 +24,16 @@ group.
 \code{ExpandedVCF} object.
 }
     \item{samples}{
-\code{numeric} or \code{character} vector of indicating samples to consider
-in \code{VariantAnnotation::geno(vcf)}.
+\code{integer}, \code{numeric} or \code{character} vector
+indicating samples to consider in \code{VariantAnnotation::geno(vcf)}.
+If not specified, all samples are considered.
 }
     \item{param}{
 \code{TVTBparam} object that contains recurrent parameters.
 }
-    \item{alts}{
-\code{character} vector of alternate genotypes (both heterozygote and
-homozygote).
-}
     \item{...}{
-Additional arguments used to override \code{TVTBparam} slots.
+Additional arguments used to override \code{TVTBparam} slots (\emph{e.g.}
+\code{het}, \code{alt}).
 }
     \item{unique}{
 If \code{TRUE}, consider only variants \emph{unique} to the phenotype level
@@ -53,8 +42,8 @@ If \code{TRUE}, consider only variants \emph{unique} to the phenotype level
 }
 
 \value{
-A numeric vector of indices indicating which variants are observed in at least
-one non-reference genotype in the given group.
+Am \code{integer} vector of indices indicating which variants are observed
+in at least one non-reference genotype in the given group of samples.
 }
 \author{
 Kevin Rue-Albrecht

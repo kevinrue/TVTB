@@ -50,29 +50,11 @@ test_that("addFrequencies supports all signatures",{
             vcf = vcf, phenos = list(pop = "GBR"), param = tparam),
         "ExpandedVCF"
     )
-    # \alias{addFrequencies,ExpandedVCF,list,missing-method}
-    expect_s4_class(
-        addFrequencies(
-            vcf = vcf, phenos = list(pop = "GBR"),
-            ref = unlist(hRef(tparam), use.names = FALSE),
-            het = unlist(het(tparam), use.names = FALSE),
-            alt = unlist(hAlt(tparam), use.names = FALSE)),
-        "ExpandedVCF"
-    )
 
     # \alias{addFrequencies,ExpandedVCF,character,TVTBparam-method}
     expect_s4_class(
         addFrequencies(
             vcf = vcf, phenos = "gender", param = tparam),
-        "ExpandedVCF"
-    )
-    # \alias{addFrequencies,ExpandedVCF,character,missing-method}
-    expect_s4_class(
-        addFrequencies(
-            vcf = vcf, phenos = "gender",
-            ref = unlist(hRef(tparam), use.names = FALSE),
-            het = unlist(het(tparam), use.names = FALSE),
-            alt = unlist(hAlt(tparam), use.names = FALSE)),
         "ExpandedVCF"
     )
 
@@ -82,15 +64,7 @@ test_that("addFrequencies supports all signatures",{
             vcf = vcf, param = tparam),
         "ExpandedVCF"
     )
-    # \alias{addFrequencies,ExpandedVCF,missing,missing-method}
-    expect_s4_class(
-        addFrequencies(
-            vcf = vcf,
-            ref = unlist(hRef(tparam), use.names = FALSE),
-            het = unlist(het(tparam), use.names = FALSE),
-            alt = unlist(hAlt(tparam), use.names = FALSE)),
-        "ExpandedVCF"
-    )
+
 })
 
 # Overwrite INFO header fields ----

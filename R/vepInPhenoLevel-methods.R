@@ -1,11 +1,11 @@
-### param = TVTBparam ----
+
 ## phenotypes = DataFrame ----
 
 setMethod(
     f = "vepInPhenoLevel",
     signature = c(vcf="ExpandedVCF", param="TVTBparam"),
     definition = function(
-        vcf, phenoCol, level, vepCol, param = NULL, ...,
+        vcf, phenoCol, level, vepCol, param, ...,
         unique = FALSE, facet = NULL){
 
         param <- .override.TVTBparam(param, ...)
@@ -16,35 +16,14 @@ setMethod(
             unique = unique, facet = facet)}
 )
 
-### param = missing ----
-## phenotypes = DataFrame ----
-
-setMethod(
-    f = "vepInPhenoLevel",
-    signature = c(vcf="ExpandedVCF", param="missing"),
-    definition = function(
-        vcf, phenoCol, level, vepCol, alts, param = NULL, ...,
-        unique = FALSE, facet = NULL){
-
-        if (length(alts) < 2)
-            stop(
-                "length(alts) must be >= 2: ",
-                "Heterozygote and Homozygote alternate genotypes")
-        # ref will not be used
-        param <- TVTBparam(genos = list("", alts[1], alts[2:length(alts)]))
-
-        param <- .override.TVTBparam(param, ...)
-
-        .vepInPhenoLevel(
-            vcf = vcf, phenoCol = phenoCol, level = level, vepCol = vepCol,
-            param = param,
-            unique = unique, facet = facet)}
-)
 
 .vepInPhenoLevel <- function(
     vcf, phenoCol, level, vepCol, param,
     unique = FALSE, facet = NULL){
 
+    stopifnot(identical(x = length(phenoCol), y = as.integer(1)))
+    stopifnot(identical(x = length(level), y = as.integer(1)))
+    
     phenos <- colData(vcf)
 
     # Identify samples with the phenotype of interest

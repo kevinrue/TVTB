@@ -6,10 +6,7 @@
 \alias{tabulateVepInPhenoLevel}
 
 \alias{tabulateVepByPhenotype,ExpandedVCF,TVTBparam-method}
-\alias{tabulateVepByPhenotype,ExpandedVCF,missing-method}
-
 \alias{tabulateVepInPhenoLevel,ExpandedVCF,TVTBparam-method}
-\alias{tabulateVepInPhenoLevel,ExpandedVCF,missing-method}
 
 \docType{methods}
 \alias{tabulateVep-methods}
@@ -32,19 +29,9 @@
         vcf, phenoCol, vepCol, param, ..., filter = VcfFilterRules(),
         unique = FALSE, facet = NULL, plot = FALSE, percentage = FALSE)
 
-\S4method{tabulateVepByPhenotype}{ExpandedVCF,missing}(
-        vcf, phenoCol, vepCol, alts, param = NULL, ...,
-        filter = VcfFilterRules(),
-        unique = FALSE, facet = NULL, plot = FALSE, percentage = FALSE)
-
 ## tabulateVepInPhenoLevel
 \S4method{tabulateVepInPhenoLevel}{ExpandedVCF,TVTBparam}(
         level, vcf, phenoCol, vepCol, param, ..., filter = VcfFilterRules(),
-        unique = FALSE, facet = NULL, plot = FALSE, percentage = FALSE)
-
-\S4method{tabulateVepInPhenoLevel}{ExpandedVCF,missing}(
-        level, vcf, phenoCol, vepCol, alts, param = NULL, ...,
-        filter = VcfFilterRules(),
         unique = FALSE, facet = NULL, plot = FALSE, percentage = FALSE)
 }
 
@@ -59,10 +46,8 @@ Name of a column in \code{colData(vcf)}.
 Name of a metadata column in \code{ensemblVEP::parseCSQToGRanges(vcf)}.
 }
     \item{param}{
-\code{TVTBparam} object that contains recurrent parameters.
-}
-    \item{alts}{
-Character vector of alternate genotypes (both heterozygote and homozygote).
+\code{TVTBparam} object that contains recurrent parameters (\emph{e.g.}
+\code{het}, \code{alt}).
 }
     \item{level}{
 Phenotype level; only variants observed in at least one sample will be

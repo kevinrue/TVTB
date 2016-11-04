@@ -23,7 +23,7 @@ sampleIdx <- 1:(ncol(vcf))
 
 test_that("variantsInSamples() supports all signatures",{
 
-    ## ExpandedVCF,numeric,TVTBparam
+    ## samples: numeric
     expect_type(
         variantsInSamples(
             vcf = vcf,
@@ -33,33 +33,13 @@ test_that("variantsInSamples() supports all signatures",{
         "integer"
     )
 
-    # # ExpandedVCF,numeric,missing / tested by higher functions TODO: change
-    expect_type(
-        variantsInSamples(
-            vcf = vcf,
-            samples = sampleIdx,
-            alts = c("0|1", "1|0", "1|1"),
-            unique = FALSE),
-        "integer"
-    )
-
-    # ExpandedVCF,character,TVTBparam
+    # ExpandedVCF,TVTBparam
     expect_type(
         variantsInSamples(
             vcf = vcf,
             samples = colnames(vcf)[sampleIdx],
             param = tparam,
-            unique = FALSE),
-        "integer"
-    )
-
-    # ExpandedVCF,character,missing
-    expect_type(
-        variantsInSamples(
-            vcf = vcf,
-            samples = colnames(vcf)[sampleIdx],
-            alts = c("0|1", "1|0", "1|1"),
-            unique = FALSE),
+            unique = TRUE),
         "integer"
     )
 
@@ -74,20 +54,20 @@ test_that("unique=TRUE is supported",{
     #     variantsInSamples(
     #         vcf = vcf,
     #         samples = sampleIdx,
-    #         alts = c("0|1", "1|0", "1|1"),
+    #         param = tparam,
     #         unique = FALSE),
     #     "integer"
     # )
 
-    # TRUE
-    expect_type(
-        variantsInSamples(
-            vcf = vcf,
-            samples = sampleIdx,
-            alts = c("0|1", "1|0", "1|1"),
-            unique = TRUE),
-        "integer"
-    )
+    # TRUE / tested above
+    # expect_type(
+    #     variantsInSamples(
+    #         vcf = vcf,
+    #         samples = sampleIdx,
+    #         param = tparam,
+    #         unique = TRUE),
+    #     "integer"
+    # )
 
 })
 

@@ -14,28 +14,12 @@ setMethod(
     }
 )
 
-## param = missing ----
-
-setMethod(
-    f = "addPhenoLevelFrequencies",
-    signature = c(vcf="ExpandedVCF", param="missing"),
-    definition = function(
-        vcf, pheno, level, ref, het, alt, ..., force = FALSE){
-
-        # Use default TVTBparam
-        param <- TVTBparam(genos = list(ref, het, alt))
-
-        .addPhenoLevelFrequencies(
-            vcf = vcf, param = param, pheno = pheno, level = level)
-    }
-)
-
 # Main method ----
 
 .checkInputsPLF <- function(vcf, param, pheno, level, force){
 
-    stopifnot(length(pheno) == 1)
-    stopifnot(length(level) == 1)
+    stopifnot(identical(x = length(pheno), y = as.integer(1)))
+    stopifnot(identical(x = length(level), y = as.integer(1)))
     stopifnot(is.logical(force))
 
     if (!pheno %in% colnames(colData(vcf))){

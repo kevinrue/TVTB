@@ -36,8 +36,8 @@ Name of the INFO field to create or update
 (\code{character} vector of length 1).
 }
     \item{samples}{
-\code{numeric} or \code{character} vector of indicating samples to consider
-in \code{VariantAnnotation::geno(vcf)}.
+\code{integer}, \code{numeric} or \code{character} vector
+indicating samples to consider in \code{VariantAnnotation::geno(vcf)}.
 If not specified, all samples are considered.
 }
     \item{force}{
@@ -47,7 +47,7 @@ If \code{FALSE}, an error is thrown if the field already exists.
 }
 
 \value{
-\code{ExpandedVCF} object including an additional \emph{INFO} field stating
+\code{ExpandedVCF} object including an additional INFO field stating
     the count of genotypes.
 }
 \author{
@@ -87,7 +87,7 @@ vcf <- VariantAnnotation::expand(vcf, row.names = TRUE)
 
 # Example usage ----
 
-## NOTE: use.names=FALSE is cleaner but not strictly necessary
+## NOTE: use.names=FALSE is more accurate but not strictly necessary
 addCountGenos(
     vcf = vcf, genos = unlist(het(tparam), use.names = FALSE),
     key = names(het(tparam)),

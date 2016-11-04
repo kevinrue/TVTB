@@ -27,14 +27,4 @@ test_that("addOverallFrequencies supports all signatures",{
         "ExpandedVCF"
     )
 
-    # \alias{addOverallFrequencies,ExpandedVCF,missing-method}
-    expect_s4_class(
-        addOverallFrequencies(
-            vcf = vcf,
-            ref = unlist(hRef(tparam), use.names = FALSE),
-            het = unlist(het(tparam), use.names = FALSE),
-            alt = unlist(hAlt(tparam), use.names = FALSE)),
-        "ExpandedVCF"
-    )
-
 })

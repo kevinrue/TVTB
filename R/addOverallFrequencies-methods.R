@@ -14,22 +14,6 @@ setMethod(
     }
 )
 
-## param = missing ----
-
-setMethod(
-    f = "addOverallFrequencies",
-    signature = c(vcf="ExpandedVCF", param="missing"),
-    definition = function(
-        vcf, ref, het, alt, ..., force = FALSE){
-
-        # Use default TVTBparam
-        param <- TVTBparam(genos = list(ref, het, alt))
-
-        .addOverallFrequencies(
-            vcf = vcf, param = param, force = force)
-    }
-)
-
 # Main method ----
 
 .checkOverallInfo <- function(vcf, param, force){

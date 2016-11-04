@@ -1,78 +1,36 @@
-### param = TVTBparam ----
+
 ## samples = column index ----
 
 setMethod(
     f = "variantsInSamples",
-    signature = c("ExpandedVCF", "numeric", "TVTBparam"),
+    signature = c("ExpandedVCF", "TVTBparam"),
 
-    definition = function(vcf, samples, param = NULL, ..., unique = FALSE){
+    definition = function(
+        vcf, param, samples = 1:ncol(vcf), ..., unique = FALSE){
 
         param <- .override.TVTBparam(param, ...)
 
         .variantsInSamples(
-            vcf = vcf, samples = samples, param = param,
-            unique = unique)}
+            vcf = vcf, param = param, samples = samples, unique = unique)}
 )
 
-# samples as column names
-setMethod(
-    f = "variantsInSamples",
-    signature = c("ExpandedVCF", "character", "TVTBparam"),
-
-    definition = function(vcf, samples, param = NULL, ..., unique = FALSE){
-
-        param <- .override.TVTBparam(param, ...)
-
-        .variantsInSamples(
-            vcf = vcf, samples = samples, param = param,
-            unique = unique)}
-)
-
-### param = missing ----
-## samples = column index ----
-
-setMethod(
-    f = "variantsInSamples",
-    signature = c("ExpandedVCF", "numeric", "missing"),
-
-    definition = function(
-        vcf, samples, alts, unique = FALSE){
-
-        if (length(alts) < 2)
-            stop(
-                "length(alts) must be >= 2: ",
-                "Heterozygote and Homozygote alternate genotypes")
-        # ref will not be used
-        param <- TVTBparam(genos = list("", alts[1], alts[2:length(alts)]))
-
-        .variantsInSamples(
-            vcf = vcf, samples = samples, param = param,
-            unique = unique)}
-)
-
-# samples as column names
-setMethod(
-    f = "variantsInSamples",
-    signature = c("ExpandedVCF", "character", "missing"),
-
-    definition = function(
-        vcf, samples, alts, unique = FALSE){
-
-        if (length(alts) < 2)
-            stop(
-                "length(alts) must be >= 2: ",
-                "Heterozygote and Homozygote alternate genotypes")
-        # ref will not be used
-        param <- TVTBparam(genos = list("", alts[1], alts[2:length(alts)]))
-
-        .variantsInSamples(
-            vcf = vcf, samples = samples, param = param,
-            unique = unique)}
-)
+# Main method ----
 
 .variantsInSamples <- function(
-    vcf, samples, param, unique = FALSE){
+    vcf, param, samples = 1:ncol(vcf), unique = FALSE){
 
+    stopifnot(class(samples) %in% c("character", "numeric", "integer"))
+    stopifnot(is.logical(unique))
+    stopifnot(length(samples) > 0)
+    
+    # If samples is character (colnames)
+    if (identical(class(samples), "character")){
+        # convert to index
+        samples <- match(samples, colnames(vcf))
+        # If some sample names were not found, throw an error
+        stopifnot(!any(is.na(samples)))
+    }
+    
     # Extract once genotypes from ExpandedVCF
     genos <- geno(vcf)[["GT"]]
 

@@ -1,6 +1,5 @@
 
 ### phenos = list ----
-## param = TVTBparam ----
 
 setMethod(
     f = "addFrequencies",
@@ -15,24 +14,7 @@ setMethod(
     }
 )
 
-### param = missing ----
-
-setMethod(
-    f = "addFrequencies",
-    signature = c(vcf="ExpandedVCF", phenos="list", param="missing"),
-    definition = function(
-        vcf, phenos, ref, het, alt, ..., force = FALSE){
-
-        # Use default TVTBparam
-        param <- TVTBparam(genos = list(ref, het, alt))
-
-        .addFrequencies(
-            vcf = vcf, param = param, phenos = phenos, force = force)
-    }
-)
-
 ### phenos = character ----
-## param = TVTBparam ----
 
 setMethod(
     f = "addFrequencies",
@@ -52,29 +34,7 @@ setMethod(
     }
 )
 
-### param = missing ----
-
-setMethod(
-    f = "addFrequencies",
-    signature = c(vcf="ExpandedVCF", phenos="character", param="missing"),
-    definition = function(
-        vcf, phenos, ref, het, alt, ..., force = FALSE){
-
-        # Use default TVTBparam
-        param <- TVTBparam(genos = list(ref, het, alt))
-
-        # named list of all levels of given phenotypes
-        phenos <- sapply(X = phenos, FUN = function(x){
-            unique(colData(vcf)[,x])
-        }, simplify = FALSE)
-
-        .addFrequencies(
-            vcf = vcf, param = param, phenos = phenos, force = force)
-    }
-)
-
 ### phenos = missing ----
-## param = TVTBparam ----
 
 setMethod(
     f = "addFrequencies",
@@ -83,22 +43,6 @@ setMethod(
         vcf, param, ..., force = FALSE){
 
         param <- .override.TVTBparam(param, ...)
-
-        .addFrequencies(
-            vcf = vcf, param = param, phenos = list(), force = force)
-    }
-)
-
-### param = missing ----
-
-setMethod(
-    f = "addFrequencies",
-    signature = c(vcf="ExpandedVCF", phenos="missing", param="missing"),
-    definition = function(
-        vcf, ref, het, alt, ..., force = FALSE){
-
-        # Use default TVTBparam
-        param <- TVTBparam(genos = list(ref, het, alt))
 
         .addFrequencies(
             vcf = vcf, param = param, phenos = list(), force = force)

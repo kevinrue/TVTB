@@ -2,7 +2,6 @@
 
 \alias{addPhenoLevelFrequencies}
 \alias{addPhenoLevelFrequencies,ExpandedVCF,TVTBparam-method}
-\alias{addPhenoLevelFrequencies,ExpandedVCF,missing-method}
 
 \docType{methods}
 \alias{addPhenoLevelFrequencies-methods}
@@ -14,9 +13,9 @@ Genotypes and allele frequencies for a given phenotype level
 
 Adds genotypes counts
 (reference homozygote, heterozygote, and alternate homozygote)
-and allele frequencies (alternate and minor)
+and allele frequencies (alternate and minor) calculated
 in a group of samples associated with a given level of a given phenotype
-as \emph{INFO} fields in an \code{ExpandedVCF} object.
+as INFO fields in an \code{ExpandedVCF} object.
 Multiple genotypes can be counted toward a single
 frequency (\emph{e.g.} combined \code{c("0/0", "0|0")} for
 homozygote reference genotypes).
@@ -25,9 +24,6 @@ homozygote reference genotypes).
 \usage{
 \S4method{addPhenoLevelFrequencies}{ExpandedVCF,TVTBparam}(
     vcf, pheno, level, param, ..., force = FALSE)
-
-\S4method{addPhenoLevelFrequencies}{ExpandedVCF,missing}(
-    vcf, pheno, level, ref, het, alt, ..., force = FALSE)
 }
 
 \arguments{
@@ -43,23 +39,12 @@ Phenotype level in \code{colData(vcf)[,pheno]}.
     \item{param}{
 \code{TVTBparam} object that contains recurrent parameters.
 }
-    \item{ref}{
-\code{character} vector of valid reference homozygote genotypes (\emph{e.g.}
-    \code{c("0|0", "0/0")}).
-}
-    \item{het}{
-\code{character} vector of valid heterozygote genotypes (\emph{e.g.}
-    \code{c("0|1", "0/1")}).
-}
-    \item{alt}{
-\code{character} vector of valid alternate homozygote genotypes (\emph{e.g.}
-    \code{c("1|1", "1/1")}).
-}
     \item{...}{
-Additional arguments used to override \code{TVTBparam} slots.
+Additional arguments used to override \code{TVTBparam} slots (\emph{e.g.}
+\code{ref}, \code{het}, \code{alt}).
 }
     \item{force}{
-If \code{TRUE}, \emph{INFO} fields header and data are overwritten.
+If \code{TRUE}, INFO fields header and data are overwritten.
 
 If \code{FALSE}, an error is thrown if any field already exists.
 }
@@ -68,10 +53,10 @@ If \code{FALSE}, an error is thrown if any field already exists.
 \details{
 Genotypes and frequencies are calculated within the groups of samples
 associated with the given level of the given phenotype,
-and stored in \emph{INFO} fields
+and stored in INFO fields
 named according to settings stored in the \code{TVTBparam} object (see below).
 
-The \code{param} object controls the suffix of \emph{INFO} fields as
+The \code{param} object controls the key suffix of INFO fields as
 follows:
 \describe{
     \item{\code{names(hRef(param))}}{
@@ -85,15 +70,11 @@ follows:
     \item{\code{maf(param)}}{
         Minor allele frequency}
 }
-Alternatively, if \code{param} is not provided, the following default
-values are used respectively:
-\code{REF}, \code{HET}, \code{ALT}, \code{AAF}, \code{MAF}.
-
 }
 
 \value{
 \code{ExpandedVCF} object including additional
-\emph{INFO} fields for genotype counts and allele frequencies.
+INFO fields for genotype counts and allele frequencies.
 See \emph{Details}.
 }
 

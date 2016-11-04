@@ -38,16 +38,6 @@ test_that("tabulateVep* supports all signatures",{
         "data.frame"
     )
 
-    expect_is(
-        tabulateVepByPhenotype(
-            vcf = vcf,
-            phenoCol = "super_pop",
-            vepCol = "Consequence",
-            alts = c("0|1", "1|0", "1|1"),
-            unique = TRUE),
-        "data.frame"
-    )
-
     ## Implicitely tested by *ByPhenotype
     expect_is(
         tabulateVepInPhenoLevel(
@@ -56,16 +46,6 @@ test_that("tabulateVep* supports all signatures",{
             phenoCol = "super_pop",
             vepCol = "Consequence",
             param = tparam),
-        "data.frame"
-    )
-
-    expect_is(
-        tabulateVepInPhenoLevel(
-            level = "AFR",
-            vcf = vcf,
-            phenoCol = "super_pop",
-            vepCol = "Consequence",
-            alts = c("0|1", "1|0", "1|1")),
         "data.frame"
     )
 

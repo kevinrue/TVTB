@@ -579,7 +579,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                     )
                 ),
                 column(
-                    width = 8,
+                    width = 7,
                     textInput(
                         "newFilterExpression", "Expression",
                         placeholder = paste(
@@ -591,7 +591,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                     )
                 ),
                 column(
-                  width = 1,
+                  width = 2,
                   br(),
                   actionButton(
                     "demoFilter", "Sample input",

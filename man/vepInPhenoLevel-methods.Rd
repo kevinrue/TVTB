@@ -2,7 +2,6 @@
 
 \alias{vepInPhenoLevel}
 \alias{vepInPhenoLevel,ExpandedVCF,TVTBparam-method}
-\alias{vepInPhenoLevel,ExpandedVCF,missing-method}
 
 \docType{methods}
 \alias{vepInPhenoLevel-methods}
@@ -16,10 +15,6 @@ prediction field.
 \usage{
 \S4method{vepInPhenoLevel}{ExpandedVCF,TVTBparam}(
     vcf, phenoCol, level, vepCol, param, ...,
-    unique = FALSE, facet = NULL)
-
-\S4method{vepInPhenoLevel}{ExpandedVCF,missing}(
-    vcf, phenoCol, level, vepCol, alts, param = NULL, ...,
     unique = FALSE, facet = NULL)
 }
 
@@ -41,12 +36,9 @@ VEP prediction field; Name of a metadata column in
     \item{param}{
 \code{TVTBparam} object that contains recurrent parameters.
 }
-    \item{alts}{
-\code{character} vector of alternate genotypes
-(both heterozygote and homozygote).
-}
     \item{...}{
-Additional arguments used to override \code{TVTBparam} slots.
+Additional arguments used to override \code{TVTBparam} slots (\emph{e.g.}
+\code{het}, \code{alt}).
 }
     \item{unique}{
 If \code{TRUE}, consider only variants unique to the phenotype level
