@@ -11,7 +11,7 @@
 ## Description
 
 The package provides functions to summarise and visualise
-gene centric genetic variation data stored in VCF files.
+genetic variation data stored in VCF files.
 Functionalities are also demonstrated in a Shiny web-application.
 
 ## Motivation
@@ -44,6 +44,3 @@ Unit tests and coverage implemented using the `testthat` package (CRAN).
 **Artistic License 2.0**
 
 Copyright :copyright: 2000-2006, The Perl Foundation.
-
-Everyone is permitted to copy and distribute verbatim copies of this license
-document, but changing it is not allowed.

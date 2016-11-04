@@ -9,7 +9,7 @@ date: "`r doc_date()`"
 package: "`r pkg_ver('TVTB')`"
 abstract:
     The VCF Tool Box (*TVTB*) provides functions to summarise and
-    visualise gene-centric genetic variation data stored in VCF files
+    visualise genetic variation data stored in VCF files
     pre-processed by the Ensembl Variant Effect Predictor (VEP).
     A Shiny web-application, the Shiny Variant Explorer (tSVE),
     provides a convenient interface to demonstrate
@@ -32,7 +32,7 @@ optChunkDefault <- opts_chunk$get()
 # Introduction {#Introduction}
 
 The VCF Tool Box (`r Biocpkg("TVTB")`) offers functions
-to summarise and visualise gene-centric genetic variation data
+to summarise and visualise genetic variation data
 stored in VCF files pre-processed by the
 Ensembl Variant Effect Predictor (VEP) [@RN1].
 A Shiny web-application, the Shiny Variant Explorer (tSVE),
