@@ -1,48 +1,48 @@
-\name{tabulateCsq-methods}
+\name{tabulateVep-methods}
 
-\alias{tabulateCsq}
+\alias{tabulateVep}
 
-\alias{tabulateCsqByPhenotype}
-\alias{tabulateCsqInPhenoLevel}
+\alias{tabulateVepByPhenotype}
+\alias{tabulateVepInPhenoLevel}
 
-\alias{tabulateCsqByPhenotype,ExpandedVCF,TVTBparam-method}
-\alias{tabulateCsqByPhenotype,ExpandedVCF,missing-method}
+\alias{tabulateVepByPhenotype,ExpandedVCF,TVTBparam-method}
+\alias{tabulateVepByPhenotype,ExpandedVCF,missing-method}
 
-\alias{tabulateCsqInPhenoLevel,ExpandedVCF,TVTBparam-method}
-\alias{tabulateCsqInPhenoLevel,ExpandedVCF,missing-method}
+\alias{tabulateVepInPhenoLevel,ExpandedVCF,TVTBparam-method}
+\alias{tabulateVepInPhenoLevel,ExpandedVCF,missing-method}
 
 \docType{methods}
-\alias{tabulateCsq-methods}
-\alias{tabulateCsqByPhenotype-methods}
-\alias{tabulateCsqInPhenoLevel-methods}
+\alias{tabulateVep-methods}
+\alias{tabulateVepByPhenotype-methods}
+\alias{tabulateVepInPhenoLevel-methods}
 \title{Tabulate VEP predictions in phenotypes}
 \description{
-\code{tabulateCsqByPhenotype} tabulates or plots counts of a given VEP
+\code{tabulateVepByPhenotype} tabulates or plots counts of a given VEP
     prediction field for variants observed (uniquely) in each level of a given
     phenotype.
 
-\code{tabulateCsqInPhenoLevel} considers only variants observed in samples
+\code{tabulateVepInPhenoLevel} considers only variants observed in samples
     associated with a given phenotype level, and tabulates or plots the
     corresponding counts for a given VEP prediction.
 }
 
 \usage{
-## tabulateCsqByPhenotype
-\S4method{tabulateCsqByPhenotype}{ExpandedVCF,TVTBparam}(
-        vcf, phenoCol, csqCol, param, ...,
+## tabulateVepByPhenotype
+\S4method{tabulateVepByPhenotype}{ExpandedVCF,TVTBparam}(
+        vcf, phenoCol, vepCol, param, ...,
         unique = FALSE, facet = NULL, plot = FALSE, percentage = FALSE)
 
-\S4method{tabulateCsqByPhenotype}{ExpandedVCF,missing}(
-        vcf, phenoCol, csqCol, alts, param = NULL, ...,
+\S4method{tabulateVepByPhenotype}{ExpandedVCF,missing}(
+        vcf, phenoCol, vepCol, alts, param = NULL, ...,
         unique = FALSE, facet = NULL, plot = FALSE, percentage = FALSE)
 
-## tabulateCsqInPhenoLevel
-\S4method{tabulateCsqInPhenoLevel}{ExpandedVCF,TVTBparam}(
-        level, vcf, phenoCol, csqCol, param, ...,
+## tabulateVepInPhenoLevel
+\S4method{tabulateVepInPhenoLevel}{ExpandedVCF,TVTBparam}(
+        level, vcf, phenoCol, vepCol, param, ...,
         unique = FALSE, facet = NULL, plot = FALSE, percentage = FALSE)
 
-\S4method{tabulateCsqInPhenoLevel}{ExpandedVCF,missing}(
-        level, vcf, phenoCol, csqCol, alts, param = NULL, ...,
+\S4method{tabulateVepInPhenoLevel}{ExpandedVCF,missing}(
+        level, vcf, phenoCol, vepCol, alts, param = NULL, ...,
         unique = FALSE, facet = NULL, plot = FALSE, percentage = FALSE)
 }
 
@@ -53,7 +53,7 @@
     \item{phenoCol}{
 Name of a column in \code{colData(vcf)}.
 }
-    \item{csqCol}{
+    \item{vepCol}{
 Name of a metadata column in \code{ensemblVEP::parseCSQToGRanges(vcf)}.
 }
     \item{param}{
@@ -93,7 +93,7 @@ predictions will be represented as stacked percentage values.
 
 \value{
 \describe{
-\item{\code{tabulateCsqByPhenotype}}{
+\item{\code{tabulateVepByPhenotype}}{
     \code{plot=TRUE}: A \code{ggplot} object representing the counts of
     values for a given VEP prediction field in each level of a given phenotype.
 
@@ -104,8 +104,8 @@ predictions will be represented as stacked percentage values.
     value, and one column for the phenotype level. An additional column
     containing another VEP prediction field may be added using the \code{facet}
     argument.}
-\item{\code{tabulateCsqInPhenoLevel}}{
-    Similarly to \code{tabulateCsqByPhenotype} above, either a \code{ggplot}
+\item{\code{tabulateVepInPhenoLevel}}{
+    Similarly to \code{tabulateVepByPhenotype} above, either a \code{ggplot}
     object or a \code{data.frame} in long format, for a single level of
     a given phenotype.}
 }
@@ -156,15 +156,15 @@ rownames(vcf) <- paste(rownames(vcf), mcols(vcf)[,"ALT"], sep = "_")
 # Example usage ----
 
 # Count of each "Consequence" in "super_pop"="AFR"
-tabulateCsqInPhenoLevel(
+tabulateVepInPhenoLevel(
     level = "AFR", vcf = vcf, phenoCol = "super_pop",
-    csqCol = "Consequence", param = tparam,
+    vepCol = "Consequence", param = tparam,
     facet = "Feature")
 
 # Count of each "Consequence" in each "super_pop" (barplot)
-tabulateCsqByPhenotype(
+tabulateVepByPhenotype(
     vcf = vcf, phenoCol = "super_pop",
-    csqCol = "Consequence", param = tparam,
+    vepCol = "Consequence", param = tparam,
     facet = "Feature", plot = TRUE) +
     ggplot2::theme(
         legend.text = ggplot2::element_text(size = ggplot2::rel(.5))
@@ -172,9 +172,9 @@ tabulateCsqByPhenotype(
 
 # Count of each "Consequence" in each "super_pop" (data.frame)
 as.data.frame(table(
-    tabulateCsqByPhenotype(
+    tabulateVepByPhenotype(
         vcf = vcf, phenoCol = "super_pop",
-        csqCol = "Consequence", param = tparam,
+        vepCol = "Consequence", param = tparam,
         facet = "Feature", plot = FALSE)
 ))
 }

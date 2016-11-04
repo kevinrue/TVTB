@@ -465,8 +465,8 @@ opts_chunk$set(
 
 ```{r tCBPplot, message=FALSE}
 library(ggplot2)
-tCBPplot <- tabulateCsqByPhenotype(
-    vcf = vcf, phenoCol = "super_pop", csqCol = "Consequence",
+tCBPplot <- tabulateVepByPhenotype(
+    vcf = vcf, phenoCol = "super_pop", vepCol = "Consequence",
     param = tparam,
     unique = TRUE, facet = "Feature", percentage = FALSE,
     plot = TRUE) +
@@ -490,8 +490,8 @@ The same counts can also be summarised as a `data.frame` using
 the option `plot=FALSE`:
 
 ```{r tCBPtableWide}
-tCBPwide <- tabulateCsqByPhenotype(
-        vcf = vcf, phenoCol = "super_pop", csqCol = "Consequence",
+tCBPwide <- tabulateVepByPhenotype(
+        vcf = vcf, phenoCol = "super_pop", vepCol = "Consequence",
         param = tparam,
         unique = TRUE, facet = "Feature", plot = FALSE
     )
@@ -528,8 +528,8 @@ opts_chunk$set(
 ```
 
 ```{r dCBPplot, warning=FALSE}
-densityCsqByPhenotype(
-        vcf = vcf, phenoCol = "super_pop", csqCol = "CADD_PHRED",
+densityVepByPhenotype(
+        vcf = vcf, phenoCol = "super_pop", vepCol = "CADD_PHRED",
         param = tparam,
         unique = TRUE, facet = "Feature", plot = TRUE, popFreq = FALSE) +
     theme(

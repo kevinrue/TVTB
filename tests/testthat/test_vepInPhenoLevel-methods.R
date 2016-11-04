@@ -1,4 +1,4 @@
-context("csqInPhenoLevel")
+context("vepInPhenoLevel")
 
 # Settings ----
 
@@ -29,13 +29,13 @@ rownames(vcf) <- paste(rownames(vcf), mcols(vcf)[,"ALT"], sep = "_")
 
 # Signatures ----
 
-test_that("csqInPhenoLevel() supports all signatures",{
+test_that("vepInPhenoLevel() supports all signatures",{
 
     # ExpandedVCF, / implicitely tested by higher functions TODO:
     expect_is(
-        csqInPhenoLevel(
+        vepInPhenoLevel(
             vcf = vcf, phenoCol = "super_pop", level = "EUR",
-            csqCol = "CADD_PHRED", param = tparam,
+            vepCol = "CADD_PHRED", param = tparam,
             het = c("0/1","1/0"),
             alt = "1/1",
             unique = FALSE, facet = NULL),
@@ -44,9 +44,9 @@ test_that("csqInPhenoLevel() supports all signatures",{
 
     # ExpandedVCF, character
     expect_is(
-        csqInPhenoLevel(
+        vepInPhenoLevel(
             vcf = vcf, phenoCol = "super_pop", level = "EUR",
-            csqCol = "CADD_PHRED",
+            vepCol = "CADD_PHRED",
             alts = unlist(carrier(tparam)),
             unique = FALSE, facet = NULL),
         "data.frame"

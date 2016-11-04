@@ -1,7 +1,7 @@
 Package: TVTB
 Type: Package
 Title: TVTB: The VCF Tool Box
-Version: 0.1.15
+Version: 0.1.16
 Date: 2016-08-10
 Author: Kevin Rue-Albrecht
 Maintainer: Kevin Rue-Albrecht <kevinrue67@gmail.com>
@@ -62,18 +62,16 @@ Collates:
     AllGenerics.R,
     TVTBparam-class.R,
     VcfFilterRules-class.R,
-    VcfFilters.R,
     countGenos-methods.R,
     addCountGenos-methods.R,
     addFrequencies-methods.R,
     addOverallFrequencies-methods.R,
     addPhenoLevelFrequencies-methods.R,
-    addCountGenos-methods.R,
     dropInfo.R,
     variantsInSamples-methods.R,
-    csqInPhenoLevel-methods.R,
-    tabulateCsq-methods.R,
-    densityCsq-methods.R,
+    vepInPhenoLevel-methods.R,
+    tabulateVep-methods.R,
+    densityVep-methods.R,
     show-methods.R
 VignetteBuilder: knitr
 BugReports: https://github.com/kevinrue/TVTB/issues

@@ -2,16 +2,16 @@
 ## phenotypes = DataFrame ----
 
 setMethod(
-    f = "csqInPhenoLevel",
+    f = "vepInPhenoLevel",
     signature = c(vcf="ExpandedVCF", param="TVTBparam"),
     definition = function(
-        vcf, phenoCol, level, csqCol, param = NULL, ...,
+        vcf, phenoCol, level, vepCol, param = NULL, ...,
         unique = FALSE, facet = NULL){
 
         param <- .override.TVTBparam(param, ...)
 
-        .csqInPhenoLevel(
-            vcf = vcf, phenoCol = phenoCol, level = level, csqCol = csqCol,
+        .vepInPhenoLevel(
+            vcf = vcf, phenoCol = phenoCol, level = level, vepCol = vepCol,
             param = param,
             unique = unique, facet = facet)}
 )
@@ -20,10 +20,10 @@ setMethod(
 ## phenotypes = DataFrame ----
 
 setMethod(
-    f = "csqInPhenoLevel",
+    f = "vepInPhenoLevel",
     signature = c(vcf="ExpandedVCF", param="missing"),
     definition = function(
-        vcf, phenoCol, level, csqCol, alts, param = NULL, ...,
+        vcf, phenoCol, level, vepCol, alts, param = NULL, ...,
         unique = FALSE, facet = NULL){
 
         if (length(alts) < 2)
@@ -35,14 +35,14 @@ setMethod(
 
         param <- .override.TVTBparam(param, ...)
 
-        .csqInPhenoLevel(
-            vcf = vcf, phenoCol = phenoCol, level = level, csqCol = csqCol,
+        .vepInPhenoLevel(
+            vcf = vcf, phenoCol = phenoCol, level = level, vepCol = vepCol,
             param = param,
             unique = unique, facet = facet)}
 )
 
-.csqInPhenoLevel <- function(
-    vcf, phenoCol, level, csqCol, param,
+.vepInPhenoLevel <- function(
+    vcf, phenoCol, level, vepCol, param,
     unique = FALSE, facet = NULL){
 
     phenos <- colData(vcf)
@@ -64,9 +64,9 @@ setMethod(
     if (length(csq) == 0)
         return(data.frame())
     # Keep the desired consequence(+facet) for those variants
-    csqFacet <- as.data.frame(mcols(csq[,c(csqCol, facet)]))
+    vepFacet <- as.data.frame(mcols(csq[,c(vepCol, facet)]))
 
-    colnames(csqFacet) <- c(csqCol, facet)
+    colnames(vepFacet) <- c(vepCol, facet)
 
-    return(csqFacet)
+    return(vepFacet)
 }

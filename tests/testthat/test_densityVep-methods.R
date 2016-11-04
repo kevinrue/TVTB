@@ -1,4 +1,4 @@
-context("densityCsqByPhenotype")
+context("densityVepByPhenotype")
 
 # Settings ----
 
@@ -29,44 +29,44 @@ rownames(vcf) <- paste(rownames(vcf), mcols(vcf)[,"ALT"], sep = "_")
 
 # Signatures ----
 
-test_that("densityCsq* supports all signatures",{
+test_that("densityVep* supports all signatures",{
 
     ## ByPhenotype()
     expect_is(
-        densityCsqByPhenotype(
+        densityVepByPhenotype(
             vcf = vcf,
             phenoCol = "super_pop",
-            csqCol = "CADD_PHRED",
+            vepCol = "CADD_PHRED",
             param = tparam),
         "data.frame"
     )
 
     expect_is(
-        densityCsqByPhenotype(
+        densityVepByPhenotype(
             vcf = vcf,
             phenoCol = "super_pop",
-            csqCol = "CADD_PHRED",
+            vepCol = "CADD_PHRED",
             alts = unlist(carrier(tparam))),
         "data.frame"
     )
 
     ## InPhenoLevel
     expect_is(
-        densityCsqInPhenoLevel(
+        densityVepInPhenoLevel(
             level = "GBR",
             vcf = vcf,
             phenoCol = "pop",
-            csqCol = "CADD_PHRED",
+            vepCol = "CADD_PHRED",
             param = tparam),
         "data.frame"
     )
 
     expect_is(
-        densityCsqInPhenoLevel(
+        densityVepInPhenoLevel(
             level = "GBR",
             vcf = vcf,
             phenoCol = "pop",
-            csqCol = "CADD_PHRED",
+            vepCol = "CADD_PHRED",
             alts = unlist(carrier(tparam))),
         "data.frame"
     )
@@ -78,10 +78,10 @@ test_that("densityCsq* supports all signatures",{
 test_that(".checkAlts catches invalid inputs", {
 
     expect_error(
-        densityCsqByPhenotype(
+        densityVepByPhenotype(
             vcf = vcf,
             phenoCol = "super_pop",
-            csqCol = "CADD_PHRED",
+            vepCol = "CADD_PHRED",
             alts = "0|1")
     )
 
@@ -92,21 +92,21 @@ test_that(".checkAlts catches invalid inputs", {
 test_that("plot & facet & popFreq argument work",{
 
     expect_s3_class(
-        densityCsqByPhenotype(
+        densityVepByPhenotype(
             vcf = vcf,
             phenoCol = "super_pop",
-            csqCol = "AMR_MAF",
+            vepCol = "AMR_MAF",
             param = tparam,
             facet = "Feature", plot = TRUE, popFreq = TRUE),
         c("gg", "ggplot")
     )
 
     expect_s3_class(
-        densityCsqInPhenoLevel(
+        densityVepInPhenoLevel(
             level = "AFR",
             vcf = vcf,
             phenoCol = "super_pop",
-            csqCol = "AMR_MAF",
+            vepCol = "AMR_MAF",
             param = tparam,
             facet = "Feature", plot = TRUE, popFreq = TRUE),
         c("gg", "ggplot")
@@ -114,11 +114,11 @@ test_that("plot & facet & popFreq argument work",{
 
     # No variant in EUR population
     # expect_error(
-    #     densityCsqInPhenoLevel(
+    #     densityVepInPhenoLevel(
     #         level = "EUR",
     #         vcf = vcf,
     #         phenoCol = "super_pop",
-    #         csqCol = "AMR_MAF",
+    #         vepCol = "AMR_MAF",
     #         param = tparam,
     #         facet = "Feature", plot = TRUE, popFreq = TRUE),
     #     c("gg", "ggplot")

@@ -213,9 +213,9 @@ Kevin Rue-Albrecht
 \code{\linkS4class{VCF}},
 \code{\linkS4class{ExpandedVCF}},
 \code{\link{addCountGenos-methods}}
-\code{\link{csqInPhenoLevel-methods}},
-\code{\link{densityCsq-methods}},
-\code{\link{tabulateCsq-methods}},
+\code{\link{vepInPhenoLevel-methods}},
+\code{\link{densityVep-methods}},
+\code{\link{tabulateVep-methods}},
 \code{\link{variantsInSamples-methods}},
 and \code{\linkS4class{BiocParallelParam}}.
 }

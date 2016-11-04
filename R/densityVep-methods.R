@@ -2,26 +2,26 @@
 
 ## param = TVTBparam
 setMethod(
-    f = "densityCsqByPhenotype",
+    f = "densityVepByPhenotype",
     signature = c(vcf="ExpandedVCF", param="TVTBparam"),
     definition = function(
-        vcf, phenoCol, csqCol, param, ...,
+        vcf, phenoCol, vepCol, param, ...,
         unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE){
 
         param <- .override.TVTBparam(param, ...)
 
-        .densityCsqByPhenotype(
-            vcf = vcf, phenoCol = phenoCol, csqCol = csqCol, param = param,
+        .densityVepByPhenotype(
+            vcf = vcf, phenoCol = phenoCol, vepCol = vepCol, param = param,
             unique = unique, facet = facet, plot = plot, popFreq = popFreq)
     }
 )
 
 ## param = missing
 setMethod(
-    f = "densityCsqByPhenotype",
+    f = "densityVepByPhenotype",
     signature = c(vcf="ExpandedVCF", param="missing"),
     definition = function(
-        vcf, phenoCol, csqCol, alts, param = NULL, ...,
+        vcf, phenoCol, vepCol, alts, param = NULL, ...,
         unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE){
 
         .checkAlts(alts)
@@ -31,8 +31,8 @@ setMethod(
         # Additional parameters overriden
         param <- .override.TVTBparam(param, ...)
 
-        .densityCsqByPhenotype(
-            vcf = vcf, phenoCol = phenoCol, csqCol = csqCol, param = param,
+        .densityVepByPhenotype(
+            vcf = vcf, phenoCol = phenoCol, vepCol = vepCol, param = param,
             unique = unique, facet = facet, plot = plot, popFreq = popFreq)
     }
 )
@@ -41,16 +41,16 @@ setMethod(
 
 ## param = TVTBparam
 setMethod(
-    f = "densityCsqInPhenoLevel",
+    f = "densityVepInPhenoLevel",
     signature = c(vcf="ExpandedVCF", param="TVTBparam"),
     definition = function(
-        level, vcf, phenoCol, csqCol, param, ...,
+        level, vcf, phenoCol, vepCol, param, ...,
         unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE){
 
         param <- .override.TVTBparam(param, ...)
 
-        .densityCsqInPhenoLevel(
-            level = level, vcf = vcf, phenoCol = phenoCol, csqCol = csqCol,
+        .densityVepInPhenoLevel(
+            level = level, vcf = vcf, phenoCol = phenoCol, vepCol = vepCol,
             param = param,
             unique = unique, facet = facet, plot = plot, popFreq = popFreq)
     }
@@ -58,10 +58,10 @@ setMethod(
 
 ## param = missing
 setMethod(
-    f = "densityCsqInPhenoLevel",
+    f = "densityVepInPhenoLevel",
     signature = c(vcf="ExpandedVCF", param="missing"),
     definition = function(
-        level, vcf, phenoCol, csqCol, alts, param = NULL, ...,
+        level, vcf, phenoCol, vepCol, alts, param = NULL, ...,
         unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE){
 
         .checkAlts(alts)
@@ -71,8 +71,8 @@ setMethod(
         # Additional parameters overriden
         param <- .override.TVTBparam(param, ...)
 
-        .densityCsqInPhenoLevel(
-            level = level, vcf = vcf, phenoCol = phenoCol, csqCol = csqCol,
+        .densityVepInPhenoLevel(
+            level = level, vcf = vcf, phenoCol = phenoCol, vepCol = vepCol,
             param = param,
             unique = unique, facet = facet, plot = plot, popFreq = popFreq)
     }
@@ -91,8 +91,8 @@ setMethod(
 
 # Main methods ----
 
-.densityCsqByPhenotype <- function(
-    vcf, phenoCol, csqCol, param,
+.densityVepByPhenotype <- function(
+    vcf, phenoCol, vepCol, param,
     unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE){
 
     phenos <- colData(vcf)
@@ -100,10 +100,10 @@ setMethod(
 
     ggDataList <- bplapply(
         X = pLevels,
-        FUN = .densityCsqInPhenoLevel,
+        FUN = .densityVepInPhenoLevel,
         vcf = vcf,
         phenoCol = phenoCol,
-        csqCol = csqCol,
+        vepCol = vepCol,
         param = param,
         unique = unique,
         facet = facet,
@@ -117,7 +117,7 @@ setMethod(
 
         ggPlot <- ggplot(
             data = ggData,
-            mapping = aes_string(csqCol, colour = phenoCol)) +
+            mapping = aes_string(vepCol, colour = phenoCol)) +
             geom_density()
 
         if (!is.null(facet)){
@@ -131,8 +131,8 @@ setMethod(
     }
 }
 
-.densityCsqInPhenoLevel <- function(
-    level, vcf, phenoCol, csqCol, param,
+.densityVepInPhenoLevel <- function(
+    level, vcf, phenoCol, vepCol, param,
     unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE){
 
     # Pass relevant namespaces to the parallel environment
@@ -144,8 +144,8 @@ setMethod(
     stopifnot(level %in% phenos[,phenoCol])
 
     # Keep the desired consequence for those variants
-    ggData <- .csqInPhenoLevel(
-        vcf = vcf, phenoCol = phenoCol, level = level, csqCol = csqCol,
+    ggData <- .vepInPhenoLevel(
+        vcf = vcf, phenoCol = phenoCol, level = level, vepCol = vepCol,
         param = param, unique = unique, facet = facet)
 
     if (nrow(ggData) > 0){
@@ -153,10 +153,10 @@ setMethod(
         ggData[,phenoCol] <- level
         # If dealing with population frequency, trim the ALT: prefix
         if (popFreq) {
-            ggData[,csqCol] <- gsub(".*:", "", ggData[,csqCol])
+            ggData[,vepCol] <- gsub(".*:", "", ggData[,vepCol])
         }
         # Coerce to numeric
-        ggData[,csqCol] <- as.numeric(ggData[,csqCol])
+        ggData[,vepCol] <- as.numeric(ggData[,vepCol])
     }
 
     if (plot){
@@ -166,7 +166,7 @@ setMethod(
 
         ggPlot <- ggplot(
             data = ggData,
-            mapping = aes_string(csqCol, colour = phenoCol)) +
+            mapping = aes_string(vepCol, colour = phenoCol)) +
             geom_density()
 
         if (!is.null(facet)){

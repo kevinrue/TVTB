@@ -1,11 +1,11 @@
-\name{csqInPhenoLevel-methods}
+\name{vepInPhenoLevel-methods}
 
-\alias{csqInPhenoLevel}
-\alias{csqInPhenoLevel,ExpandedVCF,TVTBparam-method}
-\alias{csqInPhenoLevel,ExpandedVCF,missing-method}
+\alias{vepInPhenoLevel}
+\alias{vepInPhenoLevel,ExpandedVCF,TVTBparam-method}
+\alias{vepInPhenoLevel,ExpandedVCF,missing-method}
 
 \docType{methods}
-\alias{csqInPhenoLevel-methods}
+\alias{vepInPhenoLevel-methods}
 \title{VEP predictions of variants observed in samples}
 \description{
 Considers only variants observed (uniquey) in samples associated with a given
@@ -14,12 +14,12 @@ prediction field.
 }
 
 \usage{
-\S4method{csqInPhenoLevel}{ExpandedVCF,TVTBparam}(
-    vcf, phenoCol, level, csqCol, param, ...,
+\S4method{vepInPhenoLevel}{ExpandedVCF,TVTBparam}(
+    vcf, phenoCol, level, vepCol, param, ...,
     unique = FALSE, facet = NULL)
 
-\S4method{csqInPhenoLevel}{ExpandedVCF,missing}(
-    vcf, phenoCol, level, csqCol, alts, param = NULL, ...,
+\S4method{vepInPhenoLevel}{ExpandedVCF,missing}(
+    vcf, phenoCol, level, vepCol, alts, param = NULL, ...,
     unique = FALSE, facet = NULL)
 }
 
@@ -34,7 +34,7 @@ Name of a column in \code{pheno}.
 Phenotype level; only variants observed in at least one sample will be
 considered.
 }
-    \item{csqCol}{
+    \item{vepCol}{
 VEP prediction field; Name of a metadata column in
 \code{ensemblVEP::parseCSQToGRanges(vcf)}.
 }
@@ -115,9 +115,9 @@ rownames(vcf) <- paste(rownames(vcf), mcols(vcf)[,"ALT"], sep = "_")
 
 # Example usage ----
 
-csqInPhenoLevel(
+vepInPhenoLevel(
     vcf = vcf, phenoCol = "super_pop", level = "AFR",
-    csqCol = "CADD_PHRED", param = tparam)
+    vepCol = "CADD_PHRED", param = tparam)
 }
 
 \keyword{methods}

@@ -54,59 +54,59 @@ setGeneric(
         standardGeneric("variantsInSamples")
 )
 
-# csqInPhenoLevel ----
+# vepInPhenoLevel ----
 
 setGeneric(
-    name = "csqInPhenoLevel",
+    name = "vepInPhenoLevel",
     signature = c("vcf", "param"),
     def = function(
-        vcf, phenoCol, level, csqCol, param, ...,
+        vcf, phenoCol, level, vepCol, param, ...,
         unique = FALSE, facet = NULL)
-        standardGeneric("csqInPhenoLevel")
+        standardGeneric("vepInPhenoLevel")
 )
 
-# densityCsqByPhenotype ----
+# densityVepByPhenotype ----
 
 setGeneric(
-    name = "densityCsqByPhenotype",
+    name = "densityVepByPhenotype",
     signature = c("vcf", "param"),
     def = function(
-        vcf, phenoCol, csqCol, param, ...,
+        vcf, phenoCol, vepCol, param, ...,
         unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE)
-        standardGeneric("densityCsqByPhenotype")
+        standardGeneric("densityVepByPhenotype")
 )
 
-# densityCsqInPhenoLevel ----
+# densityVepInPhenoLevel ----
 
 setGeneric(
-    name = "densityCsqInPhenoLevel",
+    name = "densityVepInPhenoLevel",
     signature = c("vcf", "param"),
     def = function(
-        level, vcf, phenoCol, csqCol, param, ...,
+        level, vcf, phenoCol, vepCol, param, ...,
         unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE)
-        standardGeneric("densityCsqInPhenoLevel")
+        standardGeneric("densityVepInPhenoLevel")
 )
 
-# tabulateCsqByPhenotype ----
+# tabulateVepByPhenotype ----
 
 setGeneric(
-    name = "tabulateCsqByPhenotype",
+    name = "tabulateVepByPhenotype",
     signature = c("vcf", "param"),
     def = function(
-        vcf, phenoCol, csqCol, param, ...,
+        vcf, phenoCol, vepCol, param, ...,
         unique = FALSE, facet = NULL, plot = FALSE, percentage = FALSE)
-        standardGeneric("tabulateCsqByPhenotype")
+        standardGeneric("tabulateVepByPhenotype")
 )
 
-# tabulateCsqInPhenoLevel ----
+# tabulateVepInPhenoLevel ----
 
 setGeneric(
-    name = "tabulateCsqInPhenoLevel",
+    name = "tabulateVepInPhenoLevel",
     signature = c("vcf", "param"),
     def = function(
-        level, vcf, phenoCol, csqCol, param, ...,
+        level, vcf, phenoCol, vepCol, param, ...,
         unique = FALSE, facet = NULL, plot = FALSE, percentage = FALSE)
-        standardGeneric("tabulateCsqInPhenoLevel")
+        standardGeneric("tabulateVepInPhenoLevel")
 )
 
 # TVTBparam class ----

@@ -81,8 +81,6 @@ importFrom(
     "melt", "dcast")
 
 #exportPattern("^[[:alpha:]]+")
-# csqParseFunctions.R ----
-# export(tryParseCsq)
 
 # ensembldbFunctions.R ----
 
@@ -104,9 +102,9 @@ exportMethods(
 
     "addFrequencies", "addOverallFrequencies", "addPhenoLevelFrequencies",
 
-    "tabulateCsqByPhenotype", "tabulateCsqInPhenoLevel",
-    "densityCsqByPhenotype", "densityCsqInPhenoLevel",
-    "csqInPhenoLevel", "variantsInSamples",
+    "tabulateVepByPhenotype", "tabulateVepInPhenoLevel",
+    "densityVepByPhenotype", "densityVepInPhenoLevel",
+    "vepInPhenoLevel", "variantsInSamples",
 
     "genos", "genos<-",
     "ranges", "ranges<-",

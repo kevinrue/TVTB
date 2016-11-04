@@ -1,4 +1,4 @@
-context("densityCsqByPhenotype")
+context("densityVepByPhenotype")
 
 # Settings ----
 
@@ -29,24 +29,24 @@ rownames(vcf) <- paste(rownames(vcf), mcols(vcf)[,"ALT"], sep = "_")
 
 # Signatures ----
 
-test_that("tabulateCsq* supports all signatures",{
+test_that("tabulateVep* supports all signatures",{
 
     # ExpandedVCF, TVTBparam
     expect_is(
-        tabulateCsqByPhenotype(
+        tabulateVepByPhenotype(
             vcf = vcf,
             phenoCol = "super_pop",
-            csqCol = "Consequence",
+            vepCol = "Consequence",
             param = tparam,
             unique = TRUE),
         "data.frame"
     )
 
     expect_is(
-        tabulateCsqByPhenotype(
+        tabulateVepByPhenotype(
             vcf = vcf,
             phenoCol = "super_pop",
-            csqCol = "Consequence",
+            vepCol = "Consequence",
             alts = c("0|1", "1|0", "1|1"),
             unique = TRUE),
         "data.frame"
@@ -54,21 +54,21 @@ test_that("tabulateCsq* supports all signatures",{
 
     ## Implicitely tested by *ByPhenotype
     expect_is(
-        tabulateCsqInPhenoLevel(
+        tabulateVepInPhenoLevel(
             level = "AFR",
             vcf = vcf,
             phenoCol = "super_pop",
-            csqCol = "Consequence",
+            vepCol = "Consequence",
             param = tparam),
         "data.frame"
     )
 
     expect_is(
-        tabulateCsqInPhenoLevel(
+        tabulateVepInPhenoLevel(
             level = "AFR",
             vcf = vcf,
             phenoCol = "super_pop",
-            csqCol = "Consequence",
+            vepCol = "Consequence",
             alts = c("0|1", "1|0", "1|1")),
         "data.frame"
     )
@@ -80,37 +80,37 @@ test_that("tabulateCsq* supports all signatures",{
 test_that("plot & facet & popFreq argument work",{
 
     expect_s3_class(
-        tabulateCsqByPhenotype(
+        tabulateVepByPhenotype(
             vcf = vcf, phenoCol = "super_pop",
-            csqCol = "Consequence", param = tparam,
+            vepCol = "Consequence", param = tparam,
             facet = "Feature", plot = TRUE, percentage = TRUE),
         c("gg", "ggplot")
     )
 
     expect_s3_class(
-        tabulateCsqInPhenoLevel(
+        tabulateVepInPhenoLevel(
             level = "AFR", vcf = vcf,
             phenoCol = "super_pop",
-            csqCol = "Consequence", param = tparam,
+            vepCol = "Consequence", param = tparam,
             facet = "Feature", plot = TRUE, percentage = TRUE),
         c("gg", "ggplot")
     )
 
     ## For 1% of extra coverage: plot=TRUE, percentage=FALSE,
     expect_s3_class(
-        tabulateCsqByPhenotype(
+        tabulateVepByPhenotype(
             vcf = vcf, phenoCol = "super_pop",
-            csqCol = "Consequence", param = tparam,
+            vepCol = "Consequence", param = tparam,
             unique = FALSE, facet = "Feature",
             plot = TRUE),
         c("gg", "ggplot")
     )
 
     expect_s3_class(
-        tabulateCsqInPhenoLevel(
+        tabulateVepInPhenoLevel(
             level = "AFR", vcf = vcf,
             phenoCol = "super_pop",
-            csqCol = "Consequence", param = tparam,
+            vepCol = "Consequence", param = tparam,
             unique = FALSE, facet = "Feature", plot = TRUE),
         c("gg", "ggplot")
     )
@@ -119,10 +119,10 @@ test_that("plot & facet & popFreq argument work",{
 # test_that("errors are returned when ",{
 #
 #     expect_error(
-#         tabulateCsqInPhenoLevel(
+#         tabulateVepInPhenoLevel(
 #             level = "EUR", vcf = vcf,
 #             phenoCol = "super_pop",
-#             csqCol = "Consequence", param = tparam,
+#             vepCol = "Consequence", param = tparam,
 #             facet = "Feature", plot = TRUE, percentage = TRUE)
 #     )
 #

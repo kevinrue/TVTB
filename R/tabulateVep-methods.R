@@ -2,16 +2,16 @@
 
 ## param = TVTBparam
 setMethod(
-    f = "tabulateCsqByPhenotype",
+    f = "tabulateVepByPhenotype",
     signature = c(vcf="ExpandedVCF", param="TVTBparam"),
     definition = function(
-        vcf, phenoCol, csqCol, param, ...,
+        vcf, phenoCol, vepCol, param, ...,
         unique = FALSE, facet = NULL, plot = FALSE, percentage = FALSE){
 
         param <- .override.TVTBparam(param, ...)
 
-        .tabulateCsqByPhenotype(
-            vcf = vcf, phenoCol = phenoCol, csqCol = csqCol, param = param,
+        .tabulateVepByPhenotype(
+            vcf = vcf, phenoCol = phenoCol, vepCol = vepCol, param = param,
             unique = unique, facet = facet, plot = plot,
             percentage = percentage)
     }
@@ -19,10 +19,10 @@ setMethod(
 
 ## param = missing
 setMethod(
-    f = "tabulateCsqByPhenotype",
+    f = "tabulateVepByPhenotype",
     signature = c(vcf="ExpandedVCF", param="missing"),
     definition = function(
-        vcf, phenoCol, csqCol, alts, param = NULL, ...,
+        vcf, phenoCol, vepCol, alts, param = NULL, ...,
         unique = FALSE, facet = NULL, plot = FALSE, percentage = FALSE){
 
         if (length(alts) < 2)
@@ -34,8 +34,8 @@ setMethod(
         # Additional TVTBparam overriden
         param <- .override.TVTBparam(param, ...)
 
-        .tabulateCsqByPhenotype(
-            vcf = vcf, phenoCol = phenoCol, csqCol = csqCol, param = param,
+        .tabulateVepByPhenotype(
+            vcf = vcf, phenoCol = phenoCol, vepCol = vepCol, param = param,
             unique = unique, facet = facet, plot = plot,
             percentage = percentage)
     }
@@ -45,16 +45,16 @@ setMethod(
 
 ## param = TVTBparam
 setMethod(
-    f = "tabulateCsqInPhenoLevel",
+    f = "tabulateVepInPhenoLevel",
     signature = c(vcf="ExpandedVCF", param="TVTBparam"),
     definition = function(
-        level, vcf, phenoCol, csqCol, param, ...,
+        level, vcf, phenoCol, vepCol, param, ...,
         unique = FALSE, facet = NULL, plot = FALSE, percentage = FALSE){
 
         param <- .override.TVTBparam(param, ...)
 
-        .tabulateCsqInPhenoLevel(
-            level = level, vcf = vcf, phenoCol = phenoCol, csqCol = csqCol,
+        .tabulateVepInPhenoLevel(
+            level = level, vcf = vcf, phenoCol = phenoCol, vepCol = vepCol,
             param, unique = unique, facet = facet, plot = plot,
             percentage = percentage)
     }
@@ -62,10 +62,10 @@ setMethod(
 
 ## param = TVTBparam
 setMethod(
-    f = "tabulateCsqInPhenoLevel",
+    f = "tabulateVepInPhenoLevel",
     signature = c(vcf="ExpandedVCF", param="missing"),
     definition = function(
-        level, vcf, phenoCol, csqCol, alts, param = NULL, ...,
+        level, vcf, phenoCol, vepCol, alts, param = NULL, ...,
         unique = FALSE, facet = NULL, plot = FALSE, percentage = FALSE){
 
         if (length(alts) < 2)
@@ -77,8 +77,8 @@ setMethod(
         # Additional TVTBparam overriden
         param <- .override.TVTBparam(param, ...)
 
-        .tabulateCsqInPhenoLevel(
-            level = level, vcf = vcf, phenoCol = phenoCol, csqCol = csqCol,
+        .tabulateVepInPhenoLevel(
+            level = level, vcf = vcf, phenoCol = phenoCol, vepCol = vepCol,
             param, unique = unique, facet = facet, plot = plot,
             percentage = percentage)
     }
@@ -86,8 +86,8 @@ setMethod(
 
 # Private methods ----
 
-.tabulateCsqByPhenotype <- function(
-    vcf, phenoCol, csqCol, param,
+.tabulateVepByPhenotype <- function(
+    vcf, phenoCol, vepCol, param,
     unique = FALSE, facet = NULL, plot = FALSE, percentage = FALSE){
 
     phenos <- colData(vcf)
@@ -95,10 +95,10 @@ setMethod(
 
     ggDataList <- bplapply(
         X = pLevels,
-        FUN = .csqInPhenoLevel,
+        FUN = .vepInPhenoLevel,
         vcf = vcf,
         phenoCol = phenoCol,
-        csqCol = csqCol,
+        vepCol = vepCol,
         param = param,
         unique = unique,
         facet = facet,
@@ -132,7 +132,7 @@ setMethod(
 
         ggPlot <- ggplot(
             data = ggData,
-            mapping = aes_string(phenoCol, fill = csqCol))
+            mapping = aes_string(phenoCol, fill = vepCol))
 
         if (!is.null(facet)){
             ggPlot <- ggPlot + facet_wrap(facets = facet)
@@ -148,9 +148,9 @@ setMethod(
         longData <- as.data.frame(table(ggData))
 
         if (is.null(facet))
-            dcastRow <- csqCol
+            dcastRow <- vepCol
         else
-            dcastRow <- paste(csqCol, facet, sep = " + ")
+            dcastRow <- paste(vepCol, facet, sep = " + ")
 
         f <- paste(dcastRow, "~", phenoCol)
 
@@ -164,8 +164,8 @@ setMethod(
 
 }
 
-.tabulateCsqInPhenoLevel <- function(
-    level, vcf, phenoCol, csqCol, param,
+.tabulateVepInPhenoLevel <- function(
+    level, vcf, phenoCol, vepCol, param,
     unique = FALSE, facet = NULL, plot = FALSE, percentage = FALSE){
 
     # Pass relevant namespaces to the parallel environment
@@ -176,8 +176,8 @@ setMethod(
     phenos <- colData(vcf)
     stopifnot(level %in% phenos[,phenoCol])
 
-    ggData <- .csqInPhenoLevel(
-        vcf = vcf, phenoCol = phenoCol, level = level, csqCol = csqCol,
+    ggData <- .vepInPhenoLevel(
+        vcf = vcf, phenoCol = phenoCol, level = level, vepCol = vepCol,
         param = param, unique = unique, facet = facet)
 
     # If data.frame not empty, create a column "Phenotype" stating pLevel
@@ -192,7 +192,7 @@ setMethod(
 
         ggPlot <- ggplot(
             data = ggData,
-            mapping = aes_string(phenoCol, fill = csqCol))
+            mapping = aes_string(phenoCol, fill = vepCol))
 
         if (!is.null(facet)){
             ggPlot <- ggPlot + facet_wrap(facets = facet)
@@ -214,9 +214,9 @@ setMethod(
         return(data.frame())
 
     if (is.null(facet))
-        dcastRow <- csqCol
+        dcastRow <- vepCol
     else
-        dcastRow <- paste(csqCol, facet, sep = " + ")
+        dcastRow <- paste(vepCol, facet, sep = " + ")
 
     f <- paste(dcastRow, "~", phenoCol)
 

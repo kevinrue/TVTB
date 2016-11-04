@@ -1,46 +1,46 @@
-\name{densityCsq-methods}
+\name{densityVep-methods}
 
-\alias{densityCsq}
+\alias{densityVep}
 
-\alias{densityCsqByPhenotype}
-\alias{densityCsqInPhenoLevel}
+\alias{densityVepByPhenotype}
+\alias{densityVepInPhenoLevel}
 
-\alias{densityCsqByPhenotype,ExpandedVCF,TVTBparam-method}
-\alias{densityCsqByPhenotype,ExpandedVCF,missing-method}
+\alias{densityVepByPhenotype,ExpandedVCF,TVTBparam-method}
+\alias{densityVepByPhenotype,ExpandedVCF,missing-method}
 
-\alias{densityCsqInPhenoLevel,ExpandedVCF,TVTBparam-method}
-\alias{densityCsqInPhenoLevel,ExpandedVCF,missing-method}
+\alias{densityVepInPhenoLevel,ExpandedVCF,TVTBparam-method}
+\alias{densityVepInPhenoLevel,ExpandedVCF,missing-method}
 
 \docType{methods}
-\alias{densityCsq-methods}
-\alias{densityCsqByPhenotype-methods}
-\alias{densityCsqInPhenoLevel-methods}
+\alias{densityVep-methods}
+\alias{densityVepByPhenotype-methods}
+\alias{densityVepInPhenoLevel-methods}
 \title{Density of VEP predictions in phenotypes}
 \description{
-\code{densityCsqByPhenotype} plots the density of a given VEP prediction
+\code{densityVepByPhenotype} plots the density of a given VEP prediction
     field (coerced to \code{numeric}) for variants observed (uniquely) in each
     level of a given phenotype.
 
-\code{densityCsqInPhenoLevel} considers only variants observed in samples
+\code{densityVepInPhenoLevel} considers only variants observed in samples
     associated with a given phenotype level, and plots the corresponding
     density for a given VEP prediction.
 }
 
 \usage{
-\S4method{densityCsqByPhenotype}{ExpandedVCF,TVTBparam}(
-        vcf, phenoCol, csqCol, param, ...,
+\S4method{densityVepByPhenotype}{ExpandedVCF,TVTBparam}(
+        vcf, phenoCol, vepCol, param, ...,
         unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE)
 
-\S4method{densityCsqByPhenotype}{ExpandedVCF,missing}(
-        vcf, phenoCol, csqCol, alts, param = NULL, ...,
+\S4method{densityVepByPhenotype}{ExpandedVCF,missing}(
+        vcf, phenoCol, vepCol, alts, param = NULL, ...,
         unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE)
 
-\S4method{densityCsqInPhenoLevel}{ExpandedVCF,TVTBparam}(
-        level, vcf, phenoCol, csqCol, param, ...,
+\S4method{densityVepInPhenoLevel}{ExpandedVCF,TVTBparam}(
+        level, vcf, phenoCol, vepCol, param, ...,
         unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE)
 
-\S4method{densityCsqInPhenoLevel}{ExpandedVCF,missing}(
-        level, vcf, phenoCol, csqCol, alts, param = NULL, ...,
+\S4method{densityVepInPhenoLevel}{ExpandedVCF,missing}(
+        level, vcf, phenoCol, vepCol, alts, param = NULL, ...,
         unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE)
 }
 
@@ -51,7 +51,7 @@
     \item{phenoCol}{
 Name of a column in \code{pheno}.
 }
-    \item{csqCol}{
+    \item{vepCol}{
 Name of a metadata column in \code{ensemblVEP::parseCSQToGRanges(vcf)}.
 }
     \item{param}{
@@ -84,7 +84,7 @@ as VEP typically produce one prediction per variant per feature.
 If \code{TRUE}, return a \code{ggplot} object.
 }
     \item{popFreq}{
-Should be set to \code{TRUE} if \code{csqField} is a VEP field representing a
+Should be set to \code{TRUE} if \code{vepCol} is a VEP key representing a
 population frequency of the form \code{allele:frequency}.
 If set to \code{TRUE}, only \code{frequency} will be extracted and typed as
 \code{numeric}.
@@ -93,10 +93,10 @@ If set to \code{TRUE}, only \code{frequency} will be extracted and typed as
 
 \value{
 \describe{
-\item{\code{densityCsqByPhenotype}}{
+\item{\code{densityVepByPhenotype}}{
     A \code{ggplot} object representing the density of a given VEP prediction
     field (coerced to \code{numeric}) in each level of a given phenotype.}
-\item{\code{densityCsqInPhenoLevel}}{
+\item{\code{densityVepInPhenoLevel}}{
     Similarly, a \code{ggplot} object, for a single level of a given
     phenotype.}
 }
@@ -146,12 +146,12 @@ rownames(vcf) <- paste(rownames(vcf), mcols(vcf)[,"ALT"], sep = "_")
 
 # Example usage ----
 
-densityCsqInPhenoLevel(
-    level = "EUR", vcf = vcf, phenoCol = "super_pop", csqCol = "CADD_PHRED",
+densityVepInPhenoLevel(
+    level = "EUR", vcf = vcf, phenoCol = "super_pop", vepCol = "CADD_PHRED",
     param = tparam)
 
-densityCsqByPhenotype(
-    vcf = vcf, phenoCol = "super_pop", csqCol = "CADD_PHRED",
+densityVepByPhenotype(
+    vcf = vcf, phenoCol = "super_pop", vepCol = "CADD_PHRED",
     param = tparam, facet = "Feature", plot = "TRUE") +
     ggplot2::theme(
         legend.text = ggplot2::element_text(size = ggplot2::rel(.5))
