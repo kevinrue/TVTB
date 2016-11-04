@@ -33,13 +33,13 @@ homozygote reference genotypes).
         vcf, phenos, param, ..., force = FALSE)
 
 \S4method{addFrequencies}{ExpandedVCF,list,missing}(
-        vcf, ref, het, alt, phenos, ..., force = FALSE)
+        vcf, phenos, ref, het, alt, ..., force = FALSE)
 
 \S4method{addFrequencies}{ExpandedVCF,character,TVTBparam}(
         vcf, phenos, param, ..., force = FALSE)
 
 \S4method{addFrequencies}{ExpandedVCF,character,missing}(
-        vcf, ref, het, alt, phenos, ..., force = FALSE)
+        vcf, phenos, ref, het, alt, ..., force = FALSE)
 
 \S4method{addFrequencies}{ExpandedVCF,missing,TVTBparam}(
         vcf, param, ..., force = FALSE)

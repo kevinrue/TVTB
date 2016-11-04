@@ -21,7 +21,7 @@ setMethod(
     f = "addFrequencies",
     signature = c(vcf="ExpandedVCF", phenos="list", param="missing"),
     definition = function(
-        vcf, ref, het, alt, phenos, ..., force = FALSE){
+        vcf, phenos, ref, het, alt, ..., force = FALSE){
 
         # Use default TVTBparam
         param <- TVTBparam(genos = list(ref, het, alt))
@@ -58,7 +58,7 @@ setMethod(
     f = "addFrequencies",
     signature = c(vcf="ExpandedVCF", phenos="character", param="missing"),
     definition = function(
-        vcf, ref, het, alt, phenos, ..., force = FALSE){
+        vcf, phenos, ref, het, alt, ..., force = FALSE){
 
         # Use default TVTBparam
         param <- TVTBparam(genos = list(ref, het, alt))
