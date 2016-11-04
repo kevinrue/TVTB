@@ -132,30 +132,12 @@ setMethod(
 
     if (plot){
 
-        ggPlot <- ggplot(
-            data = ggData,
-            mapping = aes_string(x = vepCol, colour = phenoCol)) +
-            scale_colour_discrete(phenoCol)
-
-        # Add requested layers (possibility of None!)
-        ggLayers <- strsplit(
-            x = gsub(" ", "", layer),
-            split = "+",
-            fixed = TRUE)[[1]]
-        if (any(grepl("density", ggLayers)))
-            ggPlot <- ggPlot +
-            geom_density()
-        if (any(grepl("dotplot", ggLayers)))
-            ggPlot <- ggPlot +
-            geom_dotplot(
-                mapping = aes_string(fill = phenoCol),
-                position = "stack",
-                stackgroups = TRUE) +
-            scale_fill_discrete(phenoCol)
-
-        if (!is.null(facet)){
-            ggPlot <- ggPlot + facet_wrap(facets = facet)
-        }
+        ggPlot <- .densityGGconfig(
+            ggData = ggData,
+            vepCol = vepCol,
+            phenoCol = phenoCol,
+            layer = layer,
+            facet = facet)
 
         return(ggPlot)
 
@@ -198,42 +180,56 @@ setMethod(
 
     if (plot){
 
-        if (nrow(ggData) == 0)
-            stop("No data to plot")
-
-        ggPlot <- ggplot(
-            data = ggData,
-            mapping = aes_string(vepCol, colour = phenoCol)) +
-            scale_colour_discrete(phenoCol)
-
-        # Add requested layers (possibility of None!)
-        ggLayers <- strsplit(
-            x = gsub(" ", "", layer),
-            split = "+",
-            fixed = TRUE)[[1]]
-        if (any(grepl("density", ggLayers)))
-            ggPlot <- ggPlot +
-            geom_density()
-        if (any(grepl("dotplot", ggLayers)))
-            ggPlot <- ggPlot +
-            geom_dotplot(
-                mapping = aes_string(fill = phenoCol),
-                position = "stack",
-                stackgroups = TRUE) +
-            scale_fill_discrete(phenoCol)
-
-        if (!is.null(facet)){
-            ggPlot <- ggPlot + facet_wrap(facets = facet)
-        }
-
-        if (!is.null(facet)){
-            ggPlot <- ggPlot + facet_wrap(facets = facet)
-        }
+        ggPlot <- .densityGGconfig(
+            ggData = ggData,
+            vepCol = vepCol,
+            phenoCol = phenoCol,
+            layer = layer,
+            facet = facet)
 
         return(ggPlot)
 
     } else {
         return(ggData)
     }
+
+}
+
+.densityGGconfig <- function(
+    ggData, vepCol, phenoCol, layer = "density+dotplot", facet = NULL){
+
+    if (nrow(ggData) == 0)
+        stop("No data to plot")
+
+    ggPlot <- ggplot(
+        data = ggData,
+        mapping = aes_string(vepCol, colour = phenoCol)) +
+        scale_colour_discrete(phenoCol)
+
+    # Add requested layers (possibility of None!)
+    ggLayers <- strsplit(
+        x = gsub(" ", "", layer),
+        split = "+",
+        fixed = TRUE)[[1]]
+    if (any(grepl("density", ggLayers)))
+        ggPlot <- ggPlot +
+        geom_density()
+    if (any(grepl("dotplot", ggLayers)))
+        ggPlot <- ggPlot +
+        geom_dotplot(
+            mapping = aes_string(fill = phenoCol),
+            position = "stack",
+            stackgroups = TRUE) +
+        scale_fill_discrete(phenoCol)
+
+    if (!is.null(facet)){
+        ggPlot <- ggPlot + facet_wrap(facets = facet)
+    }
+
+    if (!is.null(facet)){
+        ggPlot <- ggPlot + facet_wrap(facets = facet)
+    }
+
+    return(ggPlot)
 
 }
