@@ -537,12 +537,12 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                     )
                 ),
                 shiny::column(
-                    width = 6,
+                    width = 8,
                     textInput(
                         "newFilterExpression", "Expression",
                         placeholder = paste(
-                            "FILTER == \"PASS\"",
-                            "(MAF < 1e-2) & (ALT + HET > 0)",
+                            "grepl(\"pass\", tolower(FILTER))",
+                            "ALT + HET > 0",
                             "IMPACT %in% c(\"HIGH\", \"MODERATE\")",
                             sep = " - or - "
                         )
@@ -558,30 +558,39 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                 shiny::column(
                     width = 1,
                     actionButton(
-                        "testNewFilter", "Test filter",
-                        icon = icon("flask")
-                    )
-                ),
-                shiny::column(
-                    width = 2,
-                    uiOutput("vcfFilterTest")
-                ),
-                shiny::column(
-                    width = 1,
-                    actionButton(
                         "addNewFilter", "Add filter",
                         icon = icon("plus")
                     )
                 )
             ),
             fluidRow(
+                shiny::column(
+                    width = 12,
+                    uiOutput("vcfFilterTest")
+                )
+            ),
+            fluidRow(
+                br(),
+                p(strong("Notes:")),
                 p(
                     tags$sup("1"),
-                    "Known issue: quotes are auto-corrected to smart quotes,",
-                    "making the expression appear invalid.",
-                    "Current fix: curly quotes are substituted by their",
-                    "corresponding regular quote (double or simple).",
-                    "User can simply ignore the auto-corrected quotes."
+                    "Filters are tested against variants to ensure the",
+                    "validity of filters. Therefore, variants must be loaded",
+                    strong("before"), "filters can be created."
+                ),
+                p(
+                    tags$sup("2"),
+                    "Currently, filters are not re-tested if variants are",
+                    "updated. If variants are refreshed, users should ensure",
+                    "filters remain valid, or remove filters manually."
+                ),
+                p(
+                    tags$sup("3"),
+                    "Users may ignore auto-correction of quotes in the",
+                    code("Expression"), "field. The application substitutes",
+                    "curly quotes (single and double) by their",
+                    "corresponding regular quotes (",
+                    em("i.e."), code("\""), "and", code("'"), ")"
                 )
             )
         ),

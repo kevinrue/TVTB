@@ -933,6 +933,7 @@ shinyServer(function(input, output, clientData, session) {
 
     newVcfFilter <- reactive({
 
+        # updated when the add button in clicked
         if (input$newFilterExpression == "")
             return(NULL)
 
@@ -950,43 +951,40 @@ shinyServer(function(input, output, clientData, session) {
 
     })
 
-    output$vcfFilterTest <- renderUI({
-        # Only triggered by testNewFilter
-        req(input$testNewFilter)
+    newFilterTestResults <- reactive({
+        # Only triggered by addNewFilter (> 0)
+        req(input$addNewFilter)
+        print("test")
         isolate({
             newFilter <- newVcfFilter()
             vcf <- head(vcf()) # Speed up testing!
         })
 
         if (is.null(newFilter))
-            return(p("No expression provided."))
+            return("No expression provided.")
 
-        successfulTest <- tryCatch(
+        return(tryCatch(
             is.logical(S4Vectors::eval(newFilter, vcf)),
-            warning = function(e) FALSE,
+            #warning = function(e) FALSE,
             error = function(e) FALSE
-        )
+        ))
+    })
 
-        if (successfulTest)
-            return(tagList(strong(tags$span(style="color:green", "Valid"))))
+    output$vcfFilterTest <- renderUI({
+        testResult <- newFilterTestResults()
+
+        if (testResult)
+            return(strong(tags$span(style="color:green", "Valid")))
         else
-            return(strong(tags$span(style="color:red", "Invalid")))
+            return(strong(tags$span(style="color:red", geterrmessage())))
     })
 
     observeEvent(input$addNewFilter, {
-        # Only triggered by addNewFilter
         newFilter <- newVcfFilter()
-
-        if (is.null(newFilter))
-            return(p("No expression provided."))
-
-        successfulTest <- tryCatch(
-            is.logical(S4Vectors::eval(newFilter, vcf())),
-            warning = function(e) FALSE,
-            error = function(e) FALSE
-        )
-
-        validate(need(successfulTest, "Invalid filter"))
+        testResult <- newFilterTestResults()
+        print("testResult")
+        print(testResult)
+        validate(need(testResult == TRUE, "Invalid VCF filter"))
 
         RV[["vcfFilters"]] <- VcfFilterRules(
             RV[["vcfFilters"]],
