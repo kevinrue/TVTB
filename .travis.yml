@@ -5,7 +5,7 @@ bioc_required: true
 r: bioc-release
 before_install:
     - R CMD Rscript -e 'source(file = "http://bioconductor.org/biocLite.R");useDevel(devel = TRUE)'
-    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then tlmgr install bera nowidow parnotes marginfix; fi
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then tlmgr install bera nowidow marginfix; fi
 warnings_are_errors: false
 sudo: required
 r_github_packages:
