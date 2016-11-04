@@ -198,8 +198,7 @@ setMethod(
             x <- callNextMethod(x, i)
         }
 
-        if (length(unique(type(x))) == 1)
-            x <- .dropVcfFilterRules(x)
+        x <- .dropVcfFilterRules(x)
 
         return(x)
     }
@@ -210,7 +209,7 @@ setMethod(
     filterType <- unique(type(x))
 
     if(length(filterType) > 1)
-        stop("More than one type: cannot drop")
+        return(x)
 
     listData <- slot(x, "listData")
 
@@ -274,8 +273,7 @@ setMethod(
             names(x)[i] <- names(value)
         }
 
-        if (length(unique(type(x))) == 1)
-            x <- .dropVcfFilterRules(x)
+        x <- .dropVcfFilterRules(x)
 
         return(x)
     }

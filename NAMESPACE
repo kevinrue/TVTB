@@ -145,5 +145,7 @@ exportMethods(
      # S4Vectors
     "eval", "evalSeparately", "subsetByFilter",
     # Biostrings
-    "active"
+    "active",
+    # VariantAnnotation
+    "readVcf", "ScanVcfParam"
 )
