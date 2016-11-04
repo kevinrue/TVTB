@@ -4,7 +4,7 @@ language: R
 r: bioc-devel
 cache: packages
 
-pandoc_version: 1.17.1
+# pandoc_version: 1.17.1
 
 r_check_args: --no-build-vignettes
 
