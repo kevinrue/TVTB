@@ -34,6 +34,7 @@ setMethod(
         cat("Bioconductor parallel parameters\n")
         cat("- ")
         print(object@bp)
+        return(NULL)
     }
 )
 

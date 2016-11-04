@@ -11,6 +11,9 @@
     if (is.null(names(g)))
         errors <- c(errors, "names(genos) must not be NULL")
 
+    if (any(lengths(g) < 1))
+        errors <- c(errors, "lengths(genos) must all be >= 1")
+
     if (sum(lengths(g)) != length(unique(unlist(g))))
         errors <- c(errors, "genos values must not overlap")
 

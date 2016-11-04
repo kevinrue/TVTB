@@ -36,8 +36,6 @@ test_that("vepInPhenoLevel() supports all signatures",{
         vepInPhenoLevel(
             vcf = vcf, phenoCol = "super_pop", level = "EUR",
             vepCol = "CADD_PHRED", param = tparam,
-            het = c("0/1","1/0"),
-            alt = "1/1",
             unique = FALSE, facet = NULL),
         "data.frame"
     )
@@ -50,6 +48,29 @@ test_that("vepInPhenoLevel() supports all signatures",{
             alts = unlist(carrier(tparam)),
             unique = FALSE, facet = NULL),
         "data.frame"
+    )
+
+})
+
+# Invalid input ----
+
+test_that("vepInPhenoLevel() catches invalid input",{
+
+    expect_error(
+        vepInPhenoLevel(
+            vcf = vcf, phenoCol = "super_pop", level = "EUR",
+            vepCol = "CADD_PHRED", param = tparam,
+            het = NULL, alt = "1|1",
+            unique = FALSE, facet = NULL)
+    )
+
+    # ExpandedVCF, character
+    expect_error(
+        vepInPhenoLevel(
+            vcf = vcf, phenoCol = "super_pop", level = "EUR",
+            vepCol = "CADD_PHRED",
+            alts = "0|1",
+            unique = FALSE, facet = NULL)
     )
 
 })
