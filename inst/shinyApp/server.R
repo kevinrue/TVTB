@@ -2612,7 +2612,8 @@ shinyServer(function(input, output, clientData, session) {
                 mapping = aes(Samples, Variants)
             ) +
                 geom_tile(aes(fill = Genotype, colour = Genotype)) +
-                scale_fill_discrete() +
+                scale_fill_discrete(drop = TRUE) + # TODO: give choice (widget)
+                scale_colour_discrete(drop = TRUE) + # tie with widget above
                 theme(
                     axis.text = element_blank(),
                     axis.title = element_text(size = rel(1.5)),

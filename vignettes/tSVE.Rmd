@@ -413,7 +413,7 @@ as well as Ensembl VEP predictions stored as `GRanges` returned by the
 `r Biocpkg("ensemblVEP")` `parseCSQToGRanges` method.
 
 A separate vignette described in greater detail the use of classes
-that contain *VCF filter rules*.
+that contain *VCF filter rules*. A simple example is shown below.
 
 > **Action**:
 > 
@@ -424,6 +424,26 @@ that contain *VCF filter rules*.
 > * See the list of rules update at the bottom of the screen
 > * Click the *Apply filters* action button
 > * See the summary of filtered variants update beside the action button
+
+# Views {#Views}
+
+This panel offers the chance to examine the main objects of the session,
+namely:
+
+* the active genomic ranges
+* `rowRanges` and selected meta-columns of the filtered variants
+* selected field of the `info` slot (of the filtered variants)
+* selected Ensembl VEP predictions (of the filtered variants)
+* selected phenotypes attached to the variants
+* subset of genotypes (among the filtered variants)
+    + genotypes of all filtered variants may be displayed as a heatmap
+        (`ggplot`)
+        
+> **Action**:
+> 
+> * In the various panels, select fields to examine each object
+> * In the *Heatmap* tab of the *Genotypes* panel
+> * Click the *Go!* action button to calculate and display the heatmap
 
 # Session info {#SessionInfo}
 
