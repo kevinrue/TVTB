@@ -1,7 +1,7 @@
 Package: TVTB
 Type: Package
 Title: TVTB: The VCF Tool Box
-Version: 0.99.4
+Version: 0.99.5
 Date: 2016-10-12
 Authors@R: person(
     "Kevin", "Rue-Albrecht", role = c("aut", "cre"),
@@ -59,25 +59,22 @@ biocViews:
     Coverage,
     Alignment,
     SequenceMatching
-Collates:
-    ensembldbFunctions.R,
-    regions2vcf.R,
-    tSVE.R,
-    AllClasses.R,
-    AllGenerics.R,
-    Genotypes-class.R,
-    TVTBparam-class.R,
-    VcfFilterRules-class.R,
-    countGenos-methods.R,
-    addCountGenos-methods.R,
-    addFrequencies-methods.R,
-    addOverallFrequencies-methods.R,
-    addPhenoLevelFrequencies-methods.R,
-    dropInfo.R,
-    variantsInSamples-methods.R,
-    vepInPhenoLevel-methods.R,
-    tabulateVep-methods.R,
-    densityVep-methods.R,
+Collate:
+    tSVE.R
+    AllClasses.R
+    AllGenerics.R
+    Genotypes-class.R
+    TVTBparam-class.R
+    VcfFilterRules-class.R
+    countGenos-methods.R
+    addCountGenos-methods.R
+    addFrequencies-methods.R
+    addOverallFrequencies-methods.R
+    addPhenoLevelFrequencies-methods.R
+    dropInfo.R
+    readVcf-methods.R
+    variantsInSamples-methods.R
+    vepInPhenoLevel-methods.R
     show-methods.R
 VignetteBuilder: knitr
 URL: https://github.com/kevinrue/TVTB

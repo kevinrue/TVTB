@@ -1,6 +1,15 @@
 \name{TVTB-NEWS}
 \title{NEWS: The VCF Tool Box}
 
+\section{Changes in version 0.99.5 2016-10-12}{
+\subsection{Bug fix}{
+\itemize{
+\item
+    Fixed \code{Collate:} field of the \code{DESCRIPTION} file.
+}
+}
+}
+
 \section{Changes in version 0.99.4 2016-10-12}{
 \subsection{Experimental changes}{
 \itemize{
