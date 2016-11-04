@@ -7,3 +7,6 @@ before_install:
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then tlmgr install bera nowidow parnotes marginfix; fi
 warnings_are_errors: false
 sudo: required
+r_github_packages:
+    - rstudio/shiny
+    - rstudio/DT
