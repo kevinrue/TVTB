@@ -1,3 +1,12 @@
+# dropInfo ----
+
+setGeneric(
+    name = "dropInfo",
+    signature = c("vcf"),
+    def = function(vcf, key = NULL, slot = "both")
+        standardGeneric("dropInfo")
+)
+
 # addOverallFrequencies ----
 
 setGeneric(

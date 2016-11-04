@@ -106,6 +106,8 @@ exportMethods(
     "densityVepByPhenotype", "densityVepInPhenoLevel",
     "vepInPhenoLevel", "variantsInSamples",
 
+    "dropInfo",
+
     "genos", "genos<-",
     "ranges", "ranges<-",
     "aaf", "aaf<-",
