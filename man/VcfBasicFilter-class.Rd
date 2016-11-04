@@ -127,9 +127,11 @@ A \code{VcfBasicFilter} object.
 Kevin Rue-Albrecht
 }
 
-%\seealso{
-% Soon: VcfInfoFilterList
-%}
+\seealso{
+\code{\linkS4class{VcfFilterList}},
+\code{\linkS4class{VCF}},
+and \code{\link{parseCSQToGRanges,VCF-method}}.
+}
 
 \examples{
 # Constructors ----
@@ -138,13 +140,13 @@ VcfFixedFilter(name = "FILTER", condition = "==", value = "PASS")
 
 VcfInfoFilter(name = "MAF", condition = "<=", value = 1e-6)
 
-nf <- VcfVepFilter(
+filt <- VcfVepFilter(
     name = "IMPACT", condition = "\%in\%", value = c("MODERATE", "HIGH"))
 
 # Accessors ----
 
-## Name, condition, and value stored in the tSVEParam object
-name(nf)
-condition(nf)
-value(nf)
+## Name, condition, and value stored in the VcfBasicFilter object
+name(filt)
+condition(filt)
+value(filt)
 }

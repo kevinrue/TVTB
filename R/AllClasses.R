@@ -112,3 +112,46 @@ VcfVepFilter <- setClass(
     contains = "VcfBasicFilter"
 
 )
+
+#
+
+.valid.VcfFilterList <- function(object){
+
+    validFilterTypes <- c(
+        "VcfFixedFilter",
+        "VcfInfoFilter",
+        "VcfVepFilter")
+
+    errors <- c()
+
+    idxMatch <- match(
+        x = sapply(X = filterRules(object), FUN = "class"),
+        table = validFilterTypes)
+    idxInvalid <- which(is.na(idxMatch))
+
+    if (length(idxInvalid) > 0)
+        errors <- c(
+            errors,
+            paste(
+                "invalid filter type for filter(s): ",
+                paste(idxInvalid, sep = ", ")
+                )
+            )
+
+    if (length(errors) > 0)
+        return(errors)
+
+    return(TRUE)
+}
+
+VcfFilterList <- setClass(
+    Class = "VcfFilterList",
+
+    # Define the slots
+    slots = c(
+        filterRules = "list"
+    ),
+
+    validity = .valid.VcfFilterList
+
+)

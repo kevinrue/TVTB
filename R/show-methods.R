@@ -45,9 +45,9 @@ setMethod(
     definition = function(object){
         cat(sprintf(
             "VcfFixedFilter: %s %s %s\n",
-            slot(object, "name"),
-            slot(object, "condition"),
-            slot(object, "value")))
+            name(object),
+            condition(object),
+            deparse(value(object))))
     }
 )
 
@@ -57,9 +57,9 @@ setMethod(
     definition = function(object){
         cat(sprintf(
             "VcfInfoFilter: %s %s %s\n",
-            slot(object, "name"),
-            slot(object, "condition"),
-            slot(object, "value")))
+            name(object),
+            condition(object),
+            deparse(value(object))))
     }
 )
 
@@ -69,8 +69,8 @@ setMethod(
     definition = function(object){
         cat(sprintf(
             "VcfVepFilter: %s %s %s\n",
-            slot(object, "name"),
-            slot(object, "condition"),
-            slot(object, "value")))
+            name(object),
+            condition(object),
+            deparse(value(object))))
     }
 )
