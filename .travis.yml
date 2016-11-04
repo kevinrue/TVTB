@@ -9,7 +9,7 @@ r: bioc-release
 before_install:
     - Rscript -e 'source(file = "http://bioconductor.org/biocLite.R");useDevel(devel = TRUE);biocLite(pkgs = c("BiocParallel", "Biostrings", "ensembldb", "ensemblVEP", "GenomeInfoDb", "GenomicRanges", "ggplot2", "IRanges", "reshape2", "Rsamtools", "S4Vectors", "SummarizedExperiment", "VariantAnnotation"))'
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then tlmgr install bera nowidow parnotes marginfix; fi
-    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo tlmgr install titling; fi
+    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo tlmgr install titling bera nowidow parnotes marginfix; fi
 warnings_are_errors: false
 sudo: required
 r_github_packages:
