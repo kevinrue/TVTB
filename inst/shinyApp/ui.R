@@ -962,6 +962,17 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                         selected = "None"
                     ),
 
+                    selectInput(
+                        "layerDVBP",
+                        "Layer(s)",
+                        choices = list(
+                            "Density & Dot plot" = "density+dotplot",
+                            "Density" = "density",
+                            "Dot plot" = "dotplot"
+                        ),
+                        selected = "density+dotplot"
+                    ),
+
                     conditionalPanel(
                         condition = "input.phenoDVBP != 'None'",
                         checkboxInput(

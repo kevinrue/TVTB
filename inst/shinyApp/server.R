@@ -1789,12 +1789,13 @@ shinyServer(function(input, output, clientData, session) {
     output$vepCols <- renderUI({
 
         vcf <- RV[["filteredVcf"]]
-        validate(
-            need(vcf, Msgs[["importVariants"]]),
-            need(
-                input$vepKey %in% colnames(info(vcf)),
-                Msgs[["vepKeyNotFound"]])
-            )
+        # First make sure vcf exists
+        validate(need(vcf, Msgs[["importVariants"]]))
+        # If it exists, check that vepKey exist in INFO fields
+        validate(need(
+            input$vepKey %in% colnames(info(vcf)),
+            Msgs[["vepKeyNotFound"]]
+        ))
 
         csq <- tryParseCsq(vcf = vcf, vepKey = input$vepKey)
 
@@ -1984,7 +1985,8 @@ shinyServer(function(input, output, clientData, session) {
         # Update only on button click
         validate(need(
             input$buttonTVBP,
-            "Please click \"Apply\" to apply parameters."))
+            "Please click \"Apply\" to apply parameters."),
+            errorClass = "optional")
 
         isolate({
             vepTVBP <- input$vepTVBP
@@ -2126,9 +2128,10 @@ shinyServer(function(input, output, clientData, session) {
     # Print the count of consequences in the area hovered.
     output$varVepCount <- renderUI({
 
+        req(input$plotVarClass_hover)
+
         vepTableCount <- vepTableCount()
 
-        req(vepTableCount, input$plotVarClass_hover)
         hover <- input$plotVarClass_hover
         vepTVBP <- input$vepTVBP
 
@@ -2281,7 +2284,8 @@ shinyServer(function(input, output, clientData, session) {
         # Update only on button click
         validate(need(
             input$buttonDVBP,
-            "Please click \"Apply\" to apply parameters."))
+            "Please click \"Apply\" to apply parameters."),
+            errorClass = "optional")
 
         isolate({
             vepDVBP <- input$vepDVBP
@@ -2289,6 +2293,7 @@ shinyServer(function(input, output, clientData, session) {
             vepFacets <- input$vepFacetsDVBP
             patternDVBP <- input$patternDVBP
             unique2pheno <- input$unique2phenoDVBP
+            layerDVBP <- input$layerDVBP
         })
 
         withProgress(min = 0, max = 2, message = "Progress", {
@@ -2342,7 +2347,7 @@ shinyServer(function(input, output, clientData, session) {
                 facet = vepFacetKey,
                 plot = TRUE,
                 pattern = patternDVBP,
-                layer = "density+dotplot" # TODO
+                layer = layerDVBP
             )
 
             if (!is.null(vepFacetKey)){
