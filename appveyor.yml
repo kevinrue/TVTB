@@ -18,13 +18,16 @@ environment:
       R_ARCH: x64
       BIOC_USE_DEVEL: TRUE
       _R_CHECK_FORCE_SUGGESTS_: false
+      R_CHECK_ARGS="--no-vignettes --timings"
+      R_BUILD_ARGS="--keep-empty-dirs --no-resave-data"
 
 cache:
   - packages
 
 build_script:
-  - travis-tool.sh install_bioc ensemblVEP
   - travis-tool.sh install_bioc_deps
+  - travis-tool.sh install_bioc ensemblVEP EnsDb.Hsapiens.v75
+  - Rscript -e 'BiocInstaller::biocValid(fix=TRUE)'
 
 test_script:
   - travis-tool.sh run_tests
