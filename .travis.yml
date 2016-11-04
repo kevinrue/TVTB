@@ -1,6 +1,8 @@
 language: r
 use_bioc: true
 bioc_required: true
-r: bioc-devel
+r: bioc-release
+before_install:
+    - R CMD Rscript -e 'source(file = "http://bioconductor.org/biocLite.R");useDevel(devel = TRUE)'
 warnings_are_errors: false
 sudo: required
