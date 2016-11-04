@@ -257,18 +257,9 @@ shinyUI(navbarPage(theme = "bootstrap.css",
 
                     # ScanVcfParam ----
 
-                    # FIXED fields
-                    shiny::column(
-                        width = 2,
-                        selectInput(
-                            "vcfFixedKeys", "Fixed fields",
-                            choices = c(), selected = c(),
-                            multiple = TRUE)
-                    ),
-
                     # INFO fields (except VEP)
                     shiny::column(
-                        width = 6,
+                        width = 8,
                         fluidRow(
                             shiny::column(
                                 width = 12,
@@ -527,6 +518,14 @@ shinyUI(navbarPage(theme = "bootstrap.css",
             ),
             br(),
             uiOutput("vcfFilterControls")
+        ),
+        wellPanel(
+            fluidRow(
+                shiny::column(
+                    width = 12,
+                    verbatimTextOutput("vcfRules")
+                )
+            )
         )
     ),
 

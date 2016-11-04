@@ -23,7 +23,6 @@ shinyServer(function(input, output, clientData, session) {
         # VCF filter rules
         vcfFilters = VcfFilterRules(),
         # VCF keys
-        fixedKeys = NULL,
         infoKeys = NULL,
         genoKeys = NULL
     )
@@ -758,11 +757,9 @@ shinyServer(function(input, output, clientData, session) {
         )
 
         if (is.null(vcfHeader)){
-            RV[["fixedKeys"]] <- NA
             RV[["infoKeys"]] <- NA
             RV[["genoKeys"]] <- NA
         } else {
-            RV[["fixedKeys"]] <- names(fixed(vcfHeader))
             RV[["infoKeys"]] <- grep(
                 pattern = input$vepKey,
                 x = c(rownames(info(vcfHeader))),
@@ -775,12 +772,6 @@ shinyServer(function(input, output, clientData, session) {
                 invert = TRUE,
                 value = TRUE)
         }
-
-        # On update, select all fixed fields by default (may change)
-        updateSelectInput(
-            session, "vcfFixedKeys",
-            choices = RV[["fixedKeys"]], selected = RV[["fixedKeys"]]
-        )
 
         # On update, select all INFO fields by default (may change)
         updateSelectInput(
@@ -845,11 +836,7 @@ shinyServer(function(input, output, clientData, session) {
             vepKey <- input$vepKey
             genomeSeqinfo <- genomeSeqinfo()
             yieldSize <- input$yieldSize
-            fixedKeys <- input$vcfFixedKeys
-            if (length(fixedKeys) == 0)
-                fixedKeys <- NA
             infoKeys <- c(input$vcfInfoKeys, input$vepKey)
-
             genoKeys <- input$vcfFormatKeys
             if (length(genoKeys) == 0)
                 genoKeys <- "GT" # Mandatory
@@ -871,10 +858,8 @@ shinyServer(function(input, output, clientData, session) {
             message = "Progress", detail = Tracking[["preprocessing"]],
             {
 
-                # TODO: let user choose fixed/info/format keys to import
-                # for speed and memory
+                # NOTE: ALL FIXED fields imported
                 svp <- ScanVcfParam(
-                    fixed = fixedKeys,
                     info = infoKeys,
                     geno = genoKeys
                 )
@@ -964,7 +949,7 @@ shinyServer(function(input, output, clientData, session) {
         selectInput(
             "vcfCols", "Meta-columns",
             choices = colChoices,
-            selected = c(colChoices[1:min(4, length(colChoices))]),
+            selected = c(colChoices[1:min(5, length(colChoices))]),
             multiple = TRUE
         )
     })
@@ -1062,11 +1047,12 @@ shinyServer(function(input, output, clientData, session) {
         quickFix <- gsub("[“”]", "\"", input$newFilterExpression)
         quickFix <- gsub("[‘’]", "\'", quickFix)
 
-        return(tryCatch(
+        return(tryCatch({
             newFilter <- new(
                 Class = input$newFilterClass,
                 exprs = list(quickFix),
-                active = input$newFilterActive),
+                active = input$newFilterActive)
+            return(newFilter)},
             # warning = function(w) NULL,
             error = function(e) NULL
         ))
@@ -1086,6 +1072,8 @@ shinyServer(function(input, output, clientData, session) {
             RV[["newFilterStatus"]] <- "Invalid expression"
             return(FALSE)
         }
+
+        names(newFilter) <- paste0("rule", input$addNewFilter)
 
         return(tryCatch(
             expr = {
@@ -1118,11 +1106,13 @@ shinyServer(function(input, output, clientData, session) {
         # Only add new filter if valid
         validate(need(testResult == TRUE, "Invalid VCF filter"))
 
+        names(newFilter) <- paste0("rule", input$addNewFilter)
+
         newRules <- VcfFilterRules(
             RV[["vcfFilters"]],
             newFilter)
 
-        names(newRules) <- paste0("rule", 1:length(newRules))
+        # names(newRules) <- paste0("rule", 1:length(newRules))
 
         RV[["vcfFilters"]] <- newRules
     })
@@ -1148,7 +1138,10 @@ shinyServer(function(input, output, clientData, session) {
                     shiny::column(
                         width = 1,
                         checkboxInput(
-                            inputId = paste0("active", filterIndex),
+                            inputId = gsub(
+                                "rule",
+                                "active",
+                                names(vcfFilters)[filterIndex]),
                             label = NULL,
                             value = active(vcfFilters)[filterIndex])
                     ),
@@ -1156,12 +1149,30 @@ shinyServer(function(input, output, clientData, session) {
                     shiny::column(
                         width = 8,
                         code(as.character(vcfFilters[filterIndex][[1]]))
+                    ),
+                    # remove
+                    shiny::column(
+                        width = 1,
+                        actionButton(
+                            inputId = gsub(
+                                "rule",
+                                "removeFilter",
+                                names(vcfFilters)[filterIndex]),
+                            label = "Remove",
+                            icon = icon("remove")
+                        )
                     )
-            )
-        }))
+                )
+            }
+        ))
 
     })
 
+    output$vcfRules <- renderPrint({
+        return(str(RV[["vcfFilters"]]))
+    })
+
+    # Observe checboxes defining active status
     observe({
 
         # If the inputs are updated
@@ -1169,21 +1180,67 @@ shinyServer(function(input, output, clientData, session) {
 
         # Obtain the status of the VCF filters
         inputNames <- names(inputs)
-        rulesActiveNames <- grep("^active[[:digit:]]*", inputNames, value = TRUE)
-        rulesActive <- sapply(
-            X = rulesActiveNames,
+        activeButtonNames <- grep(
+            pattern = "^active[[:digit:]]*",
+            x = inputNames,
+            value = TRUE)
+        rulesStatus <- sapply(
+            X = activeButtonNames,
             FUN = function(activeName){
                 inputs[[activeName]]
             },
             simplify = TRUE)
 
+        # Rename to match rule names
+        names(rulesStatus) <- gsub("active", "rule", names(rulesStatus))
+
         # NOTE: cannot work on the reactiveValues themselves
         # Extract from the reactiveValues
         isolate({vcfRules <- RV[["vcfFilters"]]})
+        # Match status to rule order
+        idx <- match(names(vcfRules), names(rulesStatus))
         # Update the active status
-        active(vcfRules) <- as.logical(rulesActive)
+        active(vcfRules) <- as.logical(rulesStatus)[idx]
         # Update in the reactiveValues
         RV[["vcfFilters"]] <- vcfRules
+    })
+
+    # Observe actionButtons to remove rules
+    observe({
+        # If the inputs are updated
+        inputs <- input
+
+        # Obtain the status of the VCF filters
+        inputNames <- names(inputs)
+        removeButtonNames <- grep(
+            pattern = "^removeFilter[[:digit:]]*",
+            x = inputNames,
+            value = TRUE)
+
+        removeStatus <- sapply(
+            X = removeButtonNames,
+            FUN = function(buttonName){
+                inputs[[buttonName]]
+            },
+            simplify = TRUE)
+
+        # Rename to match rule names
+        names(removeStatus) <- gsub(
+            pattern = "removeFilter",
+            replacement = "rule",
+            x = names(removeStatus))
+
+        removeNames <- names(which(removeStatus > 0))
+
+        # NOTE: cannot work on the reactiveValues themselves
+        # Extract from the reactiveValues
+        isolate({vcfRules <- RV[["vcfFilters"]]})
+        # Identify the idx of the rules to remove
+        removeIdx <- which(names(vcfRules) %in% removeNames)
+
+        # Remove rules
+        if (length(removeIdx) > 0)
+            RV[["vcfFilters"]] <- VcfFilterRules(vcfRules[-removeIdx])
     })
 
     observe({
