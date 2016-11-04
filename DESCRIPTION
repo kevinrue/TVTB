@@ -1,9 +1,9 @@
 Package: TVTB
 Type: Package
 Title: TVTB: The VCF Tool Box
-Version: 0.99.9
-Date: 2016-10-14
-Authors@R: person( "Kevin", "Rue-Albrecht", role = c("aut", "cre"),
+Version: 1.1.1
+Date: 2016-10-20
+Authors@R: person("Kevin", "Rue-Albrecht", role = c("aut", "cre"),
     email = "kevinrue67@gmail.com")
 Description: The package provides S4 classes and methods to filter,
     summarise and visualise genetic variation data stored in VCF
