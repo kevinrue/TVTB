@@ -2595,8 +2595,9 @@ shinyServer(function(input, output, clientData, session) {
             genotypes <- geno(vcf)[["GT"]]
             validate(need(genotypes, Msgs[["genotypes"]]))
 
-            validGenotypes <- unlist(genos(tparam()))
-
+            validGenotypes <- unlist(genos(tparam())) # TODO: not used?
+            # Currently, all genotypes found in data are considered
+            # Potentially, undesired genotypes could be considered NAs
             genos.long <- melt(genotypes, value.name = "Genotype")
 
             colnames(genos.long)[1:2] <- c("Variants", "Samples")

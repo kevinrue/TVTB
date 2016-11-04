@@ -399,7 +399,7 @@ various levels of a given phenotype.
 > * Click the *Refresh* action button
 > * See the *Latest changes* message update at the top of the screen.
 
-# VCF filter rules {#VcfFilterRules}
+# Filters panel {#VcfFilterRules}
 
 One of the flagship features of the `r Biocpkg("TVTB")` package
 are the *VCF filter rules*, extending the
@@ -427,7 +427,7 @@ that contain *VCF filter rules*. A simple example is shown below.
 > * Click the *Apply filters* action button
 > * See the summary of filtered variants update beside the action button
 
-# Views {#Views}
+# Views panel {#Views}
 
 This panel offers the chance to examine the main objects of the session,
 namely:
@@ -447,7 +447,7 @@ namely:
 > * In the *Heatmap* tab of the *Genotypes* panel
 > * Click the *Go!* action button to calculate and display the heatmap
 
-# Plots {#Plots}
+# Plots panel {#Plots}
 
 This panel demonstrates the use of two methods implemented in the
 `r Biocpkg("TVTB")` package, namely `tabulateVepByPhenotype`
@@ -521,6 +521,74 @@ each variant contributes at most once to each faceted plot.
 > * Decrease the *Relative size of X text* and *Relative size of Y text* to
 >     `0.7`
 > * Click the *Apply* action button to refresh the `ggplot`
+
+# Settings panel
+
+This panel stores more advanced settings that users may not need to edit as
+frequently, if at all. Those settings are divided in two sub-panels:
+
+* **Advanced**
+    + Genotypes, INFO key suffixes, and VCF yield size
+* **Parallel**
+    + Use of multiple CPUs to accelerate calculations
+
+## Advanced settings {#AdvancedSettings}
+
+### Genotypes {#AdvancedGenotypes}
+
+It is critical to accurately identify and define how the different
+genotypes---homozygote reference, heterozygote, and homozygote alternate---are
+encoded in the VCF file, to produce accurate
+[genotypes counts and frequencies](#Frequencies), for instance.
+This generally requires examining the
+content of the FORMAT/GT field outside of the web-application.
+For instance, the functions `unique` and `table` may be used to identify
+(and count) all the distinct genotype codes in the `geno` slot (`"GT"` key) of
+a `VCF` object.
+
+The default selected values are immediately compatible with the demonstration
+data set. Users who require genotypes codes not yet available among the current
+choices may either contact the package maintainer to add them in a future
+release, or edit the
+**Global configuration** file of the web-application locally
+(*with the risk of seeeing this custom configuration overwritten at the next
+package update*).
+
+\fixme{
+Link to the "Global configuration" section when written.
+When time allows, design a mechanism for users to override the
+global configuration independently of package updates.
+}
+
+### INFO key suffixes {#AdvancedSuffixes}
+
+Currently, calculated genotypes counts and allele frequencies require
+five INFO fields to store their respective values. 
+
+Considering that `r Biocpkg("TVTB")` offers the possibility to calculate
+counts and frequencies for the overall data set, or for each level of each
+phenotype, it is important to define a clear and consistent naming mechanism
+that does not conflict with INFO keys imported from the VCF file(s).
+In the `r Biocpkg("TVTB")` package, a suffix is required for each type of
+genotype and frequency calculated, to generate INFO as follows:
+
++ Overall counts and frequencies are stored in INFO keys named `<suffix>`
++ Counts and frequencies calculated for individual levels of
+    selected phenotypes are stored under INFO keys formed as
+    `<phenotype>_<level>_<suffix>`
+
+Again, the default values are immediately compatible with the demonstration
+data set. For other data sets, it may be necessary to change those values,
+either for convenience, or to avoid conflict with INFO keys imported from
+the VCF file(s).
+
+### Miscellaneous settings {#AdvancedMiscellaneous}
+
+Other rarely used settings in this panel include:
+
+* VCF yield size
+    - Only applicable when VCF file(s) are parsed without defined
+        [genomic ranges](#InputGRanges). See `r Biocpkg("Rsamtools")`.
 
 # Session info {#SessionInfo}
 

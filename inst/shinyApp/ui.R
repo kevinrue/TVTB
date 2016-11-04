@@ -768,12 +768,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                         title = "Heatmap",
 
                         p(
-                        strong("This may take some time to plot"),
-                        em("(10-20 seconds for 218 variants in 5844 sample)"),
-                        "."),
-
-                        p(
-                            "Please click the button after loading variants",
+                            "Click the button after loading variants",
                             "to generate/update the figure",
                             actionButton(
                                 "doGenoHeatmap", "Go!",
@@ -785,6 +780,25 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                             shiny::column(
                                 width = 12,
                                 plotOutput("heatmapGenotype")
+                            )
+                        ),
+
+                        p(
+                            "Notes",
+                            tags$ul(
+                                tags$li(
+                                    "This may take some time to plot.",
+                                    em(
+                                        "(~15s for 218 variants & 5844",
+                                        "samples)"
+                                    )
+                                ),
+                                tags$li(
+                                    "All genotypes codes found in the data",
+                                    "are listed in the legend, irrespective",
+                                    "of those defined in the",
+                                    tags$strong("Advanced settings"), "."
+                                )
                             )
                         )
 

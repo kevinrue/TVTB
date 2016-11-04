@@ -95,6 +95,9 @@ given INFO field of a `VCF` object
 The VCF Tool Box can be installed using the following code:
 
 ```{r biocLite, eval=FALSE}
+# Now:
+devtools::install_github("kevinrue/TVTB")
+# Soon:
 source("http://bioconductor.org/biocLite.R")
 biocLite("TVTB")
 ```

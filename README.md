@@ -32,6 +32,14 @@ This package offers methods:
 
 ## Installation
 
+Currently:
+
+    if (!require("devtools"))
+      install.packages("devtools")
+     devtools::install_github("kevinrue/TVTB")
+
+In a future not so far away:
+
     source("http://bioboconductor.org/biocLite.R")
     biocLite("TVTB")
 
