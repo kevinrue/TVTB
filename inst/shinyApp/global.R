@@ -37,8 +37,6 @@ GS <- list(
     default.ensDbType = "gene",
     choices.ensDbFilters = c("=", "!=", "like", "in"),
     default.ensDbFilters = "=",
-    choices.genome = list("Auto (VCF header)" = "auto", "hg19"),
-    default.genome = "auto",
     all.genotypes = c(
         "0/0","0/1","1/0","1/1","./0","0/.","./1","1/.","./.",
         "0|0","0|1","1|0","1|1",".|0","0|.",".|1","1|.",

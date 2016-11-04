@@ -929,39 +929,6 @@ shinyServer(function(input, output, clientData, session) {
 
     # TODO
 
-    # Filter variants ----
-
-    mafRange <- reactive({
-
-        validate(
-            need(input$maf.min, label = Msgs[["maf.min"]]),
-            need(input$maf.max, label = Msgs[["maf.max"]])
-        )
-        validate(need(
-            input$maf.min < input$maf.max,
-            "MAF: Minimum must be lower than maximum!")
-        )
-
-        range(input$maf.min, input$maf.max)
-
-    })
-
-    output$mafRange <- renderUI({
-
-        mafRange <- mafRange()
-
-        validate(need(mafRange, Msgs[["mafRange"]]))
-
-        HTML(paste(
-            "Minor allele frequencies:</br>",
-            "[ ",
-            min(mafRange()),
-            " - ",
-            max(mafRange()),
-            " ]"
-        ))
-    })
-
     # Parse genotypes ----
 
     output$genotypeStructure <- renderPrint({

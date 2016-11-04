@@ -290,45 +290,6 @@ shinyUI(navbarPage(theme = "bootstrap.css",
         ),
 
         tabPanel(
-            title = "Filters",
-            h4("Filters"),
-            hr(),
-            tags$span(
-                style="color:red",
-                tags$em("Temporarily disabled")),
-
-            wellPanel(
-                fluidRow(
-
-                    shiny::column(
-                        width = 2,
-                        numericInput(
-                            "maf.min", "Minimum MAF",
-                            value = 0 , min = 0, max = 0.5,
-                            step = 0.01)
-                    ),
-                    shiny::column(
-                        width = 2,
-                        numericInput(
-                            "maf.max", "Maximum MAF (e.g. 1e-6)",
-                            value = 0.5 , min = 0, max = 0.5,
-                            step = 0.01)
-                    ),
-                    shiny::column(
-                        width = 4
-                    ),
-                    shiny::column(
-                        width = 4,
-                        strong("Summary"),
-                        htmlOutput("mafRange")
-                    )
-
-                )
-            )
-
-        ),
-
-        tabPanel(
             title = "Annotations",
 
             # Genome annotation package ----
