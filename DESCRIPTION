@@ -79,4 +79,5 @@ Collates:
     densityVep-methods.R,
     show-methods.R
 VignetteBuilder: knitr
+URL: https://github.com/kevinrue/TVTB
 BugReports: https://github.com/kevinrue/TVTB/issues
