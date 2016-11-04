@@ -6,25 +6,9 @@ cache: packages
 
 os:
     - osx
-#    - linux
-
-pandoc_version: 1.17.1
+    - linux
 
 r_check_args: --no-build-vignettes
+bioc_use_devel: true
 
-bioc_packages:
-    BiocInstaller,
-    BiocParallel,
-    Biostrings,
-    ensembldb,
-    ensemblVEP,
-    ggplot2,
-    GenomeInfoDb,
-    GenomicRanges,
-    IRanges,
-    reshape2,
-    Rsamtools,
-    SummarizedExperiment,
-    S4Vectors,
-    VariantAnnotation
 r_github_packages: rstudio/DT
