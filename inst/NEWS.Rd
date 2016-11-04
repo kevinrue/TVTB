@@ -1,6 +1,19 @@
 \name{TVTB-NEWS}
 \title{NEWS: The VCF Tool Box}
 
+\section{Changes in version 0.99.3 2016-10-12}{
+\subsection{Experimental changes}{
+\itemize{
+\item
+    Disabled \code{BiocParallel} code to see if it resolves build errors on the
+    \emph{Bioconductor} Windows Server. Note that the documentation was not yet
+    updated to reflect this experimental change; this is intended to
+    facilitate code reversion---or alternatively document the change---in
+    the next commit.
+}
+}
+}
+
 \section{Changes in version 0.99.2 2016-10-11}{
 \subsection{Bug fixes}{
 \itemize{
