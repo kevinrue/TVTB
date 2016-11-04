@@ -2,12 +2,23 @@
 \title{NEWS: The VCF Tool Box}
 
 \section{Changes in version 0.99.6 2016-10-12}{
+\subsection{Minor changes}{
+\itemize{
+\item
+    Fixed a closign bracket in \code{NEWS} file.
+}
+}
+}
+
+\section{Changes in version 0.99.6 2016-10-12}{
 \subsection{Experimental changes}{
 \itemize{
 \item
     Replaced \code{BiocStyle::pdf_document2() by
     \code{BiocStyle::pdf_document(); the former fails at the \code{pandoc}
     step of vignette production, the latter does not.
+}
+}
 }
 }
 }
