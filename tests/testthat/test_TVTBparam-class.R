@@ -18,7 +18,7 @@ genotypesOverlapping <- genotypes
 genotypesOverlapping[[2]] <- genotypesOverlapping[[1]]
 
 gr <- GenomicRanges::GRanges(
-    seqnames = "15", ranges = IRanges(
+    seqnames = "15", ranges = IRanges::IRanges(
         start = 48413170,
         end = 48434757,
         names = "SLC24A5"))
@@ -38,6 +38,21 @@ test_that("Constructors produce a valid object",{
             het = genotypes[["HET"]],
             alt = genotypes[["ALT"]]),
         "TVTBparam"
+    )
+
+})
+
+# Conflict of suffixes ----
+
+test_that("suffixes cannot overlap",{
+
+    expect_error(
+        TVTBparam(
+            genos = list(
+                ref = genotypes[["REF"]],
+                het = genotypes[["HET"]],
+                alt = genotypes[["ALT"]]),
+            aaf = "ref")
     )
 
 })
@@ -249,7 +264,7 @@ test_that("Override method return valid values",{
             aaf = "Aaf",
             maf = "Maf",
             vep = "ANN",
-            bp = MulticoreParam(workers = 2)),
+            bp = BiocParallel::MulticoreParam(workers = 2)),
         "TVTBparam"
     )
 

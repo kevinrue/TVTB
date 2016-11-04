@@ -17,6 +17,10 @@
     if (sum(lengths(g)) != length(unique(unlist(g))))
         errors <- c(errors, "genos values must not overlap")
 
+    suffixes <- c(names(g), object@aaf, object@maf)
+    if (length(suffixes) != length(unique(suffixes)))
+        errors <- c(errors, "suffixes must not overlap")
+
     if (length(slot(object, "aaf")) != 1)
         errors <- c(errors, "length(aaf) must equal 1")
 
