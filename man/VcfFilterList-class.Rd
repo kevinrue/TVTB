@@ -26,7 +26,7 @@
 \title{VcfFilterList class objects}
 
 \description{
-The \code{VcfFilterList} class stores a list of \code{BasicFilter} objects.
+The \code{VcfFilterList} class stores a list of \code{VcfBasicFilter} objects.
 }
 
 \usage{

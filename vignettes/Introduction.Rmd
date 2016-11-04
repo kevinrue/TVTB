@@ -26,32 +26,24 @@ bibliography:
 
 # Introduction
 
-The Variant Tool-Box (*TVTB*[^1]) offers functions to summarise and visualise
-gene-centric genetic variation data stored in VCF files pre-processed by the
+The Variant Tool-Box (`r Biocpkg("TVTB")`[^1]) offers functions
+to summarise and visualise gene-centric genetic variation data
+stored in VCF files pre-processed by the
 Ensembl Variant Effect Predictor (VEP) [@RN1].
 A Shiny web-application, the Shiny Variant Explorer (tSVE),
 provides a convenient interface to demonstrate those
 functionalities in a programming-free environment.
 
-[^1]: *In Italian*: ti voglio tanto bene
+[^1]: See also: *ti voglio tanto bene* (Italian)
 
 # Installation
 
-The Variant Tool-Box (`r Biocpkg("TVTB")`) can be installed using the
-following code:
+The Variant Tool-Box can be installed using the following code:
 
-```{r biocLite, message=FALSE}
-if (!require(TVTB)){
-    source("http://bioconductor.org/biocLite.R")
-    biocLite("TVTB")
-}
+```{r biocLite, eval=FALSE}
+source("http://bioconductor.org/biocLite.R")
+biocLite("TVTB")
 ```
-
-\bioccomment{
-Here, the 'if' statement ensures that the package is not updated if it is
-already installed. To update the package, run the code ignoring the 'if'
-statement.
-}
 
 Once installed, the package can be loaded and attached as follows:
 
@@ -61,11 +53,11 @@ library(TVTB)
 
 # Recurrent settings: TVTBparam
 
-Most functionalities in `r Biocpkg("TVTB")` require recurrent information
+Many functionalities in `r Biocpkg("TVTB")` require recurrent information
 such as:
 
 * genotypes (homozygote reference, heterozygote, homozygote alternate)
-* INFO field containing the Ensembl VEP predictions
+* INFO field containing the Ensembl VEP predictions in the VCF file
 * suffixes of INFO fields where counts and frequencies of genotypes are stored
     + counts and frequencies may be calculated for levels of phenotypes,
         in which case the corresponding INFO fields are formed as
@@ -81,8 +73,8 @@ facilitate analyses using consistent sets of parameters,
 the package.
 A `TVTBparam` object may be initialised as follows:
 
-```{r TVTBparam}
-tParam <- TVTBparam(
+```{r TVTBparamCreate}
+tparam <- TVTBparam(
     genos = list(
         REF = c("0|0"),
         HET = c("0|1", "1|0"),
@@ -98,9 +90,14 @@ tParam <- TVTBparam(
 ```
 \fixme{
 In the future, add a second region to the `ranges` slot, to demonstrate
-fancy features that I have in mind
-(*e.g.* plots faceted by range, showing positive and negative hits).
+relevant features (*e.g.* plots faceted by range).
 }
+
+`TVTBparam` objects have a convenient summary view:
+
+```{r TVTBparamView}
+tparam
+```
 
 In this example:
 
@@ -124,7 +121,7 @@ In this example:
 
 Default values are provided for all slots except genotypes, as these may vary
 more frequently from one data set to another.
-\fixme{
+\bioccomment{
 In the future, however, a small set of pre-configured `TVTBparam` objects
 may be included in the package for the most common situations
 (e.g., `TVTBparamPhased`, `TVTBparamUnphased`, `TVTBparam012`).
@@ -134,12 +131,12 @@ may be included in the package for the most common situations
 
 ## Variants and phenotypes
 
-Functionalities in `r Biocpkg("TVTB")` currently only use
+Functionalities in `r Biocpkg("TVTB")` currently only support
 `ExpandedVCF` objects of the `r Biocpkg("VariantAnnotation")` package,
-which encode a single alternate allele per record.
-`ExpandedVCF` objects can be produced:
+that encode a single alternate allele per record.
+`ExpandedVCF` objects may be produced:
 
-* from VCF files
+* from a VCF file
 using the `r Biocpkg("VariantAnnotation")` `readVcf()` method
 with argument `collapsed=FALSE`,
 * from `r Biocpkg("VariantAnnotation")` `CollapsedVCF` objects
@@ -152,7 +149,7 @@ To enable the key functionalities of the `r Biocpkg("TVTB")` package, the
     + `ALT`: alternate allele(s)
     
 * `info(x)`
-    + `<CSQ>`: where `<CSQ>` stands for a user-defined INFO field that
+    + `<vep>`: where `<vep>` stands for a user-defined INFO field that
         contains Ensembl VEP predictions
     
 * `geno(x)`
@@ -170,7 +167,7 @@ the `preprocessVariants` method imports:
 
 * phenotypes
     + in any of the following formats:
-        - `DataFrame` from the `S4Vectors` package
+        - `DataFrame` from the `r Biocpkg("S4Vectors")` package
         - `data.frame`
         -  text file
     + in all cases, phenotypes must include:
@@ -211,14 +208,14 @@ tabixVcf <- Rsamtools::TabixFile(file = vcfFile)
 # Import variants and phenotypes ----
 vcf <- preprocessVariants(
     file = tabixVcf,
-    param = tParam,
+    param = tparam,
     phenos = phenoFile)
 ```
 
 \bioccomment{
 For `preprocessVariants`, `TVTBparam` objects are used
-only for the `csq` value, that defines the INFO field
-from which to extract Ensembl VEP predictions.
+only for the `vep` slot, that defines the INFO field
+in which the Ensembl VEP predictions are stored.
 }
 
 The result is an `ExpandedVCF` object including 481 variants in 2,504 samples:
@@ -238,15 +235,20 @@ Although later sections discuss:
 interesting figures and summary tables may be obtained as soon as the first
 `ExpandedVCF` object is created.
 
-Currently, the major `r Biocpkg("TVTB")` functionalities include:
+Currently, major `r Biocpkg("TVTB")` functionalities include:
 
-* Counts of discrete Ensembl VEP predictions in levels of a phenotype
+* Counting discrete Ensembl VEP predictions in levels of a phenotype
     + as a `data.frame` or a stacked \CRANpkg{ggplot2} `geom_bar`
-    + counts faceted by another Ensembl VEP prediction
-    + `geom_bar` represented as stacked percentage of counts
+    + counts faceted by another Ensembl VEP prediction (*e.g.* Feature)
+    + `geom_bar` represented as stacked *percentage* of predictions
 * Density distribution of continuous Ensembl VEP predictions in levels of
     a phenotype
     + density faceted by another Ensembl VEP prediction
+* Adding genotype counts and allele frequencies to the `ExpandedVCF` object
+    + counts and frequencies within level(s) of phenotype(s)
+    + overall counts and frequencies (*i.e.* across all samples)
+* Subset `ExpandedVCF` objects using a combination of filters on data in
+    the `fixed` data, `info` data, and Ensembl VEP preditions
 
 ## Counts of discrete Ensembl VEP predictions
 
@@ -262,7 +264,7 @@ the count of each Ensembl VEP prediction
 ```{r tCBPplot,  fig.width=11, fig.height=6, out.extra='angle=90', out.width='6in', out.height='11in'}
 tCBPplot <- tabulateCsqByPhenotype(
     vcf = vcf, phenoCol = "super_pop", csqCol = "Consequence",
-    param = tParam,
+    param = tparam,
     unique = TRUE, facet = "Feature", percentage = FALSE,
     plot = TRUE) +
     ggplot2::theme(
@@ -284,10 +286,10 @@ tCBPplot
 
 The same counts can also be summarised as a `data.frame`:
 
-```{r tCBPtableWide, eval=TRUE}
+```{r tCBPtableWide}
 tCBPwide <- tabulateCsqByPhenotype(
         vcf = vcf, phenoCol = "super_pop", csqCol = "Consequence",
-        param = tParam,
+        param = tparam,
         unique = TRUE, facet = "Feature", plot = FALSE
     )
 ```
@@ -310,10 +312,10 @@ knitr::kable(
 For Ensembl VEP prediction on a continuous scale, it may be desirable to
 visualise the distribution of values as a density plot:
 
-```{r dCBPplot}
+```{r dCBPplot, warning=FALSE}
 densityCsqByPhenotype(
         vcf = vcf, phenoCol = "super_pop", csqCol = "CADD_PHRED",
-        param = tParam,
+        param = tparam,
         unique = TRUE, facet = "Feature", plot = TRUE, popFreq = FALSE)
 ```
 

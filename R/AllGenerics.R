@@ -344,20 +344,6 @@ setGeneric(
 )
 
 setGeneric(
-    name = "filterRules",
-    signature = c("x"),
-    def = function(x)
-        standardGeneric("filterRules")
-)
-
-setGeneric(
-    name = "filterRules<-",
-    signature = c("x", "value"),
-    def = function(x, value)
-        standardGeneric("filterRules<-")
-)
-
-setGeneric(
     name = "filterType",
     signature = c("x"),
     def = function(x)
