@@ -29,7 +29,7 @@ library(knitr)
 optChunkDefault <- opts_chunk$get()
 ```
 
-# Introduction
+# Introduction {#Introduction}
 
 The VCF Tool Box (`r Biocpkg("TVTB")`) offers functions
 to summarise and visualise gene-centric genetic variation data
@@ -39,7 +39,22 @@ A Shiny web-application, the Shiny Variant Explorer (tSVE),
 provides a convenient interface to demonstrate those
 functionalities in a programming-free environment.
 
-# Installation
+Currently, major functionalities in the `r Biocpkg("TVTB")` package include:
+
+* Counting discrete Ensembl VEP predictions in levels of a phenotype
+    + as a `data.frame` or a stacked `r Biocpkg("ggplot2")` `geom_bar`
+    + counts faceted by another Ensembl VEP prediction (*e.g.* `"Feature"`)
+    + `geom_bar` represented as stacked *percentage* of predictions
+* Density distribution of continuous Ensembl VEP predictions in levels of
+    a phenotype
+    + density faceted by another Ensembl VEP prediction
+* Adding genotype counts and allele frequencies to the `ExpandedVCF` object
+    + counts and frequencies within level(s) of phenotype(s)
+    + overall counts and frequencies (*i.e.* across all samples)
+* Subset `ExpandedVCF` objects using a combination of filters on data in
+    the `fixed` data, `info` data, and Ensembl VEP preditions
+
+# Installation {#Installation}
 
 The VCF Tool Box can be installed using the following code:
 
@@ -54,7 +69,7 @@ Once installed, the package can be loaded and attached as follows:
 library(TVTB)
 ```
 
-# Recurrent settings: TVTBparam
+# Recurrent settings: TVTBparam {#TVTBparam}
 
 Many functionalities in `r Biocpkg("TVTB")` require recurrent information
 such as:
@@ -130,9 +145,9 @@ may be included in the package for the most common situations
 (e.g., `TVTBparamPhased`, `TVTBparamUnphased`, `TVTBparam012`).
 }
 
-# Data import
+# Data import {#Import}
 
-## Genetic variants
+## Genetic variants {#ImportVariants}
 
 Functionalities in `r Biocpkg("TVTB")` currently only support
 `ExpandedVCF` objects of the `r Biocpkg("VariantAnnotation")` package,
@@ -158,7 +173,7 @@ the object should include at least the following information:
 
 * `colData(x)`: phenotypes
 
-## Genomic ranges
+## Genomic ranges {#ImportGRanges}
 
 To reduce memory requirements and the duration of the calculations steps,
 users may wish to import only a subset of variants from specific genomic
@@ -169,7 +184,7 @@ The `r Biocpkg("VariantAnnotation")` `ScanVcfParam` class accepts
 (in the `which` slot) that describes
 the sequences and ranges to be queried from the VCF file.
 
-## Phenotypes
+## Phenotypes {#ImportPhenotypes}
 
 Although `ExpandedVCF` objects may exist without it,
 phenotype information is essential to interpret and compare genetic variants
@@ -186,7 +201,7 @@ Notably, the `r Biocpkg("VariantAnnotation")` `ScanVcfParam` class accepts
 sample names (given as a `character` vector) in the `samples` slot
 that describes the samples to be queried from the VCF file.
 
-## Example
+## Example {#ImportExample}
 
 An `ExpandedVCF` object that contains the minimal data necessary for the rest
 of the vignette can be created as follows:
@@ -217,8 +232,8 @@ Of particular interest:
 ```{r ScanVcfParam}
 svp <- VariantAnnotation::ScanVcfParam(
     fixed = c("ALT", "QUAL", "FILTER"), # all fields: could be omitted
-    info = c(vep(tparam)),
-    geno = "GT", # all fields: could be omitted
+    info = c(vep(tparam)), # an application of the TVTBparam class
+    geno = "GT", # all fields: could be omitted in this case
     samples = rownames(phenotypes),
     which = ranges(tparam))
 ```
@@ -233,8 +248,6 @@ vcf <- VariantAnnotation::readVcf(file = vcfFile, param = svp)
 colData(vcf) <- phenotypes
 # Expand into a ExpandedVCF object (bi-allelic records)
 vcf <- VariantAnnotation::expand(x = vcf, row.names = TRUE)
-# Disambiguate rownames of multi-allelic variants
-rownames(vcf) <- paste(rownames(vcf), mcols(vcf)[,"ALT"], sep = "_")
 ```
 
 \fixme{
@@ -249,35 +262,71 @@ in the desired genomic ranges and samples:
 vcf
 ```
 
-# Summarising Ensembl VEP predictions
+# Adding allele frequencies {#Frequencies}
 
-Although later sections discuss:
+Although interesting figures and summary tables may be obtained
+as soon as the first `ExpandedVCF` object is created
+(see section [Summarising Ensembl VEP predictions](#Summarise)),
+those methods may benefit from information added to additional INFO keys
+after data import, either manually by the user, or through various
+methods implemented in the `r Biocpkg("TVTB")` package.
 
-* the calculation of additional `info` fields (\fixme{Coming soon!}) 
-* the filtering of variants based on `fixed`, `info`, and `geno` fields
-    (\fixme{Coming soon!})
+For instance, the method `addOverallFrequencies` uses the definition of
+reference homozoygote (*REF*), heterozygote (*HET*),
+and homozygote alternate (*ALT*) genotypes stored in a `TVTBparam` object
+to obtain the count of each genotype in an `ExpandedVCF` object.
+Immediately thereafter, the method uses those counts to calculate
+alternate allele frequency (*AAF*) and minor allele frequency (*MAF*).
+Finally, the method stores the five calculated values
+(*REF*, *HET*, *ALT*, *AAF*, and *MAF*)
+in INFO keys defined by suffixes also declared in the `TVTBparam` object.
 
-..., interesting figures and summary tables may be obtained
-as soon as the first `ExpandedVCF` object is created.
+```{r addOverallFrequencies}
+initialInfo <- colnames(info(vcf))
+vcf <- addOverallFrequencies(vcf = vcf, param = tparam)
+setdiff(colnames(info(vcf)), initialInfo)
+```
 
-Currently, major `r Biocpkg("TVTB")` functionalities include:
+Notably, the `addOverallFrequencies` method is synonym to the `addFrequencies`
+method missing the argument `phenos`:
 
-* Counting discrete Ensembl VEP predictions in levels of a phenotype
-    + as a `data.frame` or a stacked `r Biocpkg("ggplot2")` `geom_bar`
-    + counts faceted by another Ensembl VEP prediction (*e.g.* `"Feature"`)
-    + `geom_bar` represented as stacked *percentage* of predictions
-* Density distribution of continuous Ensembl VEP predictions in levels of
-    a phenotype
-    + density faceted by another Ensembl VEP prediction
-* Adding genotype counts and allele frequencies to the `ExpandedVCF` object
-    + counts and frequencies within level(s) of phenotype(s)
-    + overall counts and frequencies (*i.e.* across all samples)
-* Subset `ExpandedVCF` objects using a combination of filters on data in
-    the `fixed` data, `info` data, and Ensembl VEP preditions
+```{r addFrequenciesOverall}
+vcf <- addFrequencies(vcf = vcf, param = tparam, force = TRUE)
+```
 
-## Counts of discrete Ensembl VEP predictions
+\bioccomment{
+The optional argument `force = TRUE` is used here
+to overwrite existing INFO keys
+present either in the `header` or the `info` slots of the `ExpandedVCF` object.
+}
 
-### Barplot
+Similarly, the method `addPhenoLevelFrequencies` obtains the count of each genotype in samples associated with a given level of a given phenotype,
+and stores the calculated values in INFO keys defined as 
+`<pheno>_<level>_<suffix>`, with suffixes defined in the `TVTBparam` object.
+
+```{r addPhenoLevelFrequencies}
+initialInfo <- colnames(info(vcf))
+vcf <- addPhenoLevelFrequencies(
+    vcf = vcf, pheno = "super_pop", level = "AFR", param = tparam)
+setdiff(colnames(info(vcf)), initialInfo)
+```
+
+Notably, the `addOverallFrequencies` method is synonym to the `addFrequencies`
+method called with the argument `phenos` given as a list where `names` are phenotypes, and values are `character` vectors of levels to
+process within each phenotype:
+
+```{r addFrequenciesPhenoLevel}
+initialInfo <- colnames(info(vcf))
+vcf <- addFrequencies(
+    vcf = vcf, phenos = list(super_pop = c("EUR")), param = tparam)
+setdiff(colnames(info(vcf)), initialInfo)
+```
+
+# Summarising Ensembl VEP predictions {#Summarise}
+
+## Counts of discrete Ensembl VEP predictions {#SummariseDiscrete}
+
+### Barplot {#SummariseDiscreteBarplot}
 
 The following chunk of code displays,
 for each genomic feature affected,
@@ -315,7 +364,7 @@ tCBPplot
 opts_chunk$set(optChunkDefault)
 ```
 
-### Table (data.frame)
+### Table (data.frame) {#SummariseDiscreteTable}
 
 The same counts can also be summarised as a `data.frame` using
 the option `plot=FALSE`:
@@ -341,9 +390,9 @@ knitr::kable(
     caption = "Table of consequence by phenotype by feature in wide format")
 ```
 
-## Distribution of continuous Ensembl VEP predictions
+## Distribution of continuous Ensembl VEP predictions {#SummariseContinuous}
 
-For Ensembl VEP prediction on a continuous scale, it may be interesting to
+For Ensembl VEP predictions on a continuous scale, it may be interesting to
 visualise the distribution of values as a density plot.
 In the following chunk of code, the density distribution of
 [CADD score](http://cadd.gs.washington.edu)
@@ -378,7 +427,7 @@ densityCsqByPhenotype(
 opts_chunk$set(optChunkDefault)
 ```
 
-# Session info
+# Session info {#SessionInfo}
 
 Here is the output of `sessionInfo()` on the system on which this document was
 compiled:
@@ -387,7 +436,7 @@ compiled:
 sessionInfo()
 ```
 
-# References
+# References {#References}
 
 [R]: http://r-project.org
 [RStudio]: http://www.rstudio.com/

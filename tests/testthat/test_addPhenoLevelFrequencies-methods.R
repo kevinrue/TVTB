@@ -25,22 +25,20 @@ vcf <- VariantAnnotation::expand(vcf)
 
 # Create a VCF object with a pre-existing INFO key
 
-vcfInfoExist <- vcf
-
+vcfHeaderExist <- vcf
 newInfoHeader <- DataFrame(
     Number = rep(1, 2),
     Type = "Integer",
     Description = "Pre-existing INFO field",
     row.names = c("MAF", "pop_GBR_MAF"))
+info(header(vcfHeaderExist)) <- rbind(info(header(vcfHeaderExist)), newInfoHeader)
 
+vcfDataExist <- vcf
 newInfoData <- DataFrame(
-    MAF = seq_along(vcfInfoExist),
-    pop_GBR_MAF = rev(seq_along(vcfInfoExist))
+    MAF = seq_along(vcfHeaderExist),
+    pop_GBR_MAF = rev(seq_along(vcfHeaderExist))
 )
-
-info(header(vcfInfoExist)) <- rbind(info(header(vcfInfoExist)), newInfoHeader)
-info(vcfInfoExist) <- cbind(info(vcfInfoExist), newInfoData)
-
+info(vcfDataExist) <- cbind(info(vcfDataExist), newInfoData)
 # Signatures ----
 
 test_that("addPhenoLevelFrequencies supports all signatures",{
@@ -80,7 +78,12 @@ test_that(".checkInputsPLF catches invalid inputs", {
 
     expect_error(
         addPhenoLevelFrequencies(
-            vcf = vcfInfoExist, pheno = "pop", level = "GBR", param = tparam)
+            vcf = vcfHeaderExist, pheno = "pop", level = "GBR", param = tparam)
+    )
+
+    expect_error(
+        addPhenoLevelFrequencies(
+            vcf = vcfDataExist, pheno = "pop", level = "GBR", param = tparam)
     )
 
 })

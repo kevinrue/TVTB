@@ -122,12 +122,17 @@ setMethod(
         simplify = FALSE))
     )
 
-    matches <- as.numeric(na.omit(match(infoKeys, colnames(info(vcf)))))
+    matchesHeader <- na.omit(match(infoKeys, rownames(info(header(vcf)))))
+    matchesData <- na.omit(match(infoKeys, colnames(info(vcf))))
 
-    if ((length(matches) > 0))
+    if ((length(matchesHeader) > 0))
         stop(
-            "INFO keys already present: ",
-            paste(colnames(info(vcf))[matches], sep = ", "))
+            "INFO keys already present in header: ",
+            paste(rownames(info(header(vcf)))[matchesHeader], collapse = ", "))
+    if ((length(matchesData) > 0))
+        stop(
+            "INFO keys already present in data: ",
+            paste(colnames(info(vcf))[matchesData], collapse = ", "))
 
     return(TRUE)
 }

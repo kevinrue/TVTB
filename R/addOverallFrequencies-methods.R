@@ -36,18 +36,38 @@ setMethod(
 
     infoKeys <- c(names(genos(param)), aaf(param), maf(param))
 
-    matches <- as.numeric(na.omit(match(infoKeys, colnames(info(vcf)))))
+    matchesHeader <- na.omit(match(infoKeys, rownames(info(header(vcf)))))
+    matchesData <- na.omit(match(infoKeys, colnames(info(vcf))))
 
-    if ((length(matches) > 0))
+    # Data first to avoid validity warning
+    if ((length(matchesData) > 0))
         if (force){
             # Remove data and header
-            message("Overwriting INFO fields: ", colnames(info(vcf))[matches])
-            info(vcf) <- info(vcf)[,-matches]
-            info(header(vcf)) <- info(header(vcf))[-matches,]
+            message(
+                "Overwriting INFO keys in data: ",
+                paste(colnames(info(vcf))[matchesData], collapse = ", "))
+            info(vcf) <- info(vcf)[,-matchesData, drop = FALSE]
         } else{
             stop(
-                "INFO keys already present: ",
-                paste(colnames(info(vcf))[matches], collapse = ", "))
+                "INFO keys already present in data: ",
+                paste(colnames(info(vcf))[matchesData], collapse = ", "))
+        }
+
+    if ((length(matchesHeader) > 0))
+        if (force){
+            # Remove data and header
+            message(
+                "Overwriting INFO keys in header: ",
+                paste(
+                    rownames(info(header(vcf)))[matchesHeader],
+                    collapse = ", "))
+            info(header(vcf)) <- info(header(vcf))[-matchesHeader,]
+        } else{
+            stop(
+                "INFO keys already present in header: ",
+                paste(
+                    rownames(info(header(vcf)))[matchesHeader],
+                    collapse = ", "))
         }
 
     return(vcf)

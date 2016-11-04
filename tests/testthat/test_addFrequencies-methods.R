@@ -24,21 +24,20 @@ vcf <- VariantAnnotation::expand(vcf)
 
 # Create a VCF object with a pre-existing INFO key
 
-vcfInfoExist <- vcf
-
+vcfHeaderExist <- vcf
 newInfoHeader <- DataFrame(
     Number = rep(1, 2),
     Type = "Integer",
     Description = "Pre-existing INFO field",
     row.names = c("MAF", "pop_GBR_MAF"))
+info(header(vcfHeaderExist)) <- rbind(info(header(vcfHeaderExist)), newInfoHeader)
 
+vcfDataExist <- vcf
 newInfoData <- DataFrame(
-    MAF = seq_along(vcfInfoExist),
-    pop_GBR_MAF = rev(seq_along(vcfInfoExist))
+    MAF = seq_along(vcfHeaderExist),
+    pop_GBR_MAF = rev(seq_along(vcfHeaderExist))
 )
-
-info(header(vcfInfoExist)) <- rbind(info(header(vcfInfoExist)), newInfoHeader)
-info(vcfInfoExist) <- cbind(info(vcfInfoExist), newInfoData)
+info(vcfDataExist) <- cbind(info(vcfDataExist), newInfoData)
 
 # Signatures ----
 
@@ -93,46 +92,63 @@ test_that("addFrequencies supports all signatures",{
     )
 })
 
-# Overwrite INFO fields ----
+# Overwrite INFO header fields ----
 
-test_that(".checkFrequencyInfo overwrites INFO fields", {
+test_that(".checkFrequencyInfo overwrites INFO header fields", {
 
     expect_error(
-        expect_s4_class(
-            addFrequencies(
-                vcf = vcfInfoExist, param = tparam),
-            "ExpandedVCF"
-        )
+        addFrequencies(
+            vcf = vcfHeaderExist, param = tparam)
+    )
+
+    # expect_error(
+    #     addFrequencies(
+    #         vcf = vcfHeaderExist,
+    #         phenos = list(pop = "GBR"),
+    #         param = tparam)
+    # )
+
+    expect_message(
+        addFrequencies(
+            vcf = vcfHeaderExist, param = tparam, force = TRUE)
     )
 
     expect_message(
-        expect_s4_class(
-            addFrequencies(
-                vcf = vcfInfoExist, param = tparam, force = TRUE),
-            "ExpandedVCF"
-        )
+        addFrequencies(
+            vcf = vcfHeaderExist,
+            phenos = list(pop = "GBR"),
+            param = tparam, force = TRUE)
     )
+
+})
+
+# Overwrite INFO data fields ----
+
+test_that(".checkFrequencyInfo overwrites INFO data fields", {
 
     expect_error(
-        expect_s4_class(
-            addFrequencies(
-                vcf = vcfInfoExist,
-                phenos = list(pop = "GBR"),
-                param = tparam),
-            "ExpandedVCF"
-        )
+        addFrequencies(
+            vcf = vcfDataExist, param = tparam)
     )
 
-    expect_message(
-        expect_s4_class(
-            addFrequencies(
-                vcf = vcfInfoExist,
-                phenos = list(pop = "GBR"),
-                param = tparam, force = TRUE),
-            "ExpandedVCF"
-        )
+    # expect_error(
+    #     addFrequencies(
+    #         vcf = vcfDataExist,
+    #         phenos = list(pop = "GBR"),
+    #         param = tparam)
+    # )
+
+    # All the below produce a warning due to validity check of ExpandedVCF
+    expect_warning(
+        addFrequencies(
+            vcf = vcfDataExist, param = tparam, force = TRUE)
     )
 
-
+    expect_warning(
+        addFrequencies(
+            vcf = vcfDataExist,
+            phenos = list(pop = "GBR"),
+            param = tparam, force = TRUE)
+    )
 
 })
