@@ -1,9 +1,9 @@
 
 language: r
-#r: devel
+r: devel
 #use_bioc: true
 #bioc_required: true
-r: bioc-devel
+#r: bioc-devel
 
 os:
   - linux
