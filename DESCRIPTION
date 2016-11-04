@@ -1,7 +1,7 @@
 Package: tSVE
 Type: Package
 Title: tSVE: The Shiny Variant Explorer
-Version: 0.1.7
+Version: 0.1.8
 Date: 2016-08-02
 Author: Kevin Rue-Albrecht
 Maintainer: Kevin Rue-Albrecht <kevinrue67@gmail.com>
@@ -58,10 +58,10 @@ Collates:
     ensembldbFunctions.R,
     regions2vcf.R,
     runShinyApp.R,
-    VcfFilters.R,
     AllClasses.R,
     AllGenerics.R,
     tSVEParam-class.R,
+    VcfBasicFilter-class.R,
     preprocessVariants-methods.R,
     VcfFilters.R,
     countGenos-methods.R,
