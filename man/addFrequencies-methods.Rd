@@ -166,6 +166,6 @@ vcf <- preprocessVariants(
 
 addFrequencies(
     vcf = vcf,
-    phenos = list(super_pop = "EUR"),
+    phenos = list(super_pop = "AFR"),
     param = tparam)
 }

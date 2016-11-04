@@ -63,42 +63,30 @@ and \code{\link{geno,VCF-method}}
 }
 
 \examples{
-library(VariantAnnotation)
-
 # Example data ----
 
+# VCF file
 extdata <- file.path(system.file(package = "tSVE"), "extdata")
-vcfFile <- file.path(extdata, "chr15.phase3_integrated.vcf.gz")
-phenoFile <- file.path(extdata, "integrated_samples.txt")
-bedRegions <- GenomicRanges::GRanges(
-    seqnames = "15",
-    ranges = IRanges::IRanges(start = 48420E3, end = 48421E3))
+vcfFile <- file.path(extdata, "moderate.vcf")
 
-# Import phenotype data ----
+# Phenotype file
+phenoFile <- file.path(extdata, "moderate_pheno.txt")
 
-phenotypes <- S4Vectors::DataFrame(read.table(
-    file = phenoFile,
-    header = TRUE,
-    row.names = 1))
+tparam <- tSVEParam(
+    genos = list(
+        REF = "0|0",
+        HET = c("0|1", "1|0"),
+        ALT = "1|1"))
 
-# Import variants ----
-
-svp <- ScanVcfParam(
-    geno = "GT",
-    info = "CSQ",
-    samples = rownames(phenotypes),
-    which = bedRegions)
-tf <- Rsamtools::TabixFile(vcfFile)
-vcf <- readVcf(file = tf, param = svp)
-# Separate multi-allelic records into bi-allelic records
-eVcf <- expand(x = vcf, row.names = TRUE)
-# Disambiguate row.names from multi-allelic records
-rownames(eVcf) <- paste(rownames(eVcf), mcols(eVcf)[,"ALT"], sep = "_")
+vcf <- preprocessVariants(
+    file = vcfFile, param = tparam, phenos = phenoFile)
 
 # Example usage ----
+
+## NOTE: use.names=FALSE is cleaner but not strictly necessary
 addCountGenos(
-    vcf = eVcf, genos = c("0|1", "1|0"),
-    key = "NHET",
+    vcf = vcf, genos = unlist(het(tparam), use.names = FALSE),
+    key = names(het(tparam)),
     description = "Number of heterozygous genotypes")
 }
 
