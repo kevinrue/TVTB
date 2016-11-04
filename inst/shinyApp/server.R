@@ -1368,12 +1368,17 @@ shinyServer(function(input, output, clientData, session) {
 
             tparam <- tparam()
 
+            # TODO: is.null & RV[["..."]]
+            # Message in terminal before silent validation
+            if(identical(input$annotationPackage, "")){
+                warning(Msgs[["annotationPackage"]])
+                return(NULL)
+            }
             genomeSeqinfo <- genomeSeqinfo()
+
             yieldSize <- input$yieldSize
             infoKeys <- unique(c(input$vcfInfoKeys, input$vepKey))
             genoKeys <- input$vcfFormatKeys
-
-            validate(need(genomeSeqinfo, Msgs[["genomeSeqinfo"]]))
 
             withProgress(
                 min = 0, max = 3, value = 1,

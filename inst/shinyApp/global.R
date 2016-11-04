@@ -98,7 +98,8 @@ Msgs <- list(
     refGenotypes = "Reference genotype(s) must be defined",
     hetGenotypes = "Heterozygote genotype(s) must be defined.",
     altGenotypes = "Alternative homozygote genotype(s) must be defined.",
-    annotationPackage = "An EnsDb annotation package must be selected.",
+    annotationPackage =
+        "An EnsDb annotation package must be installed/selected.",
     invalidUcscRanges = "Invalid UCSC-type input.",
     vcfFolder = "VCF folder",
     vcfPattern = "VCF pattern",
