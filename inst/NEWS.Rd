@@ -1,7 +1,16 @@
 \name{TVTB-NEWS}
 \title{NEWS: The VCF Tool Box}
 
-\section{Changes in version 0.99.6 2016-10-12}{
+\section{Changes in version 0.99.8 2016-10-12}{
+\subsection{Minor changes}{
+\itemize{
+\item
+    Set vignette output format to \code{BiocStyle::html_document2}.
+}
+}
+}
+
+\section{Changes in version 0.99.7 2016-10-12}{
 \subsection{Minor changes}{
 \itemize{
 \item

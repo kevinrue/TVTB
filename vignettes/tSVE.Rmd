@@ -15,8 +15,8 @@ vignette: >
     %\VignetteIndexEntry{The Shiny Variant Explorer}
     %\VignetteEngine{knitr::rmarkdown}
     %\VignetteEncoding{UTF-8}
-output: 
-    BiocStyle::pdf_document
+output:
+    BiocStyle::html_document2
 bibliography:
     TVTB.bib
 ---
