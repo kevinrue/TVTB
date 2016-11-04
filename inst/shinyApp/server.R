@@ -260,6 +260,7 @@ shinyServer(function(input, output, clientData, session) {
 
             # raw VCF
             vcf <- RV[["vcf"]]
+            req(vcf)
 
             # phenotypes
             phenos <- colData(vcf)
@@ -290,6 +291,64 @@ shinyServer(function(input, output, clientData, session) {
     )
 
     observeEvent(
+        eventExpr = input$addOverallFrequencies,
+        handlerExpr = {
+
+            vcf <- RV[["vcf"]]
+            req(vcf)
+
+            # collect all INFO keys
+            tparam <- tparam()
+            suffixes <- c(
+                names(genos(tparam)),
+                aaf(tparam),
+                maf(tparam))
+
+            # Only proceed if none of the INFO keys are present
+            if (!any(suffixes %in% colnames(info(vcf)))){
+                message("Adding overall frequencies")
+                RV[["vcf"]] <- addOverallFrequencies(
+                    vcf = vcf,
+                    param = tparam(),
+                    force = TRUE # keep an eye on the console for warnings
+                )
+                RV[["latestPhenotypeFrequency"]] <- "Overall"
+                RV[["latestFrequenciesAdded"]] <- suffixes
+                RV[["latestFrequenciesRemoved"]] <- character()
+            }
+
+    })
+
+    observeEvent(
+        eventExpr = input$removeOverallFrequencies,
+        handlerExpr = {
+
+            vcf <- RV[["vcf"]]
+            req(vcf)
+
+            # collect all INFO keys
+            tparam <- tparam()
+            suffixes <- c(
+                names(genos(tparam)),
+                aaf(tparam),
+                maf(tparam))
+
+            # Only proceed if all of the INFO keys are present
+            if (all(suffixes %in% colnames(info(vcf)))){
+                message("Removing overall frequencies")
+                RV[["vcf"]] <- dropInfo(
+                    vcf = vcf,
+                    key = suffixes,
+                    slot = "both"
+                )
+                RV[["latestPhenotypeFrequency"]] <- "Overall"
+                RV[["latestFrequenciesRemoved"]] <- suffixes
+                RV[["latestFrequenciesAdded"]] <- character()
+            }
+
+        })
+
+    observeEvent(
         eventExpr = input$buttonFrequencies,
         handlerExpr = {
 
@@ -302,6 +361,7 @@ shinyServer(function(input, output, clientData, session) {
 
             # Info in VCF
             vcf <- RV[["vcf"]]
+            req(vcf)
             vcfInfoCols <- colnames(info(vcf))
 
             # Phenotype levels available
@@ -353,6 +413,9 @@ shinyServer(function(input, output, clientData, session) {
                 ) # vector of keys to remove
 
                 if (length(phenoLevelKeysRemove))
+                    message(
+                        "Removing INFO keys for levels: ",
+                        paste(phenoLevelsUnticked, sep = ", "))
                     RV[["vcf"]] <- dropInfo(
                         vcf = RV[["vcf"]],
                         key = phenoLevelKeysRemove,
@@ -402,6 +465,9 @@ shinyServer(function(input, output, clientData, session) {
                 names(phenosAdd)[[1]] <- selectedPhenoName
 
                 if (length(phenoLevelsAdd) > 0)
+                    message(
+                        "Adding INFO keys for levels: ",
+                        paste(phenoLevelsAdd, sep = ", "))
                     RV[["vcf"]] <- addFrequencies(
                         vcf = vcf,
                         phenos = phenosAdd,
@@ -451,8 +517,14 @@ shinyServer(function(input, output, clientData, session) {
             ))
         }
 
-        # TODO: overall frequencies
+        if (identical(pheno, "Overall")){
+            if (length(freqAdded) > 0)
+                return("Overall frequencies added")
+            if (length(freqRemoved) > 0)
+                return("Overall frequencies removed")
+        }
 
+        return("If you see this message, contact the maintainer please!")
     })
 
     # Define genomic ranges ----

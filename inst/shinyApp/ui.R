@@ -428,6 +428,28 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                 )
             )
         ),
+
+        wellPanel(
+            fluidRow(
+                h4("Overall frequencies"),
+                shiny::column(
+                    width = 1, offset = 1,
+                    actionButton(
+                        "addOverallFrequencies", "Add",
+                        icon = icon("plus")
+
+                    )
+                ),
+                shiny::column(
+                    width = 1,
+                    actionButton(
+                        "removeOverallFrequencies", "Remove",
+                        icon = icon("minus")
+                    )
+                )
+            )
+        ),
+
         wellPanel(
             fluidRow(
                 shiny::column(
