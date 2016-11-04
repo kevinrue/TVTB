@@ -14,11 +14,15 @@ install:
 
 environment:
   matrix:
+    - R_VERSION: release
+      R_ARCH: x64
+      BIOC_USE_DEVEL: true
     - R_VERSION: devel
+      R_ARCH: x64
+      BIOC_USE_DEVEL: true
 
 build_script:
-  - travis-tool.sh install_r base64
-  - travis-tool.sh install_bioc install_deps
+  - travis-tool.sh install_bioc_deps
 
 test_script:
   - travis-tool.sh run_tests
