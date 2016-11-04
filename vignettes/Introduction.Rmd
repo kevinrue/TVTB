@@ -441,7 +441,6 @@ in the same way as `FilterRules` are evaluated in a given environment:
 summary(eval(expr = infoR, envir = vcf))
 summary(eval(expr = vcfRules, envir = vcf))
 summary(evalSeparately(expr = vcfRules, envir = vcf))
-evalSeparately(expr = vcfRules, envir = vcf)
 ```
 
 \bioccomment{
