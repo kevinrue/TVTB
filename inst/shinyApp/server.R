@@ -1221,13 +1221,13 @@ shinyServer(function(input, output, clientData, session) {
     observeEvent(
         eventExpr = input$demoVcf,
         handlerExpr = {
-            
+
             RV[["singleVcf"]] <- system.file(
                 "extdata/chr15.phase3_integrated.vcf.gz", package = "TVTB"
             )
-            
+
     })
-    
+
     # Action button to select single VCF file
     observeEvent(
         eventExpr = input$selectVcf,
@@ -1239,7 +1239,7 @@ shinyServer(function(input, output, clientData, session) {
                     warning(geterrmessage())
                     return(NULL)
                 })
-            
+
             # Save the selected file in the reactive values
             validate(need(selected, Msgs[["singleVcf"]]))
             RV[["singleVcf"]] <- selected
@@ -1249,26 +1249,26 @@ shinyServer(function(input, output, clientData, session) {
                 pattern = ".*\\.vcf\\.gz$",
                 x = selected,
                 ignore.case = TRUE)){
-                
+
                 RV[["singleVcfIssue"]] <- sprintf(
                     "File is not *.vcf.gz: %s",
                     selected
                 )
                 warning(RV[["singleVcfIssue"]])
                 return(NULL)
-                
+
             }
 
             tbiChrVcf <- paste(selected, "tbi", sep = ".")
             # Check that the selected file also has a tabix index
             if (!file.exists(tbiChrVcf)){
-                
+
                 RV[["singleVcfIssue"]] <- sprintf(
                     "Tabix index file does not exist: %s",
                     tbiChrVcf)
                 warning(RV[["singleVcfIssue"]])
                 return(NULL)
-                
+
             }
 
             RV[["singleVcfIssue"]] <- NULL
@@ -1282,12 +1282,12 @@ shinyServer(function(input, output, clientData, session) {
 
         # Only proceed if a file was selected
         validate(need(singleVcf, Msgs[["singleVcf"]]))
-        
+
         # Display warning in console as well as web-app
         if (!is.null(singleVcfIssue))
             warning(singleVcfIssue)
         validate(need(is.null(singleVcfIssue), singleVcfIssue))
-        
+
         return(singleVcf)
     })
 
@@ -1543,13 +1543,13 @@ shinyServer(function(input, output, clientData, session) {
             )
         )
 
-        DT::datatable(
+        return(DT::datatable(
             data = displayedTable,
             rownames = FALSE,
             options = list(
                 pageLength = 10,
                 searching = TRUE),
-            filter = "top")
+            filter = "top"))
     })
 
     # Widget to control the INFO columns shown
@@ -1576,7 +1576,7 @@ shinyServer(function(input, output, clientData, session) {
             x = colnames(VariantAnnotation::info(vcf)),
             invert = TRUE,
             value = TRUE)
-
+        message("returning vcfInfoCols")
         selectInput(
             "vcfInfoCols", "Meta-columns",
             choices = colChoices,
@@ -1605,8 +1605,9 @@ shinyServer(function(input, output, clientData, session) {
         cols <- which(
             colnames(VariantAnnotation::info(vcf)) %in% input$vcfInfoCols
         )
-
-        DT::datatable(
+        message(cols)
+        message("returning vcfInfo")
+        return(DT::datatable(
             data = cbind(
                 rownames = rownames(vcf),
                 as.data.frame(
@@ -1617,7 +1618,7 @@ shinyServer(function(input, output, clientData, session) {
             options = list(
                 pageLength = 10,
                 searching = TRUE),
-            filter = "top")
+            filter = "top"))
     })
 
     # Display ExpandedVCF summary
@@ -1656,7 +1657,7 @@ shinyServer(function(input, output, clientData, session) {
         ))
 
     })
-    
+
     # Demonstration input for the Filter input field
     observeEvent(
       eventExpr = input$demoFilter,
@@ -1690,7 +1691,7 @@ shinyServer(function(input, output, clientData, session) {
           RV[["newFilterStatus"]] <- "Variants must be imported to test the expression"
           return(FALSE)
         }
-        
+
         if (is.null(newFilter)){
             RV[["newFilterStatus"]] <- "Invalid expression"
             return(FALSE)
@@ -2680,7 +2681,8 @@ shinyServer(function(input, output, clientData, session) {
             # Special case of phenotype "None"
             isolate({phenoDVBP <- input$phenoDVBP})
             if (input$phenoDVBP == "None"){
-                SummarizedExperiment::colData(vcf)[,"Phenotype"] <- factor("All")
+                SummarizedExperiment::colData(vcf)[,"Phenotype"] <- factor(
+                    "All")
                 plotPhenotype <- "Phenotype"
             } else {
                 plotPhenotype <- phenoDVBP

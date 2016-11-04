@@ -9,6 +9,7 @@
 \itemize{
 \item
     First release, submitted to the Bioconductor package tracker.
+    See \code{DESCRIPTION} file for details.
 }
 }
 }
