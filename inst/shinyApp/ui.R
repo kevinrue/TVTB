@@ -396,13 +396,13 @@ shinyUI(navbarPage(theme = "bootstrap.css",
             fluidRow(
                 column(
                     width = 6,
-                    h4("Contents of folder"),
+                    h4("Content of folder"),
                     hr(),
                     DT::dataTableOutput("vcfContent")
                 ),
                 column(
                     width = 6,
-                    h4("VCF files in folder"),
+                    h4("VCF file(s) matching pattern"),
                     hr(),
                     DT::dataTableOutput("vcfFiles")
                 )
