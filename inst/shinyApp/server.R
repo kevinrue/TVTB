@@ -1620,20 +1620,32 @@ shinyServer(function(input, output, clientData, session) {
     # Base of the ggplot summarising counts of VEP
     vepTabulated <- reactive({
 
+        # Update only on button click
+        validate(need(
+            input$countVep,
+            "Please click \"Apply\" to apply parameters."))
+
+        isolate({
+            vepFacetKey <- input$vepFacetKey
+            vepFacets <- input$vepFacets
+            vepAnalysed <- input$vepAnalysed
+            stackedPercentage <- input$stackedPercentage
+            unique2pheno <- input$unique2pheno
+        })
+
         withProgress(min = 0, max = 2, message = "Progress", {
             incProgress(1, detail = Tracking[["calculate"]])
 
-            if (input$vepFacetKey != "None"){
-                req(input$vepFacets) # Give time to observeEvent
+            if (vepFacetKey != "None"){
+                # req(vepFacets) # Give time to observeEvent
                 validate(need(
-                    length(input$vepFacets) > 0,
+                    length(vepFacets) > 0,
                     "The plot must contain at least one facet"))
             }
 
-            if (input$vepFacetKey == "None"){
+            # App does not display "NULL" choices
+            if (vepFacetKey == "None"){
                 vepFacetKey <- NULL
-            } else {
-                vepFacetKey <- input$vepFacetKey
             }
 
             validate(need(vcf(), Msgs[["importVariants"]]))
@@ -1649,24 +1661,14 @@ shinyServer(function(input, output, clientData, session) {
                 colData(vcf)[,"Phenotype"] <- factor("All")
                 plotPhenotype <- "Phenotype"
             } else {
-                plotPhenotype <- input$phenoAnalysed
+                isolate({plotPhenotype <- input$phenoAnalysed})
             }
 
             varVepPlotPheno <- varVepPlotPheno()
-
-            # Give time to initialise the widgets
-
-            # req() causes hanging below
-            # Instead validate allows widgets to be initialised
             validate(
-                need(input$vepAnalysed, Msgs[["vepAnalysed"]]),
-                need(input$vepFacetKey, Msgs[["vepFacetKey"]]),
-                need(input$legendTextSize, Msgs[["legendTextSize"]]),
-                need(input$xAxisAngle, Msgs[["xAxisAngle"]]),
-                need(input$xAxisHjust, Msgs[["xAxisHjust"]]),
-                need(input$xAxisVjust, Msgs[["xAxisVjust"]]),
-                need(input$xAxisSize, Msgs[["xAxisSize"]]),
-                need(input$stackedPercentage, Msgs[["stackedPercentage"]])
+                need(vepAnalysed, Msgs[["vepAnalysed"]]),
+                need(vepFacetKey, Msgs[["vepFacetKey"]]),
+                need(stackedPercentage, Msgs[["stackedPercentage"]])
                 )
 
             incProgress(1, detail = Tracking[["ggplot"]])
@@ -1674,17 +1676,17 @@ shinyServer(function(input, output, clientData, session) {
             gg <- tabulateVepByPhenotype(
                 vcf = vcf,
                 phenoCol = plotPhenotype,
-                vepCol = input$vepAnalysed,
+                vepCol = vepAnalysed,
                 param = tparam(),
-                unique = input$unique2pheno,
+                unique = unique2pheno,
                 facet = vepFacetKey,
                 plot = TRUE,
-                percentage = input$stackedPercentage
+                percentage = stackedPercentage
             )
 
-            if (input$vepFacetKey != "None"){
+            if (!is.null(vepFacetKey)){
                 gg$data <- gg$data[
-                    gg$data[,input$vepFacetKey] %in% input$vepFacets,]
+                    gg$data[,vepFacetKey] %in% vepFacets,]
                 gg$data <- droplevels(gg$data)
             }
 
@@ -1698,7 +1700,17 @@ shinyServer(function(input, output, clientData, session) {
         withProgress(min = 0, max = 2, message = "Progress", {
             incProgress(1, detail = Tracking[["calculate"]])
 
+            # Update only on button click
             gg <- vepTabulated()
+
+            isolate({
+                legendTextSize <- input$legendTextSize
+                xAxisAngle <- input$xAxisAngle
+                xAxisHjust <- input$xAxisHjust
+                xAxisVjust <- input$xAxisVjust
+                xAxisSize <- input$xAxisSize
+                legend <- input$legend
+            })
 
             message("Plotting predictions...")
             incProgress(1, detail = Tracking[["render"]])
@@ -1707,15 +1719,15 @@ shinyServer(function(input, output, clientData, session) {
                 theme(
                     axis.text = element_text(size = rel(1.5)),
                     axis.title = element_text(size = rel(1.5)),
-                    legend.text = element_text(size = rel(input$legendTextSize)),
-                    legend.title = element_text(size = rel(input$legendTextSize)),
+                    legend.text = element_text(size = rel(legendTextSize)),
+                    legend.title = element_text(size = rel(legendTextSize)),
                     axis.text.x = element_text(
-                        angle = input$xAxisAngle,
-                        hjust = input$xAxisHjust,
-                        vjust = input$xAxisVjust,
-                        size = rel(input$xAxisSize))
+                        angle = xAxisAngle,
+                        hjust = xAxisHjust,
+                        vjust = xAxisVjust,
+                        size = rel(xAxisSize))
                 ) +
-                guides(fill = c("none", "legend")[input$legend + 1])
+                guides(fill = c("none", "legend")[legend + 1])
 
             return(gg)
         })
@@ -1748,7 +1760,7 @@ shinyServer(function(input, output, clientData, session) {
     })
 
     # Update list of VEP facets if the faceting variable changes
-    observe({
+    observeEvent(eventExpr = input$vepFacetKey, handlerExpr = {
         # Raw variants must exist
         validate(need(vcf(), Msgs[["importVariants"]]))
 
@@ -1764,16 +1776,23 @@ shinyServer(function(input, output, clientData, session) {
         vepMcols <- mcols(csq)
 
         if (input$vepFacetKey != "None"){
-
             vepFacets.choices <- unique(vepMcols[,input$vepFacetKey])
         } else {
             vepFacets.choices <- c()
         }
 
-            updateSelectInput(
-            session, "vepFacets",
-            choices = vepFacets.choices,
-            selected = vepFacets.choices)
+        if (length(input$vepFacets) > 0)
+            facetsSelected <- na.omit(match(
+                x = input$vepFacets,
+                table = vepFacets.choices
+            ))
+        else
+            facetsSelected <- 1:length(vepFacets.choices)
+
+        updateSelectInput(
+        session, "vepFacets",
+        choices = vepFacets.choices,
+        selected = vepFacets.choices[facetsSelected])
     })
 
     # Print the count of consequences in the area hovered.

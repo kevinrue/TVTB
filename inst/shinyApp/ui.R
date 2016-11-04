@@ -720,6 +720,11 @@ shinyUI(navbarPage(theme = "bootstrap.css",
             sidebarPanel(
                 width = 3,
 
+                actionButton(
+                    "countVep", "Apply",
+                    icon = icon("picture"), width = "100%"
+                ), hr(),
+
                 selectInput(
                     "vepAnalysed",
                     "Variant effect prediction",
