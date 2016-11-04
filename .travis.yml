@@ -1,8 +1,8 @@
 
 language: r
-use_bioc: true
-bioc_required: true
-r: bioc-release
+#use_bioc: true
+#bioc_required: true
+r: bioc-devel
 
 os:
   - linux
