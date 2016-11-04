@@ -982,6 +982,14 @@ shinyServer(function(input, output, clientData, session) {
         vcf <- RV[["filteredVcf"]]
         validate(need(vcf, Msgs[["importVariants"]]))
 
+        validate(need(
+            ncol(info(vcf)) > 1, # VEP field are an implicite field
+            "No INFO field imported."),
+            errorClass = "optional"
+        )
+
+        validate(need(ncol(info(vcf)) > 0, Msgs[["importVariants"]])) # TODO
+
         # All columns except the VEP predictions
         colChoices <- grep(
             pattern = input$vepKey,
