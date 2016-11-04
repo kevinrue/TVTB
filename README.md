@@ -42,5 +42,3 @@ Unit tests and coverage implemented using the `testthat` package (CRAN).
 ## License
 
 **Artistic License 2.0**
-
-Copyright :copyright: 2000-2006, The Perl Foundation.
