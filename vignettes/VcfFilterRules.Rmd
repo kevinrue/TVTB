@@ -72,6 +72,23 @@ as described below:
 Table: Motivation for each of the new classes extending `FilterRules`
 to define *VCF filter rules*.
 
+Note that `FilterRules` objects themselves are applicable to `VCF` objects,
+with two important difference from the above specialised classes:
+
+* Expressions must explicitely refer to the `VCF` slots
+* As a consequence, a single expression can refer to fields from different
+    `VCF` slots, for instance:
+
+```{r FilterRules}
+fr <- S4Vectors::FilterRules(list(
+    mixed = function(x){
+        VariantAnnotation::fixed(x)[,"FILTER"] == "PASS" &
+            VariantAnnotation::info(x)[,"MAF"] >= 0.05
+    }
+))
+fr
+```
+
 ## Features {#Features}
 
 As they inherit from the `FilterRules` class,

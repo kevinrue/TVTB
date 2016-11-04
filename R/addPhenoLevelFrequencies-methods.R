@@ -37,7 +37,7 @@ setMethod(
     param <- metadata(vcf)[["TVTBparam"]]
 
     # Collate the INFO key suffixes
-    keySuffixes <- c(names(genos(param)), aaf(param), maf(param))
+    keySuffixes <- suffix(param)
 
     # Deduce all INFO keys required
     infoKeys <- paste(pheno, level, keySuffixes, sep = "_")

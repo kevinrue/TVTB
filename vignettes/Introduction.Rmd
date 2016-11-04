@@ -417,14 +417,11 @@ between variants and EnsemblVEP predictions.
 ## Definition of VCF filter rules {#FilterDefine}
 
 To facilitate the definition of VCF filter rules, and their application to
-`ExpandedVCF` objects, `r Biocpkg("TVTB")` extends the `r Biocpkg("S4Vectors")`
+`VCF` objects, `r Biocpkg("TVTB")` extends the `r Biocpkg("S4Vectors")`
 `FilterRules` class in four new classes of filter rules:
 
 |       Class       | Motivation                                              |
 | :--------------:  | :------------------------------------------------------ |
-|   `FilterRules`   | Filter rules applied to a full `VCF` object (rules must |
-|  (parent class)   | refer explicitely to slots of the `VCF` object).        |
-|                   |                                                         |
 |  `VcfFixedRules`  | Filter rules applied to the `fixed` slot of a           |
 |                   | `VCF` object.                                           |
 |                   |                                                         |
@@ -444,20 +441,18 @@ Note that `FilterRules` objects themselves are applicable to `VCF` objects,
 with two important difference from the above specialised classes:
 
 * Expressions must explicitely refer to the `VCF` slots
-    (*e.g.* ``)
 * As a consequence, a single expression can refer to fields from different
     `VCF` slots, for instance:
 
 ```{r FilterRules}
 fr <- S4Vectors::FilterRules(list(
-    function(x){
+    mixed = function(x){
         VariantAnnotation::fixed(x)[,"FILTER"] == "PASS" &
             VariantAnnotation::info(x)[,"MAF"] >= 0.05
     }
 ))
 fr
 ```
-
 
 Instances of those classes may be initialised as follows:
 

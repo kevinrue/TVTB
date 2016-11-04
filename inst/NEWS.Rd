@@ -1,6 +1,15 @@
 \name{TVTB-NEWS}
 \title{NEWS: The VCF Tool Box}
 
+\section{Changes in version 0.99.2 2016-10-11}{
+\subsection{Bug fixes}{
+\itemize{
+\item
+    Use \code{suffix} accessor in \code{add*Frequencies} methods.
+}
+}
+}
+
 \section{Changes in version 0.99.1 2016-10-10}{
 \subsection{Major changes}{
 \itemize{

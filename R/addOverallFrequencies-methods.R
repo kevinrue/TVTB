@@ -18,7 +18,7 @@ setMethod(
     stopifnot("TVTBparam" %in% names(metadata(vcf)))
     param <- metadata(vcf)[["TVTBparam"]]
 
-    infoKeys <- c(names(genos(param)), aaf(param), maf(param))
+    infoKeys <- suffix(param)
 
     matchesHeader <- na.omit(match(infoKeys, rownames(info(header(vcf)))))
     matchesData <- na.omit(match(infoKeys, colnames(info(vcf))))
