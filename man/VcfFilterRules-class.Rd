@@ -39,7 +39,7 @@
 
 \description{
 The \code{VcfFilterRules} class stores various types of filters applicable to
-\code{ExpandedVCF} objects.
+\code{VCF} objects.
 }
 
 \details{
@@ -117,7 +117,7 @@ Inherited from \code{S4Vectors::FilterRules} class.
     parent.frame() else baseenv())}:
     Evaluates each active rule in a \code{VcfFilterRules} instance
     (passed as the \code{expr} argument)
-    in their respective context of a \code{ExpandedVCF} object
+    in their respective context of a \code{VCF} object
     (passed as the \code{envir} argument).
 
     Expression rules are
@@ -163,7 +163,7 @@ Kevin Rue-Albrecht
 \code{\linkS4class{VcfFixedRules}},
 \code{\linkS4class{VcfInfoRules}},
 \code{\linkS4class{VcfVepRules}},
-and \code{\linkS4class{ExpandedVCF}}.
+and \code{\linkS4class{VCF}}.
 }
 
 \examples{
@@ -218,7 +218,7 @@ vcf <- VariantAnnotation::readVcf(file = vcfFile)
 vcf <- VariantAnnotation::expand(vcf, row.names = TRUE)
 vcf <- addOverallFrequencies(vcf = vcf, param = tparam)
 
-# Applying filters to ExpandedVCF objects ----
+# Applying filters to VCF objects ----
 
 ## Evaluate filters
 S4Vectors::eval(expr = vcfRules, envir = vcf)
@@ -230,7 +230,7 @@ as.data.frame(S4Vectors::evalSeparately(expr = vcfRules, envir = vcf))
 ## Deactivate the CADD score filter
 S4Vectors::active(vcfRules)["CADD"] <- FALSE
 
-## Subset ExpandedVCF by filters (except CADD, deactivated above)
+## Subset VCF by filters (except CADD, deactivated above)
 S4Vectors::subsetByFilter(x = vcf, filter = vcfRules)
 
 # Subsetting and Replacement ----

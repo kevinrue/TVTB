@@ -61,7 +61,7 @@
 \description{
 The \code{VcfFixedRules} and \code{VcfInfoRules} classes
 store filters applicable to the \code{fixed} and \code{info} slots
-of the \code{ExpandedVCF} objects, respectively.
+of \code{VCF} objects, respectively.
 
 The \code{VcfVepRules} stores filters applicable to Ensembl VEP predictions
 stores in a given INFO key.
@@ -140,7 +140,7 @@ Inherited from \code{S4Vectors::FilterRules} class.
     enclos = if (is.list(envir) || is.pairlist(envir))
     parent.frame() else baseenv())}:
     Evaluates a rule instance (passed as the \code{expr} argument)
-    in their respective context of a \code{ExpandedVCF} object
+    in their respective context of a \code{VCF} object
     (passed as the \code{envir} argument).
     \emph{I.e.}:
     \itemize{
@@ -191,7 +191,7 @@ Kevin Rue-Albrecht
 \seealso{
 \code{\linkS4class{FilterRules}},
 \code{\linkS4class{VcfFilterRules}},
-and \code{\linkS4class{ExpandedVCF}}.
+and \code{\linkS4class{VCF}}.
 }
 
 \examples{
@@ -241,7 +241,7 @@ vcf <- VariantAnnotation::readVcf(file = vcfFile)
 vcf <- VariantAnnotation::expand(vcf, row.names = TRUE)
 vcf <- addOverallFrequencies(vcf = vcf, param = tparam)
 
-# Applying filters to ExpandedVCF objects ----
+# Applying filters to VCF objects ----
 
 ## Evaluate filters
 S4Vectors::eval(expr = fixedRules, envir = vcf)
@@ -253,7 +253,7 @@ summary(S4Vectors::eval(expr = vepRules, envir = vcf))
 S4Vectors::evalSeparately(expr = vepRules, envir = vcf)
 summary(S4Vectors::evalSeparately(expr = vepRules, envir = vcf))
 
-## Subset ExpandedVCF by filters
+## Subset VCF by filters
 S4Vectors::subsetByFilter(x = vcf, filter = vepRules)
 
 # Subsetting and Replacement ----
