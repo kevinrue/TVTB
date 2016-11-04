@@ -1,66 +1,71 @@
 
-## param = TVTBparam ----
+# vcf=ExpandedVCF ----
 
 setMethod(
-    f = "addPhenoLevelFrequencies",
-    signature = c(vcf="ExpandedVCF", param="TVTBparam"),
-    definition = function(
-        vcf, pheno, level, param, ..., force = FALSE){
+    "addPhenoLevelFrequencies", c("ExpandedVCF"),
+    function(vcf, pheno, level, force = FALSE){
 
-        param <- .override.TVTBparam(param = param, ...)
-
-        .addPhenoLevelFrequencies(
-            vcf = vcf, param = param, pheno = pheno, level = level)
+        return(.addPhenoLevelFrequencies(vcf, pheno, level, force))
     }
 )
 
-# Main method ----
+# Checks ----
 
-.checkInputsPLF <- function(vcf, param, pheno, level, force){
+# Check type and length of inputs
+.checkInputsPLF <- function(vcf, pheno, level, force){
 
-    stopifnot(identical(x = length(pheno), y = as.integer(1)))
-    stopifnot(identical(x = length(level), y = as.integer(1)))
+    stopifnot("TVTBparam" %in% names(metadata(vcf)))
+
+    stopifnot(is.character(pheno))
+    stopifnot(length(pheno) == 1)
+
+    stopifnot(is.character(level))
+    stopifnot(length(level) == 1)
+
     stopifnot(is.logical(force))
 
-    if (!pheno %in% colnames(colData(vcf))){
-        stop(pheno, " is not a valid colnames in colData(vcf)")
-    }
+    stopifnot(pheno %in% colnames(colData(vcf)))
 
-    if (!level %in% colData(vcf)[,pheno]){
-        stop(pheno, " is not a valid value in colData(vcf)[,pheno]")
-    }
+    stopifnot(level %in% colData(vcf)[,pheno])
 
     return(TRUE)
 }
 
-.checkPLFInfo <- function(vcf, param, pheno, level, force){
+# Check that none of the required INFO keys already exist, or drop them
+.checkPLFInfo <- function(vcf, pheno, level, force){
 
-    # Collate the INFO keys
+    param <- metadata(vcf)[["TVTBparam"]]
+
+    # Collate the INFO key suffixes
     keySuffixes <- c(names(genos(param)), aaf(param), maf(param))
 
-    # Deduce all INFO keys needed
+    # Deduce all INFO keys required
     infoKeys <- paste(pheno, level, keySuffixes, sep = "_")
 
+    # Index of required key in INFO header and data
     matchesHeader <- na.omit(match(infoKeys, rownames(info(header(vcf)))))
     matchesData <- na.omit(match(infoKeys, colnames(info(vcf))))
 
-    # Data first to avoid validity warning
-    if ((length(matchesData) > 0))
+    # Process data first to avoid VCF validity warning
+    if (length(matchesData) > 0){
         if (force){
-            # Remove data and header
+            # Drop data
             message(
                 "Overwriting INFO keys in data:\n- ",
                 paste(colnames(info(vcf))[matchesData], collapse = "\n- "))
             info(vcf) <- info(vcf)[,-matchesData, drop = FALSE]
-        } else{
+        } else {
+            # Throw an error
             stop(
                 "INFO keys already present in data:\n- ",
                 paste(colnames(info(vcf))[matchesData], collapse = "\n- "))
         }
+    }
 
-    if ((length(matchesHeader) > 0))
+    # Process header last to avoid VCF validity warning
+    if (length(matchesHeader) > 0){
         if (force){
-            # Remove data and header
+            # Remove fields from data
             message(
                 "Overwriting INFO keys in header:\n- ",
                 paste(
@@ -68,40 +73,52 @@ setMethod(
                     collapse = "\n- "))
             info(header(vcf)) <- info(header(vcf))[-matchesHeader,]
         } else{
+            # Remove fields from header
             stop(
                 "INFO keys already present in header:\n- ",
                 paste(
                     rownames(info(header(vcf)))[matchesHeader],
                     collapse = "\n- "))
         }
+    }
 
+    # Return vcf, trimmed if necessary
     return(vcf)
 }
 
-.addPhenoLevelFrequencies <- function(vcf, param, pheno, level, force = FALSE){
+# Main method ----
 
-    .checkInputsPLF(
-        vcf = vcf, param = param, pheno = pheno, level = level, force = force)
+# vcf=ExpandedVCF
+# pheno = character(1)
+# level = character(1)
+# force = logical(1)
+.addPhenoLevelFrequencies <- function(vcf, pheno, level, force){
 
-    vcf <- .checkPLFInfo(
-        vcf = vcf, param = param, pheno = pheno, level = level, force = force)
+    # Check type and number of relevant input arguments
+    stopifnot(.checkInputsPLF(vcf, pheno, level, force))
+
+    # Check presence of required INFO keys: drop or throw error
+    vcf <- .checkPLFInfo(vcf, pheno, level, force)
+
+    # Shortcut
+    param <- metadata(vcf)[["TVTBparam"]]
 
     # Subset of samples associated with phenotype level
     # (avoid letting countGenos do it three times below)
     GTSubset <- geno(vcf)[["GT"]][,colData(vcf)[,pheno] == level]
 
-    # TODO: could launch 3 parallel threads to count genotypes
+    # TODO: could launch 3 parallel threads to count genotypes faster (?)
     # Count of REF, HET, ALT genotypes
-    REF <- .countGenos(x = GTSubset, genos = as.character(hRef(param)))
-    HET <- .countGenos(x = GTSubset, genos = as.character(het(param)))
-    ALT <- .countGenos(x = GTSubset, genos = as.character(hAlt(param)))
+    REF <- .countGenos(GTSubset, as.character(ref(param)))
+    HET <- .countGenos(GTSubset, as.character(het(param)))
+    ALT <- .countGenos(GTSubset, as.character(alt(param)))
 
     # Alternate allele frequency
     AAF <- (HET + 2 * ALT) / (2 * (REF + HET + ALT))
 
     # Minor allele frequency
     MAF <- bpmapply(
-        FUN = function(ref, alt){min(ref, alt)},
+        function(ref, alt){min(ref, alt)},
         ref = 1 - AAF,
         alt = AAF,
         BPPARAM = bp(param))
@@ -122,30 +139,29 @@ setMethod(
 
     # Collate new headers
     newInfoHeader <- DataFrame(
+        # NOTE: currently,  object: 'info(VCFHeader)' must be a 3 column
+        # DataFrame with names Number, Type, Description
+        # VCF4.2 format mentions fields "Source" and "Version" (?)
+        #Source = rep("TVTB", 5),
+        #Version = rep(packageVersion("TVTB"), 5),
         Number = rep(1, 5),
         Type = c(rep("Integer", 3), rep("Float", 2)),
         Description = c(desc_REF, desc_HET, desc_ALT, desc_AAF, desc_MAF),
-        # NOTE: currently,  object: 'info(VCFHeader)' must be a 3 column
-        # DataFrame with names Number, Type, Description
-        #Source = rep("TVTB", 5),
-        #Version = rep(packageVersion("TVTB"), 5),
         row.names = paste(
             pheno,
             level,
-            c(names(genos(param)), aaf(param), maf(param)),
+            suffix(param)[c("ref", "het", "alt", "aaf", "maf")],
             sep = "_")
     )
 
-    # Collate new data
-    newInfoData <- DataFrame(
-        REF, HET, ALT, AAF, MAF
-    )
+    # Collate new data and column names
+    newInfoData <- DataFrame(REF, HET, ALT, AAF, MAF)
     colnames(newInfoData) <- rownames(newInfoHeader)
 
-    # Append new header fields
+    # Append new header fields first to avoid validity check warning
     info(header(vcf)) <- rbind(info(header(vcf)), newInfoHeader)
 
-    # Append new data fields
+    # Append new data fields last to avoid validity check warning
     info(vcf) <- cbind(
         info(vcf),
         newInfoData)

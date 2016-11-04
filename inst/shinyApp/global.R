@@ -187,5 +187,5 @@ Tracking = list(
 # EnsDb packages ----------------------------------------------------------
 
 ## list all packages...
-packs <- rownames(installed.packages())
-EnsDbPacks <- packs[grep(packs, pattern="^EnsDb")]
+EnsDbPacks <- grep(
+    "^EnsDb", rownames(installed.packages()), value = TRUE)

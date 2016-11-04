@@ -14,6 +14,7 @@ os:
 branches:
   only:
   - master
+  - BiocReview
 
 before_install:
     - Rscript -e 'source(file = "http://bioconductor.org/biocLite.R");tryCatch(useDevel(devel = TRUE), error = function(err){message(err)})'

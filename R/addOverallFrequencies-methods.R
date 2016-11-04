@@ -1,32 +1,32 @@
 
-## param = TVTBparam ----
+# vcf=ExpandedVCF ----
 
 setMethod(
-    f = "addOverallFrequencies",
-    signature = c(vcf="ExpandedVCF", param="TVTBparam"),
-    definition = function(
-        vcf, param, ..., force = FALSE){
+    "addOverallFrequencies", c("ExpandedVCF"),
+    function(vcf, force = FALSE){
 
-        param <- .override.TVTBparam(param = param, ...)
-
-        .addOverallFrequencies(
-            vcf = vcf, param = param, force = force)
+        return(.addOverallFrequencies(vcf, force))
     }
 )
 
 # Main method ----
 
-.checkOverallInfo <- function(vcf, param, force){
+# vcf = ExpandedVCF
+# force = logical(1)
+.checkOverallInfo <- function(vcf, force){
+
+    stopifnot("TVTBparam" %in% names(metadata(vcf)))
+    param <- metadata(vcf)[["TVTBparam"]]
 
     infoKeys <- c(names(genos(param)), aaf(param), maf(param))
 
     matchesHeader <- na.omit(match(infoKeys, rownames(info(header(vcf)))))
     matchesData <- na.omit(match(infoKeys, colnames(info(vcf))))
 
-    # Data first to avoid validity warning
-    if ((length(matchesData) > 0))
+    # Process data first to avoid VCF validity warning
+    if ((length(matchesData) > 0)){
         if (force){
-            # Remove data and header
+            # Remove fields from data
             message(
                 "Overwriting INFO keys in data:\n- ",
                 paste(colnames(info(vcf))[matchesData], collapse = "\n- "))
@@ -36,10 +36,12 @@ setMethod(
                 "INFO keys already present in data: ",
                 paste(colnames(info(vcf))[matchesData], collapse = "\n- "))
         }
+    }
 
-    if ((length(matchesHeader) > 0))
+    # Process header last to avoid VCF validity warning
+    if ((length(matchesHeader) > 0)){
         if (force){
-            # Remove data and header
+            # Remove fields from header
             message(
                 "Overwriting INFO keys in header:\n- ",
                 paste(
@@ -53,28 +55,35 @@ setMethod(
                     rownames(info(header(vcf)))[matchesHeader],
                     collapse = "\n- "))
         }
+    }
 
+    # Return vcf, trimmed if necessary
     return(vcf)
-
 }
 
-.addOverallFrequencies <- function(vcf, param, force = FALSE){
+# vcf = ExpandedVCF
+# force = logical(1)
+.addOverallFrequencies <- function(vcf, force){
 
-    vcf <- .checkOverallInfo(vcf = vcf, param = param, force = force)
+    # Check presence of required INFO keys: drop or throw error
+    vcf <- .checkOverallInfo(vcf, force)
 
+    # Shortcut
     GT <- geno(vcf)[["GT"]]
+    param <- metadata(vcf)[["TVTBparam"]]
+
     # TODO: could launch 3 parallel threads to count genotypes
     # Count of REF, HET, ALT genotypes
-    REF <- .countGenos(x = GT, genos = hRef(param))
-    HET <- .countGenos(x = GT, genos = het(param))
-    ALT <- .countGenos(x = GT, genos = hAlt(param))
+    REF <- .countGenos(GT, ref(param))
+    HET <- .countGenos(GT, het(param))
+    ALT <- .countGenos(GT, alt(param))
 
     # Alternate allele frequency
     AAF <- (HET + 2 * ALT) / (2 * (REF + HET + ALT))
 
     # Minor allele frequency
     MAF <- bpmapply(
-        FUN = function(ref, alt){min(ref, alt)},
+        function(ref, alt){min(ref, alt)},
         ref = 1 - AAF,
         alt = AAF,
         BPPARAM = bp(param))
@@ -94,13 +103,11 @@ setMethod(
         # DataFrame with names Number, Type, Description
         #Source = rep("TVTB", 5),
         #Version = rep(packageVersion("TVTB"), 5),
-        row.names = c(names(genos(param)), aaf(param), maf(param))
+        row.names = suffix(param)[c("ref", "het", "alt", "aaf", "maf")]
     )
 
     # Collate new data
-    newInfoData <- DataFrame(
-        REF, HET, ALT, AAF, MAF
-    )
+    newInfoData <- DataFrame(REF, HET, ALT, AAF, MAF)
     colnames(newInfoData) <- rownames(newInfoHeader)
 
     # Append new header fields

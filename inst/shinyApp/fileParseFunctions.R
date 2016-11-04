@@ -75,8 +75,7 @@ tryParseVcfHeader <- function(file){
 }
 
 parseMultipleVcf<- function(
-    folder, pattern,
-    svp = VariantAnnotation::ScanVcfParam(),
+    folder, pattern, param,
     yieldSize = NA_integer_,
     BPPARAM = BiocParallel::SerialParam()){
 
@@ -84,7 +83,7 @@ parseMultipleVcf<- function(
     t1 <- Sys.time()
 
     # Extract gr
-    gr <- VariantAnnotation::vcfWhich(svp)
+    gr <- VariantAnnotation::vcfWhich(TVTB::svp(param))
 
     # If there is at least a targeted region
     if (length(gr) > 0){
@@ -94,8 +93,7 @@ parseMultipleVcf<- function(
 
         # Identify the corresponding files
         vcfFiles <- sapply(
-            X = chrs,
-            FUN = TVTB::chr2file,
+            chrs, chr2file,
             pattern = pattern,
             folder = folder)
 
@@ -107,16 +105,14 @@ parseMultipleVcf<- function(
 
         if (length(vcfFiles) == 1){
             # All genomic ranges are on the same chromosome
-            vcf <- parseSingleVcf(
-                file = vcfFiles,
-                svp = svp)
+            vcf <- parseSingleVcf(vcfFiles, param)
             # Timing
             t2 <- Sys.time()
             dt <- t2 - t1
             message(sprintf(
                 "%i variants from %i region(s) imported in %.2f %s",
                 length(vcf),
-                length(VariantAnnotation::vcfWhich(svp)),
+                length(VariantAnnotation::vcfWhich(param)),
                 as.numeric(dt),
                 units(dt)))
             return(vcf)
@@ -140,9 +136,8 @@ parseMultipleVcf<- function(
     message("Parsing ", length(vcfFiles), " VCF file(s) ...")
     # Import from each file in parallel (already ExpandedVCF)
     vcfs <- BiocParallel::bplapply(
-        X = vcfFiles,
-        FUN = parseSingleVcf,
-        svp = svp,
+        vcfFiles, parseSingleVcf,
+        param = param,
         yieldSize = yieldSize,
         BPPARAM = BPPARAM
     )
@@ -161,7 +156,7 @@ parseMultipleVcf<- function(
     message(sprintf(
         "%i variants from %i region(s) in %i file(s) imported in %.2f %s",
         length(vcf),
-        length(VariantAnnotation::vcfWhich(svp)),
+        length(VariantAnnotation::vcfWhich(TVTB::svp(param))),
         length(vcfFiles),
         as.numeric(dt),
         units(dt)))
@@ -170,18 +165,17 @@ parseMultipleVcf<- function(
 }
 
 parseSingleVcf <- function(
-    file,
-    svp = VariantAnnotation::ScanVcfParam(),
+    file, param,
     yieldSize = NA_integer_){
     message("Parsing VCF file: ", file, " ...")
     tf <- Rsamtools::TabixFile(file)
 
     # scanTabix: 'yieldSize(file)' must be 'NA_integer_' when range specified
-    if (length(VariantAnnotation::vcfWhich(svp)) > 0)
+    if (length(VariantAnnotation::vcfWhich(TVTB::svp(param))) > 0)
         Rsamtools::yieldSize(tf) <- NA_integer_
 
     # Import variants
-    vcf <- VariantAnnotation::readVcf(file = tf, param = svp)
+    vcf <- TVTB::readVcf(tf, param = param)
 
     # Expand variants into bi-allelic records
     vcf <- VariantAnnotation::expand(vcf, row.names = TRUE)
@@ -190,14 +184,13 @@ parseSingleVcf <- function(
 }
 
 tryParseMultipleVcf <- function(
-    folder, pattern,
-    svp = VariantAnnotation::ScanVcfParam(),
+    folder, pattern, param,
     yieldSize = NA_integer_,
     BPPARAM = BiocParallel::SerialParam()){
 
     rawData <- tryCatch(
         parseMultipleVcf(
-            folder, pattern, svp = svp, yieldSize = yieldSize),
+            folder, pattern, param = param, yieldSize = yieldSize),
         warning = function(warn){
             warning(warn)
             return(NULL)},
@@ -210,15 +203,12 @@ tryParseMultipleVcf <- function(
     return(rawData)
 }
 
-tryParseSingleVcf <- function(
-    file,
-    svp = VariantAnnotation::ScanVcfParam(),
-    yieldSize = NA_integer_){
+tryParseSingleVcf <- function(file, param, yieldSize = NA_integer_){
 
     rawData <- tryCatch(
         parseSingleVcf(
             file = file,
-            svp = svp,
+            param = param,
             yieldSize = yieldSize),
         warning = function(warn){
             warning(warn)

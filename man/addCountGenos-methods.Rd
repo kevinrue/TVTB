@@ -62,8 +62,7 @@ and subsequently inserting the new data after the last remaining INFO field.
 }
 
 \seealso{
-\code{\link{countGenos,ExpandedVCF-method}},
-\code{\linkS4class{VCF}},
+\code{\link{countGenos,ExpandedVCF-method}}
 and \code{\link{geno,VCF-method}}
 }
 
@@ -71,27 +70,22 @@ and \code{\link{geno,VCF-method}}
 # Example data ----
 
 # VCF file
-extdata <- file.path(system.file(package = "TVTB"), "extdata")
-vcfFile <- file.path(extdata, "moderate.vcf")
+vcfFile <- system.file("extdata", "moderate.vcf", package = "TVTB")
 
 # TVTB parameters
-tparam <- TVTBparam(
-    genos = list(
-        REF = "0|0",
-        HET = c("0|1", "1|0"),
-        ALT = "1|1"))
+tparam <- TVTBparam(Genotypes(ref = "0|0", het = c("0|1", "1|0"), alt = "1|1"))
 
 # Pre-process variants
-vcf <- VariantAnnotation::readVcf(file = vcfFile)
+vcf <- VariantAnnotation::readVcf(vcfFile, param = tparam)
 vcf <- VariantAnnotation::expand(vcf, row.names = TRUE)
+
 
 # Example usage ----
 
-## NOTE: use.names=FALSE is more accurate but not strictly necessary
-addCountGenos(
-    vcf = vcf, genos = unlist(het(tparam), use.names = FALSE),
-    key = names(het(tparam)),
-    description = "Number of heterozygous genotypes")
+vcf <- addCountGenos(
+    vcf, het(tparam),
+    suffix(tparam)["het"],
+    "Number of heterozygous genotypes")
 }
 
 \keyword{methods}

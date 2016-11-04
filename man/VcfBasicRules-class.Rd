@@ -23,6 +23,14 @@
 \alias{initialize,VcfVepRules-method}
 
 % Accessor methods:
+\alias{type,FilterRules-method}
+\alias{type,VcfFixedRules-method}
+\alias{type,VcfInfoRules-method}
+\alias{type,VcfVepRules-method}
+
+\alias{vep,FilterRules-method}
+\alias{vep,VcfFixedRules-method}
+\alias{vep,VcfInfoRules-method}
 \alias{vep,VcfVepRules-method}
 \alias{vep<-,VcfVepRules,character-method}
 
@@ -42,9 +50,9 @@
 \alias{[[<-,VcfInfoRules,ANY,ANY-method}
 \alias{[[<-,VcfVepRules,ANY,ANY-method}
 % [<-
-\alias{[<-,VcfFixedRules,ANY,ANY,ANY-method}
-\alias{[<-,VcfInfoRules,ANY,ANY,ANY-method}
-\alias{[<-,VcfVepRules,ANY,ANY,ANY-method}
+\alias{[<-,VcfFixedRules,numeric,missing,VcfFixedRules-method}
+\alias{[<-,VcfInfoRules,numeric,missing,VcfInfoRules-method}
+\alias{[<-,VcfVepRules,numeric,missing,VcfVepRules-method}
 
 % Combine methods:
 \alias{c,VcfFixedRules-method}
@@ -82,12 +90,20 @@ In the following code snippets \code{x} is an object from any of the classes
 decribed in this help page, except when specified otherwise.
 \describe{
     \item{\code{active(x)}, \code{active(x)<-}}{
-    Get or set the active state of each filter rule in \code{x}.
+    Gets or sets the active state of each filter rule in \code{x}.
     Inherited from \code{\linkS4class{FilterRules}}
     }
     \item{\code{vep(x)}, \code{vep(x)<- }}{
-    Gets the INFO key where the Ensembl VEP predictions to use for filtering
-    are stored. \emph{This accessor is only applicable to \code{VcfVepRules}}.
+    Gets or sets the INFO key where the Ensembl VEP predictions
+    to use for filtering are stored.
+    Returns \code{NA_character_} for filters not applicable to VEP predictions.
+    }
+    \item{\code{type(x)}}{
+    Returns \code{"filter"} (\code{linkS4class{FilterRules}}),
+    \code{"fixed"} (\code{linkS4class{VcfFixedRules}}),
+    \code{"info"} (\code{linkS4class{VcfInfoRules}}),
+    or \code{"vep"} (\code{linkS4class{VcfVepRules}})
+    as a \code{character} vector of \code{length(x)}.
     }
 }
 }
@@ -100,7 +116,7 @@ decribed in this help page, except when specified otherwise.
 
 \code{VcfVepRules(exprs = list(), ..., active = TRUE, vep = "CSQ")}
 
-all construct an object of the corresponding class
+All methods construct an object of the corresponding class
 with the rules given in the list \code{exprs} or in \code{...}.
 The initial active state of the rules is given by \code{active},
 which is recycled as necessary.
@@ -161,50 +177,27 @@ produces a \code{VcfFilterRules} object.
 As described in the \code{S4Vectors} documentation:
 \describe{
 \item{}{
-    \code{eval(expr, envir = parent.frame(),
-    enclos = if (is.list(envir) || is.pairlist(envir))
-    parent.frame() else baseenv())}:
+    \code{eval(expr, envir, enclos)}:
     Evaluates a rule instance (passed as the \code{expr} argument)
     in their respective context of a \code{VCF} object
     (passed as the \code{envir} argument).
-    \emph{I.e.}:
+    \emph{i.e.}:
     \itemize{
     \item{\strong{\code{VcfFixedRules}}: \code{fixed(envir)}}
     \item{\strong{\code{VcfInfoRules}}: \code{info(envir)}}
-    \item{\strong{\code{VcfVepRules}}: \code{parseCSQToGRanges(envir, ...)}}
+    \item{\strong{\code{VcfVepRules}}:
+        \code{mcols(parseCSQToGRanges(envir, ...))}}
+    \item{\strong{\code{FilterRules}}: \code{envir}}
     }
+}
+\item{}{
+    \code{evalSeparately(expr, envir, enclos)}:
 
-    Expression rules are
-    evaluated in \code{envir}, while function rules are invoked with
-    \code{envir} as their only argument. The evaluation of a rule
-    should yield a logical vector. The results from the rule
-    evaluations are combined via the AND operation (i.e. \code{&}) so
-    that a single logical vector is returned from \code{eval}.
-}
-\item{}{
-    \code{evalSeparately(expr, envir = parent.frame(), enclos = if
-    (is.list(envir) || is.pairlist(envir)) parent.frame() else
-    baseenv())}: Evaluates separately each rule in a
-    rule instance (passed as the \code{expr}
-    argument). Expression rules are evaluated in \code{envir}, while
-    function rules are invoked with \code{envir} as their only
-    argument. The evaluation of a rule should yield a logical
-    vector. The results from the rule evaluations are combined into
-    a logical matrix, with a column for each rule. This is
-    essentially the parallel evaluator, while \code{eval} is the
-    serial evaluator.
-}
-\item{}{
-    \code{subsetByFilter(x, filter)}: Evaluates \code{filter} on
-    \code{x} and uses the result to subset \code{x}. The result
-    contains only the elements in \code{x} for which \code{filter}
-    evaluates to \code{TRUE}.
-}
-\item{}{\code{summary(object)}:
-    Returns an integer vector with the number of elements
-    that pass each rule in a \code{FilterMatrix}
-    (passed as the \code{object} argument), along with
-    a count of the elements that pass all filters.
+        \code{subsetByFilter(x, filter)}
+
+        \code{summary(object)}
+
+        See \code{\link{eval,FilterRules,ANY-method}} for details.
 }
 }
 }
@@ -222,23 +215,29 @@ and \code{\linkS4class{VCF}}.
 \examples{
 # Constructors ----
 
-fixedRules <- VcfFixedRules(exprs = list(
+fixedRules <- VcfFixedRules(list(
     pass = expression(FILTER == "PASS"),
     qual = expression(QUAL > 20)
     ))
 fixedRules
 
-infoRules <- VcfInfoRules(exprs = list(
-    common = expression(MAF > 0.1), # minor allele frequency
+infoRules <- VcfInfoRules(list(
+    common = expression(MAF > 0.01), # minor allele frequency
     alt = expression(ALT > 0) # count of alternative homozygotes
     ))
 infoRules
 
-vepRules <- VcfVepRules(exprs = list(
+vepRules <- VcfVepRules(list(
     missense = expression(Consequence \%in\% c("missense_variant")),
     CADD = expression(CADD_PHRED > 15)
     ))
 vepRules
+
+filterRules <- S4Vectors::FilterRules(list(
+    PASS = function(x) fixed(x)$FILTER == "PASS",
+    COMMON = function(x) info(x)$MAF > 0.05
+    ))
+filterRules
 
 # Accessors ----
 
@@ -248,38 +247,40 @@ S4Vectors::active(infoRules)["common"] <- FALSE
 
 ## See S4Vectors::FilterRules for more examples
 
+
 # Example data ----
 
 # VCF file
-extdata <- file.path(system.file(package = "TVTB"), "extdata")
-vcfFile <- file.path(extdata, "moderate.vcf")
+vcfFile <- system.file("extdata", "moderate.vcf", package = "TVTB")
 
 # TVTB parameters
-tparam <- TVTBparam(
-    genos = list(
-        REF = "0|0",
-        HET = c("0|1", "1|0"),
-        ALT = "1|1"))
+tparam <- TVTBparam(Genotypes("0|0", c("0|1", "1|0"), "1|1"))
 
 # Pre-process variants
-vcf <- VariantAnnotation::readVcf(file = vcfFile)
+vcf <- VariantAnnotation::readVcf(vcfFile, param = tparam)
 vcf <- VariantAnnotation::expand(vcf, row.names = TRUE)
-vcf <- addOverallFrequencies(vcf = vcf, param = tparam)
+vcf <- addOverallFrequencies(vcf)
+
 
 # Applying filters to VCF objects ----
 
 ## Evaluate filters
-S4Vectors::eval(expr = fixedRules, envir = vcf)
-S4Vectors::eval(expr = infoRules, envir = vcf)
-S4Vectors::eval(expr = vepRules, envir = vcf)
-summary(S4Vectors::eval(expr = vepRules, envir = vcf))
+S4Vectors::eval(fixedRules, vcf)
+S4Vectors::eval(infoRules, vcf)
+S4Vectors::eval(vepRules, vcf)
+S4Vectors::eval(filterRules, vcf)
+
+summary(S4Vectors::eval(vepRules, vcf))
+
 
 ## Evaluate filters separately
-S4Vectors::evalSeparately(expr = vepRules, envir = vcf)
-summary(S4Vectors::evalSeparately(expr = vepRules, envir = vcf))
+S4Vectors::evalSeparately(vepRules, vcf)
+
+summary(S4Vectors::evalSeparately(vepRules, vcf))
 
 ## Subset VCF by filters
-S4Vectors::subsetByFilter(x = vcf, filter = vepRules)
+S4Vectors::subsetByFilter(vcf, vepRules)
+
 
 # Subsetting and Replacement ----
 
@@ -291,6 +292,6 @@ vepRules[[2]] <- expression(CADD_PHRED > 30)
 
 # Replace the rule (active state and name transferred from v5obj)
 vepRules[2] <- VcfVepRules(
-    exprs = list(newRule = expression(CADD_PHRED > 30)),
+    list(newRule = expression(CADD_PHRED > 30)),
     active = FALSE)
 }

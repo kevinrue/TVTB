@@ -57,17 +57,17 @@ Currently, major functionalities in the `r Biocpkg("TVTB")` package include:
 
 * List of reference homozygote, heterozygote, and alternate homozygote
     genotype encodings
-* Suffix of the INFO fields where calculated data will be stored
 * Key of the INFO field where Ensembl VEP predictions are stored
     in the VCF file
+* Suffix of the INFO fields where calculated data will be stored
 * List of genomic ranges to analyse and visualise
 * Parameters for parallel calculations (using `r Biocpkg("BiocParallel")`)
 
 **Genotype counts and allele frequencies**
 
-* May be calculated from the data of an `ExpandedVCF` objects
+* Calculated from the data of an `ExpandedVCF` objects
     (*i.e.* bi-allelic records)
-* Stored in INFO fields of the `ExpandedVCF` object
+* Stored in INFO fields defined by the above suffixes
     + overall counts and frequencies (*i.e.* across all samples)
     + counts and frequencies within level(s) of phenotype(s)
 
@@ -75,27 +75,10 @@ Currently, major functionalities in the `r Biocpkg("TVTB")` package include:
 
 * Filter rules applicable to the `fixed` slot of an `VCF` object
 * Filter rules applicable to the `info` slot of an `VCF` object
-* Filter rules applicable to the Ensembl VEP predictions stored in a
-given INFO field of a `VCF` object
+* Filter rules applicable to Ensembl VEP predictions stored in a
+    given INFO field
 * A container for combinations of filter rules listed above
-* Subset a `VCF` object using any combination of the above filter rules
-
-**Counts of discrete Ensembl VEP predictions**
-
-* Count VEP predictions in levels of a given phenotype
-    + returned as a `data.frame` or a stacked `r Biocpkg("ggplot2")`
-        `geom_bar` layer
-    + returned as a `geom_bar` layer representing stacked
-        *percentage* of VEP predictions
-    + optionally faceted by another Ensembl VEP prediction
-        (*e.g.* `"Feature"`)
-
-**Density of continuous Ensembl VEP predictions**
-
-* Ditribution of VEP predictions in levels of a phenotype
-    + as a `r Biocpkg("ggplot2")` `geom_density` and/or `geom_dotplot` layer
-    + as a `data.frame` listing all values faceted by phenotype level
-    + optionally faceted by another Ensembl VEP prediction
+* Subset `VCF` objects using the above filter rules
 
 # Installation {#Installation}
 
@@ -104,7 +87,7 @@ The VCF Tool Box can be installed using the following code:
 ```{r biocLite, eval=FALSE}
 # Currently:
 devtools::install_github("kevinrue/TVTB")
-# Soon:
+# When hosted on Bioconductor:
 source("http://bioconductor.org/biocLite.R")
 biocLite("TVTB")
 ```
@@ -117,11 +100,13 @@ library(TVTB)
 
 # Recurrent settings: TVTBparam {#TVTBparam}
 
-Many functionalities in `r Biocpkg("TVTB")` require recurrent information
+Most functionalities in `r Biocpkg("TVTB")` require recurrent information
 such as:
 
 * Genotype encoding (homozygote reference, heterozygote, homozygote alternate),
 * INFO key that contains the Ensembl VEP predictions in the VCF file,
+* List of genomic ranges within which data must be summarised or visualised
+    + affecting the genomic ranges to import from the VCF file 
 * Suffixes of INFO keys where counts and frequencies of genotypes must be
     stored:
     + Counts and frequencies may be calculated for individual levels of
@@ -144,36 +129,31 @@ across the package.
 A `TVTBparam` object may be initialised as follows:
 
 ```{r TVTBparamCreate}
-tparam <- TVTBparam(
-    genos = list(
-        REF = c("0|0"),
-        HET = c("0|1", "1|0", "0|2", "2|0", "1|2", "2|1"),
-        ALT = c("1|1", "2|2")), # required
-    ranges = GenomicRanges::GRangesList( # optional
-        GenomicRanges::GRanges(
+tparam <- TVTBparam(Genotypes(
+    ref = "0|0",
+    het = c("0|1", "1|0", "0|2", "2|0", "1|2", "2|1"),
+    alt = c("1|1", "2|2")),
+    ranges = GenomicRanges::GRangesList(
+        SLC24A5 = GenomicRanges::GRanges(
             seqnames = "15",
             IRanges::IRanges(
-                start = 48413170, end = 48434757, names = "SLC24A5")
+                start = 48413170, end = 48434757)
             )
-        ),
-    aaf = "AAF", # default (optional)
-    maf = "MAF", # default (optional)
-    vep = "CSQ", # default (optional)
-    bp = BiocParallel::SerialParam()) # default (optional)
+        )
+    )
 ```
 
-`TVTBparam` objects have a convenient summary view:
+`TVTBparam` objects have a convenient summary view and accessor methods:
 
 ```{r TVTBparamView}
 tparam
 ```
 
-In addition, accessors and setters were implemented for all slots of the class.
-
 In this example:
 
 * **Genotypes**
-    + Accessor: `genos(tparam)`
+    + Accessor: `genos(x)`
+    + Class: `Genotypes`
     + Homozygote reference genotype is encoded `"0|0"`.
     + Counts of reference genotypes are stored in INFO keys suffixed with
         `"REF"`.
@@ -185,20 +165,27 @@ In this example:
     + Counts of alternate genotypes are stored in INFO keys suffixed with
         `"ALT"`.
 * **Genomic ranges**
-    + Accessor: `ranges(tparam)`
+    + Accessor: `ranges(x)`
+    + Class: `GRangesList`
     + A gene-coding region on chromosome `"15"`.
 * **Alternate allele frequency**
-    + Accessor: `aaf(tparam)`
+    + Accessor: `aaf(x)`
     + Calculated values will be stored under INFO keys suffixed with `"AAF"`.
 * **Minor allele frequency**
-    + Accessor: `maf(tparam)`
+    + Accessor: `maf(x)`
     + Calculated values will be stored under INFO keys suffixed with `"MAF"`.
 * **Ensembl VEP predictions**
-    + Accessor: `vep(tparam)`
+    + Accessor: `vep(x)`
     + Information will be imported from the INFO field `"CSQ"`.
 * **Parallel calculations**
-    + Accessor: `bp(tparam)`
-    + Inactivated: *Serial calculations will be performed*.
+    + Accessor: `bp(x)`
+    + Class: `BiocParallelParam`
+    + Serial evaluation (*i.e.* do not run parallel code)
+* **VCF scan parameters**
+    + Accessor: `svp(x)`
+    + Class: `ScanVcfParam`
+    + `which` slot automatically populated with `reduce(unlist(ranges(x)))`
+    + `info` slot automatically populated with `vep(x)`
 
 Default values are provided for all slots except genotypes, as these may vary
 more frequently from one data set to another (*e.g.* phased, unphased,
@@ -223,30 +210,20 @@ Any information that users deem relevant for the analysis may be
 imported from VCF files and stored in
 `VCF` objects passed to `r Biocpkg("TVTB")` methods.
 However, to enable the key functionalities of the package,
-the various slots of a `VCF` object should include
+the slots of a `VCF` object should include
 at least the following information:
 
 * `fixed(x)`
-    + No minimal requirement.
-    + **Recommended**: at least the fields `"REF"` and `"ALT"`.
+    + fields `"REF"` and `"ALT"`.
     
 * `info(x)`
-    + No minimal requirement.
-    + **Recommended**:
-        field `<vep>`: where `<vep>` stands for the INFO key where
+    + field `<vep>`: where `<vep>` stands for the INFO key where
         the Ensembl VEP predictions are stored in the `VCF` object.
     
 * `geno(x)`
     + `GT`: genotypes.
 
 * `colData(x)`: phenotypes.
-
-\bioccomment{
-In the future, `geno(x)[["GQ"]]` may be recommended, if available.
-For instance, this could enable inclusion (or exclusion) of individual
-genotypes on the basis of passing a genotype quality cut-off
-when counting genotypes in phenotype levels.
-}
 
 ## List of genomic ranges {#ImportGRangesList}
 
@@ -261,25 +238,17 @@ in example,
 as each `GRanges` in the `GRangesList` would represent a transcript,
 and each element in the `GRanges` would represent an exon.
 
-Although currently, none of the `r Biocpkg("TVTB")` package functions
-access the `ranges` slot
-of `TVTBparam` objects, users may already use it to store a list of genomic
-ranges, thereby reducing the number of objects in their workspace.
-For instance, the `r Biocpkg("VariantAnnotation")` `ScanVcfParam` class
-accepts `r Biocpkg("GenomicRanges")` `GRanges` objects (in the `which` slot)
-that describes the sequences and ranges to be queried from VCF file(s):
+Furthermore, `TVTBparam` objects may be supplied as the `param`
+argument of the `r Biocpkg("VariantAnnotation")` `readVcf`. In this case,
+`TVTBparam` object is used to import variants overlapping
+the relevant genomic regions.
+Moreover, the `readVcf` method also ensured that the `vep` slot of the
+`TVTBparam` object is present in the header of the VCF file.
 
-```{r, reduceGRangesList, results='hide'}
-ScanVcfParam(which = GenomicRanges::reduce(unlist(ranges(tparam))))
+```{r, reduceGRangesList}
+svp <- as(tparam, "ScanVcfParam")
+svp
 ```
-
-**Tip**: In the chunk of code above, the `reduce` method is used to ensure
-that each genomic position is only covered by a single `GRanges`,
-therefore reducing the chances of importing certain variants multiple times
-(this occurs if they overlap multiple `GRanges`). Note that after reduction 
-genetic insertions and deletions may still overlap
-distinct non-overlapping `GRanges`,
-or stranded `GRanges` overlapping from an unstranded perspective.
 
 ## Phenotypes {#ImportPhenotypes}
 
@@ -292,8 +261,10 @@ between groups of samples
 (as `r Biocpkg("S4Vectors")` `DataFrame`) in the `colData` slot.
 This practice has the key advantage of keeping phenotype and genetic
 information synchronised through operation such as subsetting and re-ordering,
-limiting [software entropy](https://en.wikipedia.org/wiki/Software_entropy)
+limiting workspace [entropy](https://en.wikipedia.org/wiki/Software_entropy)
 and confusion.
+
+
 
 ## Example {#ImportExample}
 
@@ -303,8 +274,8 @@ of the vignette can be created as follows:
 **Step 1:** Import phenotypes
 
 ```{r importPhenotypes}
-extdata <- system.file("extdata", package = "TVTB")
-phenoFile <- file.path(extdata, "integrated_samples.txt")
+phenoFile <- system.file(
+    "extdata", "integrated_samples.txt", package = "TVTB")
 phenotypes <- S4Vectors::DataFrame(
     read.table(file = phenoFile, header = TRUE, row.names = 1))
 ```
@@ -312,39 +283,46 @@ phenotypes <- S4Vectors::DataFrame(
 **Step 2:** Define the VCF file to parse
 
 ```{r vcfFile}
-vcfFile <- file.path(extdata, "chr15.phase3_integrated.vcf.gz")
+vcfFile <- system.file(
+    "extdata", "chr15.phase3_integrated.vcf.gz", package = "TVTB")
 tabixVcf <- Rsamtools::TabixFile(file = vcfFile)
 ```
 
 **Step 3:** Define VCF import parameters
 
 ```{r ScanVcfParam}
-svp <- VariantAnnotation::ScanVcfParam(
-    fixed = c("ALT", "QUAL", "FILTER"), # all fields: could be omitted
-    info = vep(tparam), # an application of the TVTBparam class
-    geno = "GT", # all fields: could be omitted in this case
-    samples = rownames(phenotypes),
-    which = GenomicRanges::reduce(unlist(ranges(tparam))))
+VariantAnnotation::vcfInfo(svp(tparam)) <- vep(tparam)
+VariantAnnotation::vcfGeno(svp(tparam)) <- "GT"
+svp(tparam)
 ```
 
-Of particular interest in the above chunk of code, the slots:
+Of particular interest in the above chunk of code:
 
-* `samples`: import only samples with phenotype information
-* `info` demonstrates the utility of the `TVTBparam` class for storing
-    recurrent parameters
-* `which`: import only variants in the targeted list of genomic ranges;
-    demonstrates another application of the `TVTBparam` class
+* The [earlier](#ImportGRangesList) coercion of `TVTBparam` to `ScanVcfParam`
+    populated the `which` slot of `svp` with "reduced" (*i.e.* non-overlapping)
+    genomic ranges defined in the `ranges` slot.
+* Only the INFO key defined in the `vep` slot is imported
+* Only the matrix of called genotypes is imported
 
 **Step 4:** Import and pre-process variants
 
 ```{r preprocessVariants, message=FALSE}
 # Import variants as a CollapsedVCF object
-vcf <- VariantAnnotation::readVcf(file = tabixVcf, param = svp)
-# Combine with phenotype information
-SummarizedExperiment::colData(vcf) <- phenotypes
+vcf <- VariantAnnotation::readVcf(
+    tabixVcf, param = tparam, colData = phenotypes)
 # Expand into a ExpandedVCF object (bi-allelic records)
 vcf <- VariantAnnotation::expand(x = vcf, row.names = TRUE)
 ```
+
+Of particular interest in the above chunk of code, the `readVcf` method is
+given:
+
+* `TVTBparam` parameters, invoking the corresponding method signature
+* phenotypes
+    + The `rownames` of those phenotypes defines the sample identifiers that
+        are queried from the VCF file.
+    + Those phenotypes are stored in the `colData` slot of the resulting
+        `VCF` object.
 
 The result is an `ExpandedVCF` object that includes variants
 in the targeted genomic range(s) and samples:
@@ -366,7 +344,8 @@ methods implemented in the `r Biocpkg("TVTB")` package.
 
 For instance, the method `addOverallFrequencies` uses the
 reference homozoygote (*REF*), heterozygote (*HET*),
-and homozygote alternate (*ALT*) genotypes defined in a `TVTBparam` object
+and homozygote alternate (*ALT*) genotypes defined in the `TVTBparam` object
+stored in the `VCF` metadata
 to obtain the count of each genotype in an `ExpandedVCF` object.
 Immediately thereafter, the method uses those counts to calculate
 alternate allele frequency (*AAF*) and minor allele frequency (*MAF*).
@@ -376,7 +355,7 @@ in INFO keys defined by suffixes also declared in the `TVTBparam` object.
 
 ```{r addOverallFrequencies}
 initialInfo <- colnames(info(vcf))
-vcf <- addOverallFrequencies(vcf = vcf, param = tparam)
+vcf <- addOverallFrequencies(vcf = vcf)
 setdiff(colnames(info(vcf)), initialInfo)
 ```
 
@@ -384,7 +363,7 @@ Notably, the `addOverallFrequencies` method is synonym to the `addFrequencies`
 method missing the argument `phenos`:
 
 ```{r addFrequenciesOverall}
-vcf <- addFrequencies(vcf = vcf, param = tparam, force = TRUE)
+vcf <- addFrequencies(vcf = vcf, force = TRUE)
 ```
 
 \bioccomment{
@@ -397,12 +376,13 @@ to overwrite INFO keys created in the previous chunk of code.
 Similarly, the method `addPhenoLevelFrequencies` obtains the count of each
 genotype in samples associated with given level(s) of given phenotype(s),
 and stores the calculated values in INFO keys defined as 
-`<pheno>_<level>_<suffix>`, with suffixes defined in the `TVTBparam` object.
+`<pheno>_<level>_<suffix>`, with suffixes defined in the `TVTBparam` object
+stored in the `VCF` metadata.
 
 ```{r addPhenoLevelFrequencies}
 initialInfo <- colnames(info(vcf))
 vcf <- addPhenoLevelFrequencies(
-    vcf = vcf, pheno = "super_pop", level = "AFR", param = tparam)
+    vcf = vcf, pheno = "super_pop", level = "AFR")
 setdiff(colnames(info(vcf)), initialInfo)
 ```
 
@@ -418,7 +398,7 @@ vcf <- addFrequencies(
     vcf = vcf, phenos = list(
         super_pop = c("EUR", "AFR"),
         pop = c("GBR", "FIN", "MSL")),
-    param = tparam, force = TRUE)
+    force = TRUE)
 setdiff(colnames(info(vcf)), initialInfo)
 ```
 
@@ -442,27 +422,49 @@ To facilitate the definition of VCF filter rules, and their application to
 
 |       Class       | Motivation                                              |
 | :--------------:  | :------------------------------------------------------ |
-|  VcfFixedRules    | Filter rules applicable to the `fixed` slot of a        |
+|   `FilterRules`   | Filter rules applied to a full `VCF` object (rules must |
+|  (parent class)   | refer explicitely to slots of the `VCF` object).        |
+|                   |                                                         |
+|  `VcfFixedRules`  | Filter rules applied to the `fixed` slot of a           |
 |                   | `VCF` object.                                           |
 |                   |                                                         |
-|   VcfInfoRules    | Filter rules applicable to the `info` slot of a         |
+|   `VcfInfoRules`  | Filter rules applied to the `info` slot of a            |
 |                   | `VCF` object.                                           |
 |                   |                                                         |
-|   VcfVepRules     | Filter rules applicable to the Ensembl VEP predictions  |
+|   `VcfVepRules`   | Filter rules applied to the Ensembl VEP predictions     |
 |                   | stored in a given INFO key of a `VCF` object.           |
 |                   |                                                         |
-|  VcfFilterRules   | Combination of `VcfFixedRules`, `VcfInfoRules`, and     |
+|  `VcfFilterRules` | Combination of `VcfFixedRules`, `VcfInfoRules`, and     |
 |                   |  `VcfVepRules` applicable to a `VCF` object.            |
 
 Table: Motivation for each of the new classes extending `FilterRules`
 to define VCF filter rules.
+
+Note that `FilterRules` objects themselves are applicable to `VCF` objects,
+with two important difference from the above specialised classes:
+
+* Expressions must explicitely refer to the `VCF` slots
+    (*e.g.* ``)
+* As a consequence, a single expression can refer to fields from different
+    `VCF` slots, for instance:
+
+```{r FilterRules}
+fr <- S4Vectors::FilterRules(list(
+    function(x){
+        VariantAnnotation::fixed(x)[,"FILTER"] == "PASS" &
+            VariantAnnotation::info(x)[,"MAF"] >= 0.05
+    }
+))
+fr
+```
+
 
 Instances of those classes may be initialised as follows:
 
 **VcfFixedRules**
 
 ```{r VcfFixedRules}
-fixedR <- VcfFixedRules(exprs = list(
+fixedR <- VcfFixedRules(list(
     pass = expression(FILTER == "PASS"),
     qual = expression(QUAL > 20)
     ))
@@ -524,11 +526,8 @@ active(vcfRules)["CADD"] <- FALSE
 active(vcfRules)
 ```
 
-A separate vignette described in greater detail the use of classes
+A separate vignette describes in greater detail the use of classes
 that contain *VCF filter rules*.
-
-Manipulation of *VCF filter rules* is described in more depth in a separate
-vignette.
 
 ## Evaluation of VCF filter rules {#FilterEval}
 
@@ -546,13 +545,6 @@ summary(evalSeparately(expr = vcfRules, envir = vcf))
 Note how the inactive rule `CADD` returns `TRUE` for all variants.
 }
 
-\fixme{
-I am not clear why in the vignette `summary` behaves like `summary.data.frame`,
-while RStudio seems to use a different method for `FilterMatrix`,
-indicating the count of variant initially, after each individual filter,
-and after evaluating all active filters.
-}
-
 # Summarising Ensembl VEP predictions {#Summarise}
 
 As soon as genetic and phenotypic information are imported
@@ -560,143 +552,22 @@ into an `ExpandedVCF` object,
 or after the object was extended with additional information,
 the scientific value of the data may be revealed by
 a variety of summary statistics and graphical representations.
-This section presents severeal ideas implemented in `r Biocpkg("TVTB")`[^1].
+This section will soon present several ideas *being implemented* in
+`r Biocpkg("TVTB")`, for instance:
 
-[^1]: More ideas are underway.
-
-It is important to highlight that `ggplot` objects
-include the data used for plotting in their `data` slot.
-Those data may be extracted, subsetted, and replaced to refine plots and
-summary tables beyond those produced by the package methods.
-In particular, the companion Shiny web-application *tSVE*
-included in the package takes advantage of this
-point to avoid calling multiple times certain time-consuming methods.
-
-## Counts of discrete Ensembl VEP predictions {#SummariseDiscrete}
-
-### Barplot {#SummariseDiscreteBarplot}
-
-The following chunk of code displays,
-for each super-population
-(*i.e.*, each level of the `"super_pop"` phenotype),
-the count of each Ensembl VEP prediction `"Consequence"`
-affecting each "genomic feature" (*i.e.*, transcript),
-considering for each super-population only variants:
-
-* Seen at least once among the corresponding group of samples,
-* With a [CADD score](http://cadd.gs.washington.edu)[^2] greater than `20`.
-
-[^2]: A tool for scoring the deleteriousness of genetic variants.
-
-```{r optsTabulateSet, include=FALSE}
-opts_chunk$set(
-    fig.width=13,
-    fig.height=7,
-    out.extra='angle=90',
-    out.width='7in',
-    out.height='13in'
-)
-```
-
-```{r tCBPplot, fig.cap="Counts of Ensembl VEP predictions."}
-library(ggplot2)
-filterCADD <- VcfVepRules(exprs = list(
-    CADD_20 = expression(as.numeric(CADD_PHRED) > 20)
-    ))
-tCBPplot <- tabulateVepByPhenotype(
-    vcf = vcf, phenoCol = "super_pop", vepCol = "Consequence",
-    param = tparam, filter = filterCADD,
-    unique = TRUE, facet = "Feature", percentage = FALSE,
-    plot = TRUE) +
-    theme(
-        legend.text = element_text(size = rel(0.8)),
-        axis.text.x = element_text(angle = 270,vjust = 0.5),
-        axis.title.y = element_text(angle = 270),
-        axis.text.y = element_text(angle = 270,hjust = 0.5)
-    )
-
-tCBPplot
-```
-
-```{r optsTabulateReset, include=FALSE}
-opts_chunk$set(optChunkDefault)
-```
-
-### Table (data.frame) {#SummariseDiscreteTable}
-
-The same counts can also be summarised as a `data.frame` using
-the option `plot=FALSE`:
-
-```{r tCBPtableWide}
-tCBPwide <- tabulateVepByPhenotype(
-        vcf = vcf, phenoCol = "super_pop", vepCol = "Consequence",
-        param = tparam,
-        unique = TRUE, facet = "Feature", plot = FALSE
-    )
-```
-
-of which only the subset corresponding to *missense variants* is shown here:
-
-```{r tCBPtableWideSubset, eval=FALSE}
-subset(tCBPwide, Consequence == "missense_variant")
-```
-
-```{r tCBPtableWideSubsetShow, results="asis", echo=FALSE}
-knitr::kable(
-    x = subset(tCBPwide, Consequence == "missense_variant"),
-    row.names = FALSE,
-    caption = "Table of consequence by phenotype by feature in wide format.")
-```
-
-## Distribution of continuous Ensembl VEP predictions {#SummariseContinuous}
-
-For Ensembl VEP predictions on a continuous scale, it may be interesting to
-visualise the distribution of values as a density plot.
-In the following chunk of code, the density distribution of
-[CADD score](http://cadd.gs.washington.edu) is visualised
-for *missense variants* affecting each feature in each super-population:
-
-```{r optsDensitySet, include=FALSE}
-opts_chunk$set(
-    fig.width=13,
-    fig.height=7,
-    out.extra='angle=90',
-    out.width='7in',
-    out.height='13in'
-)
-```
-
-```{r dCBPplot, fig.cap="Density and dot plots of Ensembl VEP predictions."}
-densityVepByPhenotype(
-        vcf = vcf, phenoCol = "super_pop", vepCol = "CADD_PHRED",
-        param = tparam, filter = vcfRules["missense"],
-        unique = TRUE, facet = "Feature", plot = TRUE, popFreq = FALSE,
-        layer = "density+dotplot") +
-    theme(
-        legend.key.size = unit(1.2, "lines"),
-        legend.title = element_text(size = rel(1.2)),
-        legend.text = element_text(size = rel(1.2)),
-        axis.text.x = element_text(angle = 270,
-            vjust = 0.5),
-        axis.title.y = element_text(angle = 270),
-        axis.text.y = element_text(angle = 270, hjust = 0.5)
-    )
-```
-
-\bioccomment{
-The vertical density lines and rectangles are visual artefacts produced when
-only one or two variants are seen in a given phenotype level, respectively.
-}
-
-```{r optsDensityReset, include=FALSE}
-opts_chunk$set(optChunkDefault)
-```
+* Count of discrete Ensembl VEP predictions
+    + by phenotype level
+    + by genomic feature affected (*i.e.* transcript)
+* Distribution of continuous Ensembl VEP predictions
+    + by phenotype level
+    + by genomic feature affected (*i.e.* transcript)
 
 # Acknowledgement
 
 Dr. Stefan Gräf and Mr. Matthias Haimel
 for advice on the VCF file format and the Ensembl VEP script.
 Prof. Martin Wilkins for his trust and support.
+Dr. Michael Lawrence for his helpful code review and suggestions.
 
 Last but not least, the amazing collaborative effort of the `rep("many",10)`
 [Bioconductor](http://bioconductor.org) developers whose hard work

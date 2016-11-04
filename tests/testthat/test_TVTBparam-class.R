@@ -2,20 +2,7 @@ context("TVTBparam")
 
 # Settings ----
 
-genotypes <- list(
-    REF = c("0|0"),
-    HET = c("0|1", "1|0"),
-    ALT = c("1|1")
-)
-
-genotypesNoName <- genotypes
-names(genotypesNoName) <- NULL
-
-genotypesPartiallyNamed <- genotypes
-names(genotypesPartiallyNamed)[2] <- ""
-
-genotypesOverlapping <- genotypes
-genotypesOverlapping[[2]] <- genotypesOverlapping[[1]]
+genotypes <- Genotypes("0|0", c("0|1", "1|0"), "1|1")
 
 gr <- GenomicRanges::GRanges(
     seqnames = "15", ranges = IRanges::IRanges(
@@ -23,14 +10,14 @@ gr <- GenomicRanges::GRanges(
         end = 48434757,
         names = "SLC24A5"))
 
-grl <- GRangesList(gr)
+grl <- GenomicRanges::GRangesList(gr)
 
 # Constructors ----
 
 test_that("Constructors produce a valid object",{
 
     expect_s4_class(
-        TVTBparam(genos = genotypes),
+        TVTBparam(genotypes),
         "TVTBparam"
     )
 
@@ -41,85 +28,50 @@ test_that("Constructors produce a valid object",{
 test_that("suffixes cannot overlap",{
 
     expect_error(
-        TVTBparam(
-            genos = list(
-                ref = genotypes[["REF"]],
-                het = genotypes[["HET"]],
-                alt = genotypes[["ALT"]]),
-            aaf = "ref")
+        TVTBparam(genotypes, aaf = "REF")
     )
 
 })
 
-test_that("Constructors adds default genotype labels if missing",{
+# Conflict vep/INFO ----
 
-    expect_s4_class(
-        TVTBparam(genos = genotypesNoName),
-        "TVTBparam"
-    )
-
-})
-
-# Invalid constructor inputs ----
-
-test_that("Three genotypes are required",{
+test_that("vep key must be in ScanVcfParam:INFO",{
 
     expect_error(
-        TVTBparam(genos = genotypes[1:2])
-    )
-
-})
-
-test_that("Partially named genotypes are not allowed",{
-
-    expect_error(
-        TVTBparam(genos = genotypesPartiallyNamed)
-    )
-
-})
-
-test_that("Overlapping genotypes are not allowed",{
-
-    expect_error(
-        TVTBparam(genos = genotypesOverlapping)
+        TVTBparam(genotypes, vep = "CSQ", svp = ScanVcfParam(info = "ANN"))
     )
 
 })
 
 # Accessors ----
 
-tparam <- new("TVTBparam", genos = genotypes)
+tparam <- TVTBparam(genotypes)
 
 test_that("Accessors return valid values",{
 
-    expect_type(
+    expect_s4_class(
         genos(tparam),
-        "list"
+        "Genotypes"
     )
 
     expect_type(
-        sapply(genos(tparam), "class"),
+        ref(tparam),
         "character"
     )
 
     expect_type(
-        hRef(tparam),
-        "list"
-    )
-
-    expect_type(
         het(tparam),
-        "list"
+        "character"
     )
 
     expect_type(
-        hAlt(tparam),
-        "list"
+        alt(tparam),
+        "character"
     )
 
     expect_type(
         carrier(tparam),
-        "list"
+        "character"
     )
 
     expect_s4_class(
@@ -142,40 +94,35 @@ test_that("Accessors return valid values",{
         "character"
     )
 
+    expect_s4_class(
+        svp(tparam),
+        "ScanVcfParam"
+    )
+
+    expect_type(
+        suffix(tparam),
+        "character"
+    )
+
+    expect_s4_class(
+        bp(tparam),
+        "BiocParallelParam"
+    )
+
 })
 
 # Setters ----
 
 test_that("Setters return valid values",{
 
-    expect_type(
-        genos(tparam) <- genotypes,
-        "list"
+    expect_s4_class(
+        genos(tparam) <- Genotypes("a", "b", "c"),
+        "Genotypes"
     )
 
     expect_type(
-        genos(tparam) <- genotypesNoName,
-        "list"
-    )
-
-    expect_type(
-        names(genos(tparam)) <- LETTERS[1:3],
+        ref(tparam) <- "0/0",
         "character"
-    )
-
-    expect_type(
-        hRef(tparam) <- list(ref = "0/0"),
-        "list"
-    )
-
-    expect_type(
-        hRef(tparam) <- "0/0",
-        "character"
-    )
-
-    expect_type(
-        het(tparam) <- list(het = c("0/1", "1/0")),
-        "list"
     )
 
     expect_type(
@@ -184,20 +131,8 @@ test_that("Setters return valid values",{
     )
 
     expect_type(
-        hAlt(tparam) <- list(alt = "1/1"),
-        "list"
-    )
-
-    expect_type(
-        hAlt(tparam) <- c("1/1"),
+        alt(tparam) <- c("1/1"),
         "character"
-    )
-
-    expect_type(
-        carrier(tparam) <- list(
-            het = c("0/1", "1/0"),
-            alt = "1/1"),
-        "list"
     )
 
     expect_s4_class(
@@ -220,6 +155,21 @@ test_that("Setters return valid values",{
         "character"
     )
 
+    expect_type(
+        vep(tparam) <- "CSQ",
+        "character"
+    )
+
+    expect_s4_class(
+        svp(tparam) <- ScanVcfParam(fixed = c("REF", "ALT")),
+        "ScanVcfParam"
+    )
+
+    expect_s4_class(
+        bp(tparam) <- BiocParallel::SerialParam(),
+        "BiocParallelParam"
+    )
+
 })
 
 # Invalid setters inputs ----
@@ -227,7 +177,7 @@ test_that("Setters return valid values",{
 test_that("Setters catch invalid inputs",{
 
     expect_error(
-        genos(tparam) <- genotypesPartiallyNamed
+        alt(tparam) <- character()
     )
 
     expect_error(
@@ -244,30 +194,21 @@ test_that("Setters catch invalid inputs",{
 
 })
 
-# Override ----
-
-test_that("Override method return valid values",{
-
-    expect_s4_class(
-        .override.TVTBparam(
-            param = tparam,
-            ref = "0/0",
-            het = "0/1",
-            alt = "1/1",
-            ranges = grl,
-            aaf = "Aaf",
-            maf = "Maf",
-            vep = "ANN",
-            bp = BiocParallel::MulticoreParam(workers = 2)),
-        "TVTBparam"
-    )
-
-})
-
 # show ----
 
 test_that("show method return valid values",{
 
     expect_null(show(tparam))
+
+})
+
+# Coerce ----
+
+test_that("TVTBparam can be coerced to ScanVcfParam",{
+
+    expect_s4_class(
+        as(tparam, "ScanVcfParam"),
+        "ScanVcfParam"
+    )
 
 })

@@ -1,7 +1,7 @@
 \name{variantsInSamples-methods}
 
 \alias{variantsInSamples}
-\alias{variantsInSamples,ExpandedVCF,TVTBparam-method}
+\alias{variantsInSamples,ExpandedVCF-method}
 
 \docType{methods}
 \alias{variantsInSamples-methods}
@@ -12,28 +12,21 @@ group.
 }
 
 \usage{
-\S4method{variantsInSamples}{ExpandedVCF,TVTBparam}(
-    vcf, param, samples = 1:ncol(vcf), ..., unique = FALSE)
-
-\S4method{variantsInSamples}{ExpandedVCF,TVTBparam}(
-    vcf, param, samples = 1:ncol(vcf), ..., unique = FALSE)
+\S4method{variantsInSamples}{ExpandedVCF}(
+    vcf, samples = 1:ncol(vcf), unique = FALSE)
 }
 
 \arguments{
     \item{vcf}{
 \code{ExpandedVCF} object.
+
+\code{metadata(vcf)[["TVTBparam"]]} must contain a
+\code{\linkS4class{TVTBparam}} object.
 }
     \item{samples}{
 \code{integer}, \code{numeric} or \code{character} vector
 indicating samples to consider in \code{VariantAnnotation::geno(vcf)}.
 If not specified, all samples are considered.
-}
-    \item{param}{
-\code{TVTBparam} object that contains recurrent parameters.
-}
-    \item{...}{
-Additional arguments used to override \code{TVTBparam} slots (\emph{e.g.}
-\code{het}, \code{alt}).
 }
     \item{unique}{
 If \code{TRUE}, consider only variants \emph{unique} to the phenotype level
@@ -42,7 +35,7 @@ If \code{TRUE}, consider only variants \emph{unique} to the phenotype level
 }
 
 \value{
-Am \code{integer} vector of indices indicating which variants are observed
+An \code{integer} vector of indices indicating which variants are observed
 in at least one non-reference genotype in the given group of samples.
 }
 \author{
@@ -50,42 +43,35 @@ Kevin Rue-Albrecht
 }
 
 \seealso{
-\code{\linkS4class{VCF}},
-\code{\link{geno,VCF-method}}
-\code{\linkS4class{GRanges}},
-and \code{\linkS4class{DataFrame}}.
+\code{\linkS4class{VCF}}
+and \code{\linkS4class{TVTBparam}}.
 }
 
 \examples{
 # Example data ----
 
 # VCF file
-extdata <- file.path(system.file(package = "TVTB"), "extdata")
-vcfFile <- file.path(extdata, "moderate.vcf")
+vcfFile <- system.file("extdata", "moderate.vcf", package = "TVTB")
 
 # Phenotype file
-phenoFile <- file.path(extdata, "moderate_pheno.txt")
+phenoFile <- system.file("extdata", "moderate_pheno.txt", package = "TVTB")
 phenotypes <- S4Vectors::DataFrame(
     read.table(file = phenoFile, header = TRUE, row.names = 1))
 
 # TVTB parameters
-tparam <- TVTBparam(
-    genos = list(
-        REF = "0|0",
-        HET = c("0|1", "1|0"),
-        ALT = "1|1"))
+tparam <- TVTBparam(Genotypes("0|0", c("0|1", "1|0"), "1|1"))
 
 # Pre-process variants
-vcf <- VariantAnnotation::readVcf(file = vcfFile)
-colData(vcf) <- phenotypes
+vcf <- VariantAnnotation::readVcf(
+    vcfFile, param = tparam, colData = phenotypes)
 vcf <- VariantAnnotation::expand(vcf, row.names = TRUE)
+
 
 # Example usage ----
 
 variantsInSamples(
-    vcf = vcf,
-    samples = which(SummarizedExperiment::colData(vcf)[,"super_pop"]=="EUR"),
-    param = tparam)
+    vcf,
+    which(SummarizedExperiment::colData(vcf)[,"super_pop"]=="EUR"))
 }
 
 \keyword{methods}

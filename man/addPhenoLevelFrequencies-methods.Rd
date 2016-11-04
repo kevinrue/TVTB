@@ -1,7 +1,7 @@
 \name{addPhenoLevelFrequencies-methods}
 
 \alias{addPhenoLevelFrequencies}
-\alias{addPhenoLevelFrequencies,ExpandedVCF,TVTBparam-method}
+\alias{addPhenoLevelFrequencies,ExpandedVCF-method}
 
 \docType{methods}
 \alias{addPhenoLevelFrequencies-methods}
@@ -22,26 +22,22 @@ homozygote reference genotypes).
 }
 
 \usage{
-\S4method{addPhenoLevelFrequencies}{ExpandedVCF,TVTBparam}(
-    vcf, pheno, level, param, ..., force = FALSE)
+\S4method{addPhenoLevelFrequencies}{ExpandedVCF}(
+    vcf, pheno, level, force = FALSE)
 }
 
 \arguments{
     \item{vcf}{
 \code{ExpandedVCF} object.
+
+\code{metadata(vcf)[["TVTBparam"]]} must contain a
+\code{\linkS4class{TVTBparam}} object.
 }
     \item{pheno}{
 Phenotype in \code{colnames(colData(vcf))}.
 }
     \item{level}{
 Phenotype level in \code{colData(vcf)[,pheno]}.
-}
-    \item{param}{
-\code{TVTBparam} object that contains recurrent parameters.
-}
-    \item{...}{
-Additional arguments used to override \code{TVTBparam} slots (\emph{e.g.}
-\code{ref}, \code{het}, \code{alt}).
 }
     \item{force}{
 If \code{TRUE}, INFO fields header and data are overwritten.
@@ -54,16 +50,17 @@ If \code{FALSE}, an error is thrown if any field already exists.
 Genotypes and frequencies are calculated within the groups of samples
 associated with the given level of the given phenotype,
 and stored in INFO fields
-named according to settings stored in the \code{TVTBparam} object (see below).
+named according to settings stored in
+\code{metadata(vcf)[["TVTBparam"]]} (see below).
 
-The \code{param} object controls the key suffix of INFO fields as
-follows:
+The \code{\linkS4class{TVTBparam}} object controls
+the key suffix of INFO fields as follows:
 \describe{
-    \item{\code{names(hRef(param))}}{
+    \item{\code{names(ref(param))}}{
         Count of reference homozygote genotypes.}
     \item{\code{names(het(param))}}{
         Count of heterozygote genotypes.}
-    \item{\code{names(hAlt(param))}}{
+    \item{\code{names(alt(param))}}{
         Count of alternate homozygote genotypes.}
     \item{\code{aaf(param)}}{
         Alternate allele frequency.}
@@ -83,40 +80,32 @@ Kevin Rue-Albrecht
 }
 
 \seealso{
-\code{\link{addFrequencies,ExpandedVCF,list,TVTBparam-method}},
-\code{\link{addOverallFrequencies,ExpandedVCF,TVTBparam-method}},
-and \code{\linkS4class{VCF}}.
+\code{\link{addFrequencies,ExpandedVCF,list-method}},
+\code{\link{addOverallFrequencies,ExpandedVCF-method}},
+\code{\linkS4class{VCF}},
+and \code{\linkS4class{TVTBparam}}.
 }
 
 \examples{
 # Example data ----
 
 # VCF file
-extdata <- file.path(system.file(package = "TVTB"), "extdata")
-vcfFile <- file.path(extdata, "moderate.vcf")
+vcfFile <- system.file("extdata", "moderate.vcf", package = "TVTB")
 
 # Phenotype file
-phenoFile <- file.path(extdata, "moderate_pheno.txt")
-phenotypes <- S4Vectors::DataFrame(
-    read.table(file = phenoFile, header = TRUE, row.names = 1))
+phenoFile <- system.file("extdata", "moderate_pheno.txt", package = "TVTB")
+phenotypes <- S4Vectors::DataFrame(read.table(phenoFile, TRUE, row.names = 1))
 
 # TVTB parameters
-tparam <- TVTBparam(
-    genos = list(
-        REF = "0|0",
-        HET = c("0|1", "1|0"),
-        ALT = "1|1"))
+tparam <- TVTBparam(Genotypes("0|0", c("0|1", "1|0"), "1|1"))
 
 # Pre-process variants
-vcf <- VariantAnnotation::readVcf(file = vcfFile)
-colData(vcf) <- phenotypes
+vcf <- VariantAnnotation::readVcf(
+    vcfFile, param = tparam, colData = phenotypes)
 vcf <- VariantAnnotation::expand(vcf, row.names = TRUE)
+
 
 # Example usage ----
 
-addPhenoLevelFrequencies(
-    vcf = vcf,
-    pheno = "super_pop",
-    level = "AFR",
-    param = tparam)
+vcf <- addPhenoLevelFrequencies(vcf, "super_pop", "AFR")
 }

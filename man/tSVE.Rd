@@ -5,9 +5,11 @@
 The Shiny Variant Explorer (tSVE) web-application
 }
 \description{
+\emph{Currently unsupported --- Package undergoing major updates.}
+
 This function starts the interactive \code{tSVE} shiny web-application that
 allows to interactively load and visualise genetic variants and their
-Ensembl Variant Effect Predictor (VEP) predictions.
+Ensembl Variant Effect Predictor (VEP) predictions using the package methods.
 }
 \usage{
     tSVE(...)

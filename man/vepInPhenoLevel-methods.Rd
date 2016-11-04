@@ -1,7 +1,7 @@
 \name{vepInPhenoLevel-methods}
 
 \alias{vepInPhenoLevel}
-\alias{vepInPhenoLevel,ExpandedVCF,TVTBparam-method}
+\alias{vepInPhenoLevel,ExpandedVCF-method}
 
 \docType{methods}
 \alias{vepInPhenoLevel-methods}
@@ -13,14 +13,17 @@ prediction field.
 }
 
 \usage{
-\S4method{vepInPhenoLevel}{ExpandedVCF,TVTBparam}(
-    vcf, phenoCol, level, vepCol, param, ...,
+\S4method{vepInPhenoLevel}{ExpandedVCF}(
+    vcf, phenoCol, level, vepCol,
     unique = FALSE, facet = NULL)
 }
 
 \arguments{
     \item{vcf}{
 \code{ExpandedVCF} object.
+
+\code{metadata(vcf)[["TVTBparam"]]} must contain a
+\code{\linkS4class{TVTBparam}} object.
 }
     \item{phenoCol}{
 Name of a column in \code{pheno}.
@@ -32,13 +35,6 @@ considered.
     \item{vepCol}{
 VEP prediction field; Name of a metadata column in
 \code{ensemblVEP::parseCSQToGRanges(vcf)}.
-}
-    \item{param}{
-\code{TVTBparam} object that contains recurrent parameters.
-}
-    \item{...}{
-Additional arguments used to override \code{TVTBparam} slots (\emph{e.g.}
-\code{het}, \code{alt}).
 }
     \item{unique}{
 If \code{TRUE}, consider only variants unique to the phenotype level
@@ -56,7 +52,8 @@ as VEP typically produce one prediction per variant per feature.
 }
 
 \value{
-A \code{data.frame} in long format including one row per variant
+A \code{data.frame} in long format including one row
+for each VEP prediction associated with a variant
 seen in at least one sample (heterozygote or alternate homozygote)
 associated with the phenotype level.
 The \code{data.frame} contains at least one column for the VEP prediction
@@ -79,31 +76,25 @@ and \code{\linkS4class{DataFrame}}.
 # Example data ----
 
 # VCF file
-extdata <- file.path(system.file(package = "TVTB"), "extdata")
-vcfFile <- file.path(extdata, "moderate.vcf")
+vcfFile <- system.file("extdata", "moderate.vcf", package = "TVTB")
 
 # Phenotype file
-phenoFile <- file.path(extdata, "moderate_pheno.txt")
+phenoFile <- system.file("extdata", "moderate_pheno.txt", package = "TVTB")
 phenotypes <- S4Vectors::DataFrame(
     read.table(file = phenoFile, header = TRUE, row.names = 1))
 
 # TVTB parameters
-tparam <- TVTBparam(
-    genos = list(
-        REF = "0|0",
-        HET = c("0|1", "1|0"),
-        ALT = "1|1"))
+tparam <- TVTBparam(Genotypes("0|0", c("0|1", "1|0"), "1|1"))
 
 # Pre-process variants
-vcf <- VariantAnnotation::readVcf(file = vcfFile)
-colData(vcf) <- phenotypes
+vcf <- VariantAnnotation::readVcf(
+    vcfFile, param = tparam, colData = phenotypes)
 vcf <- VariantAnnotation::expand(vcf, row.names = TRUE)
+
 
 # Example usage ----
 
-vepInPhenoLevel(
-    vcf = vcf, phenoCol = "super_pop", level = "AFR",
-    vepCol = "CADD_PHRED", param = tparam)
+vepInPhenoLevel(vcf, "super_pop", "AFR", "CADD_PHRED")
 }
 
 \keyword{methods}

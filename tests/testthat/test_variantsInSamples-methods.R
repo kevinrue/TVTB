@@ -3,92 +3,35 @@ context("variantsInSamples")
 # Settings ----
 
 # VCF file
-extdata <- file.path(system.file(package = "TVTB"), "extdata")
-vcfFile <- file.path(extdata, "moderate.vcf")
+vcfFile <- system.file("extdata", "moderate.vcf", package = "TVTB")
 
 # TVTB parameters
-tparam <- TVTBparam(
-    genos = list(
-        REF = "0|0",
-        HET = c("0|1", "1|0"),
-        ALT = "1|1"))
+tparam <- TVTBparam(Genotypes("0|0", c("0|1", "1|0"), "1|1"))
 
 # Pre-process variants
-vcf <- VariantAnnotation::readVcf(file = vcfFile)
+vcf <- VariantAnnotation::readVcf(vcfFile, param = tparam)
 vcf <- VariantAnnotation::expand(vcf, row.names = TRUE)
 
 sampleIdx <- 1:(ncol(vcf))
 
 # Signatures ----
 
-test_that("variantsInSamples() supports all signatures",{
+test_that("all signatures are supported",{
 
     ## samples: numeric
     expect_type(
-        variantsInSamples(
-            vcf = vcf,
-            samples = sampleIdx,
-            param = tparam,
-            unique = FALSE),
+        variantsInSamples(vcf, sampleIdx, unique = FALSE),
         "integer"
     )
 
-    # ExpandedVCF,TVTBparam
+})
+
+test_that("unique=TRUE is supported", {
+
     expect_type(
         variantsInSamples(
-            vcf = vcf,
-            samples = colnames(vcf)[sampleIdx],
-            param = tparam,
-            unique = TRUE),
+            vcf, colnames(vcf)[sampleIdx], unique = TRUE),
         "integer"
-    )
-
-})
-
-# Argument: unique ----
-
-test_that("unique=TRUE is supported",{
-
-    # FALSE / tested above
-    # expect_type(
-    #     variantsInSamples(
-    #         vcf = vcf,
-    #         samples = sampleIdx,
-    #         param = tparam,
-    #         unique = FALSE),
-    #     "integer"
-    # )
-
-    # TRUE / tested above
-    # expect_type(
-    #     variantsInSamples(
-    #         vcf = vcf,
-    #         samples = sampleIdx,
-    #         param = tparam,
-    #         unique = TRUE),
-    #     "integer"
-    # )
-
-})
-
-# Argument: unique ----
-
-test_that("two or more alternate genotypes are required",{
-
-    expect_error(
-        variantsInSamples(
-            vcf = vcf,
-            samples = sampleIdx,
-            alts = c("1|1"),
-            unique = FALSE)
-    )
-
-    expect_error(
-        variantsInSamples(
-            vcf = vcf,
-            samples = colnames(vcf)[sampleIdx],
-            alts = c("1|1"),
-            unique = FALSE)
     )
 
 })

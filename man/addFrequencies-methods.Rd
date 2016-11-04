@@ -2,9 +2,9 @@
 
 \alias{addFrequencies}
 
-\alias{addFrequencies,ExpandedVCF,list,TVTBparam-method}
-\alias{addFrequencies,ExpandedVCF,character,TVTBparam-method}
-\alias{addFrequencies,ExpandedVCF,missing,TVTBparam-method}
+\alias{addFrequencies,ExpandedVCF,list-method}
+\alias{addFrequencies,ExpandedVCF,character-method}
+\alias{addFrequencies,ExpandedVCF,missing-method}
 
 \docType{methods}
 \alias{addFrequencies-methods}
@@ -15,7 +15,7 @@ Group-level genotypes counts and allele frequencies
 \description{
 Adds genotypes counts
 (reference homozygote, heterozygote, and alternate homozygote)
-and allele frequencies (alternate and minor) 
+and allele frequencies (alternate and minor)
 as INFO fields in an \code{ExpandedVCF} object.
 Counts and frequencies may be calculated overall
 (\emph{i.e.} across all samples), or within groups of samples
@@ -26,19 +26,19 @@ homozygote reference genotypes).
 }
 
 \usage{
-\S4method{addFrequencies}{ExpandedVCF,list,TVTBparam}(
-        vcf, phenos, param, ..., force = FALSE)
+\S4method{addFrequencies}{ExpandedVCF,list}(vcf, phenos, force = FALSE)
 
-\S4method{addFrequencies}{ExpandedVCF,character,TVTBparam}(
-        vcf, phenos, param, ..., force = FALSE)
+\S4method{addFrequencies}{ExpandedVCF,character}(vcf, phenos, force = FALSE)
 
-\S4method{addFrequencies}{ExpandedVCF,missing,TVTBparam}(
-        vcf, param, ..., force = FALSE)
+\S4method{addFrequencies}{ExpandedVCF,missing}(vcf, force = FALSE)
 }
 
 \arguments{
     \item{vcf}{
 \code{ExpandedVCF} object.
+
+\code{metadata(vcf)[["TVTBparam"]]} must contain a
+\code{\linkS4class{TVTBparam}} object.
 }
     \item{phenos}{
 If \code{NULL}, counts and frequencies are calculated across all samples.
@@ -50,13 +50,6 @@ or a named \code{list} in which \code{names} are phenotypes in
 \code{colnames(colData(vcf))} and values are \code{character} vectors of
 phenotype levels in \code{colData(vcf)[,phenotype]}.
 See \emph{Details} below.
-}
-    \item{param}{
-\code{TVTBparam} object that contains recurrent parameters.
-}
-    \item{...}{
-Additional arguments used to override \code{TVTBparam} slots (\emph{e.g.}
-\code{ref}, \code{het}, \code{alt}).
 }
     \item{force}{
 If \code{TRUE}, INFO fields header and data are overwritten
@@ -88,11 +81,11 @@ described above.
 The \code{param} object controls the key (suffix) of INFO fields as
 follows:
 \describe{
-    \item{\code{names(hRef(param))}}{
+    \item{\code{names(ref(param))}}{
         Count of reference homozygote genotypes.}
     \item{\code{names(het(param))}}{
         Count of heterozygote genotypes.}
-    \item{\code{names(hAlt(param))}}{
+    \item{\code{names(alt(param))}}{
         Count of alternate homozygote genotypes.}
     \item{\code{aaf(param)}}{
         Alternate allele frequency.}
@@ -112,39 +105,32 @@ Kevin Rue-Albrecht
 }
 
 \seealso{
-\code{\link{addOverallFrequencies,ExpandedVCF,TVTBparam-method}},
-\code{\link{addPhenoLevelFrequencies,ExpandedVCF,TVTBparam-method}},
-and \code{\linkS4class{VCF}}.
+\code{\link{addOverallFrequencies,ExpandedVCF-method}},
+\code{\link{addPhenoLevelFrequencies,ExpandedVCF-method}},
+\code{\linkS4class{VCF}},
+and \code{\linkS4class{TVTBparam}}.
 }
 
 \examples{
 # Example data ----
 
 # VCF file
-extdata <- file.path(system.file(package = "TVTB"), "extdata")
-vcfFile <- file.path(extdata, "moderate.vcf")
+vcfFile <- system.file("extdata", "moderate.vcf", package = "TVTB")
 
 # Phenotype file
-phenoFile <- file.path(extdata, "moderate_pheno.txt")
-phenotypes <- S4Vectors::DataFrame(
-    read.table(file = phenoFile, header = TRUE, row.names = 1))
+phenoFile <- system.file("extdata", "moderate_pheno.txt", package = "TVTB")
+phenotypes <- S4Vectors::DataFrame(read.table(phenoFile, TRUE, row.names = 1))
 
 # TVTB parameters
-tparam <- TVTBparam(
-    genos = list(
-        REF = "0|0",
-        HET = c("0|1", "1|0"),
-        ALT = "1|1"))
+tparam <- TVTBparam(Genotypes("0|0", c("0|1", "1|0"), "1|1"))
 
 # Pre-process variants
-vcf <- VariantAnnotation::readVcf(file = vcfFile)
-colData(vcf) <- phenotypes
+vcf <- VariantAnnotation::readVcf(
+    vcfFile, param = tparam, colData = phenotypes)
 vcf <- VariantAnnotation::expand(vcf, row.names = TRUE)
+
 
 # Example usage ----
 
-addFrequencies(
-    vcf = vcf,
-    phenos = list(super_pop = "AFR"),
-    param = tparam)
+vcf <- addFrequencies(vcf, list(super_pop = "AFR"))
 }

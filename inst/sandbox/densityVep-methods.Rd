@@ -143,35 +143,29 @@ and \code{\linkS4class{DataFrame}}.
 # Example data ----
 
 # VCF file
-extdata <- file.path(system.file(package = "TVTB"), "extdata")
-vcfFile <- file.path(extdata, "moderate.vcf")
+vcfFile <- system.file("extdata", "moderate.vcf", package = "TVTB")
 
 # Phenotype file
-phenoFile <- file.path(extdata, "moderate_pheno.txt")
+phenoFile <- system.file("extdata", "moderate_pheno.txt", package = "TVTB")
 phenotypes <- S4Vectors::DataFrame(
     read.table(file = phenoFile, header = TRUE, row.names = 1))
 
 # TVTB parameters
-tparam <- TVTBparam(
-    genos = list(
-        REF = "0|0",
-        HET = c("0|1", "1|0"),
-        ALT = "1|1"))
+tparam <- TVTBparam(Genotypes("0|0", c("0|1", "1|0"), "1|1"))
 
 # Pre-process variants
-vcf <- VariantAnnotation::readVcf(file = vcfFile)
+vcf <- VariantAnnotation::readVcf(vcfFile)
 colData(vcf) <- phenotypes
 vcf <- VariantAnnotation::expand(vcf, row.names = TRUE)
 
+
 # Example usage ----
 
-densityVepInPhenoLevel(
-    level = "EUR", vcf = vcf, phenoCol = "super_pop",
-    vepCol = "CADD_PHRED", param = tparam)
+densityVepInPhenoLevel("EUR", vcf, "super_pop", "CADD_PHRED", tparam)
 
 densityVepByPhenotype(
-    vcf = vcf, phenoCol = "super_pop", vepCol = "CADD_PHRED",
-    param = tparam, facet = "Feature", plot = "TRUE") +
+    vcf, "super_pop", "CADD_PHRED", tparam, facet = "Feature", plot = "TRUE"
+    ) +
     ggplot2::theme(
         legend.text = ggplot2::element_text(size = ggplot2::rel(.5))
     )

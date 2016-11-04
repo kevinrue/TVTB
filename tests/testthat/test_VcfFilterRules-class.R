@@ -3,25 +3,20 @@ context("VcfFilterRules")
 # Settings ----
 
 # VCF file
-extdata <- file.path(system.file(package = "TVTB"), "extdata")
-vcfFile <- file.path(extdata, "moderate.vcf")
+vcfFile <- system.file("extdata", "moderate.vcf", package = "TVTB")
 
 # TVTB parameters
-tparam <- TVTBparam(
-    genos = list(
-        REF = "0|0",
-        HET = c("0|1", "1|0"),
-        ALT = "1|1"))
+tparam <- TVTBparam(Genotypes("0|0", c("0|1", "1|0"), "1|1"))
 
 # Pre-process variants
-vcf <- VariantAnnotation::readVcf(file = vcfFile)
+vcf <- VariantAnnotation::readVcf(vcfFile, param = tparam)
 vcf <- VariantAnnotation::expand(vcf)
-vcf <- addOverallFrequencies(vcf = vcf, param = tparam)
+vcf <- addOverallFrequencies(vcf, tparam)
 
 # Test object ----
 
 fixedRules <- VcfFixedRules(
-    exprs = list(
+    list(
         pass = expression(FILTER == "PASS"),
         qual = function(env){env[,"QUAL"] > 20}
         ),
@@ -29,35 +24,49 @@ fixedRules <- VcfFixedRules(
 )
 
 infoRules <- VcfInfoRules(
-    exprs = list(
+    list(
         common = expression(MAF > 0.1),
         alt = function(env){env[,"ALT"] > 0}
         ),
     active = c(TRUE, FALSE))
 
 vepRules <- VcfVepRules(
-    exprs = list(
+    list(
         missense = expression(Consequence %in% c("missense_variant")),
         CADD = function(env){env[,"CADD_PHRED"] > 15}
         ),
     active = c(TRUE, FALSE))
 
-vcfRules <- VcfFilterRules(fixedRules, infoRules, vepRules)
+filterRules <- FilterRules(
+    list(
+        PASS = function(x) fixed(x)$FILTER == "PASS",
+        QUAL = function(x) fixed(x)$QUAL > 20
+    ),
+    active = c(TRUE, FALSE)
+)
+
+vcfRules <- VcfFilterRules(fixedRules, infoRules, vepRules, filterRules)
 
 filterNoVep <- VcfFilterRules(fixedRules, infoRules)
 
-newFixedFilter <- VcfFixedRules(exprs = list(
-    filtSynonyms = expression(FILTER %in% c("PASS", "OK")),
-    fail = expression(FILTER=="FAIL")
-))
-newInfoFilter <- VcfInfoRules(exprs = list(
-    altIsMinor = expression(AAF <= 0.5),
-    altIsMajor = expression(AAF > 0.5)
-))
-newVepFilter <- VcfVepRules(exprs = list(
-    highImpact = expression(IMPACT == "HIGH"),
-    moderateImpact = expression(IMPACT == "MODERATE")
-))
+newFixedFilter <- VcfFixedRules(
+    list(
+        filtSynonyms = expression(FILTER %in% c("PASS", "OK")),
+        fail = expression(FILTER=="FAIL")
+        ),
+    active = c(F, T))
+newInfoFilter <- VcfInfoRules(
+    list(
+        altIsMinor = expression(AAF <= 0.5),
+        altIsMajor = expression(AAF > 0.5)
+        ),
+    active = c(F, T))
+newVepFilter <- VcfVepRules(
+    list(
+        highImpact = expression(IMPACT == "HIGH"),
+        moderateImpact = expression(IMPACT == "MODERATE")
+        ),
+    active = c(F, T))
 newVepSlot <- newVepFilter
 vep(newVepSlot) <- "ANN"
 
@@ -72,26 +81,74 @@ test_that("Constructors produce a valid object",{
     expect_s4_class(vepRules, "VcfVepRules")
 
     expect_s4_class(vcfRules, "VcfFilterRules")
-    # Constructor including an object itself
-    expect_s4_class(VcfFilterRules(
-        VcfFilterRules(infoRules),
-        vepRules
-    ), "VcfFilterRules")
 
-    vepANN <-  VcfVepRules(exprs = list(
-        nonsense = expression(Fake == "NA")), vep = "ANN")
+    # Constructor including a VcfFilterRules object itself
+    expect_s4_class(
+        VcfFilterRules(VcfFilterRules(infoRules), vepRules),
+        "VcfFilterRules"
+    )
+
+    # Incompatible vep slots
+    vepANN <-  VcfVepRules(
+        list(nonsense = expression(Fake == "NA")), vep = "ANN")
     expect_error(VcfFilterRules(vepRules, vepANN))
+
+    # VcfFilterRules without vep rule
+    vepNA <- VcfFilterRules(fixedRules, infoRules)
+    expect_s4_class(
+        vepNA,
+        "VcfFilterRules"
+    )
+    expect_identical(vep(vepNA), NA_character_)
 
     expect_identical(filterNoVep@vep, NA_character_)
 })
 
 # Accessors ----
 
-test_that("Accessors return valid values", {
+test_that("type accessor returns valid values", {
 
-    expect_type(
-        type(vcfRules),
-        "character")
+    type_VcfRules <- type(vcfRules)
+    expect_type(type_VcfRules, "character")
+    expect_length(type_VcfRules, length(vcfRules))
+    expect_identical(names(type_VcfRules), names(type_VcfRules))
+
+    type_VepRules <- type(vepRules)
+    expect_identical(names(type_VepRules), names(vepRules))
+    expect_equivalent(type_VepRules, rep("vep", length(vepRules)))
+
+    type_InfoRules <- type(infoRules)
+    expect_identical(names(type_InfoRules), names(type_InfoRules))
+    expect_equivalent(type_InfoRules, rep("info", length(infoRules)))
+
+    type_FixedRules <- type(fixedRules)
+    expect_identical(names(type_FixedRules), names(type_FixedRules))
+    expect_equivalent(type_FixedRules, rep("fixed", length(fixedRules)))
+
+    type_FixedRules <- type(fixedRules)
+    expect_identical(names(type_FixedRules), names(type_FixedRules))
+    expect_equivalent(type_FixedRules, rep("fixed", length(fixedRules)))
+
+})
+
+test_that("vep accessor returns valid values", {
+
+    vep_VcfRules <- vep(vcfRules)
+    expect_type(vep_VcfRules, "character")
+    expect_length(vep_VcfRules, 1)
+
+    vep_VepRules <- vep(vepRules)
+    expect_type(vep_VepRules, "character")
+    expect_length(vep_VepRules, 1)
+
+    vep_InfoRules <- vep(infoRules)
+    expect_identical(vep_InfoRules, NA_character_)
+
+    vep_FixedRules <- vep(fixedRules)
+    expect_identical(vep_FixedRules, NA_character_)
+
+    vep_FilterRules <- vep(filterRules)
+    expect_identical(vep_FilterRules, NA_character_)
 
 })
 
@@ -110,20 +167,34 @@ test_that("Accessors return valid values", {
 test_that("eval method return valid values", {
 
     expect_type(
-        eval(expr = fixedRules, envir = vcf),
+        eval(fixedRules, vcf),
         "logical")
 
     expect_type(
-        eval(expr = infoRules, envir = vcf),
+        eval(infoRules, vcf),
         "logical")
 
     expect_type(
-        eval(expr = vepRules, envir = vcf),
+        eval(vepRules, vcf),
         "logical")
 
     expect_type(
-        eval(expr = vcfRules, envir = vcf),
+        eval(vcfRules, vcf),
         "logical")
+
+})
+
+test_that("evaluate empty filter rule is supported", {
+
+    expect_identical(
+        eval(VcfVepRules(), vcf),
+        rep(TRUE, length(vcf))
+    )
+
+    expect_identical(
+        eval(VcfFilterRules(), vcf),
+        rep(TRUE, length(vcf))
+    )
 
 })
 
@@ -187,8 +258,11 @@ test_that("[[ methods perform valid replacement", {
     expect_that(vcfRules[["common"]], is_a("expression"))
     expect_equal(names(vcfRules)[4], "new_name")
     # An active expression was replaced, therefore no active state changed
-    expect_equivalent(active(vcfRules), rep(c(TRUE, FALSE), 3))
-    expect_equal(type(vcfRules), rep(c("fixed", "info", "vep"), each = 2))
+    expect_equivalent(active(vcfRules), rep(c(TRUE, FALSE), 4))
+    expect_equivalent(
+        type(vcfRules),
+        rep(c("fixed", "info", "vep", "filter"), each = 2)
+    )
 
     expect_error(
         fixedRules[[1:2]] <- c(
@@ -277,70 +351,147 @@ test_that("[ methods return valid values", {
 
 # [<- ----
 
-test_that("[ methods perform valid replacement", {
+test_that("[<- can replace VcfFixedRules by index",{
 
-    # Expected usage
     fixedRules[1:2] <- newFixedFilter
+
     expect_s4_class(fixedRules, "VcfFixedRules")
-    fixedRules["fail"] <- newFixedFilter["fail"]
+    expect_identical(fixedRules[[1]], newFixedFilter[[1]])
+    expect_identical(fixedRules[[2]], newFixedFilter[[2]])
+
+})
+
+test_that("[<- can replace VcfFixedRules by name",{
+
+    fixedRules["pass"] <- newFixedFilter["fail"]
+
     expect_s4_class(fixedRules, "VcfFixedRules")
+    expect_identical(fixedRules[["pass"]], newFixedFilter[["fail"]])
+
+})
+
+test_that("[<- can replace VcfInfoRules by index",{
+
     infoRules[1:2] <- newInfoFilter
+
     expect_s4_class(infoRules, "VcfInfoRules")
-    infoRules["altIsMinor"] <- newInfoFilter["altIsMinor"]
+    expect_identical(infoRules[[1]], newInfoFilter[[1]])
+    expect_identical(infoRules[[2]], newInfoFilter[[2]])
+
+})
+
+test_that("[<- can replace VcfInfoRules by name",{
+
+    infoRules["alt"] <- newInfoFilter["altIsMinor"]
+
     expect_s4_class(infoRules, "VcfInfoRules")
+    expect_identical(infoRules[["alt"]], newInfoFilter[["altIsMinor"]])
+
+})
+
+test_that("[<- can replace VcfVepRules by index",{
+
     vepRules[1:2] <- newVepFilter
+
     expect_s4_class(vepRules, "VcfVepRules")
-    vepRules["highImpact"] <- newVepFilter["highImpact"]
+    expect_identical(vepRules[[1]], newVepFilter[[1]])
+    expect_identical(vepRules[[2]], newVepFilter[[2]])
+
+})
+
+test_that("[<- can replace VcfVepRules by name",{
+
+    vepRules["CADD"] <- newVepFilter["moderateImpact"]
+
     expect_s4_class(vepRules, "VcfVepRules")
-    vcfRules[1:2] <- newFixedFilter # replacement returns value, not object
-    vcfRules["fail"] <- newFixedFilter[2]
+    expect_identical(vepRules[["CADD"]], newVepFilter[["moderateImpact"]])
+
+})
+
+test_that("[<- can replace VcfFilterRules by index",{
+
+    # Replacement is VcfFixedRules
+    vcfRules[1:2] <- newFixedFilter
+
     expect_s4_class(vcfRules, "VcfFilterRules")
+    expect_identical(vcfRules[[1]], newFixedFilter[[1]])
+    expect_identical(vcfRules[[2]], newFixedFilter[[2]])
+
+    # Replacement is VcfInfoRules
     vcfRules[3:4] <- newInfoFilter
-    vcfRules["altIsMinor"] <- newInfoFilter[1]
+
     expect_s4_class(vcfRules, "VcfFilterRules")
+    expect_identical(vcfRules[[3]], newInfoFilter[[1]])
+    expect_identical(vcfRules[[4]], newInfoFilter[[2]])
+
+    # Replacement is VcfVepRules
     vcfRules[5:6] <- newVepFilter
-    vcfRules["highImpact"] <- newVepFilter[1]
+
     expect_s4_class(vcfRules, "VcfFilterRules")
+    expect_identical(vcfRules[[5]], newVepFilter[[1]])
+    expect_identical(vcfRules[[6]], newVepFilter[[2]])
+
+    # Replacement is VcfFilterRules
     vcfRules[5:6] <- VcfFilterRules(newVepFilter)
-    vcfRules["highImpact"] <- VcfFilterRules(newVepFilter)["highImpact"]
+
     expect_s4_class(vcfRules, "VcfFilterRules")
+    expect_identical(vcfRules[[5]], newVepFilter[[1]])
+    expect_identical(vcfRules[[6]], newVepFilter[[2]])
+})
 
-    # TODO: check that rules cannot have identical names in specialised classes
-    # it seems this is not caught by the validity check
-    expect_error(fixedRules["filtSynonyms"] <- fixedRules["fail"])
+# Mimic behaviour of base::list
+# TODO: requires fix in S4Vector::Vector
+test_that("[<-NULL removes rules", {
 
-    # Error if incompatible vep slots (do not override)
+    # fixedRules[1] <- NULL
+    # expect_equal(length(fixedRules), 1) # 2 - 1
+
+    # infoRules[1] <- NULL
+    # expect_equal(length(fixedRules), 1) # 2 - 1
+
+    # vepRules[1] <- NULL
+    # expect_equal(length(fixedRules), 1) # 2 - 1
+
+    # vcfRules[1] <- NULL
+    # expect_equal(length(vcfRules), 5) # 6 - 1
+
+    # vcfRules[1:3] <- NULL
+    # expect_s4_class(vcfRules, "VcfFilterRules")
+})
+
+test_that("[<- requires compatible vep slots", {
+
+    # x=VcfVepRules
     expect_error(vepRules[1:2] <- newVepSlot)
+
+    # x=VcfFilterRules
     expect_error(vcfRules[1:2] <- newVepSlot)
 
-    # Number of replacement must match number of indices
-    expect_error(fixedRules[1] <- newFixedFilter) # 1 vs 2
-    expect_error(infoRules[1] <- newInfoFilter) # 1 vs 2
-    expect_error(vepRules[1] <- newVepFilter) # 1 vs 2
-    expect_error(vcfRules[1:3] <- newFixedFilter) # 3 vs 2
+})
 
-    # <-NULL removes rule(s) (and active and type)
-    fixedRules[1] <- NULL
-    expect_equal(length(fixedRules), 1) # 2 - 1
-    infoRules[1] <- NULL
-    expect_equal(length(fixedRules), 1) # 2 - 1
-    vepRules[1] <- NULL
-    expect_equal(length(fixedRules), 1) # 2 - 1
-    vcfRules[1] <- NULL
-    expect_equal(length(vcfRules), 5) # 6 - 1
 
-    # drop=FALSE does not down-type VcfFilterRules
-    # keep in mind that a rule was already removed above
-    vcfRules[1:3, drop=FALSE] <- NULL
-    expect_s4_class(vcfRules, "VcfFilterRules")
+# TODO: requires fix in S4Vector::FilterRules to subset active slot
+test_that("[ requires valid length of values", {
 
-    # 'value' must be an object of the correct class
+    # currently produces error & warning
+    # expect_warning(fixedRules[1] <- newFixedFilter) # 1 vs 2
+    # expect_warning(infoRules[1] <- newInfoFilter) # 1 vs 2
+    # expect_warning(vepRules[1] <- newVepFilter) # 1 vs 2
+    # expect_warning(vcfRules[1:3] <- newFixedFilter) # 3 vs 2
+
+})
+
+test_that("[ requires value of a valid class", {
+
     expect_error(fixedRules[1] <- newFixedFilter[[1]])
     expect_error(infoRules[1] <- newInfoFilter[[1]])
     expect_error(vepRules[1] <- newVepFilter[[1]])
     expect_error(fixedRules[1] <- newVepFilter[[1]])
 
-    # Replacing is position-based, throw error if [row, column] given
+})
+
+test_that("[ throws an error if columns indices are given", {
+
     expect_error(fixedRules[1:2, 2] <- NULL)
     expect_error(infoRules[1:2, 2] <- NULL)
     expect_error(vepRules[1:2, 2] <- NULL)
@@ -353,17 +504,17 @@ test_that("[ methods perform valid replacement", {
 test_that("as method coerces objects", {
 
     expect_s4_class(
-        as(object = fixedRules, Class = "VcfFilterRules"),
+        as(fixedRules, "VcfFilterRules"),
         "VcfFilterRules"
     )
 
     expect_s4_class(
-        as(object = infoRules, Class = "VcfFilterRules"),
+        as(infoRules, "VcfFilterRules"),
         "VcfFilterRules"
     )
 
     expect_s4_class(
-        as(object = vepRules, Class = "VcfFilterRules"),
+        as(vepRules, "VcfFilterRules"),
         "VcfFilterRules"
     )
 
@@ -417,6 +568,17 @@ test_that("append method combine values", {
     expect_equal(
         length(append(filterNoVep, vepRules)),
         length(filterNoVep) + length(vepRules)
+    )
+
+})
+
+# .dropVcfFilterRules method ----
+
+test_that("VcfFilterRules of length 0 cannot be down-typed", {
+
+    expect_identical(
+        TVTB:::.dropVcfFilterRules(TVTB::VcfFilterRules()),
+        TVTB::VcfFilterRules()
     )
 
 })

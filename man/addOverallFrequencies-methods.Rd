@@ -1,7 +1,7 @@
 \name{addOverallFrequencies-methods}
 
 \alias{addOverallFrequencies}
-\alias{addOverallFrequencies,ExpandedVCF,TVTBparam-method}
+\alias{addOverallFrequencies,ExpandedVCF-method}
 
 \docType{methods}
 \alias{addOverallFrequencies-methods}
@@ -22,20 +22,15 @@ homozygote reference genotypes).
 }
 
 \usage{
-\S4method{addOverallFrequencies}{ExpandedVCF,TVTBparam}(
-    vcf, param, ..., force = FALSE)
+\S4method{addOverallFrequencies}{ExpandedVCF}(vcf, force = FALSE)
 }
 
 \arguments{
     \item{vcf}{
 \code{ExpandedVCF} object.
-}
-    \item{param}{
-\code{TVTBparam} object that contains recurrent parameters.
-}
-    \item{...}{
-Additional arguments used to override \code{TVTBparam} slots (\emph{e.g.}
-\code{ref}, \code{het}, \code{alt}).
+
+\code{metadata(vcf)[["TVTBparam"]]} must contain a
+\code{\linkS4class{TVTBparam}} object.
 }
     \item{force}{
 If \code{TRUE}, INFO fields header and data are overwritten.
@@ -52,11 +47,11 @@ named according to settings stored in the \code{TVTBparam} object (see below).
 The \code{param} object controls the key of INFO fields as
 follows:
 \describe{
-    \item{\code{names(hRef(param))}}{
+    \item{\code{names(ref(param))}}{
         Count of reference homozygote genotypes.}
     \item{\code{names(het(param))}}{
         Count of heterozygote genotypes.}
-    \item{\code{names(hAlt(param))}}{
+    \item{\code{names(alt(param))}}{
         Count of alternate homozygote genotypes.}
     \item{\code{aaf(param)}}{
         Alternate allele frequency.}
@@ -76,8 +71,8 @@ Kevin Rue-Albrecht
 }
 
 \seealso{
-\code{\link{addFrequencies,ExpandedVCF,list,TVTBparam-method}},
-\code{\link{addPhenoLevelFrequencies,ExpandedVCF,TVTBparam-method}},
+\code{\link{addFrequencies,ExpandedVCF,list-method}},
+\code{\link{addPhenoLevelFrequencies,ExpandedVCF-method}},
 and \code{\linkS4class{VCF}}.
 }
 
@@ -85,23 +80,17 @@ and \code{\linkS4class{VCF}}.
 # Example data ----
 
 # VCF file
-extdata <- file.path(system.file(package = "TVTB"), "extdata")
-vcfFile <- file.path(extdata, "moderate.vcf")
+vcfFile <- system.file("extdata", "moderate.vcf", package = "TVTB")
 
 # TVTB parameters
-tparam <- TVTBparam(
-    genos = list(
-        REF = "0|0",
-        HET = c("0|1", "1|0"),
-        ALT = "1|1"))
+tparam <- TVTBparam(Genotypes("0|0", c("0|1", "1|0"), "1|1"))
 
 # Pre-process variants
-vcf <- VariantAnnotation::readVcf(file = vcfFile)
+vcf <- VariantAnnotation::readVcf(vcfFile, param = tparam)
 vcf <- VariantAnnotation::expand(vcf, row.names = TRUE)
+
 
 # Example usage ----
 
-addOverallFrequencies(
-    vcf = vcf,
-    param = tparam)
+vcf <- addOverallFrequencies(vcf, tparam)
 }

@@ -1,39 +1,60 @@
+# Genotypes ----
+
+setMethod(
+    "show", "Genotypes",
+    function(object){
+        cat("Class: Genotypes\n")
+        cat(sprintf(
+            "  @ref (hom. ref.): \"%s\" {%s}\n",
+            suffix(object)["ref"],
+            paste(object@ref, collapse = ", ")))
+        cat(sprintf(
+            "  @het (heter.)   : \"%s\" {%s}\n",
+            suffix(object)["het"],
+            paste(object@het, collapse = ", ")))
+        cat(sprintf(
+            "  @alt (hom. alt.): \"%s\" {%s}",
+            suffix(object)["alt"],
+            paste(object@alt, collapse = ", ")))
+        return(NULL)
+    }
+)
+
 # TVTBparam ----
 
 setMethod(
-    f = "show",
-    signature = "TVTBparam",
-    definition = function(object){
-        cat("Class: TVTBparam\n")
-        cat("Genotypes\n")
+    "show", "TVTBparam",
+    function(object){
+        cat("class: TVTBparam\n")
+        cat(  "@genos: class: Genotypes\n")
+        g <- object@genos
         cat(sprintf(
-            "- Reference: \"%s\" {%s}\n",
-            names(object@genos)[1],
-            paste(object@genos[[1]], collapse = ", ")))
+            "    @ref (hom. ref.): \"%s\" {%s}\n",
+            suffix(g)["ref"],
+            paste(g@ref, collapse = ", ")))
         cat(sprintf(
-            "- Heterozygote: \"%s\" {%s}\n",
-            names(object@genos)[2],
-            paste(object@genos[[2]], collapse = ", ")))
+            "    @het (heter.): \"%s\" {%s}\n",
+            suffix(g)["het"],
+            paste(g@het, collapse = ", ")))
         cat(sprintf(
-            "- Alternative: \"%s\" {%s}\n",
-            names(object@genos)[3],
-            paste(object@genos[[3]], collapse = ", ")))
+            "    @alt (hom. alt.): \"%s\" {%s}\n",
+            suffix(g)["alt"],
+            paste(g@alt, collapse = ", ")))
         cat(sprintf(
-            "ranges: %i GRanges on %i sequence(s)\n",
-            length(object@ranges),
-            length(seqlevels(object@ranges))))
+            "  @ranges: %i GRanges on %i sequence(s)\n",
+            length(ranges(object)),
+            length(seqlevels(ranges(object)))))
         cat(sprintf(
-            "Alternate allele frequency: \"%s\"\n",
-            object@aaf))
+            "  @aaf (alt. allele freq.): \"%s\"\n",
+            aaf(object)))
         cat(sprintf(
-            "Minor allele frequency: \"%s\"\n",
-            object@maf))
+            "  @maf (minor allele freq.): \"%s\"\n",
+            maf(object)))
         cat(sprintf(
-            "Ensembl Variant Effet Predictor: \"%s\"\n",
-            object@vep))
-        cat("Bioconductor parallel parameters\n")
-        cat("- ")
-        print(object@bp)
+            "  @vep (Ensembl VEP key): \"%s\"\n",
+            vep(object)))
+        cat("  @svp: <ScanVcfParam object>\n")
+        cat(sprintf("  @bp: <%s object>\n", class(bp(object))))
         return(NULL)
     }
 )

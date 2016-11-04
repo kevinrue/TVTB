@@ -3,129 +3,40 @@ context("addFrequencies")
 # Settings ----
 
 # VCF file
-extdata <- file.path(system.file(package = "TVTB"), "extdata")
-vcfFile <- file.path(extdata, "moderate.vcf")
+vcfFile <- system.file("extdata", "moderate.vcf", package = "TVTB")
 
 # Phenotype file
-phenoFile <- file.path(extdata, "moderate_pheno.txt")
-phenotypes <- S4Vectors::DataFrame(
-    read.table(file = phenoFile, header = TRUE, row.names = 1))
+phenoFile <- system.file("extdata", "moderate_pheno.txt", package = "TVTB")
+phenotypes <- S4Vectors::DataFrame(read.table(phenoFile, TRUE, row.names = 1))
 
 # TVTB parameters
-tparam <- TVTBparam(
-    genos = list(
-        REF = "0|0",
-        HET = c("0|1", "1|0"),
-        ALT = "1|1"))
+tparam <- TVTBparam(Genotypes("0|0", c("0|1", "1|0"), "1|1"))
 
 # Pre-process variants
-vcf <- VariantAnnotation::readVcf(file = vcfFile)
-colData(vcf) <- phenotypes
+vcf <- VariantAnnotation::readVcf(
+    vcfFile, param = tparam, colData = phenotypes)
 vcf <- VariantAnnotation::expand(vcf, row.names = TRUE)
-
-# Create a VCF object with a pre-existing INFO key
-
-vcfHeaderExist <- vcf
-newInfoHeader <- DataFrame(
-    Number = rep(1, 2),
-    Type = "Integer",
-    Description = "Pre-existing INFO field",
-    row.names = c("MAF", "pop_GBR_MAF"))
-info(header(vcfHeaderExist)) <- rbind(info(header(vcfHeaderExist)), newInfoHeader)
-
-vcfDataExist <- vcfHeaderExist
-newInfoData <- DataFrame(
-    MAF = seq_along(vcfHeaderExist),
-    pop_GBR_MAF = rev(seq_along(vcfHeaderExist))
-)
-info(vcfDataExist) <- cbind(info(vcfDataExist), newInfoData)
 
 # Signatures ----
 
 test_that("addFrequencies supports all signatures",{
 
-    # \alias{addFrequencies,ExpandedVCF,list,TVTBparam-method}
+    # \alias{addFrequencies,ExpandedVCF,list-method}
     expect_s4_class(
-        addFrequencies(
-            vcf = vcf, phenos = list(pop = "GBR"), param = tparam),
+        addFrequencies(vcf, list(pop = "GBR")),
         "ExpandedVCF"
     )
 
-    # \alias{addFrequencies,ExpandedVCF,character,TVTBparam-method}
+    # \alias{addFrequencies,ExpandedVCF,character-method}
     expect_s4_class(
-        addFrequencies(
-            vcf = vcf, phenos = "gender", param = tparam),
+        addFrequencies(vcf, "gender"),
         "ExpandedVCF"
     )
 
-    # \alias{addFrequencies,ExpandedVCF,missing,TVTBparam-method}
+    # \alias{addFrequencies,ExpandedVCF,missing-method}
     expect_s4_class(
-        addFrequencies(
-            vcf = vcf, param = tparam),
+        addFrequencies(vcf),
         "ExpandedVCF"
-    )
-
-})
-
-# Overwrite INFO header fields ----
-
-test_that(".checkFrequencyInfo overwrites INFO header fields", {
-
-    expect_error(
-        addFrequencies(
-            vcf = vcfHeaderExist, param = tparam)
-    )
-
-    # expect_error(
-    #     addFrequencies(
-    #         vcf = vcfHeaderExist,
-    #         phenos = list(pop = "GBR"),
-    #         param = tparam)
-    # )
-
-    expect_message(
-        addFrequencies(
-            vcf = vcfHeaderExist, param = tparam, force = TRUE)
-    )
-
-    expect_message(
-        addFrequencies(
-            vcf = vcfHeaderExist,
-            phenos = list(pop = "GBR"),
-            param = tparam, force = TRUE)
-    )
-
-})
-
-# Overwrite INFO data fields ----
-
-test_that(".checkFrequencyInfo overwrites INFO data fields", {
-
-    expect_error(
-        addFrequencies(
-            vcf = vcfDataExist, param = tparam)
-    )
-
-    # expect_error(
-    #     addFrequencies(
-    #         vcf = vcfDataExist,
-    #         phenos = list(pop = "GBR"),
-    #         param = tparam)
-    # )
-
-    # All the below produce a warning due to validity check of ExpandedVCF
-    expect_message(
-        object = addFrequencies(
-            vcf = vcfDataExist, param = tparam, force = TRUE),
-        regexp = "Overwriting"
-    )
-
-    expect_message(
-        object = addFrequencies(
-            vcf = vcfDataExist,
-            phenos = list(pop = "GBR"),
-            param = tparam, force = TRUE),
-        regexp = "Overwriting"
     )
 
 })

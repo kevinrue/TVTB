@@ -49,11 +49,10 @@ and \code{\link{seqnames,GRanges-method}}.
 \examples{
 # Identify VCF file correponding to chromosome ----
 
-vcfFolder <- file.path(system.file(package = "TVTB"), "extdata")
+vcfFolder <- system.file("extdata", package = "TVTB")
 
-# Example usage
-vcfFile <- chr2file(
-    chr = "15",
-    pattern = "^chr\%s\\\..*\\\.vcf\\\.gz$",
-    folder = vcfFolder)
+
+# Example usage ----
+
+vcfFile <- chr2file("15", "^chr\%s\\\..*\\\.vcf\\\.gz$", vcfFolder)
 }

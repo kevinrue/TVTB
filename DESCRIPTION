@@ -1,8 +1,8 @@
 Package: TVTB
 Type: Package
 Title: TVTB: The VCF Tool Box
-Version: 0.99.0
-Date: 2016-09-15
+Version: 0.99.1
+Date: 2016-10-10
 Authors@R: person(
     "Kevin", "Rue-Albrecht", role = c("aut", "cre"),
     email = "kevinrue67@gmail.com")
@@ -62,9 +62,10 @@ biocViews:
 Collates:
     ensembldbFunctions.R,
     regions2vcf.R,
-    runShinyApp.R,
+    tSVE.R,
     AllClasses.R,
     AllGenerics.R,
+    Genotypes-class.R,
     TVTBparam-class.R,
     VcfFilterRules-class.R,
     countGenos-methods.R,

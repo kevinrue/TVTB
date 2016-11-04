@@ -1,46 +1,49 @@
+
+# Genotypes class ----
+
+setGeneric(
+    "Genotypes", signature = c("ref", "het", "alt"),
+    function(ref, het, alt, suffix = c(ref="REF", het="HET", alt="ALT"))
+        standardGeneric("Genotypes")
+)
+
 # dropInfo ----
 
 setGeneric(
-    name = "dropInfo",
-    signature = c("vcf"),
-    def = function(vcf, key = NULL, slot = "both")
+    "dropInfo", signature = "vcf",
+    function(vcf, key = NULL, slot = "both")
         standardGeneric("dropInfo")
 )
 
 # addOverallFrequencies ----
 
 setGeneric(
-    name = "addOverallFrequencies",
-    signature = c("vcf", "param"),
-    def = function(vcf, param, ...)
+    "addOverallFrequencies", signature = c("vcf"),
+    function(vcf, force = FALSE)
         standardGeneric("addOverallFrequencies")
 )
 
 # addPhenoLevelFrequencies ----
 
 setGeneric(
-    name = "addPhenoLevelFrequencies",
-    signature = c("vcf", "param"),
-    def = function(vcf, pheno, level, param, ...)
+    "addPhenoLevelFrequencies", signature = c("vcf"),
+    function(vcf, pheno, level, force = FALSE)
         standardGeneric("addPhenoLevelFrequencies")
 )
 
 # addPhenotypeFrequencies ----
 
 setGeneric(
-    name = "addFrequencies",
-    signature = c("vcf", "phenos", "param"),
-    def = function(vcf, phenos, param, ...)
+    "addFrequencies", signature = c("vcf", "phenos"),
+    function(vcf, phenos, force = FALSE)
         standardGeneric("addFrequencies")
 )
 
 # addCountGenos ----
 
-# Not used within the package anymore; left for user convenience
 setGeneric(
-    name = "addCountGenos",
-    signature = c("vcf"),
-    def = function(
+    "addCountGenos", signature = "vcf",
+    function(
         vcf, genos, key, description, samples = 1:ncol(vcf), force = FALSE)
         standardGeneric("addCountGenos")
 )
@@ -48,212 +51,132 @@ setGeneric(
 # countGenos ----
 
 setGeneric(
-    name = "countGenos",
-    signature = c("x"),
-    def = function(x, genos, pheno = NULL, level = NULL)
+    "countGenos", signature = "x",
+    function(x, genos, pheno = NULL, level = NULL)
         standardGeneric("countGenos")
 )
 
 # variantsInSamples ----
 
 setGeneric(
-    name = "variantsInSamples",
-    signature = c("vcf", "param"),
-    def = function(vcf, param, samples = 1:ncol(vcf), ..., unique = FALSE)
+    "variantsInSamples", signature = c("vcf"),
+    function(vcf, samples = 1:ncol(vcf), unique = FALSE)
         standardGeneric("variantsInSamples")
 )
 
 # vepInPhenoLevel ----
 
 setGeneric(
-    name = "vepInPhenoLevel",
-    signature = c("vcf", "param"),
-    def = function(
-        vcf, phenoCol, level, vepCol, param, ...,
+    "vepInPhenoLevel", signature = c("vcf"),
+    function(
+        vcf, phenoCol, level, vepCol,
         unique = FALSE, facet = NULL)
         standardGeneric("vepInPhenoLevel")
-)
-
-# densityVepByPhenotype ----
-
-setGeneric(
-    name = "densityVepByPhenotype",
-    signature = c("vcf", "param"),
-    def = function(
-        vcf, phenoCol, vepCol, param, ..., filter = VcfFilterRules(),
-        unique = FALSE, facet = NULL, plot = FALSE, pattern = NULL,
-        layer = "density+dotplot")
-        standardGeneric("densityVepByPhenotype")
-)
-
-# densityVepInPhenoLevel ----
-
-setGeneric(
-    name = "densityVepInPhenoLevel",
-    signature = c("vcf", "param"),
-    def = function(
-        level, vcf, phenoCol, vepCol, param, ..., filter = VcfFilterRules(),
-        unique = FALSE, facet = NULL, plot = FALSE, pattern = NULL,
-        layer = "density+dotplot")
-        standardGeneric("densityVepInPhenoLevel")
-)
-
-# tabulateVepByPhenotype ----
-
-setGeneric(
-    name = "tabulateVepByPhenotype",
-    signature = c("vcf", "param"),
-    def = function(
-        vcf, phenoCol, vepCol, param, ..., filter = VcfFilterRules(),
-        unique = FALSE, facet = NULL, plot = FALSE, percentage = FALSE)
-        standardGeneric("tabulateVepByPhenotype")
-)
-
-# tabulateVepInPhenoLevel ----
-
-setGeneric(
-    name = "tabulateVepInPhenoLevel",
-    signature = c("vcf", "param"),
-    def = function(
-        level, vcf, phenoCol, vepCol, param, ..., filter = VcfFilterRules(),
-        unique = FALSE, facet = NULL, plot = FALSE, percentage = FALSE)
-        standardGeneric("tabulateVepInPhenoLevel")
 )
 
 # TVTBparam class ----
 
 setGeneric(
-    name = "TVTBparam",
-    signature = "genos",
-    def = function(
-        genos,
-        ranges = GRangesList(),
-        aaf = "AAF", maf = "MAF", vep = "CSQ", bp = SerialParam())
+    "TVTBparam", signature = "genos",
+    function(
+        genos, ranges = GRangesList(),
+        aaf = "AAF", maf = "MAF", vep = "CSQ", bp = SerialParam(),
+        svp = ScanVcfParam(which = reduce(unlist(ranges))))
         standardGeneric("TVTBparam")
 )
 
 setGeneric(
-    name = "genos",
-    signature = "x",
-    def = function(x)
+    "genos", signature = "x",
+    function(x)
         standardGeneric("genos")
 )
 
 setGeneric(
-    name = "genos<-",
-    signature = c("x", "value"),
-    def = function(x, value)
+    "genos<-", signature = c("x", "value"),
+    function(x, value)
         standardGeneric("genos<-")
 )
 
 setGeneric(
-    name = "aaf",
-    signature = "x",
-    def = function(x)
+    "aaf", signature = "x",
+    function(x)
         standardGeneric("aaf")
 )
 
 setGeneric(
-    name = "aaf<-",
-    signature = c("x", "value"),
-    def = function(x, value)
+    "aaf<-", signature = c("x", "value"),
+    function(x, value)
         standardGeneric("aaf<-")
 )
 
 setGeneric(
-    name = "maf",
-    signature = "x",
-    def = function(x)
+    "maf", signature = "x",
+    function(x)
         standardGeneric("maf")
 )
 
 setGeneric(
-    name = "maf<-",
-    signature = c("x", "value"),
-    def = function(x, value)
+    "maf<-", signature = c("x", "value"),
+    function(x, value)
         standardGeneric("maf<-")
 )
 
 setGeneric(
-    name = "hRef",
-    signature = "x",
-    def = function(x)
-        standardGeneric("hRef")
-)
-
-setGeneric(
-    name = "hRef<-",
-    signature = c("x", "value"),
-    def = function(x, value)
-        standardGeneric("hRef<-")
-)
-
-setGeneric(
-    name = "het",
-    signature = "x",
-    def = function(x)
+    "het", signature = "x",
+    function(x)
         standardGeneric("het")
 )
 
 setGeneric(
-    name = "het<-",
-    signature = c("x", "value"),
-    def = function(x, value)
+    "het<-", signature = c("x", "value"),
+    function(x, value)
         standardGeneric("het<-")
 )
 
 setGeneric(
-    name = "hAlt",
-    signature = "x",
-    def = function(x)
-        standardGeneric("hAlt")
-)
-
-setGeneric(
-    name = "hAlt<-",
-    signature = c("x", "value"),
-    def = function(x, value)
-        standardGeneric("hAlt<-")
-)
-
-setGeneric(
-    name = "carrier",
-    signature = "x",
-    def = function(x)
+    "carrier", signature = "x",
+    function(x)
         standardGeneric("carrier")
 )
 
 setGeneric(
-    name = "carrier<-",
-    signature = c("x", "value"),
-    def = function(x, value)
-        standardGeneric("carrier<-")
-)
-
-setGeneric(
-    name = "vep",
-    signature = "x",
-    def = function(x)
+    "vep", signature = "x",
+    function(x)
         standardGeneric("vep")
 )
 
 setGeneric(
-    name = "vep<-",
-    signature = c("x", "value"),
-    def = function(x, value)
+    "vep<-", signature = c("x", "value"),
+    function(x, value)
         standardGeneric("vep<-")
 )
 
 setGeneric(
-    name = "bp",
-    signature = "x",
-    def = function(x)
+    "bp", signature = "x",
+    function(x)
         standardGeneric("bp")
 )
 
 setGeneric(
-    name = "bp<-",
-    signature = c("x", "value"),
-    def = function(x, value)
+    "bp<-", signature = c("x", "value"),
+    function(x, value)
         standardGeneric("bp<-")
+)
+
+setGeneric(
+    "suffix", signature = "x",
+    function(x)
+        standardGeneric("suffix")
+)
+
+setGeneric(
+    "svp", signature = "x",
+    function(x)
+        standardGeneric("svp")
+)
+
+setGeneric(
+    "svp<-", signature = c("x", "value"),
+    function(x, value)
+        standardGeneric("svp<-")
 )

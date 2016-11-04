@@ -92,7 +92,7 @@ For instance:
     Ensembl Variant Effect Predictor are stored in a `VCF` object.
     The `vep` accessor method may be used to access this slot.
 * `VcfFilterRules`---which may combine any number of filter rules stored in
-    `VcfFixedRules`, `VcfInfoRules`, `VcfVepRules`, and other
+    `FixedRules`, `VcfFixedRules`, `VcfInfoRules`, `VcfVepRules`, and other
     `VcfFilterRules` objects---
     mark each filter rule with their type in the combined
     object. The information is stored in the `type` slot, which may be

@@ -25,10 +25,10 @@ shinyServer(function(input, output, clientData, session) {
         infoKeys = NULL, # choices of info key
         genoKeys = NULL, # choices of geno keys
         # GRanges
-        genomicRanges = GenomicRanges::GRanges(), # All variants imported
+        genomicRanges = GenomicRanges::GRanges(), # active ranges
         # Single VCF file
-        singleVcf = NULL, # Path to file
-        singleVcfIssue = NULL # no issue
+        singleVcf = NULL, # Path to single VCF file
+        singleVcfIssue = NULL # NULL if no issue
     )
 
     # Import phenotype information ----
@@ -63,31 +63,33 @@ shinyServer(function(input, output, clientData, session) {
     })
 
     # DataFrame of imported phenotypes, or NULL
-    phenotypes <- reactive({
-        # Depends on phenoFile
-        phenoFile <- RV[["phenoFile"]]
+    observeEvent(
+        RV[["phenoFile"]],
+        {
+            phenoFile <- RV[["phenoFile"]]
 
-        if (is.null(phenoFile))
-            return(NULL)
-        else {
-            message("Importing phenotypes ...")
-            rawData <- tryParsePheno(file = phenoFile)
+            if (is.null(phenoFile)){
+                RV[["phenotypes"]] <- NULL
+            } else {
+                message("Importing phenotypes ...")
+                rawData <- tryParsePheno(phenoFile)
 
-            validate(need(
-                all(dim(rawData) > c(0, 0)),
-                paste(
-                    "Phenotype file must have at least 1 row and 1 column",
-                    "with colnames and rownames")))
-        }
-
-        return(S4Vectors::DataFrame(rawData))
-    })
+                validate(need(
+                    all(dim(rawData) > c(0, 0)),
+                    paste(
+                        "Phenotype file must have at least 1 row and 1 column",
+                        "with colnames and rownames")))
+                RV[["phenotypes"]] <- S4Vectors::DataFrame(rawData)
+            }
+        },
+        ignoreNULL = FALSE
+    )
 
     # HTML summary of imported phenotypes
     output$phenoFileSummary <- renderUI({
-        # Depends on phenotypes()
+        # Depends on RV[["phenotypes"]]
 
-        phenotypes <- phenotypes()
+        phenotypes <- RV[["phenotypes"]]
 
         if (is.null(phenotypes))
             return(Msgs[["phenotypes"]])
@@ -103,7 +105,7 @@ shinyServer(function(input, output, clientData, session) {
     # Column names available for selection from phenotypes
     output$phenoCols <- renderUI({
         # NOTE:
-        # phenotype view depends on the filteredVcf(), not phenotypes()
+        # phenotype view depends on the filteredVcf(), not RV[["phenotypes"]]
         # 1) users can easily look at their raw phenotypes separately
         # 2) all analyses use data stored in the VCF object only
 
@@ -115,7 +117,7 @@ shinyServer(function(input, output, clientData, session) {
         validate(need(
             ncol(phenos) > 0,
             ifelse(
-                is.null(phenotypes()),
+                is.null(RV[["phenotypes"]]),
                 Msgs[["colDataEmptyOK"]],
                 Msgs[["colDataEmptyImport"]])
         ),
@@ -129,34 +131,6 @@ shinyServer(function(input, output, clientData, session) {
         )
     })
 
-    # When phenotypes are updated in VCF, update the choices for plotting
-    observeEvent(RV[["filteredVcf"]], {
-        # Depends on RV[["filteredVcf"]] & input$phenoTVBP
-        pheno.choices <- c(
-            "None",
-            colnames(SummarizedExperiment::colData(RV[["filteredVcf"]])))
-
-        # If new phenotype files also contains the current phenotype,
-        # keep it active instead of resetting to the first choice
-        ## Tabulate VEP by phenotype (TVBP)
-        pheno.TVBPselected <- pheno.choices[
-            max(1, which(pheno.choices == input$phenoTVBP))]
-
-        updateSelectInput(
-            session, "phenoTVBP",
-            choices = pheno.choices,
-            selected = pheno.TVBPselected)
-
-        # Same thing for DVBP
-        pheno.DVBPselected <- pheno.choices[
-            max(1, which(pheno.choices == input$phenoDVBP))]
-
-        updateSelectInput(
-            session, "phenoDVBP",
-            choices = pheno.choices,
-            selected = pheno.DVBPselected)
-    })
-
     # Display structure of phenotypes attached to variants
     output$phenotypesStructure <- renderPrint({
 
@@ -168,7 +142,7 @@ shinyServer(function(input, output, clientData, session) {
         validate(need(
             ncol(phenos) > 0,
             ifelse(
-                is.null(phenotypes()),
+                is.null(RV[["phenotypes"]]),
                 Msgs[["colDataEmptyOK"]],
                 Msgs[["colDataEmptyImport"]])
         ),
@@ -177,7 +151,7 @@ shinyServer(function(input, output, clientData, session) {
         validate(need(
             ncol(phenos) > 0,
             ifelse(
-                is.null(phenotypes()),
+                is.null(RV[["phenotypes"]]),
                 Msgs[["colDataEmptyOK"]],
                 Msgs[["colDataEmptyImport"]])
             ),
@@ -349,7 +323,6 @@ shinyServer(function(input, output, clientData, session) {
 
                         RV[["vcf"]] <- TVTB::addOverallFrequencies(
                             vcf = vcf,
-                            param = tparam(),
                             force = TRUE # watch the console for warnings
                         )
                         RV[["latestPhenotypeFrequency"]] <- "Overall"
@@ -546,7 +519,6 @@ shinyServer(function(input, output, clientData, session) {
                         RV[["vcf"]] <- TVTB::addFrequencies(
                             vcf = vcf,
                             phenos = phenosAdd,
-                            param = tparam(),
                             force = TRUE # watch console for warnings
                         )
 
@@ -690,7 +662,8 @@ shinyServer(function(input, output, clientData, session) {
                 RV[["GRangesBED"]] <- GenomicRanges::GRanges()
             else
                 RV[["GRangesBED"]] <- rawData
-        }
+        },
+        ignoreNULL = FALSE
     )
 
     # If a new BED file is selected, update GRangesBED
@@ -774,7 +747,8 @@ shinyServer(function(input, output, clientData, session) {
             rawData <- validateDataFrameGRanges(rawData, selectedEnsDb())
 
             RV[["GRangesUCSC"]] <- rawData
-        }
+        },
+        ignoreNULL = FALSE
     )
 
     observeEvent(
@@ -794,7 +768,8 @@ shinyServer(function(input, output, clientData, session) {
                 RV[["GRangesEnsDb"]] <- GenomicRanges::GRanges()
             else
                 RV[["GRangesEnsDb"]] <- queryGenes
-        }
+        },
+        ignoreNULL = FALSE
     )
 
     observeEvent(
@@ -873,7 +848,7 @@ shinyServer(function(input, output, clientData, session) {
     })
 
     # Show BED records
-    output$rangesStructure <- renderPrint({
+    output$rangesSession <- renderPrint({
 
         genomicRanges <- RV[["genomicRanges"]]
 
@@ -882,7 +857,7 @@ shinyServer(function(input, output, clientData, session) {
             Msgs[["noGenomicRanges"]]),
             errorClass = "optional")
 
-        return(str(genomicRanges))
+        return(genomicRanges)
     })
 
     output$rangesSample <- DT::renderDataTable({
@@ -916,7 +891,7 @@ shinyServer(function(input, output, clientData, session) {
             "Failed loading annotation package."
         ))
 
-        return(TVTB::getEdb(input$annotationPackage))
+        return(getEdb(input$annotationPackage))
     })
 
     genomeSeqinfo <- reactive({
@@ -980,14 +955,12 @@ shinyServer(function(input, output, clientData, session) {
         if (input$ensDb.value == "")
             return(NULL)
 
-        ensDbFilter = TVTB::EnsDbFilter(
+        ensDbFilter = EnsDbFilter(
             type = input$ensDb.type,
             condition = input$ensDb.condition,
             value = input$ensDb.value)
 
-        res <- ensembldb::genes(
-            edb,
-            filter = ensDbFilter)
+        res <- ensembldb::genes(edb, filter = ensDbFilter)
 
         return(res)
     })
@@ -1059,25 +1032,40 @@ shinyServer(function(input, output, clientData, session) {
             need(input$mafSuffix, Msgs[["mafSuffix"]])
         )
 
-        genos <- list(
-            REF = input$refGenotypes,
-            HET = input$hetGenotypes,
-            ALT = input$altGenotypes)
-
-        names(genos) <- c(
-            input$refSuffix,
-            input$hetSuffix,
-            input$altSuffix
-        )
-
-        return(new(
-            Class = "TVTBparam",
-            genos = genos,
+        tparam <- TVTB::TVTBparam(
+            genos = TVTB::Genotypes(
+                ref = input$refGenotypes,
+                het = input$hetGenotypes,
+                alt = input$altGenotypes,
+                suffix = c(
+                    ref = input$refSuffix,
+                    het = input$hetSuffix,
+                    alt = input$altSuffix
+                )
+            ),
             aaf = input$aafSuffix,
             maf = input$mafSuffix,
             vep = input$vepKey,
-            bp = bpParam
-        ))
+            bp = bpParam,
+            svp = VariantAnnotation::ScanVcfParam(
+                info = c(input$vepKey, input$vcfInfoKeys),
+                geno = c("GT", input$vcfFormatKeys)
+            )
+        )
+
+        if (!is.null(RV[["genomicRanges"]])){
+            VariantAnnotation::vcfWhich(TVTB::svp(tparam)) <-
+                GenomicRanges::reduce(unlist(TVTB::ranges(tparam)))
+        }
+
+        phenotypes <- RV[["phenotypes"]]
+
+        if (!is.null(phenotypes)){
+            VariantAnnotation::vcfSamples(TVTB::svp(tparam)) <-
+                rownames(phenotypes)
+        }
+
+        return(tparam)
     })
 
     output$TVTBsettings <- renderPrint({
@@ -1107,23 +1095,12 @@ shinyServer(function(input, output, clientData, session) {
             genoNumRow = input$genoNumRow,
             genoFirstRow = input$genoFirstRow,
             genoNumCols = input$genoNumCols,
-            genoFirstCol = input$genoFirstCol,
-            vepTVBP = input$vepTVBP,
-            phenoTVBP = input$phenoTVBP,
-            unique2phenoTVBP = input$unique2phenoTVBP,
-            vepFacetKeyTVBP = input$vepFacetKeyTVBP,
-            vepFacetsTVBP = input$vepFacetsTVBP,
-            stackedPercentageTVBP = input$stackedPercentageTVBP
+            genoFirstCol = input$genoFirstCol
         ))
     })
 
     output$advancedSettings <- renderPrint({
         return(list(
-            legendTextSizeTVBP = input$legendTextSizeTVBP,
-            xAxisAngleTVBP = input$xAxisAngleTVBP,
-            xAxisSizeTVBP = input$xAxisSizeTVBP,
-            xAxisHjustTVBP = input$xAxisHjustTVBP,
-            xAxisVjustTVBP = input$xAxisVjustTVBP,
             refGenotypes = input$refGenotypes,
             hetGenotypes = input$hetGenotypes,
             altGenotypes = input$altGenotypes,
@@ -1388,48 +1365,20 @@ shinyServer(function(input, output, clientData, session) {
         handlerExpr = {
 
             vcfInputMode <- input$vcfInputMode
-            genomicRanges <- RV[["genomicRanges"]]
+
             tparam <- tparam()
-            vepKey <- input$vepKey
+
             genomeSeqinfo <- genomeSeqinfo()
             yieldSize <- input$yieldSize
-            infoKeys <- c(input$vcfInfoKeys, input$vepKey)
+            infoKeys <- unique(c(input$vcfInfoKeys, input$vepKey))
             genoKeys <- input$vcfFormatKeys
-            if (length(genoKeys) == 0)
-                genoKeys <- "GT" # Mandatory
 
-            if (is.null(RV[["phenoFile"]])) {
-                phenotypes <- S4Vectors::DataFrame()
-            } else {
-                phenotypes <- phenotypes()
-            }
-
-            validate(
-                need(vepKey, label = Msgs[["vepKey"]]),
-                need(genomeSeqinfo, Msgs[["genomeSeqinfo"]])
-            )
+            validate(need(genomeSeqinfo, Msgs[["genomeSeqinfo"]]))
 
             withProgress(
                 min = 0, max = 3, value = 1,
                 message = "Progress", detail = Tracking[["preprocessing"]],
                 {
-
-                    # NOTE: ALL FIXED fields imported
-                    svp <- VariantAnnotation::ScanVcfParam(
-                        info = infoKeys,
-                        geno = genoKeys
-                    )
-
-                    # Only import samples with phenotype information
-                    if (nrow(phenotypes) > 0)
-                        VariantAnnotation::vcfSamples(svp) <-
-                            rownames(phenotypes)
-
-                    # Only import variants in targeted GRanges
-                    if (length(genomicRanges) > 0)
-                        VariantAnnotation::vcfWhich(svp) <-
-                            GenomicRanges::reduce(genomicRanges)
-
 
                     # # Timing
                     # t1 <- Sys.time()
@@ -1446,7 +1395,7 @@ shinyServer(function(input, output, clientData, session) {
 
                             tryParseSingleVcf(
                                 file = singleVcf,
-                                svp = svp,
+                                param = tparam,
                                 yieldSize = yieldSize
                             )
                         },
@@ -1466,7 +1415,7 @@ shinyServer(function(input, output, clientData, session) {
                             tryParseMultipleVcf(
                                 folder = vcfFolder,
                                 pattern = vcfPattern,
-                                svp = svp,
+                                param = tparam,
                                 yieldSize = yieldSize,
                                 BPPARAM = TVTB::bp(tparam)
                             )
@@ -1480,11 +1429,14 @@ shinyServer(function(input, output, clientData, session) {
                         length(vcf) > 0,
                         "No variant found in BED region(s)"))
 
-                    if (nrow(phenotypes) == 0)
-                        phenotypes <- S4Vectors::DataFrame(
-                            row.names = colnames(vcf))
+                    if (is.null(RV[["phenoFile"]])){
+                        SummarizedExperiment::colData(vcf) <-
+                            S4Vectors::DataFrame(row.names = colnames(vcf))
+                    } else {
+                        SummarizedExperiment::colData(vcf) <-
+                            RV[["phenotypes"]]
+                    }
 
-                    SummarizedExperiment::colData(vcf) <- phenotypes
                 })
 
             # Clean header of INFO fields not imported
@@ -1576,13 +1528,13 @@ shinyServer(function(input, output, clientData, session) {
             x = colnames(VariantAnnotation::info(vcf)),
             invert = TRUE,
             value = TRUE)
-        message("returning vcfInfoCols")
-        selectInput(
+
+        return(selectInput(
             "vcfInfoCols", "Meta-columns",
             choices = colChoices,
             selected = colChoices[1:min(5, length(colChoices))],
             multiple = TRUE
-        )
+        ))
     })
 
     # Displayed requested VCF INFO fields
@@ -1605,7 +1557,7 @@ shinyServer(function(input, output, clientData, session) {
         cols <- which(
             colnames(VariantAnnotation::info(vcf)) %in% input$vcfInfoCols
         )
-        message(cols)
+
         message("returning vcfInfo")
         return(DT::datatable(
             data = cbind(
@@ -1642,10 +1594,9 @@ shinyServer(function(input, output, clientData, session) {
         quickFix <- gsub("[‘’]", "\'", quickFix)
 
         return(tryCatch({
-
             newFilter <- new(
-                Class = input$newFilterClass,
-                exprs = list(quickFix),
+                input$newFilterClass,
+                listData = list(parse(text = quickFix, keep.source = FALSE)),
                 active = input$newFilterActive)
 
             if (class(newFilter) == "VcfVepRules")
@@ -1672,7 +1623,7 @@ shinyServer(function(input, output, clientData, session) {
         )
         updateTextInput(
           session, "newFilterExpression",
-          value = "grepl(\"missense\", Consequence)"
+          value = 'grepl("missense", Consequence)'
         )
       }
     )
@@ -1688,7 +1639,8 @@ shinyServer(function(input, output, clientData, session) {
         })
 
         if (is.null(vcf)){
-          RV[["newFilterStatus"]] <- "Variants must be imported to test the expression"
+          RV[["newFilterStatus"]] <-
+              "Variants must be imported to test the expression"
           return(FALSE)
         }
 
@@ -1716,11 +1668,19 @@ shinyServer(function(input, output, clientData, session) {
     output$vcfFilterTest <- renderUI({
         testResult <- newFilterTestResults()
 
-        if (testResult)
-            return()
-        else
+        if (testResult){
             return(
-                strong(tags$span(style="color:red", RV[["newFilterStatus"]])))
+                strong(tags$span(
+                    style="color:green",
+                    RV[["newFilterStatus"]])
+                ))
+        } else {
+            return(
+                strong(tags$span(
+                    style="color:red",
+                    RV[["newFilterStatus"]])
+                ))
+        }
     })
 
     observeEvent(input$addNewFilter, {
@@ -1796,7 +1756,7 @@ shinyServer(function(input, output, clientData, session) {
         return(str(RV[["vcfFilters"]]))
     })
 
-    # Observe checboxes defining active status
+    # Observe checkboxes defining active status
     observe({
 
         # If the inputs are updated
@@ -1874,13 +1834,11 @@ shinyServer(function(input, output, clientData, session) {
         input$filterVariants
         vcf <- RV[["vcf"]]
 
-        # Do not update when filters change, wait for actionButton/vcf
+        # Do not update when filters change, wait for actionButton or VCF
         isolate({vcfFilters <- RV[["vcfFilters"]]})
 
         # Store the filtered VCF in the reativeValues
-        RV[["filteredVcf"]] <- S4Vectors::subsetByFilter(
-            x = vcf, filter = vcfFilters
-        )
+        RV[["filteredVcf"]] <- S4Vectors::subsetByFilter(vcf, vcfFilters)
     })
 
     output$filteredVcfSummary <- renderUI({
@@ -2189,576 +2147,6 @@ shinyServer(function(input, output, clientData, session) {
             filter = "top")
     })
 
-    # When variants are updated, update the choices for plotting
-    # plot: tabulatedVariantsByPhenotype (TVBP)
-    # plot densityVariantsByPhenotype (DVBP)
-    observeEvent(RV[["vcf"]], {
-
-        vcf <- RV[["vcf"]]
-
-        validate(
-            need(vcf, Msgs[["importVariants"]]),
-            need(
-                input$vepKey %in% colnames(VariantAnnotation::info(vcf)),
-                Msgs[["vepKeyNotFound"]])
-        )
-
-        csq <- tryParseCsq(vcf = vcf, vepKey = input$vepKey)
-
-        validate(need(csq, Msgs[["csq"]]))
-
-        vepMcols <- S4Vectors::mcols(csq)
-
-        vepKey.choices <- colnames(vepMcols)
-
-        # Initialise by order of preference if present:
-        # Current selection > Consequence > Impact > First field
-        ## TVBP (Tabulate VEP by phenotype)
-        vep.TVBPdefault <- max(
-            1,
-            head(x = na.omit(
-                match(
-                    x = c(input$vepTVBP, "Consequence","IMPACT"),
-                    table = vepKey.choices
-                    )
-                ), n = 1)
-            )
-
-        updateSelectInput(
-            session, "vepTVBP",
-            choices = vepKey.choices,
-            selected = vepKey.choices[vep.TVBPdefault])
-
-        ## DVBP (Density VEP by phenotype)
-        vep.DVBPdefault <- max(
-            1,
-            head(x = na.omit(
-                match(
-                    x = c(input$vepTVBP, "CADD_PHRED","Protein_position"),
-                    table = vepKey.choices
-                )
-            ), n = 1)
-        )
-
-        updateSelectInput(
-            session, "vepDVBP",
-            choices = vepKey.choices,
-            selected = vepKey.choices[vep.TVBPdefault])
-
-        vepKey.choices <- c("None", vepKey.choices)
-
-        # Initialise by order of preference if present:
-        # Current selection > None
-        ## TVBP
-        vepFacetKey.TVBPselected <- max(
-            1,
-            head(x = na.omit(
-                match(
-                    x = c(input$vepFacetKeyTVBP),
-                    table = vepKey.choices
-                )
-            ), n = 1)
-        )
-
-        updateSelectInput(
-            session, "vepFacetKeyTVBP",
-            choices = vepKey.choices,
-            selected = vepKey.choices[vepFacetKey.TVBPselected])
-
-        ## DVBP
-        vepFacetKey.DVBPselected <- max(
-            1,
-            head(x = na.omit(
-                match(
-                    x = c(input$vepFacetKeyDVBP),
-                    table = vepKey.choices
-                )
-            ), n = 1)
-        )
-
-        updateSelectInput(
-            session, "vepFacetKeyDVBP",
-            choices = vepKey.choices,
-            selected = vepKey.choices[vepFacetKey.DVBPselected])
-    })
-
-    # Tabulate VEP by phenotype (TVBP) ----
-
-    # Phenotype to summarise VEP: or NULL if "None"
-    varVepPlotPhenoTVBP <- reactive({
-
-        phenotype <- input$phenoTVBP
-        # Give time to initialise the widget
-        req(phenotype)
-
-        if (phenotype == "None"){
-            return("Phenotype")
-        } else {
-            return(phenotype)
-        }
-    })
-
-    # Update list of VEP facets if the faceting variable changes
-    observeEvent(
-        eventExpr = input$vepFacetKeyTVBP,
-        handlerExpr = {
-            # Raw variants must exist
-            validate(need(RV[["vcf"]], Msgs[["importVariants"]]))
-
-            vcf <- RV[["filteredVcf"]]
-            # Give time to filter variants
-            req(vcf)
-
-            validate(need(
-                input$vepKey %in% colnames(VariantAnnotation::info(vcf)),
-                Msgs[["vepKeyNotFound"]]))
-            csq <- tryParseCsq(vcf = vcf, vepKey = input$vepKey)
-
-            validate(need(csq, Msgs[["csq"]]))
-
-            vepMcols <- S4Vectors::mcols(csq)
-
-            # Initialise to avoid crash
-            facetsSelected <- NULL
-            if (input$vepFacetKeyTVBP != "None"){
-                vepFacets.choices <- unique(vepMcols[,input$vepFacetKeyTVBP])
-            } else {
-                vepFacets.choices <- NA_character_
-            }
-
-            updateSelectInput(
-                session, "vepFacetsTVBP",
-                choices = vepFacets.choices,
-                selected = vepFacets.choices)
-        }
-    )
-
-    # Base of the ggplot summarising counts of VEP
-    TVBPggplot <- reactive({
-
-        # Update only on button click
-        validate(need(
-            input$buttonTVBP,
-            "Please click \"Apply\" to apply parameters."),
-            errorClass = "optional")
-
-        isolate({
-            vepTVBP <- input$vepTVBP
-            vepFacetKey <- input$vepFacetKeyTVBP
-            vepFacets <- input$vepFacetsTVBP
-            stackedPercentage <- input$stackedPercentageTVBP
-            unique2pheno <- input$unique2phenoTVBP
-        })
-
-        withProgress(min = 0, max = 2, message = "Progress", {
-            incProgress(1, detail = Tracking[["calculate"]])
-
-            if (vepFacetKey != "None"){
-                # req(vepFacets) # Give time to observeEvent
-                validate(need(
-                    length(vepFacets) > 0,
-                    "The plot must contain at least one facet"))
-            }
-
-            # App does not display "NULL" choices
-            if (vepFacetKey == "None"){
-                vepFacetKey <- NULL
-            }
-
-            validate(need(RV[["vcf"]], Msgs[["importVariants"]]))
-
-            vcf <- RV[["filteredVcf"]]
-
-            validate(need(
-                nrow(vcf) > 0,
-                Msgs[["filterVcfEmpty"]]),
-                errorClass = "optional")
-
-            # Special case of phenotype "None"
-            isolate({phenoTVBP <- input$phenoTVBP})
-            if (phenoTVBP == "None"){
-                SummarizedExperiment::colData(vcf)[,"Phenotype"] <- factor("All")
-                plotPhenotype <- "Phenotype"
-            } else {
-                plotPhenotype <- phenoTVBP
-            }
-
-            isolate({varVepPlotPheno <- varVepPlotPhenoTVBP()})
-            validate(
-                need(vepTVBP, Msgs[["vepTVBP"]]),
-                need(
-                    is.logical(stackedPercentage),
-                    Msgs[["stackedPercentageTVBP"]])
-                )
-
-            incProgress(1, detail = Tracking[["ggplot"]])
-
-            gg <- TVTB::tabulateVepByPhenotype(
-                vcf = vcf,
-                phenoCol = plotPhenotype,
-                vepCol = vepTVBP,
-                param = tparam(),
-                unique = unique2pheno,
-                facet = vepFacetKey,
-                plot = TRUE,
-                percentage = stackedPercentage
-            )
-
-            if (!is.null(vepFacetKey)){
-                gg$data <- gg$data[
-                    gg$data[,vepFacetKey] %in% vepFacets,]
-                gg$data <- droplevels(gg$data)
-            }
-
-            return(gg)
-        })
-
-    })
-
-    # Stacked bars classifying consequence of variants
-    output$vepCountBarplot <- renderPlot({
-        withProgress(min = 0, max = 2, message = "Progress", {
-            incProgress(1, detail = Tracking[["calculate"]])
-
-            # Update only on button click
-            gg <- TVBPggplot()
-
-            isolate({
-                legendTextSize <- input$legendTextSizeTVBP
-                xAxisAngle <- input$xAxisAngleTVBP
-                xAxisHjust <- input$xAxisHjustTVBP
-                xAxisVjust <- input$xAxisVjustTVBP
-                xAxisSize <- input$xAxisSizeTVBP
-                legend <- input$legendTVBP
-            })
-
-            message("Plotting predictions...")
-            incProgress(1, detail = Tracking[["render"]])
-
-            gg <- gg +
-                ggplot2::theme(
-                    axis.text = ggplot2::element_text(
-                        size = ggplot2::rel(1.5)),
-                    axis.title = ggplot2::element_text(
-                        size = ggplot2::rel(1.5)),
-                    legend.text = ggplot2::element_text(
-                        size = ggplot2::rel(legendTextSize)),
-                    legend.title = ggplot2::element_text(
-                        size = ggplot2::rel(legendTextSize)),
-                    axis.text.x = ggplot2::element_text(
-                        angle = xAxisAngle,
-                        hjust = xAxisHjust,
-                        vjust = xAxisVjust,
-                        size = ggplot2::rel(xAxisSize))
-                ) +
-                ggplot2::guides(fill = c("none", "legend")[legend + 1])
-
-            return(gg)
-        })
-    })
-
-    vepTableCount <- reactive({
-        # Depeds on: vepTabulated
-
-        vepTabulated <- TVBPggplot()$data
-
-        vepTable <- as.data.frame(table(vepTabulated))
-
-        return(vepTable)
-    })
-
-    # Table of VEP counts by phenotype level by VEP facet
-    output$vepTableDecreasing <- DT::renderDataTable({
-
-        vepTableCount <- vepTableCount()
-
-        vepTableDecreasing <- dplyr::arrange(vepTableCount, desc(Freq))
-
-        DT::datatable(
-            vepTableDecreasing,
-            options = list(
-                pageLength = 20,
-                searching = TRUE),
-            filter = "top",
-            rownames = FALSE)
-    })
-
-    # Print the count of consequences in the area hovered.
-    output$varVepCount <- renderUI({
-
-        req(input$plotVarClass_hover)
-
-        vepTableCount <- vepTableCount()
-
-        hover <- input$plotVarClass_hover
-        vepTVBP <- input$vepTVBP
-
-        # If not hovered, show empty values
-        if (is.null(hover)){
-            x_lvl <- NULL
-            y_lvl <- NULL
-            countVarLevel <- NULL
-        }
-        else{
-            # Identify the level of the phenotype (x axis)
-            x_lvls <- levels(vepTableCount[,hover$mapping$x])
-            x_lvl <- x_lvls[round(hover$x)]
-            # Identify the level of the variant category (y axis)
-            filters <- data.frame(
-                pheno = vepTableCount[,hover$mapping$x] == x_lvl
-            )
-            # Identify data for the panel (vepFacetKey) hovered
-            if (input$vepFacetKeyTVBP != "None"){
-
-                filters$vepFacetKeyTVBP <- vepTableCount[
-                    ,hover$mapping$panelvar1] ==
-                    hover$panelvar1
-            }
-            # Extract VEP counts for the panel hovered:
-            # matches x (phenotype level) and y (VEP level)
-            y_lvls <- vepTableCount[
-                apply(X = filters, MARGIN = 1, FUN = all),
-                c(vepTVBP, "Freq")]
-
-            # If in percentage mode, rescale the values
-            if (input$stackedPercentageTVBP){
-                y_lvls[,"Freq"] <- y_lvls[,"Freq"] / sum(y_lvls[,"Freq"])
-            }
-
-            # If out of range, show empty values
-            if (
-                input$plotVarClass_hover$y < 0 ||
-                input$plotVarClass_hover$y > sum(y_lvls[,"Freq"])){
-                y_lvl <- NULL
-                countVarLevel <- NULL
-            } else {
-                y_lvls[,"cumsum"] <- cumsum(y_lvls[,"Freq"])
-                y_lvls <- y_lvls[
-                    y_lvls[,"cumsum"] >= input$plotVarClass_hover$y,]
-                y_lvl <- as.character(y_lvls[1, vepTVBP])
-                countVarLevel <- y_lvls[y_lvls[,vepTVBP] == y_lvl, "Freq"]
-                countVarLevel <- ifelse(
-                    input$stackedPercentageTVBP,
-                    yes = sprintf(
-                        "%.1f%%", 100 * countVarLevel),
-                    no = as.character(countVarLevel))
-            }
-        }
-
-        html1Start <- "<ul>"
-        html2Facet <- ifelse(
-            input$vepFacetKeyTVBP == "None",
-            yes = "",
-            no = sprintf(
-                "<li>%s : <code>%s</code></li>",
-                hover$mapping$panelvar1,
-                hover$panelvar1
-            ))
-        html3Pheno <- sprintf(
-            "<li>%s : <code>%s</code></li>",
-            hover$mapping$x,
-            x_lvl
-        )
-
-        if(is.null(y_lvl)){
-            html4Vep <- ""
-            html5Value <- ""
-        } else {
-            html4Vep <- sprintf(
-                "<li>%s : <code>%s</code></li>",
-                vepTVBP,
-                y_lvl
-            )
-            html5Value <- ifelse(
-                input$stackedPercentageTVBP,
-                yes = sprintf(
-                    "<li>Percentage : <code>%s</code></li>",
-                    countVarLevel,
-                    y_lvl),
-                no = sprintf(
-                    "<li>Count : <code>%s</code></li>",
-                    countVarLevel)
-            )
-        }
-
-        html6End <- "</ul>"
-
-        HTML(paste(
-            html1Start, html2Facet, html3Pheno, html4Vep, html5Value, html6End,
-            sep = ""))
-    })
-
-    # Density VEP by phenotype (DVBP) ----
-
-    # Phenotype to summarise VEP density: or NULL if "None"
-    varVepPlotPhenoDVBP <- reactive({
-
-        phenotype <- input$phenoDVBP
-        # Give time to initialise the widget
-        req(phenotype)
-
-        if (phenotype == "None"){
-            return("Phenotype")
-        } else {
-            return(phenotype)
-        }
-    })
-
-    # Update list of VEP facets if the faceting variable changes
-    observeEvent(eventExpr = input$vepFacetKeyDVBP, handlerExpr = {
-        # Raw variants must exist
-        validate(need(RV[["vcf"]], Msgs[["importVariants"]]))
-
-        vcf <- RV[["filteredVcf"]]
-        # Give time to filter variants
-        req(vcf)
-
-        validate(need(
-            input$vepKey %in% colnames(VariantAnnotation::info(vcf)),
-            Msgs[["vepKeyNotFound"]]))
-        csq <- tryParseCsq(vcf = vcf, vepKey = input$vepKey)
-
-        validate(need(csq, Msgs[["csq"]]))
-
-        vepMcols <- S4Vectors::mcols(csq)
-
-        # Select a subset of VEP facets
-        if (input$vepFacetKeyDVBP != "None"){
-            # List all choices of facets
-            vepFacets.choices <- unique(vepMcols[,input$vepFacetKeyDVBP])
-        } else {
-            vepFacets.choices <- NA_character_
-        }
-
-        updateSelectInput(
-            session, "vepFacetsDVBP",
-            choices = vepFacets.choices,
-            selected = vepFacets.choices)
-    })
-
-    # Base of the ggplot summarising counts of VEP
-    DVBPggplot <- reactive({
-
-        # Update only on button click
-        validate(need(
-            input$buttonDVBP,
-            "Please click \"Apply\" to apply parameters."),
-            errorClass = "optional")
-
-        isolate({
-            vepDVBP <- input$vepDVBP
-            vepFacetKey <- input$vepFacetKeyDVBP
-            vepFacets <- input$vepFacetsDVBP
-            patternDVBP <- input$patternDVBP
-            unique2pheno <- input$unique2phenoDVBP
-            layerDVBP <- input$layerDVBP
-        })
-
-        withProgress(min = 0, max = 2, message = "Progress", {
-            incProgress(1, detail = Tracking[["calculate"]])
-
-            if (vepFacetKey != "None"){
-                # req(vepFacets) # Give time to observeEvent
-                validate(need(
-                    length(vepFacets) > 0,
-                    "The plot must contain at least one facet"))
-            }
-
-            # App does not display "NULL" choices
-            if (vepFacetKey == "None"){
-                vepFacetKey <- NULL
-            }
-
-            validate(need(RV[["vcf"]], Msgs[["importVariants"]]))
-
-            vcf <- RV[["filteredVcf"]]
-
-            validate(need(
-                nrow(vcf) > 0,
-                Msgs[["filterVcfEmpty"]]),
-                errorClass = "optional")
-
-            # Special case of phenotype "None"
-            isolate({phenoDVBP <- input$phenoDVBP})
-            if (input$phenoDVBP == "None"){
-                SummarizedExperiment::colData(vcf)[,"Phenotype"] <- factor(
-                    "All")
-                plotPhenotype <- "Phenotype"
-            } else {
-                plotPhenotype <- phenoDVBP
-            }
-
-            isolate({varVepPlotPheno <- varVepPlotPhenoDVBP()})
-            validate(need(vepDVBP, Msgs[["vepDVBP"]]))
-
-            # Convert to default value for the method
-            if (patternDVBP == "")
-                patternDVBP <- NULL
-
-            incProgress(1, detail = Tracking[["ggplot"]])
-
-            gg <- TVTB::densityVepByPhenotype(
-                vcf = vcf,
-                phenoCol = plotPhenotype,
-                vepCol = vepDVBP,
-                param = tparam(),
-                unique = unique2pheno,
-                facet = vepFacetKey,
-                plot = TRUE,
-                pattern = patternDVBP,
-                layer = layerDVBP
-            )
-
-            if (!is.null(vepFacetKey)){
-                gg$data <- gg$data[
-                    gg$data[,vepFacetKey] %in% vepFacets,]
-                gg$data <- droplevels(gg$data)
-            }
-
-            return(gg)
-        })
-
-    })
-
-    # Stacked bars classifying consequence of variants
-    output$vepDensityPlot <- renderPlot({
-        withProgress(min = 0, max = 2, message = "Progress", {
-            incProgress(1, detail = Tracking[["calculate"]])
-
-            # Update only on button click
-            gg <- DVBPggplot()
-
-            isolate({
-                legendTextSize <- input$legendTextSizeDVBP
-                xAxisSize <- input$xAxisSizeDVBP
-                yAxisSize <- input$yAxisSizeDVBP
-                legend <- input$legendTVBP
-            })
-
-            message("Plotting predictions...")
-            incProgress(1, detail = Tracking[["render"]])
-
-            gg <- gg +
-                ggplot2::theme(
-                    axis.text = ggplot2::element_text(
-                        size = ggplot2::rel(1.5)),
-                    axis.title = ggplot2::element_text(
-                        size = ggplot2::rel(1.5)),
-                    legend.text = ggplot2::element_text(
-                        size = ggplot2::rel(legendTextSize)),
-                    legend.title = ggplot2::element_text(
-                        size = ggplot2::rel(legendTextSize)),
-                    axis.text.x = ggplot2::element_text(
-                        size = ggplot2::rel(xAxisSize)),
-                    axis.text.y = ggplot2::element_text(
-                        size = ggplot2::rel(yAxisSize))
-                ) +
-                ggplot2::guides(fill = c("none", "legend")[legend + 1])
-
-            return(gg)
-        })
-    })
-
     # Genotype heatmap ----
 
     # Heatmap of genotypes (ggplot)
@@ -2790,7 +2178,7 @@ shinyServer(function(input, output, clientData, session) {
 
             genos.long[,"Genotype"] <- factor(
                 x = genos.long[,"Genotype"],
-                levels = unlist(TVTB::genos(tparam()))
+                levels = TVTB::genos(TVTB::genos(tparam()))
             )
 
             incProgress(1, detail = Tracking[["ggplot"]])

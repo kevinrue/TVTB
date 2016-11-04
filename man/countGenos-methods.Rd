@@ -44,11 +44,6 @@ genotypes in each row.
 Kevin Rue-Albrecht
 }
 
-\note{
-In the future, \code{x} may also support genotype quality (GQ) to consider
-only genotypes above a flexible quality cut-off.
-}
-
 \seealso{
 \code{\linkS4class{VCF}}
 }
@@ -57,34 +52,24 @@ only genotypes above a flexible quality cut-off.
 # Example data ----
 
 # VCF file
-extdata <- file.path(system.file(package = "TVTB"), "extdata")
-vcfFile <- file.path(extdata, "moderate.vcf")
+vcfFile <- system.file("extdata", "moderate.vcf", package = "TVTB")
 
 # Phenotype file
-phenoFile <- file.path(extdata, "moderate_pheno.txt")
-phenotypes <- S4Vectors::DataFrame(
-    read.table(file = phenoFile, header = TRUE, row.names = 1))
+phenoFile <- system.file("extdata", "moderate_pheno.txt", package = "TVTB")
+phenotypes <- S4Vectors::DataFrame(read.table(phenoFile, TRUE, row.names = 1))
 
 # TVTB parameters
-tparam <- TVTBparam(
-    genos = list(
-        REF = "0|0",
-        HET = c("0|1", "1|0"),
-        ALT = "1|1"))
+tparam <- TVTBparam(Genotypes("0|0", c("0|1", "1|0"), "1|1"))
 
 # Pre-process variants
-vcf <- VariantAnnotation::readVcf(file = vcfFile)
-colData(vcf) <- phenotypes
+vcf <- VariantAnnotation::readVcf(
+    vcfFile, param = tparam, colData = phenotypes)
 vcf <- VariantAnnotation::expand(vcf, row.names = TRUE)
+
 
 # Example usage ----
 
-## NOTE: use.names=FALSE is cleaner but not strictly necessary
-countGenos(
-    x = vcf,
-    genos = unlist(het(tparam), use.names = FALSE),
-    pheno = "super_pop",
-    level = "AFR")
+vcf <- countGenos(vcf, het(tparam), "super_pop", "AFR")
 }
 
 \keyword{methods}

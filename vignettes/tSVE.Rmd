@@ -31,6 +31,8 @@ As a result, a few important considerations should be made
 to clarify what should and should **not** be expected from the 
 web-application:
 
+* Bug fixes will be treated with a much lower priority relative to those
+    related to package methods.
 * It is technically not feasible to offer in a web-interface the same degree
     of flexibility as the command-line environment (*e.g.* `...`[^1]).
 * Greater control over the input and output data is possible at the
@@ -477,76 +479,6 @@ namely:
 This panel demonstrates the use of two methods implemented in the
 `r Biocpkg("TVTB")` package, namely `tabulateVepByPhenotype`
 and `densityVepByPhenotype`.
-
-## Count and tabulate discrete VEP predictions by phenotype level {#TVBP}
-
-The `tabulateVepByPhenotype` method is designed to count 
-Ensembl VEP predictions associated with variants observed in the distinct
-levels of a given phenotype.
-The method can display those counts in two different ways:
-
-* a `r CRANpkg("ggplot")` `geom_barplot`
-* a `data.frame` in wide format
-
-Typically, those counts may be faceted by genomic feature (*i.e.* transcript),
-as the VEP script may produce one prediction per *Variant : Feature*
-combination. In other words, faceting counts by feature ensures that
-each variant contributes at most one prediction count to each facet.
-
-> **Action**:
-> 
-> * Select `Consequence` as the *Variant effect prediction*
-> * Select `super_pop` as the *Phenotype field*
-> * Select `Feature` as the *VEP faceting key*
-> * Click the *Advanced controls* checkbox
-> * Decrease the *Legend font size* to `0.6`
-> * Rotate the *Angle of X labels* to `90` degrees
-> * Click the *Apply* action button to calculate and display the barplot
-> * Hover the plot with the cursor to display useful information!
-
-In addition, the web-application also displays the counts of VEP predictions
-in long format in the *Table* panel, more convenient than the wide format
-for filtering.
-
-> **Action**:
-> 
-> * Use the filtering fields at the top of the table to examine the counts
->     (e.g. `missense_variant` and `ENST00000341459`)
-
-## Distribution of continuous VEP predictions by phenotype level {#DVBP}
-
-The `densityVepByPhenotype` method is designed to parse continuous 
-Ensembl VEP predictions associated with variants observed in the different
-levels of a given phenotype, and to display the distribution of
-those predictions in the distinct phenotype levels.
-
-The method can return this information in two different ways:
-
-* a `r CRANpkg("ggplot")` object with `geom_density` and/or `geom_dotplot`
-    layers
-* a `data.frame` of tabulated values in long format
-
-As described above for [discrete VEP predictions](#TVBP), it may be useful
-to tabulate continuous VEP predictions by genomic feature to ensure that
-each variant contributes at most once to each faceted plot.
-
-> **Action**:
-> 
-> * Select or type `CADD_PHRED` (notice the autocompletion feature)
->     as the *Variant effect prediction*
-> * Select `super_pop` as the *Phenotype field*
-> * Select `Density_&_Dot_plot` as the *Layer(s)*
-> * Select `Feature` as the *VEP faceting key*
-> * Click the *Apply* action button to calculate and display the `ggplot`
-> * See how African and East Asian population tend to display more damaging
->     mutations in this example
-> 
-> Optionally:
->
-> * Click the *Advanced controls* checkbox
-> * Decrease the *Relative size of X text* and *Relative size of Y text* to
->     `0.7`
-> * Click the *Apply* action button to refresh the `ggplot`
 
 # Settings panel
 

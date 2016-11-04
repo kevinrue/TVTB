@@ -120,40 +120,33 @@ and \code{\linkS4class{DataFrame}}.
 # Example data ----
 
 # VCF file
-extdata <- file.path(system.file(package = "TVTB"), "extdata")
-vcfFile <- file.path(extdata, "moderate.vcf")
+vcfFile <- system.file("extdata", "moderate.vcf", package = "TVTB")
 
 # Phenotype file
-phenoFile <- file.path(extdata, "moderate_pheno.txt")
-phenotypes <- S4Vectors::DataFrame(
-    read.table(file = phenoFile, header = TRUE, row.names = 1))
+phenoFile <- system.file("extdata", "moderate_pheno.txt", package = "TVTB")
+phenotypes <- S4Vectors::DataFrame(read.table(phenoFile, TRUE, row.names = 1))
 
 # TVTB parameters
-tparam <- TVTBparam(
-    genos = list(
-        REF = "0|0",
-        HET = c("0|1", "1|0"),
-        ALT = "1|1"))
+tparam <- TVTBparam(Genotypes("0|0", c("0|1", "1|0"), "1|1"))
 
 # Pre-process variants ----
 
 # Pre-process variants
-vcf <- VariantAnnotation::readVcf(file = vcfFile)
+vcf <- VariantAnnotation::readVcf(vcfFile)
 colData(vcf) <- phenotypes
 vcf <- VariantAnnotation::expand(vcf, row.names = TRUE)
+
 
 # Example usage ----
 
 # Count of each "Consequence" in "super_pop"="AFR"
 tabulateVepInPhenoLevel(
-    level = "AFR", vcf = vcf, phenoCol = "super_pop",
-    vepCol = "Consequence", param = tparam,
+    "AFR", vcf, "super_pop", "Consequence", tparam,
     facet = "Feature")
 
 # Count of each "Consequence" in each "super_pop" (barplot)
 tabulateVepByPhenotype(
-    vcf = vcf, phenoCol = "super_pop",
-    vepCol = "Consequence", param = tparam,
+    vcf, "super_pop", "Consequence", tparam,
     facet = "Feature", plot = TRUE) +
     ggplot2::theme(
         legend.text = ggplot2::element_text(size = ggplot2::rel(.5))
@@ -162,8 +155,7 @@ tabulateVepByPhenotype(
 # Count of each "Consequence" in each "super_pop" (data.frame)
 as.data.frame(table(
     tabulateVepByPhenotype(
-        vcf = vcf, phenoCol = "super_pop",
-        vepCol = "Consequence", param = tparam,
+        vcf, "super_pop", "Consequence", tparam,
         facet = "Feature", plot = FALSE)
 ))
 }

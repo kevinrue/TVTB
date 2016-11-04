@@ -1,107 +1,55 @@
 
-### phenos = list ----
+# vcf=ExpandedVCF,phenos=list ----
 
 setMethod(
-    f = "addFrequencies",
-    signature = c(vcf="ExpandedVCF", phenos="list", param="TVTBparam"),
-    definition = function(
-        vcf, phenos, param, ..., force = FALSE){
+    "addFrequencies", c("ExpandedVCF", "list"),
+    function(vcf, phenos, force = FALSE){
 
-        param <- .override.TVTBparam(param, ...)
-
-        .addFrequencies(
-            vcf = vcf, param = param, phenos = phenos, force = force)
+        return(.addFrequencies(vcf, phenos, force))
     }
 )
 
-### phenos = character ----
+# vcf=ExpandedVCF,phenos=character ----
 
 setMethod(
-    f = "addFrequencies",
-    signature = c(vcf="ExpandedVCF", phenos="character", param="TVTBparam"),
-    definition = function(
-        vcf, phenos, param, ..., force = FALSE){
+    "addFrequencies", c("ExpandedVCF", "character"),
+    function(vcf, phenos, force = FALSE){
 
-        param <- .override.TVTBparam(param, ...)
+        # List all levels of phenotypes supplied
+        phenos <- sapply(
+            phenos, function(x){unique(colData(vcf)[,x])},
+            simplify = FALSE)
 
-        # named list of all levels of given phenotypes
-        phenos <- sapply(X = phenos, FUN = function(x){
-            unique(colData(vcf)[,x])
-        }, simplify = FALSE)
-
-        .addFrequencies(
-            vcf = vcf, param = param, phenos = phenos, force = force)
+        return(.addFrequencies(vcf, phenos, force))
     }
 )
 
-### phenos = missing ----
+# vcf=ExpandedVCF,phenos=missing ----
 
 setMethod(
-    f = "addFrequencies",
-    signature = c(vcf="ExpandedVCF", phenos="missing", param="TVTBparam"),
-    definition = function(
-        vcf, param, ..., force = FALSE){
+    "addFrequencies", c("ExpandedVCF", "missing"),
+    function(vcf, force = FALSE){
 
-        param <- .override.TVTBparam(param, ...)
-
-        .addFrequencies(
-            vcf = vcf, param = param, phenos = list(), force = force)
+        # Delegate to .addOverallFrequencies if no phenotype is supplied
+        return(.addOverallFrequencies(vcf, force))
     }
 )
 
 # Main method ----
 
-.checkFrequencyInfo <- function(vcf, param, phenos, force){
-    # Collate all the phenotypes/levels pairs present
-    phenoLevels <- unlist(lapply(
-        X = 1:length(phenos),
-        FUN = function(x){paste(names(phenos)[x], phenos[[x]], sep = "_")})
-    )
-    # Collate the INFO keys
-    keySuffixes <- c(names(genos(param)), aaf(param), maf(param))
-    # Deduce all INFO keys needed
-    infoKeys <- as.character(unlist(sapply(
-        X = phenoLevels,
-        FUN = function(x){paste(x, keySuffixes, sep = "_")},
-        simplify = FALSE))
-    )
+# vcf = ExpandedVCF
+# phenos = list()
+# force = logical(1)
+.addFrequencies <- function(vcf, phenos, force){
 
-    matchesHeader <- na.omit(match(infoKeys, rownames(info(header(vcf)))))
-    matchesData <- na.omit(match(infoKeys, colnames(info(vcf))))
+    # Validate relevant inputs
+    stopifnot(is.list(phenos))
 
-    if ((length(matchesHeader) > 0))
-        stop(
-            "INFO keys already present in header: ",
-            paste(rownames(info(header(vcf)))[matchesHeader], collapse = ", "))
-    if ((length(matchesData) > 0))
-        stop(
-            "INFO keys already present in data: ",
-            paste(colnames(info(vcf))[matchesData], collapse = ", "))
-
-    return(TRUE)
-}
-
-.addFrequencies <- function(
-    vcf, param, phenos = list(), force = FALSE){
-
-    if ((length(phenos) > 0) & (!force))
-        .checkFrequencyInfo(
-            vcf = vcf, param = param, phenos = phenos)
-
-    if (length(phenos) == 0){
-        vcf <- .addOverallFrequencies(vcf = vcf, param = param, force = force)
-    } else {
-        # TODO: Parallelise by phenotype
-        for (pheno in names(phenos)){
-            for (level in phenos[[pheno]]){
-
-                vcf <- .addPhenoLevelFrequencies(
-                    vcf = vcf,
-                    param = param,
-                    pheno = pheno,
-                    level = level,
-                    force = force)
-            }
+    # TODO: consider parallel processing followed by merging
+    # Iteratively add calculated values for each phenotype level
+    for (pheno in names(phenos)){
+        for (level in phenos[[pheno]]){
+            vcf <- .addPhenoLevelFrequencies(vcf, pheno, level, force)
         }
     }
 

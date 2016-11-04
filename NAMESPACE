@@ -58,10 +58,13 @@ importMethodsFrom(
     "expand",
     "fixed", "fixed<-",
     "info", "info<-",
-    "header", "header<-"
+    "header", "header<-",
+    "ref", "ref<-",
+    "alt", "alt<-"
 )
 importFrom(
     "VariantAnnotation",
+    "vcfSamples", "vcfWhich", "vcfFixed", "vcfInfo", "vcfGeno",
     "vcfSamples<-", "vcfWhich<-", "vcfFixed<-", "vcfInfo<-", "vcfGeno<-"
 )
 
@@ -83,17 +86,9 @@ importFrom(
 
 #exportPattern("^[[:alpha:]]+")
 
-# ensembldbFunctions.R ----
-
-export("getEdb", "EnsDbFilter")
-
 # runShinyApp.R ----
 
 export("tSVE")
-
-# Regular functions ----
-
-export("chr2file")
 
 # S4 ----
 
@@ -102,8 +97,6 @@ exportMethods(
 
     "addFrequencies", "addOverallFrequencies", "addPhenoLevelFrequencies",
 
-    "tabulateVepByPhenotype", "tabulateVepInPhenoLevel",
-    "densityVepByPhenotype", "densityVepInPhenoLevel",
     "vepInPhenoLevel", "variantsInSamples",
 
     "dropInfo",
@@ -112,12 +105,14 @@ exportMethods(
     "ranges", "ranges<-",
     "aaf", "aaf<-",
     "maf", "maf<-",
-    "hRef", "hRef<-",
+    "ref", "ref<-",
     "het", "het<-",
-    "hAlt", "hAlt<-",
-    "carrier", "carrier<-",
+    "alt", "alt<-",
+    "carrier",
     "vep", "vep<-",
-    "bp","bp<-"
+    "bp","bp<-",
+    "suffix",
+    "svp", "svp<-"
 )
 
 #exportClassPattern("^.*$")
@@ -128,12 +123,12 @@ exportClasses(
 
 # Constructors ----
 
-# Defined by initialize
+# Default methods
 export("VcfFixedRules", "VcfInfoRules", "VcfVepRules", "VcfFilterRules")
 
 # S4method wrapper
 exportMethods(
-    "TVTBparam"
+    "TVTBparam", "Genotypes"
 )
 
 # Re-export useful methods defined in other packages ----
@@ -150,6 +145,7 @@ exportMethods(
 
     # S4Vectors
     "eval", "evalSeparately", "subsetByFilter", "active", "active<-",
+    "metadata", "metadata<-",
 
     # SummarizedExperiment
     "colData", "colData<-",

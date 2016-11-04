@@ -3,39 +3,37 @@ context("dropInfo")
 # Settings ----
 
 # VCF file
-extdata <- file.path(system.file(package = "TVTB"), "extdata")
-vcfFile <- file.path(extdata, "moderate.vcf")
+vcfFile <- system.file("extdata", "moderate.vcf", package = "TVTB")
 
 # TVTB parameters
-tparam <- TVTBparam(
-    genos = list(
-        REF = "0|0",
-        HET = c("0|1", "1|0"),
-        ALT = "1|1"))
+tparam <- TVTBparam(Genotypes("0|0", c("0|1", "1|0"), "1|1"))
 
 # Pre-process variants
-vcf <- VariantAnnotation::readVcf(file = vcfFile)
+vcf <- VariantAnnotation::readVcf(vcfFile, param = tparam)
 vcf <- VariantAnnotation::expand(vcf, row.names = TRUE)
-
-vcfData <- vcf
-extraInfo <- S4Vectors::DataFrame(FAKE = 1:length(vcfData))
-info(vcfData) <- cbind(info(vcfData), extraInfo)
 
 vcfHeader <- vcf
 extraHeader <- S4Vectors::DataFrame(
-    Number = 1,
-    Type = "Integer",
-    Description = "Completely fake",
+    Number = 1, Type = "Integer", Description = "Completely fake",
     row.names = "FAKE"
 )
-info(header(vcfHeader)) <- rbind(info(header(vcfHeader)), extraHeader)
+VariantAnnotation::info(VariantAnnotation::header(vcfHeader)) <- rbind(
+    VariantAnnotation::info(VariantAnnotation::header(vcfHeader)),
+    extraHeader)
+
+vcfData <- vcfHeader
+extraInfo <- S4Vectors::DataFrame(FAKE = 1:length(vcfData))
+VariantAnnotation::info(vcfData) <- cbind(
+    VariantAnnotation::info(vcfData),
+    extraInfo)
+
 
 # Signatures ----
 
 test_that("dropInfo() supports all signatures",{
 
     expect_s4_class(
-        dropInfo(vcf = vcf),
+        dropInfo(vcf),
         "VCF"
     )
 
@@ -43,10 +41,10 @@ test_that("dropInfo() supports all signatures",{
 
 # Drop a key present in both header and data ----
 
-test_that("dropInfo() drops given key from header and data",{
+test_that("requested key are removed from header and data",{
 
     expect_s4_class(
-        dropInfo(vcf = vcfHeader, key = "CSQ"),
+        dropInfo(vcfHeader, "CSQ"),
         "ExpandedVCF"
     )
 
@@ -54,38 +52,34 @@ test_that("dropInfo() drops given key from header and data",{
 
 # Drop header ----
 
-test_that("dropInfo() drops given key from header",{
+test_that("requested key are removed from header",{
 
     expect_s4_class(
-        dropInfo(vcf = vcfHeader, key = "FAKE", slot = "header"),
+        dropInfo(vcfHeader, "FAKE", "header"),
         "ExpandedVCF"
     )
 
 })
 
-test_that("dropInfo() complains about key absent from header",{
+test_that(".dropInfoHeader messages about absent keys",{
 
-    expect_message(
-        dropInfo(vcf = vcfHeader, key = "FAK", slot = "header")
-    )
+    expect_message(TVTB:::.dropInfoHeader(vcfHeader, "missing"))
 
 })
 
 # Drop data ----
 
-test_that("dropInfo() drops given key from data",{
+test_that("requested key are removed from data",{
 
     expect_s4_class(
-        dropInfo(vcf = vcfData, key = "FAKE", slot = "data"),
+        dropInfo(vcfData, "FAKE", "data"),
         "ExpandedVCF"
     )
 
 })
 
-test_that("dropInfo() complains about key absent from data",{
+test_that(".dropInfoData messages about absent keys",{
 
-    expect_message(
-        dropInfo(vcf = vcfData, key = "FAK", slot = "data")
-    )
+    expect_message(dropInfo(vcfData, "missing", "data"))
 
 })
