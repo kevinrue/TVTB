@@ -15,6 +15,9 @@ coverage:
 
     changes: true
 
+ignore:
+  - "R/AllClasses.R" # not hit by unit tests
+  - "R/tSVE.R" # cannot be unit tested
 
 comment:
     layout: "header, diff, changes, suggestions"
