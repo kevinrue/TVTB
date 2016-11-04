@@ -16,6 +16,7 @@ environment:
   matrix:
     - R_VERSION: devel
       R_ARCH: x64
+      GCC_PATH: mingw_64
       BIOC_USE_DEVEL: TRUE
       _R_CHECK_FORCE_SUGGESTS_: false
       R_CHECK_ARGS: "--no-vignettes --timings"
