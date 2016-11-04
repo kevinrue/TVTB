@@ -1,0 +1,137 @@
+
+# Imports ----
+
+importFrom(
+    "BiocParallel",
+    "SerialParam", "MulticoreParam", "SnowParam", "registered")
+importMethodsFrom(
+    "BiocParallel",
+    "bpmapply", "bplapply")
+import("Biostrings")
+
+importFrom(
+    "ensembldb",
+    "GenenameFilter")
+importMethodsFrom(
+    "ensembldb",
+    "genes")
+
+importMethodsFrom(
+    "GenomeInfoDb",
+    "seqnames", "seqinfo")
+
+importFrom(
+    "GenomicRanges",
+    "GRanges")
+
+importMethodsFrom(
+    "IRanges",
+    "reduce")
+importFrom(
+    "IRanges",
+    "IRanges")
+
+import("methods")
+
+importFrom(
+    "Rsamtools",
+    "TabixFile")
+importMethodsFrom(
+    "Rsamtools",
+    "path")
+
+importFrom(
+    "S4Vectors",
+    "DataFrame", "mcols", "FilterRules", "eval")
+
+import("SummarizedExperiment")
+
+importFrom(
+    "stats",
+    "as.formula"
+)
+
+# When Source and Version will be possible to add to VCF INFO fields
+#importFrom(
+#    "utils",
+#    "packageVersion"
+#)
+importFrom(
+    "utils",
+    "read.table")
+
+importClassesFrom(
+    "VariantAnnotation",
+    "VCF", "VCFHeader")
+importMethodsFrom(
+    "VariantAnnotation",
+    "scanVcfHeader", "ScanVcfParam", "readVcf", "geno", "samples",
+    "expand",
+
+    "info", "header",
+    "info<-", "header<-", "mcols<-"
+)
+
+importFrom("ensemblVEP", "parseCSQToGRanges")
+
+import("ggplot2")
+#import(ggbio)
+importFrom(reshape2, melt, dcast)
+
+#exportPattern("^[[:alpha:]]+")
+# csqParseFunctions.R ----
+# export(tryParseCsq)
+
+# ensembldbFunctions.R ----
+
+export("getEdb", "EnsDbFilter")
+
+# runShinyApp.R ----
+
+export("tSVE")
+
+# Regular functions ----
+
+export("chr2file")
+
+# Deprecated ----
+
+#export("altFreq")
+
+# S4 ----
+
+exportMethods(
+    "preprocessVariants",
+    "countGenos", "addCountGenos",
+
+    "addFrequencies", "addOverallFrequencies", "addPhenoLevelFrequencies",
+
+    "tabulateCsqByPhenotype", "tabulateCsqInPhenoLevel",
+    "densityCsqByPhenotype", "densityCsqInPhenoLevel",
+    "csqInPhenoLevel", "variantsInSamples",
+
+    "genos", "genos<-",
+    "aaf", "aaf<-",
+    "maf", "maf<-",
+    "hRef", "hRef<-",
+    "het", "het<-",
+    "hAlt", "hAlt<-",
+    "carrier", "carrier<-",
+    "vep", "vep<-",
+    "bp","bp<-",
+
+    "initialize"
+)
+
+#exportClassPattern("^.*$")
+exportClasses(
+    "tSVEParam"
+)
+
+# Constructors ----
+
+exportMethods(
+    "tSVEParam",
+    "show"
+)
+

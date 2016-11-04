@@ -1,0 +1,77 @@
+Package: tSVE
+Type: Package
+Title: tSVE: The Shiny Variant Explorer
+Version: 0.1.6
+Date: 2016-07-28
+Author: Kevin Rue-Albrecht
+Maintainer: Kevin Rue-Albrecht <kevinrue67@gmail.com>
+Description: The package provides functions to summarise and visualise
+    gene centric genetic variation data stored in VCF files. Functionalities
+    are centred around a Shiny application which provides a convenient and
+    reproducible interface to the package.
+License: Artistic-2.0
+Depends:
+    R (>= 3.3), methods, utils, stats
+Imports:
+    BiocParallel,
+    Biostrings,
+    ensembldb,
+    ensemblVEP,
+    ggplot2,
+    GenomeInfoDb,
+    GenomicRanges,
+    IRanges,
+    reshape2,
+    Rsamtools,
+    SummarizedExperiment,
+    S4Vectors,
+    VariantAnnotation
+Suggests:
+    EnsDb.Hsapiens.v75 (>= 0.99.7),
+    shiny (>= 0.13.2.9004),
+    DT,
+    rtracklayer,
+    BiocStyle,
+    knitr (>= 1.12),
+    rmarkdown,
+    testthat
+biocViews:
+    Software,
+    Genetics,
+    GeneticVariability,
+    GenomicVariation,
+    DataRepresentation,
+    GUI,
+    Genetics,
+    DNASeq,
+    WholeGenome,
+    Visualization,
+    MultipleComparison,
+    DataImport,
+    VariantAnnotation,
+    Sequencing,
+    Coverage,
+    Alignment,
+    SequenceMatching
+Collates:
+    ensembldbFunctions.R,
+    regions2vcf.R,
+    runShinyApp.R,
+    VcfFilters.R,
+    AllClasses.R,
+    AllGenerics.R,
+    tSVEParam-class.R,
+    preprocessVariants-methods.R,
+    VcfFilters.R,
+    countGenos-methods.R,
+    addCountGenos-methods.R,
+    addFrequencies-methods.R,
+    addOverallFrequencies-methods.R,
+    addPhenoLevelFrequencies-methods.R,
+    addCountGenos-methods.R,
+    dropInfo.R,
+    variantsInSamples-methods.R,
+    csqInPhenoLevel-methods.R,
+    tabulateCsq-methods.R,
+    densityCsq-methods.R
+VignetteBuilder: knitr
