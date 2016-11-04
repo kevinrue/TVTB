@@ -404,7 +404,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
     ),
 
     tabPanel(
-        title = "Filters",
+        title = "Filters", icon = icon("filter"),
 
         tags$span(
             style="color:red",
@@ -530,7 +530,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
     ),
 
     tabPanel(
-        title = "Views",
+        title = "Views", icon = icon("picture-o"),
 
         tabsetPanel(
             id = "tabset.views",
@@ -709,157 +709,162 @@ shinyUI(navbarPage(theme = "bootstrap.css",
 
     ),
 
-    tabPanel(
-        title = "Barplot",
+    navbarMenu(
+        title = "Plots", icon = icon("pie-chart"),
 
         # Variants predictions barplot ----
 
-        sidebarLayout(
+        tabPanel(
+            title = "VEP counts",
 
-            # Sidebar with a slider input
-            sidebarPanel(
-                width = 3,
+            sidebarLayout(
 
-                actionButton(
-                    "countVep", "Apply",
-                    icon = icon("picture"), width = "100%"
-                ), hr(),
+                # Sidebar with a slider input
+                sidebarPanel(
+                    width = 3,
 
-                selectInput(
-                    "vepAnalysed",
-                    "Variant effect prediction",
-                    choices = c()
-                ),
+                    actionButton(
+                        "countVep", "Apply",
+                        icon = icon("picture"), width = "100%"
+                    ), hr(),
 
-                selectInput(
-                    "phenoAnalysed",
-                    "Phenotype field",
-                    choices = c("None"),
-                    selected = "None"
-                ),
-
-                conditionalPanel(
-                    condition = "input.phenoAnalysed != 'None'",
-                    checkboxInput(
-                        "unique2pheno",
-                        "Unique to phenotype?",
-                        value = FALSE
-                    )
-                ),
-
-                selectInput(
-                    "vepFacetKey",
-                    "VEP faceting key",
-                    choices = c("None"),
-                    selected = "None"
-                ),
-
-                conditionalPanel(
-                    condition = "input.facet != 'None'",
                     selectInput(
-                        "vepFacets",
-                        "Facets",
-                        choices = c(),
-                        selected = c(),
-                        multiple = TRUE
+                        "vepAnalysed",
+                        "Variant effect prediction",
+                        choices = c()
+                    ),
+
+                    selectInput(
+                        "phenoAnalysed",
+                        "Phenotype field",
+                        choices = c("None"),
+                        selected = "None"
+                    ),
+
+                    conditionalPanel(
+                        condition = "input.phenoAnalysed != 'None'",
+                        checkboxInput(
+                            "unique2pheno",
+                            "Unique to phenotype?",
+                            value = FALSE
+                        )
+                    ),
+
+                    selectInput(
+                        "vepFacetKey",
+                        "VEP faceting key",
+                        choices = c("None"),
+                        selected = "None"
+                    ),
+
+                    conditionalPanel(
+                        condition = "input.facet != 'None'",
+                        selectInput(
+                            "vepFacets",
+                            "Facets",
+                            choices = c(),
+                            selected = c(),
+                            multiple = TRUE
+                        )
+                    ),
+
+                    checkboxInput(
+                        "stackedPercentage",
+                        "Show as percentage?",
+                        value = FALSE
+                    ),
+
+                    checkboxInput("advanced", "Advanced controls", value = FALSE),
+
+                    conditionalPanel(
+                        condition = "input.advanced == true",
+                        checkboxInput("legend", "Show legend", value = TRUE)
+                    ),
+
+                    conditionalPanel(
+                        condition = paste(
+                            "input.advanced == true",
+                            "input.legend == true",
+                            sep = " && "
+                        ),
+                        sliderInput(
+                            "legendTextSize", "Legend font size",
+                            value = 1, min = 0.1, max = 2, step = 0.1)
+                    ),
+
+                    conditionalPanel(
+                        condition = "input.advanced == true",
+                        sliderInput(
+                            "xAxisAngle",
+                            "Angle of X labels",
+                            min = 0, max = 90, value = 0, step = 5
+                        ),
+
+                        sliderInput(
+                            "xAxisSize",
+                            "Relative size of X text",
+                            value = 1, min = 0.1, max = 2, step = .1
+                        ),
+
+                        sliderInput(
+                            "xAxisVjust",
+                            "Vertical just. of X labels",
+                            min = 0, max = 1, value = 0.5, step = 0.1
+                        ),
+
+                        sliderInput(
+                            "xAxisHjust",
+                            "Horiz. just. of X labels",
+                            min = 0, max = 1, value = 0.5, step = 0.1
+                        )
                     )
+
                 ),
 
-                checkboxInput(
-                    "stackedPercentage",
-                    "Show as percentage?",
-                    value = FALSE
-                ),
+                mainPanel(
 
-                checkboxInput("advanced", "Advanced controls", value = FALSE),
+                    tabsetPanel(
+                        id = "vepCount",
 
-                conditionalPanel(
-                    condition = "input.advanced == true",
-                    checkboxInput("legend", "Show legend", value = TRUE)
-                ),
+                        tabPanel(
+                            title = "Barplot",
 
-                conditionalPanel(
-                    condition = paste(
-                        "input.advanced == true",
-                        "input.legend == true",
-                        sep = " && "
-                    ),
-                    sliderInput(
-                        "legendTextSize", "Legend font size",
-                        value = 1, min = 0.1, max = 2, step = 0.1)
-                ),
+                            fluidRow(
+                                shiny::column(
+                                    width = 12,
+                                    plotOutput(
+                                        "vepCountBarplot",
+                                        height = vepCountHeight,
+                                        hover = hoverOpts(
+                                            "plotVarClass_hover",
+                                            delayType = "debounce")
+                                    )
+                                )
+                            ),
 
-                conditionalPanel(
-                    condition = "input.advanced == true",
-                    sliderInput(
-                        "xAxisAngle",
-                        "Angle of X labels",
-                        min = 0, max = 90, value = 0, step = 5
-                    ),
-
-                    sliderInput(
-                        "xAxisSize",
-                        "Relative size of X text",
-                        value = 1, min = 0.1, max = 2, step = .1
-                    ),
-
-                    sliderInput(
-                        "xAxisVjust",
-                        "Vertical just. of X labels",
-                        min = 0, max = 1, value = 0.5, step = 0.1
-                    ),
-
-                    sliderInput(
-                        "xAxisHjust",
-                        "Horiz. just. of X labels",
-                        min = 0, max = 1, value = 0.5, step = 0.1
-                    )
-                )
-
-            ),
-
-            mainPanel(
-
-                tabsetPanel(
-                    id = "vepCount",
-
-                    tabPanel(
-                        title = "Barplot",
-
-                        fluidRow(
-                            shiny::column(
-                                width = 12,
-                                plotOutput(
-                                    "vepCountBarplot",
-                                    height = vepCountHeight,
-                                    hover = hoverOpts(
-                                        "plotVarClass_hover",
-                                        delayType = "debounce")
+                            fluidRow(
+                                shiny::column(
+                                    width = 12,
+                                    htmlOutput("varVepCount")
                                 )
                             )
                         ),
 
-                        fluidRow(
-                            shiny::column(
-                                width = 12,
-                                htmlOutput("varVepCount")
-                            )
+                        tabPanel(
+                            title = "Table",
+                            DT::dataTableOutput("vepTableDecreasing")
                         )
-                    ),
 
-                    tabPanel(
-                        title = "Table",
-                        DT::dataTableOutput("vepTableDecreasing")
                     )
 
                 )
-
             )
         )
+
     ),
 
     navbarMenu(
-        title = "Settings",
+        title = "Settings", icon = icon("wrench"),
 
         # Advanced settings ----
 
