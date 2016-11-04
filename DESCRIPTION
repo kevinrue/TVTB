@@ -4,35 +4,35 @@ Title: TVTB: The VCF Tool Box
 Version: 0.99.9
 Date: 2016-10-14
 Authors@R: person( "Kevin", "Rue-Albrecht", role = c("aut", "cre"),
-        email = "kevinrue67@gmail.com")
+    email = "kevinrue67@gmail.com")
 Description: The package provides S4 classes and methods to filter,
-        summarise and visualise genetic variation data stored in VCF
-        files. In particular, the package extends the FilterRules class
-        (S4Vectors package) to define news classes of filter rules
-        applicable to the various slots of VCF objects. Functionalities
-        are integrated and demonstrated in a Shiny web-application, the
-        Shiny Variant Explorer (tSVE).
+    summarise and visualise genetic variation data stored in VCF
+    files. In particular, the package extends the FilterRules class
+    (S4Vectors package) to define news classes of filter rules
+    applicable to the various slots of VCF objects. Functionalities
+    are integrated and demonstrated in a Shiny web-application, the
+    Shiny Variant Explorer (tSVE).
 License: Artistic-2.0
 Depends: R (>= 3.3), methods, utils, stats
 Imports: BiocGenerics (>= 0.19.1), BiocParallel, Biostrings, ensembldb,
-        ensemblVEP, GenomeInfoDb, GenomicRanges, ggplot2, IRanges (>=
-        2.7.1), reshape2, Rsamtools, S4Vectors (>= 0.11.11),
-        SummarizedExperiment, VariantAnnotation (>= 1.19.9)
+    ensemblVEP, GenomeInfoDb, GenomicRanges, ggplot2, IRanges (>=
+    2.7.1), reshape2, Rsamtools, S4Vectors (>= 0.11.11),
+    SummarizedExperiment, VariantAnnotation (>= 1.19.9)
 Suggests: EnsDb.Hsapiens.v75 (>= 0.99.7), shiny (>= 0.13.2.9005), DT
-        (>= 0.1.67), rtracklayer, BiocStyle (>= 2.1.23), knitr (>=
-        1.12), rmarkdown, testthat, covr
+    (>= 0.1.67), rtracklayer, BiocStyle (>= 2.1.23), knitr (>=
+    1.12), rmarkdown, testthat, covr
 biocViews: Software, Genetics, GeneticVariability, GenomicVariation,
-        DataRepresentation, GUI, Genetics, DNASeq, WholeGenome,
-        Visualization, MultipleComparison, DataImport,
-        VariantAnnotation, Sequencing, Coverage, Alignment,
-        SequenceMatching
+    DataRepresentation, GUI, Genetics, DNASeq, WholeGenome,
+    Visualization, MultipleComparison, DataImport,
+    VariantAnnotation, Sequencing, Coverage, Alignment,
+    SequenceMatching
 Collate: tSVE.R AllClasses.R AllGenerics.R Genotypes-class.R
-        TVTBparam-class.R VcfFilterRules-class.R countGenos-methods.R
-        addCountGenos-methods.R addFrequencies-methods.R
-        addOverallFrequencies-methods.R
-        addPhenoLevelFrequencies-methods.R dropInfo.R readVcf-methods.R
-        variantsInSamples-methods.R vepInPhenoLevel-methods.R
-        show-methods.R
+    TVTBparam-class.R VcfFilterRules-class.R countGenos-methods.R
+    addCountGenos-methods.R addFrequencies-methods.R
+    addOverallFrequencies-methods.R
+    addPhenoLevelFrequencies-methods.R dropInfo.R readVcf-methods.R
+    variantsInSamples-methods.R vepInPhenoLevel-methods.R
+    show-methods.R
 VignetteBuilder: knitr
 URL: https://github.com/kevinrue/TVTB
 BugReports: https://github.com/kevinrue/TVTB/issues
