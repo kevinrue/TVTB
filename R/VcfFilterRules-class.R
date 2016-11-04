@@ -362,6 +362,7 @@ setReplaceMethod(
                 x@active <- x@active[-i]
                 x@listData <- x@listData[-i]
             } else {
+                stopifnot(class(value) == class(x))
                 if (length(i) != length(value))
                     stop(paste(
                         "number of items to replace is not a multiple of",
@@ -398,6 +399,7 @@ setReplaceMethod(
                 x@active <- x@active[-i]
                 x@listData <- x@listData[-i]
             } else {
+                stopifnot(class(value) == class(x))
                 if (length(i) != length(value))
                     stop(paste(
                         "number of items to replace is not a multiple of",
@@ -434,6 +436,7 @@ setReplaceMethod(
                 x@active <- x@active[-i]
                 x@listData <- x@listData[-i]
             } else {
+                stopifnot(class(value) == class(x))
                 if (length(i) != length(value))
                     stop(paste(
                         "number of items to replace is not a multiple of",
@@ -603,4 +606,31 @@ setMethod(
         res <- .dropVcfFilterRules(x = res)
         return(res)
     }
+)
+
+# append ----
+
+setMethod(
+    f = "append",
+    signature = c(x="VcfFixedRules", values="FilterRules"),
+    definition = function(x, values, after = length(x))
+        base::append(x, values, after)
+)
+setMethod(
+    f = "append",
+    signature = c(x="VcfInfoRules", values="FilterRules"),
+    definition = function(x, values, after = length(x))
+        base::append(x, values, after)
+)
+setMethod(
+    f = "append",
+    signature = c(x="VcfVepRules", values="FilterRules"),
+    definition = function(x, values, after = length(x))
+        base::append(x, values, after)
+)
+setMethod(
+    f = "append",
+    signature = c(x="VcfFilterRules", values="FilterRules"),
+    definition = function(x, values, after = length(x))
+        base::append(x, values, after)
 )

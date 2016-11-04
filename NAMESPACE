@@ -157,5 +157,8 @@ exportMethods(
 
     # VariantAnnotation
     "readVcf", "ScanVcfParam",
-    "header", "header<-", "geno", "fixed", "info", "info<-"
+    "header", "header<-", "geno", "fixed", "info", "info<-",
+
+    # BiocGenerics
+    "append"
 )

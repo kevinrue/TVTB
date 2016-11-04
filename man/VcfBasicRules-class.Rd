@@ -51,6 +51,10 @@
 \alias{c,VcfInfoRules-method}
 \alias{c,VcfVepRules-method}
 
+\alias{append,VcfFixedRules,FilterRules-method}
+\alias{append,VcfInfoRules,FilterRules-method}
+\alias{append,VcfVepRules,FilterRules-method}
+
 % Evaluation:
 \alias{eval,VcfFixedRules,VCF-method}
 \alias{eval,VcfInfoRules,VCF-method}
@@ -106,8 +110,8 @@ See the constructor of \code{FilterRules} for more details.
 }
 
 \section{Subsetting and Replacement}{
-In the following code snippets \code{x} is an object from any of the classes
-decribed in this help page.
+In the following code snippets \code{x} and \code{value}
+are objects from any of the classes described in this help page.
 
 \describe{
     \item{}{
@@ -119,21 +123,42 @@ decribed in this help page.
     as for \code{\linkS4class{List}}.
     }
     \item{}{
-    \code{x[i] <- value}: Replaces a filter rule by one of the same class.
-    The active state(s) and name(s) are transferred from \code{value}.
+    \code{x[i] <- value}: Replaces a filter rule by one of the
+    \strong{same} class.
+    The active state(s) and name(s) are transferred from \code{value} to
+    \code{x}.
     }
     \item{}{
-    \code{x[[i]] <- value}: The same interface as for
-    \code{\linkS4class{List}}. The default active state for new rules is TRUE.
+    \code{x[[i]] <- value}:
+    The same interface as for \code{\linkS4class{List}}.
+    The default active state for new rules is TRUE.
     }
 }
 }
 
 \section{Combining}{
-Inherited from \code{S4Vectors::FilterRules} class.
+In the following code snippets \code{x}, \code{values}, and \code{...}
+are objects from any of the classes described in this help page, or
+\code{VcfFilterRules}.
+
+\describe{
+    \item{}{
+    \code{append(x, values, after = length(x))}:
+    Appends the values onto \code{x} at the index given by \code{after}.
+    }
+    \item{}{
+    \code{c(x, ...,)}:
+    Concatenates the filters objects in \code{...} onto the end of \code{x}.
+    }
+}
+
+Note that combining rules of different types
+(\emph{e.g.} \code{VcfFixedRules} and \code{VcfVepRules})
+produces a \code{VcfFilterRules} object.
 }
 
 \section{Evaluating}{
+As described in the \code{S4Vectors} documentation:
 \describe{
 \item{}{
     \code{eval(expr, envir = parent.frame(),

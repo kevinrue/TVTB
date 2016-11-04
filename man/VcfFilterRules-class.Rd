@@ -31,6 +31,7 @@
 
 % Combine methods:
 \alias{c,VcfFilterRules-method}
+\alias{append,VcfFilterRules,FilterRules-method}
 
 % Evaluation:
 \alias{eval,VcfFilterRules,VCF-method}
@@ -38,8 +39,8 @@
 \title{VcfFilterRules class objects}
 
 \description{
-The \code{VcfFilterRules} class stores various types of filters applicable to
-\code{VCF} objects.
+The \code{VcfFilterRules} class can stores multiple types of filters
+applicable to various slots of \code{VCF} objects.
 }
 
 \details{
@@ -106,10 +107,26 @@ In the code snippets below, \code{x} is a \code{VcfFilterRules} object.
 }
 
 \section{Combining}{
-Inherited from \code{S4Vectors::FilterRules} class.
+In the following code snippets \code{x} is an object of class
+\code{VcfFilterRules},
+while \code{values} and \code{...} are objects from any of the
+classes \code{VcfFixedRules}, \code{VcfInfoRules}, \code{VcfVepRules},
+or \code{VcfFilterRules}:
+
+\describe{
+    \item{}{
+    \code{append(x, values, after = length(x))}:
+    Appends the values onto \code{x} at the index given by \code{after}.
+    }
+    \item{}{
+    \code{c(x, ...,)}:
+    Concatenates the filters objects in \code{...} onto the end of \code{x}.
+    }
+}
 }
 
 \section{Evaluating}{
+As described in the \code{S4Vectors} documentation:
 \describe{
 \item{}{
     \code{eval(expr, envir = parent.frame(),

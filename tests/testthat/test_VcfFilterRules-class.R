@@ -394,3 +394,29 @@ test_that("c method combine values", {
     )
 
 })
+
+# append method ----
+
+test_that("append method combine values", {
+
+    expect_equal(
+        length(append(fixedRules, infoRules)),
+        length(fixedRules) + length(infoRules)
+    )
+
+    expect_equal(
+        length(append(infoRules, vepRules)),
+        length(infoRules) + length(vepRules)
+    )
+
+    expect_equal(
+        length(append(vepRules, fixedRules)),
+        length(vepRules) + length(fixedRules)
+    )
+
+    expect_equal(
+        length(append(filterNoVep, vepRules)),
+        length(filterNoVep) + length(vepRules)
+    )
+
+})
