@@ -21,11 +21,11 @@ importFrom(
     "GenenameFilter")
 importMethodsFrom(
     "ensembldb",
-    "genes", "seqlevels")
+    "genes")
 
 importMethodsFrom(
     "GenomeInfoDb",
-    "seqnames", "seqinfo")
+    "seqnames", "seqinfo", "seqlevels")
 
 importFrom(
     "Rsamtools",

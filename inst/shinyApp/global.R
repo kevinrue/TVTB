@@ -5,6 +5,7 @@ stopifnot(
     require(rtracklayer),
     require(Rsamtools),
     require(VariantAnnotation),
+    require(ensembldb),
     require(ensemblVEP),
     require(ggplot2),
     require(DT),
