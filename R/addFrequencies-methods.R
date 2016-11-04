@@ -125,26 +125,19 @@ setMethod(
     matches <- as.numeric(na.omit(match(infoKeys, colnames(info(vcf)))))
 
     if ((length(matches) > 0))
-        if (force){
-            # Remove data and header (append as right-most fields)
-            message("Overwriting INFO fields: ", colnames(info(vcf))[matches])
-            info(vcf) <- info(vcf)[,-matches]
-            info(header(vcf)) <- info(header(vcf))[-matches,]
-        } else{
-            stop(
-                "INFO keys already present: ",
-                paste(colnames(info(vcf))[matches], sep = ", "))
-        }
+        stop(
+            "INFO keys already present: ",
+            paste(colnames(info(vcf))[matches], sep = ", "))
 
-    return(vcf)
+    return(TRUE)
 }
 
 .addFrequencies <- function(
     vcf, param, phenos = list(), force = FALSE){
 
     if ((length(phenos) > 0) & (!force))
-        vcf <- .checkFrequencyInfo(
-            vcf = vcf, param = param, phenos = phenos, force = force)
+        .checkFrequencyInfo(
+            vcf = vcf, param = param, phenos = phenos)
 
     if (length(phenos) == 0){
         vcf <- .addOverallFrequencies(vcf = vcf, param = param, force = force)

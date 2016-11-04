@@ -107,6 +107,16 @@ test_that(".checkFrequencyInfo overwrites INFO fields", {
         )
     )
 
+    expect_error(
+        expect_s4_class(
+            addFrequencies(
+                vcf = vcfInfoExist,
+                phenos = list(pop = "GBR"),
+                param = tparam),
+            "ExpandedVCF"
+        )
+    )
+
     expect_message(
         expect_s4_class(
             addFrequencies(
