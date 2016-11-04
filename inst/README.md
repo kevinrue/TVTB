@@ -18,13 +18,15 @@ Functionalities are also demonstrated in a Shiny web-application.
 
 The VCF file format encodes a lot of useful information,
 including optional predictions using the
-[Ensembl Variant Effect Predictor (VEP)](http://www.ensembl.org/info/docs/tools/vep/index.html).
-that can be parsed using expert packages such as [`VariantAnnotation`](https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html) and formatted into `VCF` objects.
+[Ensembl Variant Effect Predictor (VEP)](http://www.ensembl.org/info/docs/tools/vep/index.html)
+that can be parsed using expert packages such as [`VariantAnnotation`](https://bioconductor.org/packages/release/bioc/html/VariantAnnotation.html)
+and formatted into `VCF` objects.
 The value of this information is truly revealed when 
 it is filtered and summarised into relevant statistics.
 
 This package offers methods:
-* to subset and summarise `VCF` objects including with Ensembl VEP predictions,
+
+* to subset and summarise `VCF` objects including Ensembl VEP predictions,
 * to explore genetic variants,
 * and to report various summary statistics.
 
