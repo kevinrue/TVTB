@@ -27,6 +27,7 @@ setMethod(
 )
 
 # Main ----
+
 .checkPhenoLevel <- function(x, pheno, level){
 
     if (! pheno %in% colnames(colData(x))){
