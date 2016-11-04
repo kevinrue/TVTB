@@ -25,6 +25,12 @@
 \alias{active<-}
 \alias{active<-,VcfFilterList-method}
 
+% Subset methods
+\alias{[,VcfFilterList-method}
+\alias{[,VcfFilterList,ANY,missing,ANY-method}
+\alias{[[,VcfFilterList-method}
+\alias{[[,VcfFilterList,ANY,missing-method}
+%\alias{[<-,VCF,ANY,missing,VCF-method}
 
 % Other methods / functions
 
@@ -37,7 +43,9 @@ The \code{VcfFilterList} class stores a list of \code{VcfBasicFilter} objects.
 \usage{
 ## Constructors
 
-\S4method{VcfFilterList}{ANY}(..., active = rep(TRUE, length(list(...))))
+\S4method{VcfFilterList}{ANY}(
+    exprs = list(), ...,
+    active = rep(TRUE, length(c(list(...), exprs))))
 }
 
 \section{Accessors}{
@@ -53,8 +61,11 @@ In the following code snippets \code{x} is a \code{VcfFilterList} object.
 }
 
 \arguments{
+    \item{exprs}{
+A \code{list} of \code{VcfBasicFilter} objects.
+}
     \item{...}{
-\code{VcfBasicFilter} objects.
+Named \code{VcfBasicFilter} objects.
 }
     \item{active}{
 A \code{logical} vector indicating active (\code{TRUE})
@@ -89,7 +100,7 @@ VF <- VcfVepFilter(
     name = "IMPACT", condition = "\%in\%", value = c("MODERATE", "HIGH"))
 VF
 
-FL <- VcfFilterList(FF, IF, VF)
+FL <- VcfFilterList(FF = FF, IF = IF, VF = VF)
 FL
 
 # Accessors ----

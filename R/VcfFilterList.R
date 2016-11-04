@@ -5,10 +5,11 @@ setMethod(
     f = "initialize",
     signature = c("VcfFilterList"),
     definition = function(
-        .Object, ..., active = rep(TRUE, length(list(...)))){
+        .Object, exprs = list(), ...,
+        active = rep(TRUE, length(c(list(...), exprs)))){
 
         # Fill slots with data
-        .Object@filterRules <- list(...)
+        .Object@filterRules <- c(list(...), exprs)
         .Object@active <- active
 
         validObject(.Object)
@@ -20,8 +21,10 @@ setMethod(
 setMethod(
     f = "VcfFilterList",
 
-    definition = function(..., active = rep(TRUE, length(list(...)))){
-        new(Class = "VcfFilterList", ..., active = active)
+    definition = function(
+        exprs = list(), ...,
+        active = rep(TRUE, length(c(list(...), exprs)))){
+        new(Class = "VcfFilterList", c(exprs, ...), active = active)
     }
 )
 
@@ -93,3 +96,31 @@ setReplaceMethod(
         return(x)
     }
 )
+
+# Subsetting ----
+
+setMethod(
+    "[", c("VcfFilterList", "ANY", "missing", "ANY"),
+    function(x, i, ...)
+    {
+        VcfFilterList(exprs = slot(x, "filterRules")[i])
+    }
+)
+
+setMethod(
+    "[[", c("VcfFilterList", "ANY", "missing"),
+    function(x, i, ...)
+    {
+        VcfFilterList(exprs = slot(x, "filterRules")[[i]])
+    }
+)
+
+# Other methods ----
+
+### activate
+# setMethod(
+#     f = "activate",
+#     signature = c("VcfFilterList", "numeric"),
+#     definition = function(x)
+#         slot(x, "active")
+# )

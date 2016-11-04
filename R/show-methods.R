@@ -43,7 +43,7 @@ setMethod(
     f = "show",
     signature = "VcfFixedFilter",
     definition = function(object){
-        cat("VcfFixedFilter:", as.character(object))
+        cat("VcfFixedFilter:", as.character(object), "\n")
     }
 )
 
@@ -51,7 +51,7 @@ setMethod(
     f = "show",
     signature = "VcfInfoFilter",
     definition = function(object){
-        cat("VcfInfoFilter:", as.character(object))
+        cat("VcfInfoFilter:", as.character(object), "\n")
     }
 )
 
@@ -59,7 +59,7 @@ setMethod(
     f = "show",
     signature = "VcfVepFilter",
     definition = function(object){
-        cat("VcfVepFilter:", as.character(object))
+        cat("VcfVepFilter:", as.character(object), '\n')
     }
 )
 

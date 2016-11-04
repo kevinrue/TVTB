@@ -147,8 +147,7 @@ setMethod(
             VcfInfoFilter = subsetVcf(
                 x = x, filter = basicFilter),
             VcfVepFilter = subsetVcf(
-                x = x, filter = basicFilter, param = param, vep = vep)
-        )
+                x = x, filter = basicFilter, param = param, vep = vep))
     }
 
     return(x)
