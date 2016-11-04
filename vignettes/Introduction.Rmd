@@ -59,9 +59,9 @@ such as:
 * genotypes (homozygote reference, heterozygote, homozygote alternate)
 * INFO field containing the Ensembl VEP predictions
 * suffixes of INFO fields where counts and frequencies of genotypes are stored
-    + counts and frequencies may be calculated for given levels of
-        given phenotypes, in which case the corresponding INFO fields are
-        formed as `<phenotype>_<level>_<suffix>`
+    + counts and frequencies may be calculated for levels of phenotypes,
+        in which case the corresponding INFO fields are formed as
+        `<phenotype>_<level>_<suffix>`
     + counts and frequencies across all samples are stored in INFO fields
         simply named `<suffix>`
 * settings for parallel calculations

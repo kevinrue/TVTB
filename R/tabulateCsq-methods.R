@@ -217,7 +217,7 @@ setMethod(
 
     f <- paste(dcastRow, "~", phenoCol)
 
-    wideData <- reshape2::dcast(
+    wideData <- dcast(
         data = longData,
         formula = as.formula(f),
         value.var = "Freq")

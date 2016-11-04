@@ -62,9 +62,18 @@ importMethodsFrom(
 
 importFrom("ensemblVEP", "parseCSQToGRanges")
 
-import("ggplot2")
+importFrom(
+    "ggplot2",
+    "ggplot", "aes_string", "facet_wrap",
+    "geom_bar", "geom_density",
+    "ylab",
+    "theme", "element_text", "rel")
+
 #import(ggbio)
-importFrom("reshape2", "melt", "dcast")
+
+importFrom(
+    "reshape2",
+    "melt", "dcast")
 
 #exportPattern("^[[:alpha:]]+")
 # csqParseFunctions.R ----
