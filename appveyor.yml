@@ -23,7 +23,7 @@ cache:
   - packages
 
 build_script:
-  #- travis-tool.sh install_bioc ensemblVEP
+  - travis-tool.sh install_bioc ensemblVEP
   - travis-tool.sh install_bioc_deps
 
 test_script:
