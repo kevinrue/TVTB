@@ -155,7 +155,9 @@ in `ExpandedVCF` objects, names fields in the different slots are identical
 in the corresponding collapsed and expanded objects.
 }
 
-# Filter rules using a single raw field {#SingleFieldFilter}
+# Usage of VCF filter rules {#FilterUsage}
+
+## Filter rules using a single raw field {#SingleFieldFilter}
 
 The value of a particular field can be used to define an `expression`
 that represents a simple filter rule based on that value.
@@ -184,7 +186,7 @@ summary(evalSeparately(fixedRules, vcf))
 Deactivated rules (*e.g.* `qual20`) return `TRUE` for all variants.
 }
 
-# Filter rules using multiple raw fields {#MultipleFieldsFilter}
+## Filter rules using multiple raw fields {#MultipleFieldsFilter}
 
 It is also possible for a `FilterRules` to use multiple fields
 (of the same `VCF` slot) in a single `expression`.
@@ -224,7 +226,7 @@ For instance, the following code should return a `VcfFixedRules` object:
     )))
 }
 
-# Filter rules involving calculations {#CalculationFilter}
+## Calculations in filter rules {#CalculationFilter}
 
 The `expression` that defines filter rules may also include calculations.
 In the chunk of code below, two simple filter rules are defined
@@ -252,7 +254,7 @@ Here, the global environment must be supplied as the filter rule requires
 the `evcf` object.
 }
 
-# Filter rules as functions {#FunctionFilter}
+## Functions in filter rules {#FunctionFilter}
 
 It may be more convenient to define filters as a `function` objects.
 For instance, the chunk of code below:
@@ -298,7 +300,7 @@ Notably, the `filterFUN` function may also be applied separately to the
 summary(filterFUN(info(evcf)))
 ```
 
-# Pattern matching {#PatternFilter}
+## Pattern matching in filter rules {#PatternFilter}
 
 The `grepl` function is particularly suited for the purpose of `FilterRules`
 as they return a `logical` vector:
@@ -321,7 +323,7 @@ In the above chunk of code:
     associated with the value `"missense_variant&splice_region_variant"`
     (but not the `"missense_variant"` value)
 
-# Using ALT data in `CollapsedVCF` and `ExpandedVCF` objects {#AltField}
+# Using ALT data in the `fixed` slot of `VCF` objects {#AltField}
 
 As detailed in an earlier section introducing the
 [demonstration data](#VcfClasses), and more thoroughly in the documentation of
@@ -332,7 +334,7 @@ As as result, *VCF filter rules* using
 data from this field must take into account the `VCF` class in order to
 handle the data appropriately:
 
-## `ExpandedVCF` {#ExpandedVCF}
+## `ExpandedVCF` {#ALTExpandedVCF}
 
 A key aspect of `ExpandedVCF` objects is that the `ALT` field of their
 `info` slot may only store a single allele per record as a `DNAStringSet`
@@ -369,7 +371,7 @@ evcf_vepIns <- subsetByFilter(evcf, vepInsertionFilter)
 as.data.frame(fixed(evcf_vepIns)[,c("REF", "ALT")])
 ```
 
-## `CollapsedVCF` {#CollapsedVCF}
+## `CollapsedVCF` {#ALTCollapsedVCF}
 
 In contrast to `ExpandedVCF`, `CollapsedVCF` may contain more than one allele
 per record in their `ALT` field, represented by a `DNAStringSetList` object.

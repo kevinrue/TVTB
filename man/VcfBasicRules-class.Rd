@@ -24,6 +24,7 @@
 
 % Accessor methods:
 \alias{vep,VcfVepRules-method}
+\alias{vep<-,VcfVepRules,character-method}
 
 % Subsetter methods:
 \alias{[[<-,VcfFixedRules,ANY,ANY-method}

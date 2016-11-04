@@ -155,12 +155,32 @@ setMethod(
     }
 )
 
+setReplaceMethod(
+    f = "vep", c("VcfVepRules", "character"),
+    function(x, value){
+
+        slot(x, "vep") <- value
+        validObject(x)
+        return(x)
+    }
+)
+
 setMethod(
     f = "vep",
     signature = c("VcfFilterRules"),
     definition = function(x){
         # Apply filters to the fixed slot
         slot(x, "vep")
+    }
+)
+
+setReplaceMethod(
+    f = "vep", c("VcfFilterRules", "character"),
+    function(x, value){
+
+        slot(x, "vep") <- value
+        validObject(x)
+        return(x)
     }
 )
 
@@ -203,7 +223,7 @@ setMethod(
     csq <- parseCSQToGRanges(
         x = envir, VCFRowID = rownames(envir), info.key = vep(expr))
     # Apply filters to the VEP predictions
-    csqBoolean <- eval(expr = expr, envir = csq, enclos = enclos)
+    csqBoolean <- eval(expr = expr, envir = mcols(csq), enclos = enclos)
     # Index of variants with 1+ prediction passing the filter
     vcfPass <- unique(mcols(csq)[csqBoolean, "VCFRowID", drop = TRUE])
     # Mark each variant with 1+ prediction passing the filter
@@ -270,6 +290,7 @@ setMethod(
                     stop(
                         "names not found:",
                         paste(indexNames[iMissing], collapse = ", "))}
+            # callNextMethod will cause validity check, filter type before
             x@type <- slot(x, "type")[i]
             x <- callNextMethod(x, i)
         }
@@ -307,127 +328,6 @@ setMethod(
     res@metadata <- slot(x, "metadata")
 
     return(res)
-}
-
-# [[ ----
-
-setMethod(
-    f = "[[",
-    signature = c(x="VcfFilterRules", i="ANY", j="ANY"),
-    definition = function(x, i, j, ...){
-
-        if (!missing(j) || length(list(...)) > 0)
-            stop("invalid subsetting")
-
-        if (!missing(i)) {
-            x <- x[i]
-        }
-
-        return(x)
-    }
-)
-
-setMethod(
-    f = "[[<-",
-    signature = c(x="VcfFilterRules", i="ANY", j="ANY"),
-    definition = function(x, i, j, ..., value) {
-
-        if (!missing(j) || length(list(...)) > 0)
-            stop("invalid subsetting")
-
-        if (!missing(i)) {
-            # Convert name to index
-            if (is.character(i)){
-                indexName <- i
-                i <- match(indexName, names(x))
-                iMissing <- which(is.na(i))
-                if (length(iMissing) > 0)
-                    stop(
-                        "names not found:",
-                        paste(indexName[iMissing], collapse = ", "))}
-
-            # Mark new rules with corresponding type
-            x@type[[i]] <- switch(
-                class(value),
-                VcfFixedRules = "fixed",
-                VcfInfoRules = "info",
-                VcfVepRules = "vep",
-                VcfFilterRules = type(value),
-                stop("Invalid filter type")
-            )
-
-            # New rules are active by default
-            x@active[i] <- TRUE
-            x@listData[i] <- slot(value, "listData")
-            x@elementMetadata[i] <- slot(value, "elementMetadata")
-            x@metadata <- slot(value, "metadata")
-            names(x)[i] <- names(value)
-        }
-
-        x <- .dropVcfFilterRules(x)
-
-        return(x)
-    }
-)
-
-setMethod(
-    f = "[[<-",
-    signature = c(x="VcfFixedRules", i="ANY", j="ANY"),
-    definition = function(x, i, j, ..., value) {
-
-        if (!missing(j) || length(list(...)) > 0)
-            stop("invalid subsetting")
-
-        if (!missing(i)) {
-            # New rules are active by default
-            x <- .replaceVcfBasicFilter(x, i, value)
-        }
-
-        return(x)
-    }
-)
-
-setMethod(
-    f = "[[<-",
-    signature = c(x="VcfInfoRules", i="ANY", j="ANY"),
-    definition = function(x, i, j, ..., value) {
-
-        if (!missing(j) || length(list(...)) > 0)
-            stop("invalid subsetting")
-
-        if (!missing(i)) {
-            # New rules are active by default
-            x <- .replaceVcfBasicFilter(x, i, value)
-        }
-
-        return(x)
-    }
-)
-
-setMethod(
-    f = "[[<-",
-    signature = c(x="VcfVepRules", i="ANY", j="ANY"),
-    definition = function(x, i, j, ..., value) {
-
-        if (!missing(j) || length(list(...)) > 0)
-            stop("invalid subsetting")
-
-        if (!missing(i)) {
-            # New rules are active by default
-            x <- .replaceVcfBasicFilter(x, i, value)
-        }
-
-        return(x)
-    }
-)
-
-
-.replaceVcfBasicFilter <- function(x, i, value){
-
-    x@active[i] <- TRUE
-    x@listData[[i]] <- value
-
-    return(x)
 }
 
 # coerce ----

@@ -11,9 +11,9 @@
 \alias{initialize,VcfFilterRules-method}
 
 % Accessor methods:
-\alias{type}
 \alias{type,VcfFilterRules-method}
 \alias{vep,VcfFilterRules-method}
+\alias{vep<-,VcfFilterRules,character-method}
 
 % Subsetter methods:
 \alias{[,VcfFilterRules,ANY,ANY,missing-method}
