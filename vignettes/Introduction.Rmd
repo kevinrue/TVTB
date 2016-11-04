@@ -448,6 +448,11 @@ Note how the inactive `VcfVepRules` named `CADD` returns `TRUE`
 for all variants.
 }
 
+\fixme{
+Not sure why in the vignette `summary` behaves like `summary.data.frame`,
+while in RStudio it processes the `FilterMatrix` differently (rightly so).
+}
+
 # Summarising Ensembl VEP predictions {#Summarise}
 
 As soon as genetic and phenotypic information are imported
