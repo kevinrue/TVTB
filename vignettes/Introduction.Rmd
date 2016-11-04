@@ -562,8 +562,7 @@ the scientific value of the data may be revealed by
 a variety of summary statistics and graphical representations.
 This section presents severeal ideas implemented in `r Biocpkg("TVTB")`[^1].
 
-[^1]: 
-More ideas are underway.
+[^1]: More ideas are underway.
 
 It is important to highlight that `ggplot` objects
 include the data used for plotting in their `data` slot.
@@ -587,8 +586,7 @@ considering for each super-population only variants:
 * Seen at least once among the corresponding group of samples,
 * With a [CADD score](http://cadd.gs.washington.edu)[^2] greater than `20`.
 
-[^2]: 
-A tool for scoring the deleteriousness of genetic variants.
+[^2]: A tool for scoring the deleteriousness of genetic variants.
 
 ```{r optsTabulateSet, include=FALSE}
 opts_chunk$set(
@@ -700,7 +698,7 @@ Dr. Stefan Gräf and Mr. Matthias Haimel
 for advice on the VCF file format and the Ensembl VEP script.
 Prof. Martin Wilkins for his trust and support.
 
-Last but not least, the amazing collaborative effort of the `rep("many", 10)`
+Last but not least, the amazing collaborative effort of the `rep("many",10)`
 [Bioconductor](http://bioconductor.org) developers whose hard work
 appears through the dependencies of this package.
 
