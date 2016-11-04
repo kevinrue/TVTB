@@ -77,3 +77,4 @@ Collates:
     densityCsq-methods.R,
     show-methods.R
 VignetteBuilder: knitr
+BugReports: https://github.com/kevinrue/tSVE/issues
