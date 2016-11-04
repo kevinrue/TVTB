@@ -74,7 +74,7 @@ Additional arguments used to override \code{TVTBparam} slots.
 Filter rules of class \code{VcfFixedRules}, \code{VcfInfoRules},
 \code{VcfVepRules}, or \code{VcfFilterRules}.
 The \code{S4Vectors::subsetByFilter} applies active filter rules
-to the \code{vcf} argument.
+to the \code{vcf} argument prior to summarisation.
 }
     \item{unique}{
 If \code{TRUE}, consider only variants unique to the phenotype level

@@ -102,7 +102,7 @@ setGeneric(
     name = "tabulateVepByPhenotype",
     signature = c("vcf", "param"),
     def = function(
-        vcf, phenoCol, vepCol, param, ...,
+        vcf, phenoCol, vepCol, param, ..., filter = VcfFilterRules(),
         unique = FALSE, facet = NULL, plot = FALSE, percentage = FALSE)
         standardGeneric("tabulateVepByPhenotype")
 )
@@ -113,7 +113,7 @@ setGeneric(
     name = "tabulateVepInPhenoLevel",
     signature = c("vcf", "param"),
     def = function(
-        level, vcf, phenoCol, vepCol, param, ...,
+        level, vcf, phenoCol, vepCol, param, ..., filter = VcfFilterRules(),
         unique = FALSE, facet = NULL, plot = FALSE, percentage = FALSE)
         standardGeneric("tabulateVepInPhenoLevel")
 )

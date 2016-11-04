@@ -449,7 +449,7 @@ As soon as genetic and phenotypic information are imported
 into an `ExpandedVCF` object,
 or after the object was extended with additional information,
 the scientific value of the data may be revealed by
-an immense variety of summary statistics and graphical representations.
+a variety of summary statistics and graphical representations.
 This section presents severeal ideas implemented in `r Biocpkg("TVTB")`.
 
 \bioccomment{
@@ -479,9 +479,14 @@ opts_chunk$set(
 
 ```{r tCBPplot, message=FALSE}
 library(ggplot2)
+filterCADD <- VcfVepRules(exprs = list(
+    CADD_15 = expression(
+        as.numeric(CADD_PHRED) > 20 &
+            !is.na(CADD_PHRED))
+    ))
 tCBPplot <- tabulateVepByPhenotype(
     vcf = vcf, phenoCol = "super_pop", vepCol = "Consequence",
-    param = tparam,
+    param = tparam, filter = filterCADD,
     unique = TRUE, facet = "Feature", percentage = FALSE,
     plot = TRUE) +
     theme(
@@ -493,6 +498,13 @@ tCBPplot <- tabulateVepByPhenotype(
 
 tCBPplot
 ```
+
+\fixme{
+Filter rules resulting in a combination of `NA` and `TRUE` throw an error
+(`NA` and `FALSE` return an acceptable overall `FALSE` result).
+The Bioconductor Core Team has been contacted to discuss the behaviour of
+the `eval` method in the presence of `NA` and `TRUE` test results.
+}
 
 ```{r optsTabulateReset, include=FALSE}
 opts_chunk$set(optChunkDefault)

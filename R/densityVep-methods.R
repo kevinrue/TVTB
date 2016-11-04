@@ -152,7 +152,6 @@ setMethod(
     stopifnot(level %in% phenos[,phenoCol])
 
     # Subset
-
     vcf <- subsetByFilter(x = vcf, filter = filter)
 
     # Keep the desired consequence for those variants
