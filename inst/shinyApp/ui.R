@@ -728,7 +728,16 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                     column(
                         width = 12,
                         wellPanel(
-                            uiOutput("vcfInfoCols")
+                            uiOutput("vcfInfoCols"),
+                            br(),
+                            p(strong("Notes:")),
+                            tags$ul(
+                                tags$li(
+                                    "Fields that contain more than one value",
+                                    "(", tags$em("e.g."), "confidence intervals)",
+                                    "may not display properly."
+                                )
+                            )
                         )
                     )
                 ),

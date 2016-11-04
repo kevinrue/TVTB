@@ -8,11 +8,11 @@ author:
 date: "`r doc_date()`"
 package: "`r pkg_ver('TVTB')`"
 abstract: >
-    Currently, *VCF* objects of the `r Biocpkg("VariantAnnotation")` package
+    Currently, `VCF` objects of the `r Biocpkg("VariantAnnotation")` package
     may be subsetted by indices or names of variant records.
-    The `r Biocpkg("TVTB")` package extends *FilterRules* of the
+    The `r Biocpkg("TVTB")` package extends `FilterRules` of the
     `r Biocpkg("S4Vectors")` package to provide filter rules applicable to
-    *VCF* objects. These new classes of filter rules provide containers
+    `VCF` objects. These new classes of filter rules provide containers
     for powerful expressions and functions to facilitate filtering of variants
     using combinations of filters applicable to FIXED fields, INFO fields,
     and Ensembl VEP predictions stored in a given INFO field of VCF files.
@@ -42,16 +42,16 @@ for further analysis.
 However, the size of genetic data sets and the variety of filter
 rules---and their combinatorial explosion---create
 considerable challenges in terms of workspace memory and entropy
-(*i.e.* size and number of objects in the workspace).
+(*i.e.* size and number of objects in the workspace, respectively).
 
 The `FilterRules` class implemented in the `r Biocpkg("S4Vectors")` package
-provides a powerful tool to define flexible 
+provides a powerful tool to create flexible 
 and lightweight filter rules defined in the form of
 `expression` and `function` objects that can be evaluated
 within given environments.
 The `r Biocpkg("TVTB")` package extends this `FilterRules` class
 into novel classes of *VCF filter rules*,
-each applicable to information stored in the distinct slots of `VCF`
+applicable to information stored in the distinct slots of `VCF`
 objects (*i.e.* `CollapsedVCF` and `ExpandedVCF` classes),
 as described below:
 
@@ -82,10 +82,10 @@ parent class, including:
     an inactive states
 * *VCF filter rules* can be subsetted, edited, replaced, and deleted
 
-To account for the structural complexity of `VCF` objects, some of the new
+To account for the more complex structure of `VCF` objects, some of the new
 *VCF filter rules* classes implemented in the `r Biocpkg("TVTB")` package
-require additional information stored in new slots of the 
-filter objects, associated with new accessor methods.
+require additional information stored in new dedicated slots,
+associated with the appropriate accessors and setters.
 For instance:
 
 * `VcfVepRules` require the INFO key where predictions of the
@@ -161,7 +161,7 @@ in the corresponding collapsed and expanded objects.
 
 # Usage of VCF filter rules {#FilterUsage}
 
-## Filter rules using a single raw field {#SingleFieldFilter}
+## Filter rules using a single field {#SingleFieldFilter}
 
 The value of a particular field can be used to define expressions
 that represent simple filter rules based on that value alone.
@@ -198,7 +198,7 @@ selected filter rule. As a consequence, the `fixedRules` object would be
 left unchanged after this command.
 }
 
-## Filter rules using multiple raw fields {#MultipleFieldsFilter}
+## Filter rules using multiple fields {#MultipleFieldsFilter}
 
 It is also possible for *VCF filter rules* to use multiple fields
 (of the same `VCF` slot) in a single expression.
@@ -428,16 +428,14 @@ type(vignetteRules)
 summary(evalSeparately(vignetteRules, evcf, enclos = .GlobalEnv))
 ```
 
-\bioccomment{
-The "Clearly" statement below would be more evident if the `summary` method
-was displaying the result of `evalSeparately` in this vignette as it does it
-in an R session.
-}
-
-Clearly, the *VCF filter rules* `SNP` and `isInsertion` are mutually exclusive,
-which explains the final `0` variants left after filtering.
+Clearly[^1], the *VCF filter rules* `SNP` and `isInsertion` are
+mutually exclusive, which explains the final `0` variants left after filtering.
 Conveniently, either of these rules may be deactivated before evaluating the
 remaining active filter rules:
+
+[^1]: This statement below would be more evident if the `summary` method
+was displaying the result of `evalSeparately` in this vignette as it does it
+in an R session.
 
 ```{r combinedRulesDeactivated}
 active(vignetteRules)["SNP"] <- FALSE
@@ -445,8 +443,11 @@ summary(evalSeparately(vignetteRules, evcf, enclos = .GlobalEnv))
 ```
 
 As a result, the deactivated filter rule (`"SNP"`) now returns `TRUE`
-for all variants,
-which leaves a final `2` variants passing the remaining active filter rules:
+for all variants, leaving a final `2` variants[^2] pass the remaining
+active filter rules:
+
+[^2]: Again, this statement would benefit from the result of `evalSeparately`
+being displayed identically to an R session.
 
 * INFO/FILTER equal to `"PASS"`
 * INFO/NS greater than 90% of the number of samples in the data set
@@ -457,7 +458,7 @@ Finally, the following chunk of code demonstrates how
 `VcfFilterRules` may also be created from the
 combination of `VcfFilterRules`, either with themselves
 or with any of the classes that define more specific *VCF filter rules*.
-Notably, when `VcfFilterRules` objects are being combined,
+Notably, when `VcfFilterRules` objects are combined,
 the `type` and `active` value of each filter rule is transferred to
 the combined object:
 
@@ -484,8 +485,8 @@ secondVcfFilter <- VcfFilterRules(missenseFilter)
 secondVcfFilter
 ```
 
-It is now possible to combine the two `VcfFilterRules`, even with another
-`VcfInfoRules` object:
+It is now possible to combine the two `VcfFilterRules`.
+Let us even combine another `VcfInfoRules` object in the same step:
 
 ```{r combineMultipleRules}
 manyRules <- VcfFilterRules(
@@ -512,6 +513,7 @@ document was compiled:
 sessionInfo()
 ```
 
+# References {#References}
 
 [R]: http://r-project.org
 [RStudio]: http://www.rstudio.com/

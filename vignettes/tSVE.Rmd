@@ -8,8 +8,9 @@ author:
 date: "`r doc_date()`"
 package: "`r pkg_ver('BiocStyle')`"
 abstract: >
-    RStudio/Shiny web-application demonstrating the functionalities of
-    the *TVTB* package integrated in a programming-free environment.
+    [Shiny](http://shiny.rstudio.com) web-application that demonstrates the
+    functionalities of the *TVTB* package integrated
+    in a programming-free environment.
 vignette: >
     %\VignetteIndexEntry{The Shiny Variant Explorer}
     %\VignetteEngine{knitr::rmarkdown}
@@ -24,7 +25,8 @@ bibliography:
 # Preliminary notes {#Preliminary}
 
 The Shiny Variant Explorer (*tSVE*) was primarily developped to demonstrate
-features implemented in the `r Biocpkg("TVTB")`.
+features implemented in the `r Biocpkg("TVTB")`, **not** as a production
+environment.
 As a result, a few important considerations should be made
 to clarify what should and should **not** be expected from the 
 web-application:
@@ -45,7 +47,7 @@ web-application:
 * This vignette is largely static as the web-application may only be used
     in an interactive session.
 * First-time users are encouraged to follow this vignette
-    sequentially (*i.e* without skipping sections),
+    sequentially (*i.e* in order, without skipping sections),
     as it takes readers through the sequence of actions of a typical analysis.
     + This vignette was designed to be read beside an open *R* session with
         the `r Biocpkg("TVTB")` package installed, so that users may follow
@@ -62,10 +64,10 @@ compared to the package, to support certain forms of data input and display.
 **Input**
 
 * The `r Biocpkg("ensembldb")` package and relevant `EnsDb`[^2] annotation
-    package are required if that interface is used to query genomic ranges
+    packages are required if that interface is used to query genomic ranges
     (demonstrated in this [section](#InputEnsDb)).
-* The `r Biocpkg("EnsDb.Hsapiens.v75")` is currently required to query
-    genomic ranges associated by gene name(s)[^3].
+* The `r Biocpkg("EnsDb.Hsapiens.v75")` is required to query
+    genomic ranges associated by gene names for the demonstration data[^3].
 * The `r Biocpkg("rtracklayer")` package is required if a BED file is used
     to provide genomic ranges (demonstrated in this [section](#InputBED)).
 
@@ -669,7 +671,8 @@ each package update.
 \bioccomment{
 In the future, a mechanism may be implemented to override global settings
 locally, without risk of seeeing this custom configuration overwritten
-at the next package update.
+at the next package update (e.g. a file in the user home folder that would
+be parsed to overwrite certain settings).
 }
 
 # Vignette session {#VignetteSessionInfo}
@@ -680,6 +683,8 @@ document was compiled:
 ```{r sessionInfo}
 sessionInfo()
 ```
+
+# References {#References}
 
 [R]: http://r-project.org
 [RStudio]: http://www.rstudio.com/
