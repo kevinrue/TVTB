@@ -266,7 +266,7 @@ Currently, major `r Biocpkg("TVTB")` functionalities include:
 
 * Counting discrete Ensembl VEP predictions in levels of a phenotype
     + as a `data.frame` or a stacked `r Biocpkg("ggplot2") `geom_bar`
-    + counts faceted by another Ensembl VEP prediction (*e.g.* Feature)
+    + counts faceted by another Ensembl VEP prediction (*e.g.* `"Feature"`")
     + `geom_bar` represented as stacked *percentage* of predictions
 * Density distribution of continuous Ensembl VEP predictions in levels of
     a phenotype
@@ -287,12 +287,11 @@ the count of each Ensembl VEP prediction
 `"Consequence"` in each "super population"
 (*i.e.*, each level of the `"super_pop"` phenotype).
 
-<!-- Cannot split chunk options over multiple lines: BioCheck NOTE -->
 ```{r optsTabulateSet, include=FALSE}
 opts_chunk$set(
-    fig.width=12, fig.height=7,
+    fig.width=13, fig.height=7,
     out.extra='angle=90',
-    out.width='7in', out.height='12in'
+    out.width='7in', out.height='13in'
 )
 ```
 
@@ -304,15 +303,10 @@ tCBPplot <- tabulateCsqByPhenotype(
     unique = TRUE, facet = "Feature", percentage = FALSE,
     plot = TRUE) +
     theme(
-        legend.text = element_text(
-            size = rel(0.5)),
-        strip.text = element_text(
-            size = rel(0.5)),
-        axis.text.x = element_text(
-            angle = 270,
-            hjust = 0.5),
-        axis.title.y = element_text(
-            angle = 270)
+        legend.text = element_text(size = rel(0.8)),
+        axis.text.x = element_text(angle = 270,vjust = 0.5),
+        axis.title.y = element_text(angle = 270),
+        axis.text.y = element_text(angle = 270,hjust = 0.5)
     )
 
 tCBPplot
@@ -357,11 +351,32 @@ In the following chunk of code, the density distribution of
 (a tool for scoring the deleteriousness of genetic variants)
 is visualised for variant affecting each feature in each super-population:
 
+```{r optsDensitySet, include=FALSE}
+opts_chunk$set(
+    fig.width=13, fig.height=7,
+    out.extra='angle=90',
+    out.width='7in', out.height='13in'
+)
+```
+
 ```{r dCBPplot, warning=FALSE}
 densityCsqByPhenotype(
         vcf = vcf, phenoCol = "super_pop", csqCol = "CADD_PHRED",
         param = tparam,
-        unique = TRUE, facet = "Feature", plot = TRUE, popFreq = FALSE)
+        unique = TRUE, facet = "Feature", plot = TRUE, popFreq = FALSE) +
+    theme(
+        legend.key.size = unit(1.2, "lines"),
+        legend.title = element_text(size = rel(1.2)),
+        legend.text = element_text(size = rel(1.2)),
+        axis.text.x = element_text(angle = 270,
+            vjust = 0.5),
+        axis.title.y = element_text(angle = 270),
+        axis.text.y = element_text(angle = 270, hjust = 0.5)
+    )
+```
+
+```{r optsDensityReset, include=FALSE}
+opts_chunk$set(optChunkDefault)
 ```
 
 # Session info

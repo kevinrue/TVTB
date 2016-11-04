@@ -96,52 +96,52 @@ Inherited from \code{S4Vectors::FilterRules} class.
 
 \section{Evaluating}{
 \describe{
-    \item{}{
-      \code{eval(expr, envir = parent.frame(),
-        enclos = if (is.list(envir) || is.pairlist(envir))
-        parent.frame() else baseenv())}:
-      Evaluates a rule instance (passed as the \code{expr} argument)
-      in their respective context of a \code{ExpandedVCF} object
-      (passed as the \code{envir} argument).
-      \emph{I.e.}:
-      \itemize{
-      \item{\strong{\code{VcfFixedRules}}: \code{fixed(envir)}}
-      \item{\strong{\code{VcfInfoRules}}: \code{info(envir)}}
-      \item{\strong{\code{VcfVepRules}}: \code{parseCSQToGRanges(envir, ...)}}
-      }
+\item{}{
+    \code{eval(expr, envir = parent.frame(),
+    enclos = if (is.list(envir) || is.pairlist(envir))
+    parent.frame() else baseenv())}:
+    Evaluates a rule instance (passed as the \code{expr} argument)
+    in their respective context of a \code{ExpandedVCF} object
+    (passed as the \code{envir} argument).
+    \emph{I.e.}:
+    \itemize{
+    \item{\strong{\code{VcfFixedRules}}: \code{fixed(envir)}}
+    \item{\strong{\code{VcfInfoRules}}: \code{info(envir)}}
+    \item{\strong{\code{VcfVepRules}}: \code{parseCSQToGRanges(envir, ...)}}
+    }
 
-      Expression rules are
-      evaluated in \code{envir}, while function rules are invoked with
-      \code{envir} as their only argument. The evaluation of a rule
-      should yield a logical vector. The results from the rule
-      evaluations are combined via the AND operation (i.e. \code{&}) so
-      that a single logical vector is returned from \code{eval}.
-    }
-    \item{}{
-      \code{evalSeparately(expr, envir = parent.frame(), enclos = if
-        (is.list(envir) || is.pairlist(envir)) parent.frame() else
-        baseenv())}: Evaluates separately each rule in a
-      rule instance (passed as the \code{expr}
-      argument). Expression rules are evaluated in \code{envir}, while
-      function rules are invoked with \code{envir} as their only
-      argument. The evaluation of a rule should yield a logical
-      vector. The results from the rule evaluations are combined into
-      a logical matrix, with a column for each rule. This is
-      essentially the parallel evaluator, while \code{eval} is the
-      serial evaluator.
-    }
-    \item{}{
-      \code{subsetByFilter(x, filter)}: Evaluates \code{filter} on
-      \code{x} and uses the result to subset \code{x}. The result
-      contains only the elements in \code{x} for which \code{filter}
-      evaluates to \code{TRUE}.
-    }
-    \item{}{\code{summary(object)}:
-      Returns an integer vector with the number of elements
-      that pass each rule in a \code{FilterMatrix}
-      (passed as the \code{object} argument), along with
-      a count of the elements that pass all filters.
-    }
+    Expression rules are
+    evaluated in \code{envir}, while function rules are invoked with
+    \code{envir} as their only argument. The evaluation of a rule
+    should yield a logical vector. The results from the rule
+    evaluations are combined via the AND operation (i.e. \code{&}) so
+    that a single logical vector is returned from \code{eval}.
+}
+\item{}{
+    \code{evalSeparately(expr, envir = parent.frame(), enclos = if
+    (is.list(envir) || is.pairlist(envir)) parent.frame() else
+    baseenv())}: Evaluates separately each rule in a
+    rule instance (passed as the \code{expr}
+    argument). Expression rules are evaluated in \code{envir}, while
+    function rules are invoked with \code{envir} as their only
+    argument. The evaluation of a rule should yield a logical
+    vector. The results from the rule evaluations are combined into
+    a logical matrix, with a column for each rule. This is
+    essentially the parallel evaluator, while \code{eval} is the
+    serial evaluator.
+}
+\item{}{
+    \code{subsetByFilter(x, filter)}: Evaluates \code{filter} on
+    \code{x} and uses the result to subset \code{x}. The result
+    contains only the elements in \code{x} for which \code{filter}
+    evaluates to \code{TRUE}.
+}
+\item{}{\code{summary(object)}:
+    Returns an integer vector with the number of elements
+    that pass each rule in a \code{FilterMatrix}
+    (passed as the \code{object} argument), along with
+    a count of the elements that pass all filters.
+}
 }
 }
 

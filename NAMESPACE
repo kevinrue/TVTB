@@ -58,7 +58,7 @@ importMethodsFrom(
     "expand",
     "fixed", "fixed<-",
     "info", "info<-",
-     "header", "header<-"
+    "header", "header<-"
 )
 importFrom(
     "VariantAnnotation",
@@ -142,7 +142,7 @@ exportMethods(
     # Biostrings
     "type",
     # GenomicRanges
-     "mcols",
+    "mcols",
     # Base
     "c",
     # S4Vectors
