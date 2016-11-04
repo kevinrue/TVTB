@@ -18,7 +18,6 @@ addons:
 
 before_install:
     - R CMD Rscript -e 'source(file = "http://bioconductor.org/biocLite.R");useDevel(devel = TRUE)'
-#    - tlmgr install bera
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then tlmgr install bera; fi
 
-r_packages: DT
-r_github_packages: rstudio/DT
+#r_github_packages: rstudio/DT
