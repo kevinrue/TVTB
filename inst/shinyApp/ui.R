@@ -729,13 +729,13 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                     ), hr(),
 
                     selectInput(
-                        "vepAnalysed",
+                        "vepTVBP",
                         "Variant effect prediction",
                         choices = c()
                     ),
 
                     selectInput(
-                        "phenoAnalysed",
+                        "phenoTVBP",
                         "Phenotype field",
                         choices = c("None"),
                         selected = "None"
@@ -859,7 +859,32 @@ shinyUI(navbarPage(theme = "bootstrap.css",
 
                 )
             )
-        )
+        ),
+
+        tabPanel(
+            title = "VEP density",
+
+            sidebarLayout(
+
+                # Sidebar with a slider input
+                sidebarPanel( # width = 4
+                    width = 3,
+
+                    actionButton(
+                        "densityVep", "Apply",
+                        icon = icon("picture"), width = "100%"
+                    ),
+                    hr()
+
+                ),
+
+                mainPanel( # width = 8
+
+                )
+
+            ) #sideBarLayout
+
+        ) # tabPanel
 
     ),
 

@@ -119,16 +119,16 @@ shinyServer(function(input, output, clientData, session) {
 
     # When phenotypes are updated in VCF, update the choices for plotting
     observeEvent(RV[["filteredVcf"]], {
-        # Depends on RV[["filteredVcf"]] & input$phenoAnalysed
+        # Depends on RV[["filteredVcf"]] & input$phenoTVBP
         pheno.choices <- c("None", colnames(colData(RV[["filteredVcf"]])))
 
         # If new phenotype files also contains the current phenotype,
         # keep it active instead of resetting to the first choice
         pheno.selected <- pheno.choices[
-            max(1, which(pheno.choices == input$phenoAnalysed))]
+            max(1, which(pheno.choices == input$phenoTVBP))]
 
         updateSelectInput(
-            session, "phenoAnalysed",
+            session, "phenoTVBP",
             choices = pheno.choices,
             selected = pheno.selected)
     })
@@ -584,8 +584,8 @@ shinyServer(function(input, output, clientData, session) {
             genoFirstRow = input$genoFirstRow,
             genoNumCols = input$genoNumCols,
             genoFirstCol = input$genoFirstCol,
-            vepAnalysed = input$vepAnalysed,
-            phenoAnalysed = input$phenoAnalysed,
+            vepTVBP = input$vepTVBP,
+            phenoTVBP = input$phenoTVBP,
             unique2pheno = input$unique2pheno,
             vepFacetKey = input$vepFacetKey,
             vepFacets = input$vepFacets,
@@ -1566,20 +1566,20 @@ shinyServer(function(input, output, clientData, session) {
 
         # Initialise by order of preference if present:
         # Current selection > Consequence > Impact > First field
-        vepAnalysed.default <- max(
+        vepTVBP.default <- max(
             1,
             head(x = na.omit(
                 match(
-                    x = c(input$vepAnalysed, "Consequence","IMPACT"),
+                    x = c(input$vepTVBP, "Consequence","IMPACT"),
                     table = vepKey.choices
                     )
                 ), n = 1)
             )
 
         updateSelectInput(
-            session, "vepAnalysed",
+            session, "vepTVBP",
             choices = vepKey.choices,
-            selected = vepKey.choices[vepAnalysed.default])
+            selected = vepKey.choices[vepTVBP.default])
 
         vepKey.choices <- c("None", vepKey.choices)
 
@@ -1606,7 +1606,7 @@ shinyServer(function(input, output, clientData, session) {
     # Phenotype to summarise VEP: or NULL if "None"
     varVepPlotPheno <- reactive({
 
-        phenotype <- input$phenoAnalysed
+        phenotype <- input$phenoTVBP
         # Give time to initialise the widget
         req(phenotype)
 
@@ -1628,7 +1628,7 @@ shinyServer(function(input, output, clientData, session) {
         isolate({
             vepFacetKey <- input$vepFacetKey
             vepFacets <- input$vepFacets
-            vepAnalysed <- input$vepAnalysed
+            vepTVBP <- input$vepTVBP
             stackedPercentage <- input$stackedPercentage
             unique2pheno <- input$unique2pheno
         })
@@ -1657,16 +1657,16 @@ shinyServer(function(input, output, clientData, session) {
                 Msgs[["filterVcfEmpty"]]),
                 errorClass = "optional")
 
-            if (input$phenoAnalysed == "None"){
+            if (input$phenoTVBP == "None"){
                 colData(vcf)[,"Phenotype"] <- factor("All")
                 plotPhenotype <- "Phenotype"
             } else {
-                isolate({plotPhenotype <- input$phenoAnalysed})
+                isolate({plotPhenotype <- input$phenoTVBP})
             }
 
             varVepPlotPheno <- varVepPlotPheno()
             validate(
-                need(vepAnalysed, Msgs[["vepAnalysed"]]),
+                need(vepTVBP, Msgs[["vepTVBP"]]),
                 need(vepFacetKey, Msgs[["vepFacetKey"]]),
                 need(stackedPercentage, Msgs[["stackedPercentage"]])
                 )
@@ -1676,7 +1676,7 @@ shinyServer(function(input, output, clientData, session) {
             gg <- tabulateVepByPhenotype(
                 vcf = vcf,
                 phenoCol = plotPhenotype,
-                vepCol = vepAnalysed,
+                vepCol = vepTVBP,
                 param = tparam(),
                 unique = unique2pheno,
                 facet = vepFacetKey,
@@ -1734,7 +1734,7 @@ shinyServer(function(input, output, clientData, session) {
     })
 
     vepTableCount <- reactive({
-        # Depeds on: vepTabulated, vepAnalysed
+        # Depeds on: vepTabulated
 
         vepTabulated <- vepTabulated()$data
 
@@ -1781,18 +1781,23 @@ shinyServer(function(input, output, clientData, session) {
             vepFacets.choices <- c()
         }
 
+        # Initialise to avoid crash
+        facetsSelected <- NULL
+        # Keep previous selection if possible
         if (length(input$vepFacets) > 0)
             facetsSelected <- na.omit(match(
                 x = input$vepFacets,
                 table = vepFacets.choices
             ))
-        else
+
+        # Otherwise select all new values
+        if (length(facetsSelected) == 0)
             facetsSelected <- 1:length(vepFacets.choices)
 
         updateSelectInput(
-        session, "vepFacets",
-        choices = vepFacets.choices,
-        selected = vepFacets.choices[facetsSelected])
+            session, "vepFacets",
+            choices = vepFacets.choices,
+            selected = vepFacets.choices[facetsSelected])
     })
 
     # Print the count of consequences in the area hovered.
@@ -1802,7 +1807,7 @@ shinyServer(function(input, output, clientData, session) {
 
         req(vepTableCount, input$plotVarClass_hover)
         hover <- input$plotVarClass_hover
-        vepAnalysed <- input$vepAnalysed
+        vepTVBP <- input$vepTVBP
 
         # If not hovered, show empty values
         if (is.null(hover)){
@@ -1829,7 +1834,7 @@ shinyServer(function(input, output, clientData, session) {
             # matches x (phenotype level) and y (VEP level)
             y_lvls <- vepTableCount[
                 apply(X = filters, MARGIN = 1, FUN = all),
-                c(vepAnalysed, "Freq")]
+                c(vepTVBP, "Freq")]
 
             # If in percentage mode, rescale the values
             if (input$stackedPercentage){
@@ -1846,8 +1851,8 @@ shinyServer(function(input, output, clientData, session) {
                 y_lvls[,"cumsum"] <- cumsum(y_lvls[,"Freq"])
                 y_lvls <- y_lvls[
                     y_lvls[,"cumsum"] >= input$plotVarClass_hover$y,]
-                y_lvl <- as.character(y_lvls[1, vepAnalysed])
-                countVarLevel <- y_lvls[y_lvls[,vepAnalysed] == y_lvl, "Freq"]
+                y_lvl <- as.character(y_lvls[1, vepTVBP])
+                countVarLevel <- y_lvls[y_lvls[,vepTVBP] == y_lvl, "Freq"]
                 countVarLevel <- ifelse(
                     input$stackedPercentage,
                     yes = sprintf(
@@ -1877,7 +1882,7 @@ shinyServer(function(input, output, clientData, session) {
         } else {
             html4Vep <- sprintf(
                 "<li>%s : <code>%s</code></li>",
-                vepAnalysed,
+                vepTVBP,
                 y_lvl
             )
             html5Value <- ifelse(

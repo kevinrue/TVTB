@@ -95,7 +95,6 @@ Msgs <- list(
     hetGenotypes = "Heterozygote genotype(s) must be defined.",
     altGenotypes = "Alternative homozygote genotype(s) must be defined.",
     vepKey = "INFO field of VEP prediction must be defined.",
-    vepFacet = "Faceting VEP field",
     maf.min = "Maximum minor allele frequency",
     maf.min = "Mimimum minor allele frequency",
     refGenotypes = "Reference genotype(s) must be defined",
@@ -106,6 +105,10 @@ Msgs <- list(
     xAxisHjust = "X axis horizontal justification",
     xAxisVjust = "X axis vertical justification",
     xAxisSize = "X axis font size",
+
+    # Tabulate VEP by phenotype (TVBP)
+    vepTVBP = "VEP field tabulated",
+    vepFacetKey = "Faceting VEP field",
 
     # Optional inputs
     importVariants = "Please import/refresh variants.",
