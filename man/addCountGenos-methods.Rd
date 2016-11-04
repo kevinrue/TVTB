@@ -69,14 +69,16 @@ and \code{\link{geno,VCF-method}}
 extdata <- file.path(system.file(package = "TVTB"), "extdata")
 vcfFile <- file.path(extdata, "moderate.vcf")
 
+# TVTB parameters
 tparam <- TVTBparam(
     genos = list(
         REF = "0|0",
         HET = c("0|1", "1|0"),
         ALT = "1|1"))
 
-vcf <- preprocessVariants(
-    file = vcfFile, param = tparam)
+# Pre-process variants
+vcf <- VariantAnnotation::readVcf(file = vcfFile)
+vcf <- VariantAnnotation::expand(vcf)
 
 # Example usage ----
 

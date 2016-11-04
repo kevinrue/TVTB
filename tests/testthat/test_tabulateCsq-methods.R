@@ -2,44 +2,30 @@ context("densityCsqByPhenotype")
 
 # Settings ----
 
-# Genomic region
-bedRegions <- GenomicRanges::GRanges(
-    seqnames = "15",
-    ranges = IRanges::IRanges(start = 48413170, end = 48434757)) # all variants
-
 # VCF file
 extdata <- file.path(system.file(package = "TVTB"), "extdata")
-vcfFile <- file.path(extdata, "chr15.phase3_integrated.vcf.gz")
-tabixVcf <- Rsamtools::TabixFile(file = vcfFile)
+vcfFile <- file.path(extdata, "moderate.vcf")
 
-# Good and bad phenotype files
-phenoFile <- file.path(extdata, "integrated_samples.txt")
-phenotypes <- S4Vectors::DataFrame(read.table(
-    file = phenoFile, header = TRUE, row.names = 1))
-# Subset phenotypes to test with a small number of samples
-samplePhenotypes <- subset(phenotypes, pop == "GBR")
-samplePhenotypes <- droplevels(samplePhenotypes)
+# Phenotype file
+phenoFile <- file.path(extdata, "moderate_pheno.txt")
+phenotypes <- S4Vectors::DataFrame(
+    read.table(file = phenoFile, header = TRUE, row.names = 1))
 
-# Import variants
-svp <- VariantAnnotation::ScanVcfParam(
-    fixed = "ALT",
-    info = "CSQ",
-    geno = "GT",
-    samples = rownames(samplePhenotypes),
-    which = bedRegions)
-vcf <- VariantAnnotation::readVcf(file = tabixVcf, param = svp)
+# TVTB parameters
+tparam <- TVTBparam(
+    genos = list(
+        REF = "0|0",
+        HET = c("0|1", "1|0"),
+        ALT = "1|1"))
+
+# Pre-process variants
+vcf <- VariantAnnotation::readVcf(file = vcfFile)
+# Add phenotype information necessary for the demo
+colData(vcf) <- phenotypes
 # Separate multi-allelic records into bi-allelic records
-eVcf <- VariantAnnotation::expand(x = vcf, row.names = TRUE)
+vcf <- VariantAnnotation::expand(x = vcf, row.names = TRUE)
 # Disambiguate row.names from multi-allelic records
-rownames(eVcf) <- paste(rownames(eVcf), mcols(eVcf)[,"ALT"], sep = "_")
-# Add some phenotypes information necessary for the demo
-SummarizedExperiment::colData(eVcf) <- samplePhenotypes
-
-# Define genotypes ----
-tparam <- TVTBparam(genos = list(
-    REF = c("0|0"),
-    HET = c("0|1","1|0"),
-    ALT = c("1|1")))
+rownames(vcf) <- paste(rownames(vcf), mcols(vcf)[,"ALT"], sep = "_")
 
 # Signatures ----
 
@@ -48,7 +34,7 @@ test_that("tabulateCsq* supports all signatures",{
     # ExpandedVCF, TVTBparam
     expect_is(
         tabulateCsqByPhenotype(
-            vcf = eVcf,
+            vcf = vcf,
             phenoCol = "super_pop",
             csqCol = "Consequence",
             param = tparam,
@@ -58,7 +44,7 @@ test_that("tabulateCsq* supports all signatures",{
 
     expect_is(
         tabulateCsqByPhenotype(
-            vcf = eVcf,
+            vcf = vcf,
             phenoCol = "super_pop",
             csqCol = "Consequence",
             alts = c("0|1", "1|0", "1|1"),
@@ -69,8 +55,8 @@ test_that("tabulateCsq* supports all signatures",{
     ## Implicitely tested by *ByPhenotype
     expect_is(
         tabulateCsqInPhenoLevel(
-            level = "EUR",
-            vcf = eVcf,
+            level = "AFR",
+            vcf = vcf,
             phenoCol = "super_pop",
             csqCol = "Consequence",
             param = tparam),
@@ -79,8 +65,8 @@ test_that("tabulateCsq* supports all signatures",{
 
     expect_is(
         tabulateCsqInPhenoLevel(
-            level = "EUR",
-            vcf = eVcf,
+            level = "AFR",
+            vcf = vcf,
             phenoCol = "super_pop",
             csqCol = "Consequence",
             alts = c("0|1", "1|0", "1|1")),
@@ -95,42 +81,49 @@ test_that("plot & facet & popFreq argument work",{
 
     expect_s3_class(
         tabulateCsqByPhenotype(
-            vcf = eVcf, phenoCol = "super_pop",
+            vcf = vcf, phenoCol = "super_pop",
             csqCol = "Consequence", param = tparam,
-            facet = "Feature", plot = TRUE, percentage = TRUE) +
-            theme(legend.text = element_text(size = rel(.5))),
+            facet = "Feature", plot = TRUE, percentage = TRUE),
         c("gg", "ggplot")
     )
 
     expect_s3_class(
         tabulateCsqInPhenoLevel(
-            level = "EUR", vcf = eVcf,
+            level = "AFR", vcf = vcf,
             phenoCol = "super_pop",
             csqCol = "Consequence", param = tparam,
-            facet = "Feature", plot = TRUE, percentage = TRUE) +
-            theme(legend.text = element_text(size = rel(.5))),
+            facet = "Feature", plot = TRUE, percentage = TRUE),
         c("gg", "ggplot")
     )
 
     ## For 1% of extra coverage: plot=TRUE, percentage=FALSE,
     expect_s3_class(
         tabulateCsqByPhenotype(
-            vcf = eVcf, phenoCol = "super_pop",
+            vcf = vcf, phenoCol = "super_pop",
             csqCol = "Consequence", param = tparam,
             unique = FALSE, facet = "Feature",
-            plot = TRUE) +
-            theme(legend.text = element_text(size = rel(.5))),
+            plot = TRUE),
         c("gg", "ggplot")
     )
 
     expect_s3_class(
         tabulateCsqInPhenoLevel(
-            level = "EUR", vcf = eVcf,
+            level = "AFR", vcf = vcf,
             phenoCol = "super_pop",
             csqCol = "Consequence", param = tparam,
-            unique = FALSE, facet = "Feature", plot = TRUE) +
-            theme(legend.text = element_text(size = rel(.5))),
+            unique = FALSE, facet = "Feature", plot = TRUE),
         c("gg", "ggplot")
     )
 })
 
+# test_that("errors are returned when ",{
+#
+#     expect_error(
+#         tabulateCsqInPhenoLevel(
+#             level = "EUR", vcf = vcf,
+#             phenoCol = "super_pop",
+#             csqCol = "Consequence", param = tparam,
+#             facet = "Feature", plot = TRUE, percentage = TRUE)
+#     )
+#
+# })

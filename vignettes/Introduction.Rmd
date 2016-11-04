@@ -24,6 +24,11 @@ bibliography:
     Introduction.bib
 ---
 
+```{r, optChunkDefault, include=FALSE}
+library(knitr)
+optChunkDefault <- opts_chunk$get()
+```
+
 # Introduction
 
 The VCF Tool Box (`r Biocpkg("TVTB")`) offers functions
@@ -55,12 +60,12 @@ Many functionalities in `r Biocpkg("TVTB")` require recurrent information
 such as:
 
 * genotypes (homozygote reference, heterozygote, homozygote alternate)
-* INFO field containing the Ensembl VEP predictions in the VCF file
-* suffixes of INFO fields where counts and frequencies of genotypes are stored
+* INFO key field that contains the Ensembl VEP predictions in the VCF file
+* suffixes of INFO keys where counts and frequencies of genotypes are stored
     + counts and frequencies may be calculated for levels of phenotypes,
-        in which case the corresponding INFO fields are formed as
+        in which case the corresponding INFO keys are formed as
         `<phenotype>_<level>_<suffix>`
-    + counts and frequencies across all samples are stored in INFO fields
+    + counts and frequencies across all samples are stored in INFO keys
         simply named `<suffix>`
 * settings for parallel calculations
 
@@ -101,19 +106,19 @@ In this example:
 
 * **Genotypes**
     + homozygote reference genotype is encoded `0|0`
-        - counts of genotypes are stored in INFO fields suffixed with `REF`
+        - counts of genotypes are stored in INFO keys suffixed with `REF`
     + heterozygote genotypes are encoded either `0|1` or `1|0`
-        - counts of genotypes are stored in INFO fields suffixed with `HET`
+        - counts of genotypes are stored in INFO keys suffixed with `HET`
     + homozygote alternate  genotype is encoded `1|1`
-        - counts of genotypes are stored in INFO fields suffixed with `ALT`
+        - counts of genotypes are stored in INFO keys suffixed with `ALT`
 * **Genomic ranges**
     + a gene-coding region on chromosome 15
 * **Alternate allele frequency**
-    + stored in INFO fields suffixed with `AAF`
+    + stored in INFO keys suffixed with `AAF`
 * **Minor allele frequency**
-    + stored in INFO fields suffixed with `MAF`
+    + stored in INFO keys suffixed with `MAF`
 * **Ensembl VEP predictions**
-    + imported from INFO field `CSQ`
+    + imported from INFO key `CSQ`
 * **Parallel calculations**
     + turned off. Serial calculations are performed.
 
@@ -127,96 +132,120 @@ may be included in the package for the most common situations
 
 # Data import
 
-## Variants and phenotypes
+## Genetic variants
 
 Functionalities in `r Biocpkg("TVTB")` currently only support
 `ExpandedVCF` objects of the `r Biocpkg("VariantAnnotation")` package,
 that encode a single alternate allele per record.
-`ExpandedVCF` objects may be produced:
-
-* from a VCF file
-using the `r Biocpkg("VariantAnnotation")` `readVcf()` method
-with argument `collapsed=FALSE`,
-* from `r Biocpkg("VariantAnnotation")` `CollapsedVCF` objects
+`ExpandedVCF` objects may be produced
+from `r Biocpkg("VariantAnnotation")` `CollapsedVCF` objects
 using the `r Biocpkg("VariantAnnotation")` `expand()` method.
 
-To enable the key functionalities of the `r Biocpkg("TVTB")` package, the
-`ExpandedVCF` object should include at least the following information:
+`ExpandedVCF` objects may include any information that users deem relevant
+for the analysis;
+however, to enable the key functionalities of the `r Biocpkg("TVTB")` package,
+the object should include at least the following information:
 
 * `fixed(x)`
     + `ALT`: alternate allele(s)
     
 * `info(x)`
-    + `<vep>`: where `<vep>` stands for a user-defined INFO field that
-        contains Ensembl VEP predictions
+    + `<vep>`: where `<vep>` stands for a user-defined INFO key where
+    the Ensembl VEP predictions are stored in the `ExpandedVCF` object
     
 * `geno(x)`
     + `GT`: genotypes
 
 * `colData(x)`: phenotypes
 
-## The preprocessVariants() method
+## Genomic ranges
 
-The `r Biocpkg("TVTB")` method `preprocessVariants` offers an integrated route
-to produce a minimal `ExpandedVCF` object that contains all the data
-necessary for subsequent analyses.
-To initialise a minimal `ExpandedVCF` object,
-the `preprocessVariants` method imports:
+To reduce memory requirements and the duration of the calculations steps,
+users may wish to import only a subset of variants from specific genomic
+region(s) (*e.g.* gene-coding, exons, promoters).
 
-* phenotypes
-    + in any of the following formats:
-        - `DataFrame` from the `r Biocpkg("S4Vectors")` package
-        - `data.frame`
-        -  text file
-    + in all cases, phenotypes must include:
-        - `rownames`: sample identifiers
-        - `colnames`: phenotype names
-* variants within given genomic region(s)
-    + `CHROM`, `POS`, `REF`, `ALT` fixed fields
-    + Ensembl VEP predictions from a given INFO field for the above variants
-        - Default: `CSQ`
-    + genotypes (`GT`) for samples identified in the above phenotypes
-        `rownames`
-        - if no phenotypes are given, all samples are imported from the VCF
-            file
+The `r Biocpkg("VariantAnnotation")` `ScanVcfParam` class accepts
+`r Biocpkg("GenomicRanges")` `GRanges` objects
+(in the `which` slot) that describes
+the sequences and ranges to be queried from the VCF file.
+
+## Phenotypes
+
+Phenotype information is essential to interpret and compare genetic variants
+between groups of samples
+(*e.g.* minor allele frequency in a group, burden of damaging variants).
+
+`ExpandedVCF` objects accepts phenotype information
+(as `r Biocpkg("S4Vectors")` `DataFrame`) in the `colData` slot.
+This has several advantages, among which:
+
+* Phenotype and genetic information are kept synchronised through operation
+    such as subsetting and re-ordering
+* `ExpandedVCF` objects ensure that the `rownames` of their `colData` slot
+    matches the `colnames` or their `geno` and `info` slots.
     
-The imported variants are expanded into bi-allelic records
-(*i.e.,* one reference allele and one alternate allele per record),
-and phenotypes are combined as the `colData` of the resulting `ExpandedVCF`
-object.
+The `r Biocpkg("VariantAnnotation")` `ScanVcfParam` class accepts
+sample names (given as a `character` vector) in the `samples` slot
+that describes the samples to be queried from the VCF file.
 
 ## Example
 
-Using the sample files included in the package, an `ExpandedVCF` object
-can be obtained as follows:
+An `ExpandedVCF` object that contains the minimal data necessary for the rest
+of the vignette can be created as follows:
 
-```{r preprocessVariants, message=FALSE}
-# Import phenotypes ----
-phenoFile <- system.file(
-    "extdata/integrated_samples.txt",
-    package = "TVTB")
+**Step 1:** Import phenotypes
 
-# Define VCF file ----
-vcfFile <- system.file(
-    "extdata/chr15.phase3_integrated.vcf.gz",
-    package = "TVTB")
-
-tabixVcf <- Rsamtools::TabixFile(file = vcfFile)
-
-# Import variants and phenotypes ----
-vcf <- preprocessVariants(
-    file = tabixVcf,
-    param = tparam,
-    phenos = phenoFile)
+```{r importPhenotypes}
+extdata <- system.file("extdata", package = "TVTB")
+phenoFile <- file.path(extdata, "integrated_samples.txt")
+phenotypes <- S4Vectors::DataFrame(
+    read.table(file = phenoFile, header = TRUE, row.names = 1))
 ```
 
-\bioccomment{
-For `preprocessVariants`, `TVTBparam` objects are used
-only for the `vep` slot, that defines the INFO field
-in which the Ensembl VEP predictions are stored.
+**Step 2:** Define VCF file
+
+```{r vcfFile}
+vcfFile <- file.path(extdata, "chr15.phase3_integrated.vcf.gz")
+tabixVcf <- Rsamtools::TabixFile(file = vcfFile)
+```
+
+**Step 3:** Define VCF import parameters
+
+Of particular interest:
+
+* `samples`: import only samples with phenotype information
+* `which`: import only variants in the targeted genomic range
+
+```{r ScanVcfParam}
+svp <- VariantAnnotation::ScanVcfParam(
+    fixed = c("ALT", "QUAL", "FILTER"), # all fields: could be omitted
+    info = c(vep(tparam)),
+    geno = "GT", # all fields: could be omitted
+    samples = rownames(phenotypes),
+    which = ranges(tparam))
+```
+
+**Step 4:** Import and pre-process variants
+
+```{r preprocessVariants, message=FALSE}
+library(SummarizedExperiment)
+# Import variants as a CollapsedVCF object
+vcf <- VariantAnnotation::readVcf(file = vcfFile, param = svp)
+# Combine with phenotype information
+colData(vcf) <- phenotypes
+# Expand into a ExpandedVCF object (bi-allelic records)
+vcf <- VariantAnnotation::expand(x = vcf, row.names = TRUE)
+# Disambiguate rownames of multi-allelic variants
+rownames(vcf) <- paste(rownames(vcf), mcols(vcf)[,"ALT"], sep = "_")
+```
+
+\fixme{
+Currently, the package relies on the ExpandedVCF object to have
+unique row names. A fix will be implemented soon.
 }
 
-The result is an `ExpandedVCF` object including 481 variants in 2,504 samples:
+The result is an `ExpandedVCF` object including variants
+in the desired genomic ranges and samples:
 
 ```{r vcf, echo=FALSE}
 vcf
@@ -230,7 +259,7 @@ Although later sections discuss:
 * the filtering of variants based on `fixed`, `info`, and `geno` fields
     (\fixme{Coming soon!})
 
-interesting figures and summary tables may be obtained as soon as the first
+, interesting figures and summary tables may be obtained as soon as the first
 `ExpandedVCF` object is created.
 
 Currently, major `r Biocpkg("TVTB")` functionalities include:
@@ -258,26 +287,39 @@ the count of each Ensembl VEP prediction
 `"Consequence"` in each "super population"
 (*i.e.*, each level of the `"super_pop"` phenotype).
 
-<!-- Cannot split chunk options over multiple lines :'-( -->
-```{r tCBPplot,  fig.width=11, fig.height=6, out.extra='angle=90', out.width='6in', out.height='11in'}
+<!-- Cannot split chunk options over multiple lines: BioCheck NOTE -->
+```{r optsTabulateSet, include=FALSE}
+opts_chunk$set(
+    fig.width=12, fig.height=7,
+    out.extra='angle=90',
+    out.width='7in', out.height='12in'
+)
+```
+
+```{r tCBPplot, message=FALSE}
+library(ggplot2)
 tCBPplot <- tabulateCsqByPhenotype(
     vcf = vcf, phenoCol = "super_pop", csqCol = "Consequence",
     param = tparam,
     unique = TRUE, facet = "Feature", percentage = FALSE,
     plot = TRUE) +
-    ggplot2::theme(
-        legend.text = ggplot2::element_text(
-            size = ggplot2::rel(0.5)),
-        strip.text = ggplot2::element_text(
-            size = ggplot2::rel(0.5)),
-        axis.text.x = ggplot2::element_text(
+    theme(
+        legend.text = element_text(
+            size = rel(0.5)),
+        strip.text = element_text(
+            size = rel(0.5)),
+        axis.text.x = element_text(
             angle = 270,
             hjust = 0.5),
-        axis.title.y = ggplot2::element_text(
+        axis.title.y = element_text(
             angle = 270)
     )
 
 tCBPplot
+```
+
+```{r optsTabulateReset, include=FALSE}
+opts_chunk$set(optChunkDefault)
 ```
 
 ### Table (data.frame)
@@ -308,8 +350,12 @@ knitr::kable(
 
 ## Distribution of continuous Ensembl VEP predictions
 
-For Ensembl VEP prediction on a continuous scale, it may be desirable to
-visualise the distribution of values as a density plot:
+For Ensembl VEP prediction on a continuous scale, it may be interesting to
+visualise the distribution of values as a density plot.
+In the following chunk of code, the density distribution of
+[CADD score](http://cadd.gs.washington.edu)
+(a tool for scoring the deleteriousness of genetic variants)
+is visualised for variant affecting each feature in each super-population:
 
 ```{r dCBPplot, warning=FALSE}
 densityCsqByPhenotype(
@@ -317,7 +363,6 @@ densityCsqByPhenotype(
         param = tparam,
         unique = TRUE, facet = "Feature", plot = TRUE, popFreq = FALSE)
 ```
-
 
 # Session info
 

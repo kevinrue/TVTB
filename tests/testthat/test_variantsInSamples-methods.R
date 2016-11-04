@@ -2,40 +2,26 @@ context("variantsInSamples")
 
 # Settings ----
 
-# Genomic region
-bedRegions <- GenomicRanges::GRanges(
-    seqnames = "15",
-    ranges = IRanges::IRanges(start = 48420E3, end = 48421E3))
-
 # VCF file
 extdata <- file.path(system.file(package = "TVTB"), "extdata")
-vcfFile <- file.path(extdata, "chr15.phase3_integrated.vcf.gz")
-tabixVcf <- Rsamtools::TabixFile(file = vcfFile)
+vcfFile <- file.path(extdata, "moderate.vcf")
 
-# Good and bad phenotype files
-phenoFile <- file.path(extdata, "integrated_samples.txt")
-phenotypes <- S4Vectors::DataFrame(read.table(
-    file = phenoFile, header = TRUE, row.names = 1))
-# Subset phenotypes to test with a small number of samples
-samplePhenotypes <- phenotypes[
-    sample(x = 1:nrow(phenotypes), size = 100),]
+# Phenotype file
+phenoFile <- file.path(extdata, "moderate_pheno.txt")
+phenotypes <- S4Vectors::DataFrame(
+    read.table(file = phenoFile, header = TRUE, row.names = 1))
 
-# Import variants
-svp <- VariantAnnotation::ScanVcfParam(
-    fixed = "ALT",
-    info = "CSQ",
-    geno = "GT",
-    samples = rownames(samplePhenotypes),
-    which = bedRegions)
-vcf <- VariantAnnotation::readVcf(file = tabixVcf, param = svp)
-# Separate multi-allelic records into bi-allelic records
-eVcf <- VariantAnnotation::expand(x = vcf, row.names = TRUE)
-# Disambiguate row.names from multi-allelic records
-rownames(eVcf) <- paste(rownames(eVcf), mcols(eVcf)[,"ALT"], sep = "_")
+tparam <- TVTBparam(
+    genos = list(
+        REF = "0|0",
+        HET = c("0|1", "1|0"),
+        ALT = "1|1"))
 
-sampleIdx <- 1:(ncol(eVcf)/10)
+vcf <- VariantAnnotation::readVcf(file = vcfFile)
+colData(vcf) <- phenotypes
+vcf <- VariantAnnotation::expand(vcf)
 
-tparam <- TVTBparam(genos = list(c("0|0"), c("0|1","1|0"), c("1|1")))
+sampleIdx <- 1:(ncol(vcf))
 
 # Signatures ----
 
@@ -44,7 +30,7 @@ test_that("variantsInSamples() supports all signatures",{
     ## ExpandedVCF,numeric,TVTBparam
     expect_type(
         variantsInSamples(
-            vcf = eVcf,
+            vcf = vcf,
             samples = sampleIdx,
             param = tparam,
             unique = FALSE),
@@ -54,7 +40,7 @@ test_that("variantsInSamples() supports all signatures",{
     # # ExpandedVCF,numeric,missing / tested by higher functions TODO: change
     expect_type(
         variantsInSamples(
-            vcf = eVcf,
+            vcf = vcf,
             samples = sampleIdx,
             alts = c("0|1", "1|0", "1|1"),
             unique = FALSE),
@@ -64,8 +50,8 @@ test_that("variantsInSamples() supports all signatures",{
     # ExpandedVCF,character,TVTBparam
     expect_type(
         variantsInSamples(
-            vcf = eVcf,
-            samples = colnames(eVcf)[sampleIdx],
+            vcf = vcf,
+            samples = colnames(vcf)[sampleIdx],
             param = tparam,
             unique = FALSE),
         "integer"
@@ -74,8 +60,8 @@ test_that("variantsInSamples() supports all signatures",{
     # ExpandedVCF,character,missing
     expect_type(
         variantsInSamples(
-            vcf = eVcf,
-            samples = colnames(eVcf)[sampleIdx],
+            vcf = vcf,
+            samples = colnames(vcf)[sampleIdx],
             alts = c("0|1", "1|0", "1|1"),
             unique = FALSE),
         "integer"
@@ -90,7 +76,7 @@ test_that("unique=TRUE is supported",{
     # FALSE / tested above
     # expect_type(
     #     variantsInSamples(
-    #         vcf = eVcf,
+    #         vcf = vcf,
     #         samples = sampleIdx,
     #         alts = c("0|1", "1|0", "1|1"),
     #         unique = FALSE),
@@ -100,7 +86,7 @@ test_that("unique=TRUE is supported",{
     # TRUE
     expect_type(
         variantsInSamples(
-            vcf = eVcf,
+            vcf = vcf,
             samples = sampleIdx,
             alts = c("0|1", "1|0", "1|1"),
             unique = TRUE),
@@ -115,7 +101,7 @@ test_that("two or more alternate genotypes are required",{
 
     expect_error(
         variantsInSamples(
-            vcf = eVcf,
+            vcf = vcf,
             samples = sampleIdx,
             alts = c("1|1"),
             unique = FALSE)
@@ -123,8 +109,8 @@ test_that("two or more alternate genotypes are required",{
 
     expect_error(
         variantsInSamples(
-            vcf = eVcf,
-            samples = colnames(eVcf)[sampleIdx],
+            vcf = vcf,
+            samples = colnames(vcf)[sampleIdx],
             alts = c("1|1"),
             unique = FALSE)
     )

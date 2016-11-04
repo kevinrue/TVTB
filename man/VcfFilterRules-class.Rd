@@ -186,13 +186,14 @@ Biostrings::type(vcfRules)
 extdata <- file.path(system.file(package = "TVTB"), "extdata")
 vcfFile <- file.path(extdata, "moderate.vcf")
 
-# Parameters
+# TVTB parameters
 tparam <- TVTBparam(
     genos = list(
         REF = "0|0",
         HET = c("0|1", "1|0"),
         ALT = "1|1"))
 
+# Pre-process variants
 vcf <- VariantAnnotation::readVcf(file = vcfFile)
 vcf <- VariantAnnotation::expand(vcf)
 vcf <- addOverallFrequencies(vcf = vcf, param = tparam)

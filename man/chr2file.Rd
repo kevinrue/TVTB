@@ -34,7 +34,7 @@ Kevin Rue-Albrecht
 }
 
 \seealso{
-\code{\link{preprocessVariants}}.
+\code{\linkS4class{ExpandedVCF}}.
 }
 \examples{
 # Identify VCF file correponding to chromosome ----

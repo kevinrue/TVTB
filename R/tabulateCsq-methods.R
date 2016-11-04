@@ -188,7 +188,7 @@ setMethod(
     if (plot){
 
         if (nrow(ggData) == 0)
-            stop("No data to plot")
+            return(ggplot())
 
         ggPlot <- ggplot(
             data = ggData,
@@ -209,6 +209,9 @@ setMethod(
     }
 
     longData <- as.data.frame(table(ggData))
+
+    if (nrow(longData) == 0)
+        return(data.frame())
 
     if (is.null(facet))
         dcastRow <- csqCol

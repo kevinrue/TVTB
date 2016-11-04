@@ -65,6 +65,16 @@ test_that("Accessors return valid values", {
 
 })
 
+# Setters ----
+
+# test_that("Setters return valid values", {
+#
+#     expect_type(
+#         vep(vcfRules) <- "ANN",
+#         "character")
+#
+# })
+
 # eval method ----
 
 test_that("eval method return valid values", {

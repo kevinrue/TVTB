@@ -6,17 +6,22 @@ context("countGenos")
 extdata <- file.path(system.file(package = "TVTB"), "extdata")
 vcfFile <- file.path(extdata, "moderate.vcf")
 
-# Good and bad phenotype files
+# Phenotype file
 phenoFile <- file.path(extdata, "moderate_pheno.txt")
+phenotypes <- S4Vectors::DataFrame(
+    read.table(file = phenoFile, header = TRUE, row.names = 1))
 
+# TVTB parameters
 tparam <- TVTBparam(
     genos = list(
         REF = "0|0",
         HET = c("0|1", "1|0"),
         ALT = "1|1"))
 
-vcf <- preprocessVariants(
-    file = vcfFile, param = tparam, phenos = phenoFile)
+# Pre-process variants
+vcf <- VariantAnnotation::readVcf(file = vcfFile)
+colData(vcf) <- phenotypes
+vcf <- VariantAnnotation::expand(vcf)
 
 # countGenos() ---
 

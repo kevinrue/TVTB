@@ -100,7 +100,6 @@ export("chr2file")
 # S4 ----
 
 exportMethods(
-    "preprocessVariants",
     "countGenos", "addCountGenos",
 
     "addFrequencies", "addOverallFrequencies", "addPhenoLevelFrequencies",
@@ -137,15 +136,20 @@ exportMethods(
     "TVTBparam"
 )
 
-# Re-export methods defined in other packages ----
+# Re-export useful methods defined in other packages ----
 
 exportMethods(
-     # S4Vectors
-    "eval", "evalSeparately", "subsetByFilter", "active",
     # Biostrings
     "type",
+    # GenomicRanges
+     "mcols",
+    # Base
+    "c",
+    # S4Vectors
+    "eval", "evalSeparately", "subsetByFilter", "active",
+    # SummarizedExperiment
+    "colData<-", "colData<-",
     # VariantAnnotation
     "readVcf", "ScanVcfParam",
-    # Base
-    "c"
+    "header", "header<-", "geno", "fixed", "info", "info<-"
 )

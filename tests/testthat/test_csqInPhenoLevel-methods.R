@@ -2,39 +2,30 @@ context("csqInPhenoLevel")
 
 # Settings ----
 
-# Genomic region
-bedRegions <- GenomicRanges::GRanges(
-    seqnames = "15",
-    ranges = IRanges::IRanges(start = 48413170, end = 48434757))
-
 # VCF file
 extdata <- file.path(system.file(package = "TVTB"), "extdata")
-vcfFile <- file.path(extdata, "chr15.phase3_integrated.vcf.gz")
-tabixVcf <- Rsamtools::TabixFile(file = vcfFile)
+vcfFile <- file.path(extdata, "moderate.vcf")
 
-# Good and bad phenotype files
-phenoFile <- file.path(extdata, "integrated_samples.txt")
-phenotypes <- S4Vectors::DataFrame(read.table(
-    file = phenoFile, header = TRUE, row.names = 1))
-# Subset phenotypes to test with a small number of samples
-samplePhenotypes <- subset(phenotypes, pop == "GBR")
+# Phenotype file
+phenoFile <- file.path(extdata, "moderate_pheno.txt")
+phenotypes <- S4Vectors::DataFrame(
+    read.table(file = phenoFile, header = TRUE, row.names = 1))
 
-# Import variants
-svp <- VariantAnnotation::ScanVcfParam(
-    fixed = "ALT",
-    info = "CSQ",
-    geno = "GT",
-    samples = rownames(samplePhenotypes),
-    which = bedRegions)
-vcf <- VariantAnnotation::readVcf(file = tabixVcf, param = svp)
+# TVTB parameters
+tparam <- TVTBparam(
+    genos = list(
+        REF = "0|0",
+        HET = c("0|1", "1|0"),
+        ALT = "1|1"))
+
+# Pre-process variants
+vcf <- VariantAnnotation::readVcf(file = vcfFile)
+# Add phenotype information necessary for the demo
+colData(vcf) <- phenotypes
 # Separate multi-allelic records into bi-allelic records
-eVcf <- VariantAnnotation::expand(x = vcf, row.names = TRUE)
+vcf <- VariantAnnotation::expand(x = vcf, row.names = TRUE)
 # Disambiguate row.names from multi-allelic records
-rownames(eVcf) <- paste(rownames(eVcf), mcols(eVcf)[,"ALT"], sep = "_")
-# Add some phenotypes information necessary for the demo
-colData(eVcf) <- samplePhenotypes
-
-tparam <- TVTBparam(genos = list(c("0|0"), c("0|1","1|0"), c("1|1")))
+rownames(vcf) <- paste(rownames(vcf), mcols(vcf)[,"ALT"], sep = "_")
 
 # Signatures ----
 
@@ -43,7 +34,7 @@ test_that("csqInPhenoLevel() supports all signatures",{
     # ExpandedVCF, / implicitely tested by higher functions TODO:
     expect_is(
         csqInPhenoLevel(
-            vcf = eVcf, phenoCol = "super_pop", level = "EUR",
+            vcf = vcf, phenoCol = "super_pop", level = "EUR",
             csqCol = "CADD_PHRED", param = tparam,
             het = c("0/1","1/0"),
             alt = "1/1",
@@ -54,7 +45,7 @@ test_that("csqInPhenoLevel() supports all signatures",{
     # ExpandedVCF, character
     expect_is(
         csqInPhenoLevel(
-            vcf = eVcf, phenoCol = "super_pop", level = "EUR",
+            vcf = vcf, phenoCol = "super_pop", level = "EUR",
             csqCol = "CADD_PHRED",
             alts = unlist(carrier(tparam)),
             unique = FALSE, facet = NULL),

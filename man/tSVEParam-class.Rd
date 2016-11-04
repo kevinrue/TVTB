@@ -215,7 +215,6 @@ Kevin Rue-Albrecht
 \code{\link{addCountGenos-methods}}
 \code{\link{csqInPhenoLevel-methods}},
 \code{\link{densityCsq-methods}},
-\code{\link{preprocessVariants-methods}},
 \code{\link{tabulateCsq-methods}},
 \code{\link{variantsInSamples-methods}},
 and \code{\linkS4class{BiocParallelParam}}.

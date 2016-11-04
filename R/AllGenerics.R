@@ -25,16 +25,6 @@ setGeneric(
         standardGeneric("addFrequencies")
 )
 
-# preprocessVariants ----
-
-setGeneric(
-    name = "preprocessVariants",
-    signature = c("file", "param", "phenos"),
-    def = function(
-        file, param, phenos, ...)
-        standardGeneric("preprocessVariants")
-)
-
 # addCountGenos ----
 
 # Not used within the package anymore; left for user convenience

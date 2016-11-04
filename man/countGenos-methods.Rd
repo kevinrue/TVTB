@@ -67,16 +67,20 @@ vcfFile <- file.path(extdata, "moderate.vcf")
 
 # Phenotype file
 phenoFile <- file.path(extdata, "moderate_pheno.txt")
+phenotypes <- S4Vectors::DataFrame(
+    read.table(file = phenoFile, header = TRUE, row.names = 1))
 
-# Parameters
+# TVTB parameters
 tparam <- TVTBparam(
     genos = list(
         REF = "0|0",
         HET = c("0|1", "1|0"),
         ALT = "1|1"))
 
-vcf <- preprocessVariants(
-    file = vcfFile, param = tparam, phenos = phenoFile)
+# Pre-process variants
+vcf <- VariantAnnotation::readVcf(file = vcfFile)
+colData(vcf) <- phenotypes
+vcf <- VariantAnnotation::expand(vcf)
 
 # Example usage ----
 
