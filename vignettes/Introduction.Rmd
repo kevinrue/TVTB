@@ -26,15 +26,13 @@ bibliography:
 
 # Introduction
 
-The VCF Tool Box (`r Biocpkg("TVTB")`[^1]) offers functions
+The VCF Tool Box (`r Biocpkg("TVTB")`) offers functions
 to summarise and visualise gene-centric genetic variation data
 stored in VCF files pre-processed by the
 Ensembl Variant Effect Predictor (VEP) [@RN1].
 A Shiny web-application, the Shiny Variant Explorer (tSVE),
 provides a convenient interface to demonstrate those
 functionalities in a programming-free environment.
-
-[^1]: See also: *ti voglio tanto bene* (Italian).
 
 # Installation
 

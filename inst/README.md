@@ -5,8 +5,8 @@
 | Resource:     | Bioconductor        | Travis CI     |
 | ------------- | ------------------- | ------------- |
 | _Platforms:_  | _Multiple_          | _Linux_       |
-| R CMD check   |                     | [![Travis-CI Build Status](https://travis-ci.org/kevinrue/tSVE.svg?branch=master)](https://travis-ci.org/kevinrue/tSVE) |
-| Test coverage |                     | [![Coverage Status](https://img.shields.io/codecov/c/github/kevinrue/tSVE/master.svg)](https://codecov.io/github/kevinrue/tSVE?branch=master)      |               |
+| R CMD check   |                     | [![Travis-CI Build Status](https://travis-ci.org/kevinrue/TVTB.svg?branch=master)](https://travis-ci.org/kevinrue/TVTB) |
+| Test coverage |                     | [![Coverage Status](https://img.shields.io/codecov/c/github/kevinrue/TVTB/master.svg)](https://codecov.io/github/kevinrue/TVTB?branch=master)      |               |
 
 ## Description
 
