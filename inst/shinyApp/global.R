@@ -118,11 +118,9 @@ Msgs <- list(
         "Variants must be imported again to attach phenotype information."),
     singleVcf = "Please select a VCF file",
 
-    # Catch warnings/errors
-    # vcf = "Impossible to read VCF file. See console.",
-
     # Calculated values (missing are likely bugs)
     filteredVcf = "Please filter variants.",
+    filterVcfEmpty = "No variant left after filtering.",
     ensDbFilter = "Invalid EnsDb filter",
     genomeSeqinfo = "genomeSeqinfo bug?",
     genoSampleRanges.rows = "genoSampleRanges$rows bug?",

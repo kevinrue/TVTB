@@ -1625,6 +1625,11 @@ shinyServer(function(input, output, clientData, session) {
 
             vcf <- RV[["filteredVcf"]]
 
+            validate(need(
+                nrow(vcf) > 0,
+                Msgs[["filterVcfEmpty"]]),
+                errorClass = "optional")
+
             if (input$phenoAnalysed == "None"){
                 colData(vcf)[,"Phenotype"] <- factor("All")
                 plotPhenotype <- "Phenotype"
