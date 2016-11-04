@@ -42,14 +42,14 @@ Using `devtools`:
     if (!require("devtools")){
         install.packages("devtools")
     }
-    # Latest BioC release (daily)
+    # Latest BioC release
     devtools::install_github("Bioconductor-mirror/TVTB", ref="release-3.4")
-    # Latest BioC devel (daily)
+    # Latest BioC devel
     devtools::install_github("Bioconductor-mirror/TVTB", ref="master")
-    # Development repository (immediate)
+    # Development repository
     devtools::install_github("kevinrue/TVTB")
     # Specific commit
-    devtools::install_github("kevinrue/TVTB", ref="7559ec0")
+    devtools::install_github("kevinrue/TVTB", ref="99966dda")
 
 ## Tests
 
