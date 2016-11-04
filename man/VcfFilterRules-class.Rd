@@ -25,7 +25,7 @@
 \alias{c,VcfFilterRules-method}
 
 % Evaluation:
-\alias{eval-methods}
+\alias{eval,VcfFilterRules,VCF-method}
 
 \title{VcfFilterRules class objects}
 

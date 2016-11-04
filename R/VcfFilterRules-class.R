@@ -168,24 +168,24 @@ setMethod(
 
 setMethod(
     f = "eval",
-    signature = c("VcfFixedRules", "ExpandedVCF"),
-    definition = function(expr, envir){
+    signature = c("VcfFixedRules", "VCF"),
+    definition = function(expr, envir, enclos){
         # Apply filters to the fixed slot
-        eval(expr = expr, envir = fixed(envir))
+        eval(expr = expr, envir = fixed(envir), enclos = enclos)
     }
 )
 
 setMethod(
     f = "eval",
-    signature = c("VcfInfoRules", "ExpandedVCF"),
-    definition = function(expr, envir){
+    signature = c("VcfInfoRules", "VCF"),
+    definition = function(expr, envir, enclos){
         # Apply filters to the info slot
-        eval(expr = expr, envir = info(envir))
+        eval(expr = expr, envir = info(envir), enclos = enclos)
     }
 )
 
 # TODO info.key taken from TVTBParam
-.evalVepFilter <- function(expr, envir){
+.evalVepFilter <- function(expr, envir, enclos){
     # If empty filter
     if (length(expr) == 0)
         return(rep(TRUE, length(envir)))
@@ -203,7 +203,7 @@ setMethod(
     csq <- parseCSQToGRanges(
         x = envir, VCFRowID = rownames(envir), info.key = vep(expr))
     # Apply filters to the VEP predictions
-    csqBoolean <- eval(expr = expr, envir = csq)
+    csqBoolean <- eval(expr = expr, envir = csq, enclos = enclos)
     # Index of variants with 1+ prediction passing the filter
     vcfPass <- unique(mcols(csq)[csqBoolean, "VCFRowID", drop = TRUE])
     # Mark each variant with 1+ prediction passing the filter
@@ -214,16 +214,16 @@ setMethod(
 
 setMethod(
     f = "eval",
-    signature = c("VcfVepRules", "ExpandedVCF"),
-    definition = function(expr, envir){
-        .evalVepFilter(expr = expr, envir = envir)
+    signature = c("VcfVepRules", "VCF"),
+    definition = function(expr, envir, enclos){
+        .evalVepFilter(expr = expr, envir = envir, enclos = enclos)
     }
 )
 
 setMethod(
     f = "eval",
-    signature = c("VcfFilterRules", "ExpandedVCF"),
-    definition = function(expr, envir){
+    signature = c("VcfFilterRules", "VCF"),
+    definition = function(expr, envir, enclos){
         if (length(expr) == 0)
             return(rep(TRUE, length(envir)))
 
@@ -235,9 +235,12 @@ setMethod(
 
                 switch(
                     validType,
-                    fixed = eval(expr = filters, envir = fixed(envir)),
-                    info = eval(expr = filters, envir = info(envir)),
-                    vep = .evalVepFilter(expr = filters, envir = envir))
+                    fixed = eval(
+                        expr = filters, envir = fixed(envir), enclos = enclos),
+                    info = eval(
+                        expr = filters, envir = info(envir), enclos = enclos),
+                    vep = .evalVepFilter(
+                        expr = filters, envir = envir, enclos = enclos))
             },
             expr = expr,
             envir = envir)

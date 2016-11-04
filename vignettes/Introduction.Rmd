@@ -22,7 +22,7 @@ output:
     BiocStyle::pdf_document2:
         toc_newpage: true
 bibliography:
-    Introduction.bib
+    TVTB.bib
 ---
 
 ```{r, optChunkDefault, include=FALSE}
@@ -264,7 +264,7 @@ svp <- VariantAnnotation::ScanVcfParam(
 
 ```{r preprocessVariants, message=FALSE}
 # Import variants as a CollapsedVCF object
-vcf <- VariantAnnotation::readVcf(file = vcfFile, param = svp)
+vcf <- VariantAnnotation::readVcf(file = tabixVcf, param = svp)
 # Combine with phenotype information
 SummarizedExperiment::colData(vcf) <- phenotypes
 # Expand into a ExpandedVCF object (bi-allelic records)
@@ -581,12 +581,6 @@ densityVepByPhenotype(
         axis.text.y = element_text(angle = 270, hjust = 0.5)
     )
 ```
-
-\fixme{
-Offer a stacked dot-plot for situations like this one, whereby density lines
-display vertical lines of height 1 and rectangles of height 0.5 for phenotype
-levels showing only 1 or 2 variants, respectively.
-}
 
 ```{r optsDensityReset, include=FALSE}
 opts_chunk$set(optChunkDefault)

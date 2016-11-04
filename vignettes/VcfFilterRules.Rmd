@@ -1,0 +1,502 @@
+---
+title: VCF filter rules
+author:
+    -   name: Kévin Rue-Albrecht
+        email: k.rue-albrecht@imperial.ac.uk
+        affiliation: Department of Medicine, Imperial College London,
+            Hammersmith Campus, Du Cane Road, London, W12 0NN, UK
+date: "`r doc_date()`"
+package: "`r pkg_ver('TVTB')`"
+abstract: >
+    `VCF` objects of the `VariantAnnotation` package may be subsetted
+    by indices or variant (row)names. The *TVTB* package extends `FilterRules`
+    of the `S4Vectors` package to provide filter rules applicable to
+    `VCF` objects. These *VCF filter rules* facilitate filtering of variants
+    using combinations of filters applicable to FIXED fields, INFO fields,
+    and Ensembl VEP predictions stored in a given INFO field.
+vignette: >
+    %\VignetteIndexEntry{VCF filter rules}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}
+output:
+    BiocStyle::pdf_document2:
+        toc_newpage: true
+bibliography:
+    TVTB.bib
+---
+
+# Motivation {#Motivation}
+
+## Background
+
+`VCF` objects of the `r Biocpkg("VariantAnnotation")` package contain a
+plethora of information imported from specific fields of source VCF files and
+stored in dedicated slots (*e.g.* `fixed`, `info`, `geno`),
+as well as optional Ensembl VEP predictions [@RN1]
+stored under a given key of their INFO slot.
+
+This information may be used to identify and filter variants of interest
+for further analyses.
+However, the size of genetic data sets and the variety of filter
+rules---and their combinatorial explosion---create
+considerable challenges in terms of workspace memory and entropy.
+
+The `FilterRules` class implemented in the `r Biocpkg("S4Vectors")` package
+provides a powerful tool to define flexible 
+and lightweight filter rules in the form of
+`expression` and `function` objects, evaluated within a given environment.
+The `r Biocpkg("TVTB")` package extends this existing `FilterRules` class
+into novel classes of *VCF filter rules*,
+each applicable to information stored in the distinct slots of `VCF`
+objects (*i.e.* `CollapsedVCF` and `ExpandedVCF` classes),
+as described below:
+
+|       Class       | Motivation                                              |
+| :--------------:  | :------------------------------------------------------ |
+| `VcfFixedRules`   | Filter rules applicable to the `fixed` slot of an       |
+|                   | `VCF` object.                                   |
+|                   |                                                         |
+|  `VcfInfoRules`   | Filter rules applicable to the `info` slot of an        |
+|                   | `VCF` object.                                   |
+|                   |                                                         |
+|  `VcfVepRules`    | Filter rules applicable to the Ensembl VEP predictions  |
+|                   | stored in a given INFO key of an `VCF` object.  |
+|                   |                                                         |
+| `VcfFilterRules`  | Combination of `VcfFixedRules`, `VcfInfoRules`, and     |
+|                   |  `VcfVepRules` applicable to a `VCF` object.            |
+
+Table: Motivation for each of the new classes extending `FilterRules`
+to define *VCF filter rules*.
+
+## Features {#Features}
+
+As they inherit from the `FilterRules` class,
+these new classes benefit from accessors and methods defined for their
+parent class, including:
+
+* individual *VCF filter rules* can be toggled between active and inactive
+    states
+* *VCF filter rules* can be subsetted and replaced
+
+To account for the structure of `VCF` objects, some of the new
+*VCF filter rules* classes implemented in the `r Biocpkg("TVTB")` package
+require additional information stored in new slots of the 
+filter objects, associated with new accessor methods.
+For instance:
+
+* `VcfVepRules` require the INFO key where predictions of the
+    Ensembl Variant Effect Predictor are stored in a `VCF` object.
+    The `vep` accessor method may be used to query this slot.
+* `VcfFilterRules`---which may combine any number of filter rules stored in
+    `VcfFixedRules`, `VcfInfoRules`, `VcfVepRules`, and other
+    `VcfFilterRules` objects---
+    mark each filter rule with their type in the combined
+    object. The information is stored in the `type` slot, which may be
+    accessed using the *read-only* accessor method `type`.
+
+# Demonstration data {#DemoData}
+
+For the purpose of demonstrating the utility and usage of *VCF filter rules*,
+a set of variants and associated phenotype information was
+obtained from the
+[1000 Genomes Project](http://www.1000genomes.org) Phase 3 release.
+It can be imported as a `CollapsedVCF` object using the following code:
+
+```{r makeCollapsedVCF}
+library(TVTB)
+extdata <- system.file("extdata", package = "TVTB")
+vcfFile <- file.path(extdata, "chr15.phase3_integrated.vcf.gz")
+tabixVcf <- Rsamtools::TabixFile(file = vcfFile)
+vcf <- VariantAnnotation::readVcf(file = tabixVcf)
+```
+
+VCF filter rules may be applied to `ExpandedVCF` objects equally:
+
+```{r makeExpandedVCF}
+evcf <- VariantAnnotation::expand(x = vcf, row.names = TRUE)
+```
+
+## CollapsedVCF and ExpandedVCF {#VcfClasses}
+
+As described in the documentation of the `r Biocpkg("VariantAnnotation")`
+package, the key difference between `CollapsedVCF` and `ExpandedVCF` objects
+---both extending the `VCF` class---is
+the expansion of multi-allelic records into bi-allelic records, respectively.
+In other words (quoting the `r Biocpkg("VariantAnnotation")` documentation):
+
+> "`CollapsedVCF` objects contains the `ALT` data as a
+> `DNAStringSetList` allowing for multiple alleles per variant.
+> In contrast, the `ExpandedVCF` stores the `ALT` data as a `DNAStringSet`
+> where the ALT column has been expanded to create a flat form of the data
+> with one row per variant-allele combination."
+
+This difference has implications for filter rules using the `ALT` field,
+as demonstrated in a [later section](#AltField).
+
+# Fields available for the definition of filter rules {#VcfFields}
+
+Let us first examine which fields (*i.e.* columns)
+are available in the `VCF` objects to create *VCF filter rules*:
+
+```{r simpleRules}
+fixedVcf <- colnames(fixed(vcf))
+fixedVcf
+infoVcf <- colnames(info(vcf))
+infoVcf
+csq <- ensemblVEP::parseCSQToGRanges(x = evcf)
+vepVcf <- colnames(mcols(csq))
+vepVcf
+```
+
+\bioccomment{
+Although multi-allelic records present in `CollapsedVCF` objects 
+are expanded into bi-allelic records
+in `ExpandedVCF` objects, names fields in the different slots are identical
+in the corresponding collapsed and expanded objects.
+}
+
+# Filter rules using a single raw field {#SingleFieldFilter}
+
+The value of a particular field can be used to define an `expression`
+that represents a simple filter rule based on that value.
+Multiple rules may be stored in any one `FilterRules` objects.
+In addition, filter rules should ideally be named
+to facilitate their use, subsetting, and (de-)activation,
+but also as a reminder of the purpose of each particular rule.
+For instance, in the chunk of code below, two filter rules are defined
+using fields of the `fixed` slot:
+
+* A rule named `pass` identifies variants for which the value in the `FILTER` 
+    field is `"PASS"`
+* A rule named `qual20` identifies variants where the value in the `QUAL` field
+    is greater than or equal to `20`
+
+```{r simpleFixedRules}
+fixedRules <- VcfFixedRules(exprs = list(
+    pass = expression(FILTER == "PASS"),
+    qual20 = expression(QUAL >= 20)
+))
+active(fixedRules["qual20"]) <- FALSE
+summary(evalSeparately(fixedRules, vcf))
+```
+
+\bioccomment{
+Deactivated rules (*e.g.* `qual20`) return `TRUE` for all variants.
+}
+
+# Filter rules using multiple raw fields {#MultipleFieldsFilter}
+
+It is also possible for a `FilterRules` to use multiple fields
+(of the same `VCF` slot) in a single `expression`.
+In the chunk of code below, the VCF filter rule identifies variants
+for which both the `REF` and `ALT` values (in the INFO slot)
+are one of the four nucleotides (*i.e.* single nucleotide polymorphisms; SNPs):
+
+```{r addFixedRule}
+nucleotides <- c("A", "T", "G", "C")
+SNPrule <- VcfFixedRules(exprs = list(
+    SNP = expression(
+    as.character(REF) %in% nucleotides &
+        as.character(ALT) %in% nucleotides)
+))
+summary(evalSeparately(SNPrule, evcf, enclos = .GlobalEnv))
+```
+
+Some considerations regarding the above filter rule:
+
+* considering that the filter rule requires the `nucleotides` character vector,
+    the global environment must be supplied as the enclosing environment to
+    successfully evaluate the expression
+* `REF` and `ALT` are stored as `DNAStringSet` in `CollapsedVCF` objects
+    and must be converted to `character`
+    in order to successfully apply the method `%in%`.
+
+\fixme{
+The `append` method (check also the `c` method)
+currently returns a `FilterRules`
+object when applying it to any of the child classes.
+The `append` method must be overridden for each child class defined in `TVTB`.
+For instance, the following code should return a `VcfFixedRules` object:
+    fixedRules <- append(fixedRules, VcfFixedRules(list(
+        SNP = expression(
+        as.character(REF) %in% nucleotides &
+            as.character(ALT) %in% nucleotides)
+    )))
+}
+
+# Filter rules involving calculations {#CalculationFilter}
+
+The `expression` that defines filter rules may also include calculations.
+In the chunk of code below, two simple filter rules are defined
+using fields of the `info` slot:
+
+* A rule named `samples` identifies variants where at least 90% of samples
+    have data (*i.e.* the `NS` value is greater than or equal to `0.9`
+    times the total number of samples)
+* A rule named `avgSuperPopAF` calculates the average of the allele frequencies
+    calculated in each the five super-populations, and
+    subsequently identifies variants with an average value greater than `0.05`.
+
+```{r simpleInfoRules}
+infoRules <- VcfInfoRules(exprs = list(
+    samples = expression(NS > (0.9 * ncol(evcf))),
+    avgSuperPopAF = expression(
+        (EAS_AF + EUR_AF + AFR_AF + AMR_AF + SAS_AF) / 5 > 0.05
+    )
+))
+summary(evalSeparately(infoRules, evcf, enclos = .GlobalEnv))
+```
+
+\bioccomment{
+Here, the global environment must be supplied as the filter rule requires
+the `evcf` object.
+}
+
+# Filter rules as functions {#FunctionFilter}
+
+It may be more convenient to define filters as a `function` objects.
+For instance, the chunk of code below:
+
+* first defines a function that:
+    + expects the `info` slot of a `VCF` object as input
+    + identifies variants where at least two thirds of the super-populations
+        show an allele frequency greater than 5%
+* defines a filter rule using the above function
+
+```{r infoFunctionRule}
+AFcutoff <- 0.05
+popCutoff <- 2/3
+filterFUN <- function(envir){
+    # info(vcf) returns a DataFrame; rowSums below requires a data.frame
+    df <- as.data.frame(envir)
+    # Identify fields storing allele frequency in super-populations
+    popFreqCols <- grep("[[:alpha:]]{3}_AF", colnames(df))
+    # Count how many super-population have an allele freq above the cutoff
+    popCount <- rowSums(df[,popFreqCols] > AFcutoff)
+    # Convert the cutoff ratio to a integer count
+    popCutOff <- popCutoff * length(popFreqCols)
+    # Identifies variants where enough super-population pass the cutoff
+    testRes <- (popCount > popCutOff)
+    # Return a boolean vector, required by the eval method
+    return(testRes)
+}
+funFilter <- VcfInfoRules(exprs = list(
+    commonSuperPops = filterFUN
+))
+summary(evalSeparately(funFilter, evcf))
+```
+
+\bioccomment{
+Filter rules written as functions may use values in the the global environment,
+while being evaluated using the `VCF` object as environment.
+}
+
+Notably, the `filterFUN` function may also be applied separately to the
+`info` slot of `VCF` objects:
+
+```{r applyInfoFunction}
+summary(filterFUN(info(evcf)))
+```
+
+# Pattern matching {#PatternFilter}
+
+The `grepl` function is particularly suited for the purpose of `FilterRules`
+as they return a `logical` vector:
+
+```{r greplFilter}
+missenseFilter <- VcfVepRules(
+    exprs = list(
+        exact = expression(Consequence == "missense_variant"),
+        grepl = expression(grepl("missense", Consequence))
+        ),
+    vep = "CSQ")
+summary(evalSeparately(missenseFilter, evcf))
+```
+
+In the above chunk of code:
+
+* the `exact` filter rule matches only the given value associated
+    with `27` variants,
+* the `grepl` filter rule also matches an extra two variants
+    associated with the value `"missense_variant&splice_region_variant"`
+    (but not the `"missense_variant"` value)
+
+# Using ALT data in `CollapsedVCF` and `ExpandedVCF` objects {#AltField}
+
+As detailed in an earlier section introducing the
+[demonstration data](#VcfClasses), and more thoroughly in the documentation of
+the `r Biocpkg("VariantAnnotation")` package, 
+`CollapsedVCF` and `ExpandedVCF` classes differ in the class of data
+stored in the `ALT` field of their respective `fixed` slot.
+As as result, *VCF filter rules* using
+data from this field must take into account the `VCF` class in order to
+handle the data appropriately:
+
+## `ExpandedVCF` {#ExpandedVCF}
+
+A key aspect of `ExpandedVCF` objects is that the `ALT` field of their
+`info` slot may only store a single allele per record as a `DNAStringSet`
+object.
+
+In an earlier section that demonstrated
+[Filter rules using multiple raw fields](#MultipleFieldsFilter),
+`ALT` data of a `ExpandedVCF` object had to be re-typed from `DNAStringSet`
+to `character` before the `%in%` function could be applied.
+
+Nevertheless, *VCF filter rules* may also make use of methods associated with
+the `DNAStringSet` class.
+For instance, insertions may be identified using the fields `REF` and `ALT`
+of the `fixed` slot:
+
+```{r fixedInsertionFilter}
+fixedInsertionFilter <- VcfFixedRules(exprs = list(
+    isInsertion = expression(
+        Biostrings::width(ALT) > Biostrings::width(REF)
+    )
+))
+evcf_fixedIns <- subsetByFilter(evcf, fixedInsertionFilter)
+as.data.frame(fixed(evcf_fixedIns)[,c("REF", "ALT")])
+```
+
+Here, the above `VcfFixedRules` is synonym to an independent
+`VcfVepRules` using the Ensembl VEP prediction `VARIANT_CLASS`:
+
+```{r vepInsertionFilter}
+vepInsertionFilter <- VcfVepRules(exprs = list(
+    isInsertion = expression(VARIANT_CLASS == "insertion")
+))
+evcf_vepIns <- subsetByFilter(evcf, vepInsertionFilter)
+as.data.frame(fixed(evcf_vepIns)[,c("REF", "ALT")])
+```
+
+## `CollapsedVCF` {#CollapsedVCF}
+
+In contrast to `ExpandedVCF`, `CollapsedVCF` may contain more than one allele
+per record in their `ALT` field, represented by a `DNAStringSetList` object.
+
+As a result, *VCF filter rules* using the `ALT` field of
+the `info` slot in `CollapsedVCF` objects
+may use methods dedicated to `DNAStringSetList` to handle the data.
+For instance,
+multi-allelic variants may be identified by the following `VcfFixedRules`:
+
+```{r fixedMultiallelicFilter}
+multiallelicFilter <- VcfFixedRules(exprs = list(
+    multiallelic = expression(lengths(ALT) > 1)
+))
+summary(eval(multiallelicFilter, vcf))
+```
+
+# Combination of multiple types of *VCF filter rules*  {#VcfFilterRules}
+
+Any number of `VcfFixedRules`, `VcfInfoRules`, and `VcfVepRules`---or
+even `VcfFilterRules` themselves---may
+be combined into a larger object of class `VcfFilterRules`.
+Notably, the `active` state of each filter rule is transferred to the
+combined object.
+Even though the `VcfFilterRules` class acts as a container for multiple types
+of *VCF filter rules*, the resulting `VcfFilterRules` object can be evaluated
+and used to subset `VCF` objects exactly like any of the classes defining
+more specific *VCF filter rules*.
+
+During the creation of `VcfFixedRules` objects, each *VCF filter rule*
+being combined is marked with a *type* value,
+indicating the VCF slot that the filter rule must be applied to.
+This information is stored in the new `type` slot of `VcfFixedRules` objects.
+For instance, it is possible to combine two `VcfFixedRules`
+(containing two and one filter rules, respectively), one 
+`VcfInfoRules`, and one `VcfVepRules` defined earlier in this vignette:
+
+```{r combineRules}
+vignetteRules <- VcfFilterRules(
+    fixedRules,
+    SNPrule,
+    infoRules,
+    vepInsertionFilter
+)
+vignetteRules
+active(vignetteRules)
+type(vignetteRules)
+summary(evalSeparately(vignetteRules, evcf, enclos = .GlobalEnv))
+```
+
+Clearly, the *VCF filter rules* `SNP` and `isInsertion` are mutually exclusive,
+which explains the final `0` variants left after filtering.
+Conveniently, either of these rules may be deactivated before evaluating the
+remaining active filter rules:
+
+```{r combinedRulesDeactivated}
+active(vignetteRules)["SNP"] <- FALSE
+summary(evalSeparately(vignetteRules, evcf, enclos = .GlobalEnv))
+```
+
+As a result, the deactivated filter rule now returns `TRUE` for all variants,
+which leaves a final `2` variants passing the remain active filter rules:
+
+* INFO/FILTER equal to `"PASS"`
+* INFO/QUAL greater than or equal to `20`
+* INFO/NS greater than 90% of the number of samples in the data set
+* Average of super-population allele frequencies greater than `0.05`
+* Ensembl VEP prediction `VARIANT_CLASS` equal to `"insertion"`
+
+Finally, the following chunk of code demonstrates how
+`VcfFilterRules` may also be created from the
+combination of `VcfFilterRules`, either with themselves
+or with any of the classes that define more specific *VCF filter rules*.
+Notably, when `VcfFilterRules` objects are being combined,
+the `type` and `active` value of each filter rule is transferred in
+the combined object.
+
+**Combine `VcfFilterRules` with `VcfVepRules`**
+```{r combineFilterVep}
+combinedFilters <- VcfFilterRules(
+    vignetteRules, # VcfFilterRules
+    missenseFilter # VcfVepRules
+)
+type(vignetteRules)
+type(combinedFilters)
+active(vignetteRules)
+active(missenseFilter)
+active(combinedFilters)
+```
+
+**Combine multiple `VcfFilterRules` with `VcfFilterRules` (and more)**
+
+To demonstrate this action, another `VcfFilterRules` must first be created:
+
+```{r combineFilterFilter}
+secondVcfFilter <- VcfFilterRules(missenseFilter)
+secondVcfFilter
+```
+
+It is now possible to combine the two `VcfFilterRules`, even with another
+`VcfInfoRules` object:
+
+```{r combineMultipleRules}
+manyRules <- VcfFilterRules(
+    vignetteRules, # VcfFilterRules
+    secondVcfFilter, # VcfFilterRules
+    funFilter # VcfInfoRules
+)
+manyRules
+active(manyRules)
+type(manyRules)
+summary(evalSeparately(manyRules, evcf, enclos = .GlobalEnv))
+```
+
+Critically, users must be careful to combine rules **all** compatible with
+the class of `VCF` object in which it will be evaluated
+(*i.e.* `CollapsedVCF` or `ExpandedVCF`).
+
+# Session info {#SessionInfo}
+
+Here is the output of `sessionInfo()` on the system on which this
+document was compiled:
+
+```{r sessionInfo, echo=FALSE}
+sessionInfo()
+```
+
+
+[R]: http://r-project.org
+[RStudio]: http://www.rstudio.com/

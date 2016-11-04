@@ -36,10 +36,9 @@
 \alias{c,VcfVepRules-method}
 
 % Evaluation:
-\alias{eval,VcfFixedRules,ExpandedVCF-method}
-\alias{eval,VcfInfoRules,ExpandedVCF-method}
-\alias{eval,VcfVepRules,ExpandedVCF-method}
-\alias{eval,VcfFilterRules,ExpandedVCF-method}
+\alias{eval,VcfFixedRules,VCF-method}
+\alias{eval,VcfInfoRules,VCF-method}
+\alias{eval,VcfVepRules,VCF-method}
 
 \title{VCF filters class objects sub-types}
 
