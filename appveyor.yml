@@ -43,9 +43,10 @@ build_script:
   - echo Current directory=%CD%
   - travis-tool.sh install_bioc_deps
   - travis-tool.sh install_bioc ensemblVEP EnsDb.Hsapiens.v75
-  - travis-tools.sh install_github Bioconductor-mirror/S4Vectors
-  - travis-tools.sh install_github Bioconductor-mirror/SummarizedExperiment
-  - travis-tools.sh install_github Bioconductor-mirror/Rsamtools
+  - travis-tool.sh install_bioc rtracklayer S4Vectors XVector IRanges Biostrings GenomicRanges GenomicAlignments
+  #- travis-tool.sh install_github Bioconductor-mirror/S4Vectors
+  #- travis-tool.sh install_github Bioconductor-mirror/SummarizedExperiment
+  #- travis-tool.sh install_github Bioconductor-mirror/Rsamtools
   #- Rscript -e 'BiocInstaller::biocValid(fix=TRUE)'
   #- Rscript -e 'print(c);showMethods(\"c\", classes = \"GenomicRanges\", includeDefs = TRUE)'
   #- Rscript -e 'library(GenomicRanges);print(c);showMethods(\"\c", classes = \"GenomicRanges\", includeDefs = TRUE)'
