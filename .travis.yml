@@ -1,9 +1,4 @@
-sudo: required
 
-os:
-  - linux
-  - osx
-  
 language: r
 use_bioc: true
 bioc_required: true
@@ -12,8 +7,8 @@ r: bioc-release
 before_install:
     - Rscript -e 'source(file = "http://bioconductor.org/biocLite.R");useDevel(devel = TRUE)'
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then tlmgr install bera nowidow parnotes marginfix; fi
-    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo tlmgr install titling bera nowidow parnotes marginfix titlesec; fi
-    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then Rscript -e 'BiocInstaller::biocLite(pkgs = c("BiocParallel", "Biostrings", "ensembldb", "ensemblVEP", "GenomeInfoDb", "GenomicRanges", "ggplot2", "IRanges", "reshape2", "Rsamtools", "S4Vectors", "SummarizedExperiment", "VariantAnnotation"))';fi
+#    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo tlmgr install titling bera nowidow parnotes marginfix titlesec; fi
+#    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then Rscript -e 'BiocInstaller::biocLite(pkgs = c("BiocParallel", "Biostrings", "ensembldb", "ensemblVEP", "GenomeInfoDb", "GenomicRanges", "ggplot2", "IRanges", "reshape2", "Rsamtools", "S4Vectors", "SummarizedExperiment", "VariantAnnotation"))';fi
     
 warnings_are_errors: false
 
