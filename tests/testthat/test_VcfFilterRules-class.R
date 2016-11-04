@@ -34,6 +34,7 @@ vepRules <- VcfVepRules(exprs = list(
 ))
 
 vcfRules <- VcfFilterRules(fixedRules, infoRules, vepRules)
+filterNoVep <- VcfFilterRules(fixedRules, infoRules)
 
 # Constructors ----
 
@@ -47,6 +48,11 @@ test_that("Constructors produce a valid object",{
 
     expect_s4_class(vcfRules, "VcfFilterRules")
 
+    vepANN <-  VcfVepRules(exprs = list(
+        nonsense = expression(Fake == "NA")), vep = "ANN")
+    expect_error(VcfFilterRules(vepRules, vepANN))
+
+    expect_identical(filterNoVep@vep, NA_character_)
 })
 
 # Accessors ----
@@ -132,27 +138,27 @@ test_that("[ and [[ methods assign values", {
     vcfRules[[1]] <- newVepFilter
     expect_identical(vcfRules[[1]], newVepFilter)
 
-    # expect_error(
-    #     expect_s4_class(fixedRules[[1, 2]] <- newFixedFilter)
-    # )
+    expect_error(
+        expect_s4_class(fixedRules[[1, 2]] <- newFixedFilter)
+    )
 
-    # expect_error(
-    #     expect_s4_class(infoRules[[1, 2]] <- newInfoFilter)
-    # )
-    #
-    # expect_error(
-    #     expect_s4_class(vepRules[[1, 2]] <- newVepFilter)
-    # )
-    #
-    # expect_error(
-    #     expect_s4_class(vcfRules[[1, 2]] <- newVepFilter)
-    # )
+    expect_error(
+        expect_s4_class(infoRules[[1, 2]] <- newInfoFilter)
+    )
+
+    expect_error(
+        expect_s4_class(vepRules[[1, 2]] <- newVepFilter)
+    )
+
+    expect_error(
+        expect_s4_class(vcfRules[[1, 2]] <- newVepFilter)
+    )
 
 })
 
 # coerce method ----
 
-test_that("[ and [[ methods assign values", {
+test_that("as method coerces objects", {
 
     expect_s4_class(
         as(object = fixedRules, Class = "VcfFilterRules"),
@@ -167,6 +173,32 @@ test_that("[ and [[ methods assign values", {
     expect_s4_class(
         as(object = vepRules, Class = "VcfFilterRules"),
         "VcfFilterRules"
+    )
+
+})
+
+# c method ----
+
+test_that("c method combine values", {
+
+    expect_equal(
+        length(c(fixedRules, infoRules)),
+        length(fixedRules) + length(infoRules)
+    )
+
+    expect_equal(
+        length(c(infoRules, vepRules)),
+        length(infoRules) + length(vepRules)
+    )
+
+    expect_equal(
+        length(c(vepRules, fixedRules)),
+        length(vepRules) + length(fixedRules)
+    )
+
+    expect_equal(
+        length(c(filterNoVep, vepRules)),
+        length(filterNoVep) + length(vepRules)
     )
 
 })

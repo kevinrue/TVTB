@@ -122,7 +122,7 @@ setMethod(
         ))))
 
         if (length(vepKey) > 1)
-            stop("Only a single vep key is allowed")
+            stop("All VcfVepFilter objects must have the same vep slot")
         else if (length(vepKey) == 1)
             .Object@vep <- vepKey
         else
