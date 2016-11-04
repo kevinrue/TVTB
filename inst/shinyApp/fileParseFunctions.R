@@ -137,7 +137,7 @@ parseMultipleVcf<- function(
     # The functions gets here in two situations:
     ## 1. genomic ranges span multiple chromosomes/vcfFiles
     ## 2. no genomic range was given: all vcfFiles in the folder are imported
-    message("Parsing ", length(vcfFiles), " VCF files ...")
+    message("Parsing ", length(vcfFiles), " VCF file(s) ...")
     # Import from each file in parallel (already ExpandedVCF)
     vcfs <- BiocParallel::bplapply(
         X = vcfFiles,
@@ -147,10 +147,11 @@ parseMultipleVcf<- function(
         BPPARAM = BPPARAM
     )
 
-    message("Combining variants from multiple VCF files...")
     # Combine the imported objects
-    if (length(vcfs) > 1)
-        vcf <- do.call(what = rbind, args = vcfs)
+    if (length(vcfs) > 1){
+      message("Combining variants from multiple VCF files...")
+      vcf <- do.call(what = rbind, args = vcfs)
+    }
     else
         vcf <- vcfs[[1]]
 
