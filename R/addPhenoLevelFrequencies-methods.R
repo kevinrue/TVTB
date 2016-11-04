@@ -66,7 +66,9 @@ setMethod(
             info(vcf) <- info(vcf)[,-matches]
             info(header(vcf)) <- info(header(vcf))[-matches,]
         } else{
-            stop("INFO keys already present:", colnames(info(vcf))[matches])
+            stop(
+                "INFO keys already present:",
+                paste(colnames(info(vcf))[matches], sep = ", "))
         }
 
     return(vcf)

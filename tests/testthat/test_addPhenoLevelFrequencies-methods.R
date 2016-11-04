@@ -16,6 +16,24 @@ tparam <- tSVEParam(
 vcf <- preprocessVariants(
     file = vcfFile, param = tparam, phenos = phenoFile)
 
+# Create a VCF object with a pre-existing INFO key
+
+vcfInfoExist <- vcf
+
+newInfoHeader <- DataFrame(
+    Number = rep(1, 2),
+    Type = "Integer",
+    Description = "Pre-existing INFO field",
+    row.names = c("MAF", "pop_GBR_MAF"))
+
+newInfoData <- DataFrame(
+    MAF = seq_along(vcfInfoExist),
+    pop_GBR_MAF = rev(seq_along(vcfInfoExist))
+)
+
+info(header(vcfInfoExist)) <- rbind(info(header(vcfInfoExist)), newInfoHeader)
+info(vcfInfoExist) <- cbind(info(vcfInfoExist), newInfoData)
+
 # Signatures ----
 
 test_that("addPhenoLevelFrequencies supports all signatures",{
@@ -35,6 +53,27 @@ test_that("addPhenoLevelFrequencies supports all signatures",{
             het = unlist(het(tparam), use.names = FALSE),
             alt = unlist(hAlt(tparam), use.names = FALSE)),
         "ExpandedVCF"
+    )
+
+})
+
+# .checkInputsPLF ----
+
+test_that(".checkInputsPLF catches invalid inputs", {
+
+    expect_error(
+        addPhenoLevelFrequencies(
+            vcf = vcf, pheno = "missing", level = "GBR", param = tparam)
+    )
+
+    expect_error(
+        addPhenoLevelFrequencies(
+            vcf = vcf, pheno = "pop", level = "missing", param = tparam)
+    )
+
+    expect_error(
+        addPhenoLevelFrequencies(
+            vcf = vcfInfoExist, pheno = "pop", level = "GBR", param = tparam)
     )
 
 })
