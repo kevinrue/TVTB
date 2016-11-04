@@ -445,6 +445,13 @@ for all variants.
 
 # Summarising Ensembl VEP predictions {#Summarise}
 
+As soon as genetic and phenotypic information are imported
+into an `ExpandedVCF` object,
+or after the object was extended with additional information,
+the scientific value of the data may be revealed by
+an immense variety of summary statistics and graphical representations.
+This section presents severeal ideas implemented in `r Biocpkg("TVTB")`.
+
 ## Counts of discrete Ensembl VEP predictions {#SummariseDiscrete}
 
 ### Barplot {#SummariseDiscreteBarplot}
