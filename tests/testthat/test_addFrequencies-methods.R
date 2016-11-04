@@ -33,7 +33,7 @@ newInfoHeader <- DataFrame(
     row.names = c("MAF", "pop_GBR_MAF"))
 info(header(vcfHeaderExist)) <- rbind(info(header(vcfHeaderExist)), newInfoHeader)
 
-vcfDataExist <- vcf
+vcfDataExist <- vcfHeaderExist
 newInfoData <- DataFrame(
     MAF = seq_along(vcfHeaderExist),
     pop_GBR_MAF = rev(seq_along(vcfHeaderExist))
@@ -140,16 +140,18 @@ test_that(".checkFrequencyInfo overwrites INFO data fields", {
     # )
 
     # All the below produce a warning due to validity check of ExpandedVCF
-    expect_warning(
-        addFrequencies(
-            vcf = vcfDataExist, param = tparam, force = TRUE)
+    expect_message(
+        object = addFrequencies(
+            vcf = vcfDataExist, param = tparam, force = TRUE),
+        regexp = "Overwriting"
     )
 
-    expect_warning(
-        addFrequencies(
+    expect_message(
+        object = addFrequencies(
             vcf = vcfDataExist,
             phenos = list(pop = "GBR"),
-            param = tparam, force = TRUE)
+            param = tparam, force = TRUE),
+        regexp = "Overwriting"
     )
 
 })
