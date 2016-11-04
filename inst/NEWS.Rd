@@ -1,6 +1,16 @@
 \name{TVTB-NEWS}
 \title{NEWS: The VCF Tool Box}
 
+\section{Changes in version 1.1.3}{
+\subsection{Minor changes}{
+\itemize{
+\item \emph{Shiny} app warns in console if no \code{EnsDb} package
+    installed/selected.
+\item Branches tracked by Travis CI.
+}
+}
+}
+
 \section{Changes in version 1.1.2 2016-10-21}{
 \subsection{Minor changes}{
 \itemize{
