@@ -369,135 +369,152 @@ shinyServer(function(input, output, clientData, session) {
         eventExpr = input$buttonFrequencies,
         handlerExpr = {
 
-            # Remove INFO keys for unticked boxes
-            # Add values for ticked boxes
+            withProgress(
+                max = 8,
+                message = "Progress",
+                detail = Tracking[["preprocessing"]],{
+                    # Remove INFO keys for unticked boxes
+                    # Add values for ticked boxes
 
-            # Phenotypes selected
-            selectedPhenoName <- input$phenoAddFrequencies
-            selectedPhenoLevels <- input$phenoLevelFreqCheckboxes
+                    # Phenotypes selected
+                    selectedPhenoName <- input$phenoAddFrequencies
+                    selectedPhenoLevels <- input$phenoLevelFreqCheckboxes
 
-            # Info in VCF
-            vcf <- RV[["vcf"]]
-            req(vcf)
-            vcfInfoCols <- colnames(info(vcf))
+                    # Info in VCF
+                    vcf <- RV[["vcf"]]
+                    req(vcf)
+                    vcfInfoCols <- colnames(info(vcf))
 
-            # Phenotype levels available
-            phenos <- colData(vcf)
-            choices <- levels(phenos[,input$phenoAddFrequencies])
+                    # Phenotype levels available
+                    phenos <- colData(vcf)
+                    choices <- levels(phenos[,input$phenoAddFrequencies])
 
-            # pre1) collect all suffixes (to check existence of fields)
-            tparam <- tparam()
-            suffixes <- c(
-                names(genos(tparam)),
-                aaf(tparam),
-                maf(tparam))
+                    # pre1) collect all suffixes (to check existence of fields)
+                    tparam <- tparam()
+                    suffixes <- c(
+                        names(genos(tparam)),
+                        aaf(tparam),
+                        maf(tparam))
 
-            # pre2) identify unticked phenoLevels
+                    # pre2) identify unticked phenoLevels
 
-            phenoLevelsUnticked <- choices[which(
-                !choices %in% selectedPhenoLevels
-            )]
+                    phenoLevelsUnticked <- choices[which(
+                        !choices %in% selectedPhenoLevels
+                    )]
 
-            if (length(phenoLevelsUnticked) > 0){
+                    if (length(phenoLevelsUnticked) > 0){
 
-                # Identify unticked phenoLevels present in vcf INFO (to remove)
-                # 1) Generate all expected key names for those phenoLevels
-                untickedPhenoLevelKeys <- sapply(
-                    X = phenoLevelsUnticked,
-                    FUN = function(phenoLevel){
-                        return(paste(
-                            input$phenoAddFrequencies,
-                            phenoLevel,
-                            suffixes,
-                            sep = "_"
-                        ))
-                    },
-                    simplify = FALSE
-                ) # named list: names=phenoLevel, value=keys
+                        shiny::incProgress(
+                            amount = 1,
+                            detail = Tracking[["rmInfoData"]])
 
-                # 4) identify phenoLevels with all keys present
-                # (in data, not header)
-                areAllPhenoLevelKeysPresent <- sapply(
-                    X = untickedPhenoLevelKeys,
-                    FUN = function(keys){
-                        return(all(keys %in% vcfInfoCols))
+                        # Identify unticked phenoLevels present in vcf INFO
+                        # (to remove)
+                        # 1) Generate all expected key names for phenoLevels
+                        untickedPhenoLevelKeys <- sapply(
+                            X = phenoLevelsUnticked,
+                            FUN = function(phenoLevel){
+                                return(paste(
+                                    input$phenoAddFrequencies,
+                                    phenoLevel,
+                                    suffixes,
+                                    sep = "_"
+                                ))
+                            },
+                            simplify = FALSE
+                        ) # named list: names=phenoLevel, value=keys
+
+                        # 4) identify phenoLevels with all keys present
+                        # (in data, not header)
+                        areAllPhenoLevelKeysPresent <- sapply(
+                            X = untickedPhenoLevelKeys,
+                            FUN = function(keys){
+                                return(all(keys %in% vcfInfoCols))
+                            }
+                        ) # named boolean vector: names=phenoLevel
+
+                        phenoLevelKeysRemove <- do.call(
+                            c,
+                            untickedPhenoLevelKeys[
+                                which(areAllPhenoLevelKeysPresent)]
+                        ) # vector of keys to remove
+
+                        if (length(phenoLevelKeysRemove))
+                            message(
+                                "Removing INFO keys for levels: ",
+                                paste(phenoLevelsUnticked, collapse = ", "))
+                        RV[["vcf"]] <- dropInfo(
+                            vcf = RV[["vcf"]],
+                            key = phenoLevelKeysRemove,
+                            slot = "both")
+
+                        RV[["latestFrequenciesRemoved"]] <-
+                            names(areAllPhenoLevelKeysPresent)[
+                                which(areAllPhenoLevelKeysPresent)
+                                ]
+                    } else {
+                        RV[["latestFrequenciesRemoved"]] <- character()
                     }
-                ) # named boolean vector: names=phenoLevel
 
-                phenoLevelKeysRemove <- do.call(
-                    c,
-                    untickedPhenoLevelKeys[which(areAllPhenoLevelKeysPresent)]
-                ) # vector of keys to remove
+                    # Identify ticked phenoLevels absent in info slot
+                    # (to calculate)
+                    if (length(selectedPhenoLevels) > 0){
 
-                if (length(phenoLevelKeysRemove))
-                    message(
-                        "Removing INFO keys for levels: ",
-                        paste(phenoLevelsUnticked, collapse = ", "))
-                    RV[["vcf"]] <- dropInfo(
-                        vcf = RV[["vcf"]],
-                        key = phenoLevelKeysRemove,
-                        slot = "both")
+                        shiny::incProgress(
+                            amount = 1,
+                            detail = Tracking[["addInfoData"]])
 
-                RV[["latestFrequenciesRemoved"]] <-
-                    names(areAllPhenoLevelKeysPresent)[
-                        which(areAllPhenoLevelKeysPresent)
-                        ]
-            } else {
-                RV[["latestFrequenciesRemoved"]] <- character()
-            }
+                        # 1) generate all keys expected for each phenoLevel
+                        tickedPhenoLevelKeys <- sapply(
+                            X = selectedPhenoLevels,
+                            FUN = function(phenoLevel){
+                                return(paste(
+                                    input$phenoAddFrequencies,
+                                    phenoLevel,
+                                    suffixes,
+                                    sep = "_"
+                                ))
+                            },
+                            simplify = FALSE
+                        ) # list: names=phenoLevels, value=keys
 
-            # Identify ticked phenoLevels absent in info slot (to calculate)
+                        # 2) identify phenoLevels with all keys absent
+                        # (in data, not header)
+                        areAllPhenoLevelKeysAbsent <- sapply(
+                            X = tickedPhenoLevelKeys,
+                            FUN = function(keys){
+                                return(!any(keys %in% vcfInfoCols))
+                            }
+                        ) # named boolean vector: names=phenoLevels
 
-            if (length(selectedPhenoLevels) > 0){
+                        phenoLevelsAdd <- names(
+                            areAllPhenoLevelKeysAbsent
+                            )[which(areAllPhenoLevelKeysAbsent)
+                              ] # phenoLevels to add
 
-                # 1) generate all keys expected for each phenoLevel (named list)
-                tickedPhenoLevelKeys <- sapply(
-                    X = selectedPhenoLevels,
-                    FUN = function(phenoLevel){
-                        return(paste(
-                            input$phenoAddFrequencies,
-                            phenoLevel,
-                            suffixes,
-                            sep = "_"
-                        ))
-                    },
-                    simplify = FALSE
-                ) # list: names=phenoLevels, value=keys
+                        # Format for addFrequencies input
+                        phenosAdd <- list(phenoLevelsAdd)
+                        names(phenosAdd)[[1]] <- selectedPhenoName
 
-                # 2) identify phenoLevels with all keys absent
-                # (in data, not header)
-                areAllPhenoLevelKeysAbsent <- sapply(
-                    X = tickedPhenoLevelKeys,
-                    FUN = function(keys){
-                        return(!any(keys %in% vcfInfoCols))
+                        if (length(phenoLevelsAdd) > 0)
+                            message(
+                                "Adding INFO keys for levels: ",
+                                paste(phenoLevelsAdd, collapse = ", "))
+                        RV[["vcf"]] <- addFrequencies(
+                            vcf = vcf,
+                            phenos = phenosAdd,
+                            param = tparam(),
+                            force = TRUE # watch console for warnings
+                        )
+
+                        RV[["latestFrequenciesAdded"]] <- phenosAdd[[1]]
+                    } else {
+                        RV[["latestFrequenciesAdded"]] <- character()
                     }
-                ) # named boolean vector: names=phenoLevels
 
-                phenoLevelsAdd <- names(areAllPhenoLevelKeysAbsent)[which(
-                    areAllPhenoLevelKeysAbsent
-                )] # phenoLevels to add
-
-                # Format for addFrequencies input
-                phenosAdd <- list(phenoLevelsAdd)
-                names(phenosAdd)[[1]] <- selectedPhenoName
-
-                if (length(phenoLevelsAdd) > 0)
-                    message(
-                        "Adding INFO keys for levels: ",
-                        paste(phenoLevelsAdd, collapse = ", "))
-                    RV[["vcf"]] <- addFrequencies(
-                        vcf = vcf,
-                        phenos = phenosAdd,
-                        param = tparam(),
-                        force = TRUE # keep an eye on the console for warnings
-                    )
-
-                RV[["latestFrequenciesAdded"]] <- phenosAdd[[1]]
-            } else {
-                RV[["latestFrequenciesAdded"]] <- character()
-            }
-
-            RV[["latestPhenotypeFrequency"]] <- selectedPhenoName
+                    RV[["latestPhenotypeFrequency"]] <- selectedPhenoName
+                }
+            )
 
         }
 

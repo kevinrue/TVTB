@@ -162,11 +162,20 @@ Msgs <- list(
 
 # Progress bars
 Tracking = list(
+    # Calculations
+    preprocessing = "Pre-processing data",
     calculate = "Crunching data...",
+    postprocessing = "Post-processing data",
+
+    # Plotting
     ggplot = "Assembling plot (ggplot2)",
     render = "Rendering.",
-    preprocessing = "Pre-processing data",
-    postprocessing = "Post-processing data",
+
+    # INFO frequencies
+    rmInfoData = "Dropping phenotype-level frequencies",
+    addInfoData = "Calculating phenotype-level frequencies",
+
+    # Imports
     singleVcf = "Importing from single VCF.",
     multiVcfs = "Importing from multiple VCF files."
 )
