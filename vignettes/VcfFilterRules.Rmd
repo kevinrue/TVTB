@@ -8,10 +8,12 @@ author:
 date: "`r doc_date()`"
 package: "`r pkg_ver('TVTB')`"
 abstract: >
-    `VCF` objects of the `VariantAnnotation` package may be subsetted
-    by indices or variant (row)names. The *TVTB* package extends `FilterRules`
-    of the `S4Vectors` package to provide filter rules applicable to
-    `VCF` objects. These *VCF filter rules* facilitate filtering of variants
+    Currently,
+    *VCF* objects of the *VariantAnnotation* package may be subsetted
+    by indices or variant (row)names. The *TVTB* package extends *FilterRules*
+    of the *S4Vectors* package to provide filter rules applicable to
+    *VCF* objects. These new *VCF filter rules* provide containers
+    for powerful expressions and functions to facilitate filtering of variants
     using combinations of filters applicable to FIXED fields, INFO fields,
     and Ensembl VEP predictions stored in a given INFO field.
 vignette: >
@@ -178,12 +180,19 @@ fixedRules <- VcfFixedRules(exprs = list(
     pass = expression(FILTER == "PASS"),
     qual20 = expression(QUAL >= 20)
 ))
-active(fixedRules["qual20"]) <- FALSE
+active(fixedRules)["qual20"] <- FALSE
 summary(evalSeparately(fixedRules, vcf))
 ```
 
 \bioccomment{
 Deactivated rules (*e.g.* `qual20`) return `TRUE` for all variants.
+}
+
+\bioccomment{
+`active(fixedRules["qual20"]) <- FALSE` would be wrong syntax, as it
+does not change the active state of the `fixedRules` object;
+instead, it changes the active state of a temporary object made of the
+selected filter rule.
 }
 
 ## Filter rules using multiple raw fields {#MultipleFieldsFilter}
@@ -214,10 +223,10 @@ Some considerations regarding the above filter rule:
     in order to successfully apply the method `%in%`.
 
 \fixme{
-The `append` method (check also the `c` method)
-currently returns a `FilterRules`
+The `append` method currently returns a `FilterRules`
 object when applying it to any of the child classes.
-The `append` method must be overridden for each child class defined in `TVTB`.
+The `append` method must be overridden for each child class defined in `TVTB`,
+to return an object of the same class.
 For instance, the following code should return a `VcfFixedRules` object:
     fixedRules <- append(fixedRules, VcfFixedRules(list(
         SNP = expression(

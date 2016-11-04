@@ -43,32 +43,42 @@ functionalities in a programming-free environment.
 
 Currently, major functionalities in the `r Biocpkg("TVTB")` package include:
 
+**Container for analysis parameters**
+
+* List of reference homozygote, heterozygote, and alternate homozygote
+    genotype encodings
+* Suffix of INFO fields where calculated data should be stored
+* Key of the INFO field where Ensembl VEP predictions are stored
+* Genomic ranges to analyse
+* Parameters for parallel calculations
+
 **Genotype counts and allele frequencies**
 
-* Stored in INFO keys of an `ExpandedVCF` objects
+* Calculated from the data of an `ExpandedVCF` objects
+* Stored in INFO fields of the `ExpandedVCF` object
     + overall counts and frequencies (*i.e.* across all samples)
     + counts and frequencies within level(s) of phenotype(s)
 
 **VCF filter rules**
 
-* Filter rules on the `fixed` slot of an `ExpandedVCF` object
-* Filter rules on the `info` slot of an `ExpandedVCF` object
-* Filter rules on the Ensembl VEP predictions stored in a given slot
-of an `ExpandedVCF` object
-* The above rules can be combined and used to subset an `ExpandedVCF` object
+* Filter rules applicable to the `fixed` slot of an `VCF` object
+* Filter rules applicable to the `info` slot of an `VCF` object
+* Filter rules applicable to the Ensembl VEP predictions stored in a given slot
+of an `VCF` object
+* Subset a `VCF` object using any combination of the above filter rules
 
 **Counts of discrete Ensembl VEP predictions**
 
-* in levels of a given phenotype
-    + as a `data.frame` or a stacked `r Biocpkg("ggplot2")` `geom_bar` layer
-        of counts
+* Count VEP predictions in levels of a given phenotype
+    + represented as a `data.frame` or a stacked `r Biocpkg("ggplot2")`
+    `geom_bar` layer
     + optionally faceted by another Ensembl VEP prediction (*e.g.* `"Feature"`)
     + `geom_bar` layer representing stacked *percentage* of predictions
 
 **Density of continuous Ensembl VEP predictions**
 
 * in levels of a phenotype
-    + as a `r Biocpkg("ggplot2")` `geom_density`
+    + as a `r Biocpkg("ggplot2")` `geom_density` and/or `geom_dotplot` layer
     + optionally faceted by another Ensembl VEP prediction
 
 # Installation {#Installation}

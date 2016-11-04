@@ -155,6 +155,8 @@ setMethod(
     }
 )
 
+# Setters ----
+
 setReplaceMethod(
     f = "vep", c("VcfVepRules", "character"),
     function(x, value){
@@ -273,34 +275,8 @@ setMethod(
 
 # [ ----
 
-setMethod(
-    f = "[",
-    signature = c(x="VcfFilterRules", i="ANY", j="ANY", drop="missing"),
-    definition = function(x, i, j, ..., drop = FALSE){
-
-        if (!missing(j) || length(list(...)) > 0)
-            stop("invalid subsetting")
-
-        if (!missing(i)) {
-            if (is.character(i)){
-                indexNames <- i
-                i <- match(indexNames, names(x))
-                iMissing <- which(is.na(i))
-                if (length(iMissing) > 0)
-                    stop(
-                        "names not found:",
-                        paste(indexNames[iMissing], collapse = ", "))}
-            # callNextMethod will cause validity check, filter type before
-            x@type <- slot(x, "type")[i]
-            x <- callNextMethod(x, i)
-        }
-
-        x <- .dropVcfFilterRules(x)
-
-        return(x)
-    }
-)
-
+# After subsetting/replacing, down-type a VcfFilterRules to one of the
+# more specialised classes
 .dropVcfFilterRules <- function(x){
 
     filterType <- unique(type(x))
@@ -312,7 +288,8 @@ setMethod(
 
     listData <- slot(x, "listData")
 
-    res <- switch (filterType,
+    res <- switch (
+        filterType,
         fixed = VcfFixedRules(exprs = listData, active = slot(x, "active")),
         info = VcfInfoRules(exprs = listData, active = slot(x, "active")),
         vep = VcfVepRules(
@@ -329,6 +306,238 @@ setMethod(
 
     return(res)
 }
+
+.namesToIndex <- function(indexNames, object){
+    i <- match(indexNames, names(object))
+    iMissing <- which(is.na(i))
+    if (length(iMissing) > 0)
+        stop(
+            "names not found: ",
+            paste(indexNames[iMissing], collapse = ", "))
+    return(i)
+}
+
+setMethod(
+    f = "[",
+    signature = c(x="VcfFilterRules", i="ANY", j="ANY", drop="ANY"),
+    definition = function(x, i, j, ..., drop = TRUE){
+
+        if (!missing(j) || length(list(...)) > 0)
+            stop("invalid subsetting")
+
+        if (!missing(i)) {
+            if (is.character(i)){
+                i <- .namesToIndex(indexNames = i, object = x)
+            }
+
+            # callNextMethod will cause validity check, filter type before
+            x@type <- slot(x, "type")[i]
+            x <- callNextMethod(x, i)
+        }
+
+        # Down-type to a more specialised class if requested and applicable
+        if (drop)
+            x <- .dropVcfFilterRules(x)
+
+        return(x)
+    }
+)
+
+# [<- ----
+
+setReplaceMethod(
+    f = "[", c("VcfFixedRules", "ANY", "ANY", "ANY"),
+    function(x, i, j, value){
+        # Check that no j is provided
+        if (!missing(j))
+            stop("invalid subsetting")
+        # Convert i from character to index
+        if (!missing(i)) {
+            if (is.character(i)){
+                i <- .namesToIndex(indexNames = i, object = x)
+            }
+
+            # If NULL, remove rule(s)
+            if (is.null(value)){
+                x@active <- x@active[-i]
+                x@listData <- x@listData[-i]
+            } else {
+                if (length(i) != length(value))
+                    stop(paste(
+                        "number of items to replace is not a multiple of",
+                        "replacement length"
+                    ))
+                # Transfer the active status(es)
+                active(x)[i] <- active(value)
+                # Transfer the name(s)
+                names(x)[i] <- names(value)
+                # Tranfer the expression(s)
+                x@listData[i] <- value@listData
+                # maybe elementMetadata too
+            }
+        }
+        validObject(x)
+        return(x)
+    }
+)
+
+setReplaceMethod(
+    f = "[", c("VcfInfoRules", "ANY", "ANY", "ANY"),
+    function(x, i, j, value){
+        # Check that no j is provided
+        if (!missing(j))
+            stop("invalid subsetting")
+        # Convert i from character to index
+        if (!missing(i)) {
+            if (is.character(i)){
+                i <- .namesToIndex(indexNames = i, object = x)
+            }
+
+            # If NULL, remove rule(s)
+            if (is.null(value)){
+                x@active <- x@active[-i]
+                x@listData <- x@listData[-i]
+            } else {
+                if (length(i) != length(value))
+                    stop(paste(
+                        "number of items to replace is not a multiple of",
+                        "replacement length"
+                    ))
+                # Transfer the active status(es)
+                active(x)[i] <- active(value)
+                # Transfer the name(s)
+                names(x)[i] <- names(value)
+                # Tranfer the expression(s)
+                x@listData[i] <- value@listData
+                # maybe elementMetadata too
+            }
+        }
+        validObject(x)
+        return(x)
+    }
+)
+
+setReplaceMethod(
+    f = "[", c("VcfVepRules", "ANY", "ANY", "ANY"),
+    function(x, i, j, value){
+        # Check that no j is provided
+        if (!missing(j))
+            stop("invalid subsetting")
+        # Convert i from character to index
+        if (!missing(i)) {
+            if (is.character(i)){
+                i <- .namesToIndex(indexNames = i, object = x)
+            }
+
+            # If NULL, remove rule(s)
+            if (is.null(value)){
+                x@active <- x@active[-i]
+                x@listData <- x@listData[-i]
+            } else {
+                if (length(i) != length(value))
+                    stop(paste(
+                        "number of items to replace is not a multiple of",
+                        "replacement length"
+                    ))
+                if (vep(value) != vep(x))
+                    stop(
+                        "Incompatible vep slots: ",
+                        vep(x), ", ", vep(value))
+                # Transfer the active status(es)
+                active(x)[i] <- active(value)
+                # Transfer the name(s)
+                names(x)[i] <- names(value)
+                # Tranfer the expression(s)
+                x@listData[i] <- value@listData
+                # maybe elementMetadata too
+            }
+        }
+        validObject(x)
+        return(x)
+    }
+)
+
+setReplaceMethod(
+    f = "[", c("VcfFilterRules", "ANY", "ANY", "ANY"),
+    function(x, i, j, value, drop = TRUE){
+
+        # Check that no j is provided
+        if (!missing(j))
+            stop("invalid subsetting")
+        # Check that value is a valid class
+        validValueClass <- c(
+            "NULL",
+            "VcfFixedRules",
+            "VcfInfoRules",
+            "VcfVepRules",
+            "VcfFilterRules")
+        if (!class(value) %in% validValueClass)
+            stop(
+                "class(value) must be one of",
+                paste(validValueClass, collapse = ", "))
+
+        # Convert i from character to index
+        if (!missing(i)) {
+            if (is.character(i)){
+                i <- .namesToIndex(indexNames = i, object = x)
+            }
+
+            # If NULL, remove rule(s)
+            if (is.null(value)){
+                x@active <- x@active[-i]
+                x@type <- x@type[-i]
+                x@listData <- x@listData[-i]
+                # maybe elementMetadata too
+            } else {
+                if (length(i) != length(value))
+                    stop(paste(
+                        "number of items to replace is not a multiple of",
+                        "replacement length"
+                    ))
+
+                # Like FilterRules:
+                # Only transfer the expression
+                # Do not transfer the active state
+                # Do not transfer the name of new rules
+                x <- switch(
+                    class(value),
+                    VcfFixedRules = {
+                        x@type[i] <- "fixed"
+                        x
+                    },
+                    VcfInfoRules = {
+                        x@type[i] <- "info"
+                        x
+                    },
+                    VcfVepRules = {
+                        if (vep(value) != vep(x))
+                            stop(
+                                "Incompatible vep slots: ",
+                                vep(x), ", ", vep(value))
+                        x@type[i] <- "vep"
+                        x
+                    },
+                    VcfFilterRules = {
+                        x@type[i] <- value@type;
+                        x
+                    }
+                )
+                # Transfer the active status(es)
+                active(x)[i] <- active(value)
+                # Transfer the name(s)
+                names(x)[i] <- names(value)
+                # Tranfer the expression(s)
+                x@listData[i] <- value@listData
+            }
+
+            # Down-type to a more specialised class if applicable
+            if (drop)
+                x <- .dropVcfFilterRules(x)
+        }
+        validObject(x)
+        return(x)
+    }
+)
 
 # coerce ----
 

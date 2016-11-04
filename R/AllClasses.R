@@ -64,7 +64,16 @@ TVTBparam <- setClass(
 # VcfFilterRules & Co. ----
 
 # TODO: any difference from FilterRules?
-.valid.VcfSlotRules <- function(object){
+.valid.VcfBasicRules <- function(object){
+    errors <- c()
+
+    rulesName <- names(object@listData)
+    if (length(rulesName) != length(unique(rulesName)))
+        errors <- c(errors, "names must be unique")
+
+    if (length(errors > 0))
+        return(errors)
+
     return(TRUE)
 }
 
@@ -73,7 +82,7 @@ VcfFixedRules <- setClass(
 
     contains = "FilterRules",
 
-    validity = .valid.VcfSlotRules
+    validity = .valid.VcfBasicRules
 )
 
 
@@ -82,7 +91,7 @@ VcfInfoRules <- setClass(
 
     contains = "FilterRules",
 
-    validity = .valid.VcfSlotRules
+    validity = .valid.VcfBasicRules
 )
 
 .valid.VcfVepRules <- function(object){
@@ -93,6 +102,10 @@ VcfInfoRules <- setClass(
 
     if (class(vep(object)) != "character")
         errors <- c(errors, "vep(x) must be \"character\"")
+
+    rulesName <- names(object@listData)
+    if (length(rulesName) != length(unique(rulesName)))
+        errors <- c(errors, "names must be unique")
 
     if (length(errors > 0))
         return(errors)

@@ -56,6 +56,11 @@ test_that("Constructors produce a valid object",{
     expect_s4_class(vepRules, "VcfVepRules")
 
     expect_s4_class(vcfRules, "VcfFilterRules")
+    # Constructor including an object itself
+    expect_s4_class(VcfFilterRules(
+        VcfFilterRules(infoRules),
+        vepRules
+    ), "VcfFilterRules")
 
     vepANN <-  VcfVepRules(exprs = list(
         nonsense = expression(Fake == "NA")), vep = "ANN")
@@ -122,7 +127,7 @@ test_that("[[ methods return valid values", {
     expect_s4_class(vepRules[["CADD"]], "FilterClosure")
     expect_s4_class(vcfRules[["alt"]], "FilterClosure")
 
-    expect_error(expect_s4_class(vcfRules[[1:2]]))
+    expect_error(vcfRules[[1:2]])
 
 })
 
@@ -170,27 +175,27 @@ test_that("[[ methods perform valid replacement", {
     expect_equal(type(vcfRules), rep(c("fixed", "info", "vep"), each = 2))
 
     expect_error(
-        expect_s4_class(fixedRules[[1:2]] <- c(
+        fixedRules[[1:2]] <- c(
             expression(A == 2),
-            allTrueFUN))
+            allTrueFUN)
     )
 
     expect_error(
-        expect_s4_class(infoRules[[1:2]] <- c(
+        infoRules[[1:2]] <- c(
             expression(A == 2),
-            allTrueFUN))
+            allTrueFUN)
     )
 
     expect_error(
-        expect_s4_class(vepRules[[1:2]] <- c(
+        vepRules[[1:2]] <- c(
             expression(A == 2),
-            allTrueFUN))
+            allTrueFUN)
     )
 
     expect_error(
-        expect_s4_class(vcfRules[[1:2]] <- c(
+        vcfRules[[1:2]] <- c(
             expression(A == 2),
-            allTrueFUN))
+            allTrueFUN)
     )
 
 })
@@ -244,9 +249,13 @@ test_that("[ methods return valid values", {
     expect_equal(vep(vcfSubset), "ANN2")
 
     # Subsetting is position-based, throw error if [row, column] given
-    expect_error(
-        expect_s4_class(vcfRules[1:2, 2])
-    )
+    expect_error(fixedRules[1:2, 2])
+    expect_error(infoRules[1:2, 2])
+    expect_error(vepRules[1:2, 2])
+    expect_error(vcfRules[1:2, 2])
+
+    # Throw an error if name not found
+    expect_error(vcfRules["missingFilter"])
 
 })
 
@@ -254,15 +263,87 @@ test_that("[ methods return valid values", {
 
 test_that("[ methods perform valid replacement", {
 
-    newFixedFilter <- VcfVepRules(exprs = list(
-        filtSynonyms = expression(FILTER %in% c("PASS", "OK"))
+    newFixedFilter <- VcfFixedRules(exprs = list(
+        filtSynonyms = expression(FILTER %in% c("PASS", "OK")),
+        fail = expression(FILTER=="FAIL")
     ))
-    newInfoFilter <- VcfVepRules(exprs = list(
-        altIsMinor = expression(AAF < 0.5)
+    newInfoFilter <- VcfInfoRules(exprs = list(
+        altIsMinor = expression(AAF <= 0.5),
+        altIsMajor = expression(AAF > 0.5)
     ))
     newVepFilter <- VcfVepRules(exprs = list(
-        highImpact = expression(IMPACT == "HIGH")
+        highImpact = expression(IMPACT == "HIGH"),
+        moderateImpact = expression(IMPACT == "MODERATE")
     ))
+    newVepSlot <- newVepFilter
+    vep(newVepSlot) <- "ANN"
+
+    # Expected usage
+    fixedRules[1:2] <- newFixedFilter
+    expect_s4_class(fixedRules, "VcfFixedRules")
+    fixedRules["fail"] <- newFixedFilter["fail"]
+    expect_s4_class(fixedRules, "VcfFixedRules")
+    infoRules[1:2] <- newInfoFilter
+    expect_s4_class(infoRules, "VcfInfoRules")
+    infoRules["altIsMinor"] <- newInfoFilter["altIsMinor"]
+    expect_s4_class(infoRules, "VcfInfoRules")
+    vepRules[1:2] <- newVepFilter
+    expect_s4_class(vepRules, "VcfVepRules")
+    vepRules["highImpact"] <- newVepFilter["highImpact"]
+    expect_s4_class(vepRules, "VcfVepRules")
+    vcfRules[1:2] <- newFixedFilter # replacement returns value, not object
+    vcfRules["fail"] <- newFixedFilter[2]
+    expect_s4_class(vcfRules, "VcfFilterRules")
+    vcfRules[3:4] <- newInfoFilter
+    vcfRules["altIsMinor"] <- newInfoFilter[1]
+    expect_s4_class(vcfRules, "VcfFilterRules")
+    vcfRules[5:6] <- newVepFilter
+    vcfRules["highImpact"] <- newVepFilter[1]
+    expect_s4_class(vcfRules, "VcfFilterRules")
+    vcfRules[5:6] <- VcfFilterRules(newVepFilter)
+    vcfRules["highImpact"] <- VcfFilterRules(newVepFilter)["highImpact"]
+    expect_s4_class(vcfRules, "VcfFilterRules")
+
+    # TODO: check that rules cannot have identical names in specialised classes
+    # it seems this is not caught by the validity check
+    expect_error(fixedRules["filtSynonyms"] <- fixedRules["fail"])
+
+    # Error if incompatible vep slots (do not override)
+    expect_error(vepRules[1:2] <- newVepSlot)
+    expect_error(vcfRules[1:2] <- newVepSlot)
+
+    # Number of replacement must match number of indices
+    expect_error(fixedRules[1] <- newFixedFilter) # 1 vs 2
+    expect_error(infoRules[1] <- newInfoFilter) # 1 vs 2
+    expect_error(vepRules[1] <- newVepFilter) # 1 vs 2
+    expect_error(vcfRules[1:3] <- newFixedFilter) # 3 vs 2
+
+    # <-NULL removes rule(s) (and active and type)
+    fixedRules[1] <- NULL
+    expect_equal(length(fixedRules), 1) # 2 - 1
+    infoRules[1] <- NULL
+    expect_equal(length(fixedRules), 1) # 2 - 1
+    vepRules[1] <- NULL
+    expect_equal(length(fixedRules), 1) # 2 - 1
+    vcfRules[1] <- NULL
+    expect_equal(length(vcfRules), 5) # 6 - 1
+
+    # drop=FALSE does not down-type VcfFilterRules
+    # keep in mind that a rule was already removed above
+    vcfRules[1:3, drop=FALSE] <- NULL
+    expect_s4_class(vcfRules, "VcfFilterRules")
+
+    # 'value' must be an object of the correct class
+    expect_error(fixedRules[1] <- newFixedFilter[[1]])
+    expect_error(infoRules[1] <- newInfoFilter[[1]])
+    expect_error(vepRules[1] <- newVepFilter[[1]])
+    expect_error(fixedRules[1] <- newVepFilter[[1]])
+
+    # Replacing is position-based, throw error if [row, column] given
+    expect_error(fixedRules[1:2, 2] <- NULL)
+    expect_error(infoRules[1:2, 2] <- NULL)
+    expect_error(vepRules[1:2, 2] <- NULL)
+    expect_error(vcfRules[1:2, 2] <- NULL)
 
 })
 

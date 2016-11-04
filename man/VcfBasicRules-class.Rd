@@ -26,10 +26,25 @@
 \alias{vep,VcfVepRules-method}
 \alias{vep<-,VcfVepRules,character-method}
 
-% Subsetter methods:
+% Subsetting methods:
+% [[
+\alias{[[,VcfFixedRules,ANY,ANY-method}
+\alias{[[,VcfInfoRules,ANY,ANY-method}
+\alias{[[,VcfVepRules,ANY,ANY-method}
+% [
+\alias{[,VcfFixedRules,ANY,ANY-method}
+\alias{[,VcfInfoRules,ANY,ANY-method}
+\alias{[,VcfVepRules,ANY,ANY-method}
+
+% Replacement methods:
+% [[<-
 \alias{[[<-,VcfFixedRules,ANY,ANY-method}
 \alias{[[<-,VcfInfoRules,ANY,ANY-method}
 \alias{[[<-,VcfVepRules,ANY,ANY-method}
+% [<-
+\alias{[<-,VcfFixedRules,ANY,ANY,ANY-method}
+\alias{[<-,VcfInfoRules,ANY,ANY,ANY-method}
+\alias{[<-,VcfVepRules,ANY,ANY,ANY-method}
 
 % Combine methods:
 \alias{c,VcfFixedRules-method}
@@ -59,14 +74,18 @@ or \code{VcfVepRules} class.
 }
 
 \section{Accessor methods}{
-In the following code snippets \code{x} is a \code{VcfFilterRules} object.
+In the following code snippets \code{x} is an object from any of the classes
+decribed in this help page, except when specified otherwise.
 \describe{
-    \item{\code{vep(x)}}{
+    \item{\code{active(x)}, \code{active(x)<-}}{
+    Get or set the active state of each filter rule in \code{x}.
+    Inherited from \code{\linkS4class{FilterRules}}
+    }
+    \item{\code{vep(x)}, \code{vep(x)<- }}{
     Gets the INFO key where the Ensembl VEP predictions to use for filtering
-    are stored.
+    are stored. \emph{This accessor is only applicable to \code{VcfVepRules}}.
     }
 }
-And accessors inherited from \code{S4Vectors::FilterRules} class.
 }
 
 \section{Constructors}{
@@ -87,7 +106,27 @@ See the constructor of \code{FilterRules} for more details.
 }
 
 \section{Subsetting and Replacement}{
-Inherited from \code{S4Vectors::FilterRules} class.
+In the following code snippets \code{x} is an object from any of the classes
+decribed in this help page.
+
+\describe{
+    \item{}{
+    \code{x[i]}: Subsets the filter rules using the same interface as for
+    \code{\linkS4class{List}}.
+    }
+    \item{}{
+    \code{x[[i]]}: Extracts an expression or function via the same interface
+    as for \code{\linkS4class{List}}.
+    }
+    \item{}{
+    \code{x[i] <- value}: Replaces a filter rule by one of the same class.
+    The active state(s) and name(s) are transferred from \code{value}.
+    }
+    \item{}{
+    \code{x[[i]] <- value}: The same interface as for
+    \code{\linkS4class{List}}. The default active state for new rules is TRUE.
+    }
+}
 }
 
 \section{Combining}{
@@ -222,5 +261,11 @@ S4Vectors::subsetByFilter(x = vcf, filter = vepRules)
 vep1 <- vepRules[1] # VcfVepRules
 vepRules[[1]] # expression
 
+# Replace the expression (active reset to TRUE, original name retained)
 vepRules[[2]] <- expression(CADD_PHRED > 30)
+
+# Replace the rule (active state and name transferred from v5obj)
+vepRules[2] <- VcfVepRules(
+    exprs = list(newRule = expression(CADD_PHRED > 30)),
+    active = FALSE)
 }
