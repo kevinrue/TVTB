@@ -24,10 +24,8 @@ setMethod(
         vcf, phenoCol, csqCol, alts, param = NULL, ...,
         unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE){
 
-        if (length(alts) < 2)
-            stop(
-                "length(alts) must be >= 2: ",
-                "Heterozygote and Homozygote alternate genotypes")
+        .checkAlts(alts)
+
         # ref will not be used
         param <- tSVEParam(genos = list("", alts[1], alts[2:length(alts)]))
         # Additional parameters overriden
@@ -66,10 +64,8 @@ setMethod(
         level, vcf, phenoCol, csqCol, alts, param = NULL, ...,
         unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE){
 
-        if (length(alts) < 2)
-            stop(
-                "length(alts) must be >= 2: ",
-                "Heterozygote and Homozygote alternate genotypes")
+        .checkAlts(alts)
+
         # ref will not be used
         param <- tSVEParam(genos = list("", alts[1], alts[2:length(alts)]))
         # Additional parameters overriden
@@ -82,7 +78,18 @@ setMethod(
     }
 )
 
-# Private methods ----
+# Helpers ----
+
+.checkAlts <- function(alts){
+    if (length(alts) < 2)
+        stop(
+            "length(alts) must be >= 2: ",
+            "Heterozygote and Homozygote alternate genotypes")
+
+    return(TRUE)
+}
+
+# Main methods ----
 
 .densityCsqByPhenotype <- function(
     vcf, phenoCol, csqCol, param,

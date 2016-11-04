@@ -2,44 +2,21 @@ context("densityCsqByPhenotype")
 
 # Settings ----
 
-# Genomic region
-regions <- GenomicRanges::GRanges(
-    seqnames = "15",
-    ranges = IRanges::IRanges(start = 48413170, end = 48434757)) # all variants
-
 # VCF file
 extdata <- file.path(system.file(package = "tSVE"), "extdata")
-vcfFile <- file.path(extdata, "chr15.phase3_integrated.vcf.gz")
-tabixVcf <- Rsamtools::TabixFile(file = vcfFile)
+vcfFile <- file.path(extdata, "moderate.vcf")
 
 # Good and bad phenotype files
-phenoFile <- file.path(extdata, "integrated_samples.txt")
-phenotypes <- S4Vectors::DataFrame(read.table(
-    file = phenoFile, header = TRUE, row.names = 1))
-# Subset phenotypes to test with a small number of samples
-samplePhenotypes <- subset(phenotypes, pop == "GBR")
-samplePhenotypes <- droplevels(samplePhenotypes)
+phenoFile <- file.path(extdata, "moderate_pheno.txt")
 
-# Import variants
-svp <- VariantAnnotation::ScanVcfParam(
-    fixed = "ALT",
-    info = "CSQ",
-    geno = "GT",
-    samples = rownames(samplePhenotypes),
-    which = regions)
-vcf <- VariantAnnotation::readVcf(file = tabixVcf, param = svp)
-# Separate multi-allelic records into bi-allelic records
-eVcf <- VariantAnnotation::expand(x = vcf, row.names = TRUE)
-# Disambiguate row.names from multi-allelic records
-rownames(eVcf) <- paste(rownames(eVcf), mcols(eVcf)[,"ALT"], sep = "_")
-# Add some phenotypes information necessary for the demo
-SummarizedExperiment::colData(eVcf) <- samplePhenotypes
+tparam <- tSVEParam(
+    genos = list(
+        REF = "0|0",
+        HET = c("0|1", "1|0"),
+        ALT = "1|1"))
 
-# Define genotypes ----
-tparam <- tSVEParam(genos = list(
-    REF = c("0|0"),
-    HET = c("0|1","1|0"),
-    ALT = c("1|1")))
+vcf <- preprocessVariants(
+    file = vcfFile, param = tparam, phenos = phenoFile)
 
 # Signatures ----
 
@@ -48,21 +25,19 @@ test_that("densityCsq* supports all signatures",{
     ## ByPhenotype()
     expect_is(
         densityCsqByPhenotype(
-            vcf = eVcf,
-            phenoCol = "gender",
+            vcf = vcf,
+            phenoCol = "super_pop",
             csqCol = "CADD_PHRED",
             param = tparam),
         "data.frame"
     )
 
-
-
     expect_is(
         densityCsqByPhenotype(
-            vcf = eVcf,
-            phenoCol = "gender",
+            vcf = vcf,
+            phenoCol = "super_pop",
             csqCol = "CADD_PHRED",
-            alts = c("0|1", "1|0", "1|1")),
+            alts = unlist(carrier(tparam))),
         "data.frame"
     )
 
@@ -70,22 +45,35 @@ test_that("densityCsq* supports all signatures",{
     expect_is(
         densityCsqInPhenoLevel(
             level = "GBR",
-            vcf = eVcf,
+            vcf = vcf,
             phenoCol = "pop",
             csqCol = "CADD_PHRED",
             param = tparam),
         "data.frame"
     )
 
-    ## Implicitely tested by *ByPhenotype
     expect_is(
         densityCsqInPhenoLevel(
-            level = "GBR",
-            vcf = eVcf,
+            level = "AFR",
+            vcf = vcf,
             phenoCol = "pop",
             csqCol = "CADD_PHRED",
-            param = tparam),
+            alts = unlist(carrier(tparam))),
         "data.frame"
+    )
+
+})
+
+# .checkAlts ----
+
+test_that(".checkAlts catches invalid inputs", {
+
+    expect_error(
+        densityCsqByPhenotype(
+            vcf = vcf,
+            phenoCol = "super_pop",
+            csqCol = "CADD_PHRED",
+            alts = "0|1")
     )
 
 })
@@ -96,7 +84,7 @@ test_that("plot & facet & popFreq argument work",{
 
     expect_s3_class(
         densityCsqByPhenotype(
-            vcf = eVcf,
+            vcf = vcf,
             phenoCol = "super_pop",
             csqCol = "AMR_MAF",
             param = tparam,
@@ -106,13 +94,25 @@ test_that("plot & facet & popFreq argument work",{
 
     expect_s3_class(
         densityCsqInPhenoLevel(
-            level = "EUR",
-            vcf = eVcf,
+            level = "AFR",
+            vcf = vcf,
             phenoCol = "super_pop",
             csqCol = "AMR_MAF",
             param = tparam,
             facet = "Feature", plot = TRUE, popFreq = TRUE),
         c("gg", "ggplot")
     )
+
+    # No variant in EUR population
+    # expect_error(
+    #     densityCsqInPhenoLevel(
+    #         level = "EUR",
+    #         vcf = vcf,
+    #         phenoCol = "super_pop",
+    #         csqCol = "AMR_MAF",
+    #         param = tparam,
+    #         facet = "Feature", plot = TRUE, popFreq = TRUE),
+    #     c("gg", "ggplot")
+    # )
 
 })
