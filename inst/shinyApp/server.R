@@ -124,13 +124,23 @@ shinyServer(function(input, output, clientData, session) {
 
         # If new phenotype files also contains the current phenotype,
         # keep it active instead of resetting to the first choice
-        pheno.selected <- pheno.choices[
+        ## Tabulate VEP by phenotype (TVBP)
+        pheno.TVBPselected <- pheno.choices[
             max(1, which(pheno.choices == input$phenoTVBP))]
 
         updateSelectInput(
             session, "phenoTVBP",
             choices = pheno.choices,
-            selected = pheno.selected)
+            selected = pheno.TVBPselected)
+
+        # Same thing for DVBP
+        pheno.DVBPselected <- pheno.choices[
+            max(1, which(pheno.choices == input$phenoDVBP))]
+
+        updateSelectInput(
+            session, "phenoDVBP",
+            choices = pheno.choices,
+            selected = pheno.DVBPselected)
     })
 
     # Display structure of phenotypes attached to variants
@@ -1566,7 +1576,8 @@ shinyServer(function(input, output, clientData, session) {
 
         # Initialise by order of preference if present:
         # Current selection > Consequence > Impact > First field
-        vep.default <- max(
+        ## TVBP (Tabulate VEP by phenotype)
+        vep.TVBPdefault <- max(
             1,
             head(x = na.omit(
                 match(
@@ -1579,13 +1590,30 @@ shinyServer(function(input, output, clientData, session) {
         updateSelectInput(
             session, "vepTVBP",
             choices = vepKey.choices,
-            selected = vepKey.choices[vep.default])
+            selected = vepKey.choices[vep.TVBPdefault])
+
+        ## DVBP (Density VEP by phenotype)
+        vep.DVBPdefault <- max(
+            1,
+            head(x = na.omit(
+                match(
+                    x = c(input$vepTVBP, "CADD_PHRED","Protein_position"),
+                    table = vepKey.choices
+                )
+            ), n = 1)
+        )
+
+        updateSelectInput(
+            session, "vepDVBP",
+            choices = vepKey.choices,
+            selected = vepKey.choices[vep.TVBPdefault])
 
         vepKey.choices <- c("None", vepKey.choices)
 
         # Initialise by order of preference if present:
         # Current selection > None
-        vepFacetKey.selected <- max(
+        ## TVBP
+        vepFacetKey.TVBPselected <- max(
             1,
             head(x = na.omit(
                 match(
@@ -1598,13 +1626,29 @@ shinyServer(function(input, output, clientData, session) {
         updateSelectInput(
             session, "vepFacetKeyTVBP",
             choices = vepKey.choices,
-            selected = vepKey.choices[vepFacetKey.selected])
+            selected = vepKey.choices[vepFacetKey.TVBPselected])
+
+        ## DVBP
+        vepFacetKey.DVBPselected <- max(
+            1,
+            head(x = na.omit(
+                match(
+                    x = c(input$vepFacetKeyDVBP),
+                    table = vepKey.choices
+                )
+            ), n = 1)
+        )
+
+        updateSelectInput(
+            session, "vepFacetKeyDVBP",
+            choices = vepKey.choices,
+            selected = vepKey.choices[vepFacetKey.DVBPselected])
     })
 
-    # Summarise consequences ----
+    # Tabulate VEP by phenotype (TVBP) ----
 
     # Phenotype to summarise VEP: or NULL if "None"
-    varVepPlotPheno <- reactive({
+    varVepPlotPhenoTVBP <- reactive({
 
         phenotype <- input$phenoTVBP
         # Give time to initialise the widget
@@ -1617,8 +1661,38 @@ shinyServer(function(input, output, clientData, session) {
         }
     })
 
+    # Update list of VEP facets if the faceting variable changes
+    observeEvent(eventExpr = input$vepFacetKeyTVBP, handlerExpr = {
+        # Raw variants must exist
+        validate(need(vcf(), Msgs[["importVariants"]]))
+
+        vcf <- RV[["filteredVcf"]]
+        # Give time to filter variants
+        req(vcf)
+
+        validate(need(input$vepKey, label = Msgs[["vepKey"]]))
+        csq <- tryParseCsq(vcf = vcf, vepKey = input$vepKey)
+
+        validate(need(csq, Msgs[["csq"]]))
+
+        vepMcols <- mcols(csq)
+
+        # Initialise to avoid crash
+        facetsSelected <- NULL
+        if (input$vepFacetKeyTVBP != "None"){
+            vepFacets.choices <- unique(vepMcols[,input$vepFacetKeyTVBP])
+        } else {
+            vepFacets.choices <- NA_character_
+        }
+
+        updateSelectInput(
+            session, "vepFacetsTVBP",
+            choices = vepFacets.choices,
+            selected = vepFacets.choices)
+    })
+
     # Base of the ggplot summarising counts of VEP
-    vepTabulated <- reactive({
+    TVBPggplot <- reactive({
 
         # Update only on button click
         validate(need(
@@ -1626,9 +1700,9 @@ shinyServer(function(input, output, clientData, session) {
             "Please click \"Apply\" to apply parameters."))
 
         isolate({
+            vepTVBP <- input$vepTVBP
             vepFacetKey <- input$vepFacetKeyTVBP
             vepFacets <- input$vepFacetsTVBP
-            vepTVBP <- input$vepTVBP
             stackedPercentage <- input$stackedPercentageTVBP
             unique2pheno <- input$unique2phenoTVBP
         })
@@ -1657,17 +1731,18 @@ shinyServer(function(input, output, clientData, session) {
                 Msgs[["filterVcfEmpty"]]),
                 errorClass = "optional")
 
-            if (input$phenoTVBP == "None"){
+            # Special case of phenotype "None"
+            isolate({phenoTVBP <- input$phenoTVBP})
+            if (phenoTVBP == "None"){
                 colData(vcf)[,"Phenotype"] <- factor("All")
                 plotPhenotype <- "Phenotype"
             } else {
-                isolate({plotPhenotype <- input$phenoTVBP})
+                plotPhenotype <- phenoTVBP
             }
 
-            varVepPlotPheno <- varVepPlotPheno()
+            varVepPlotPheno <- varVepPlotPhenoTVBP()
             validate(
                 need(vepTVBP, Msgs[["vepTVBP"]]),
-                need(vepFacetKey, Msgs[["vepFacetKeyTVBP"]]),
                 need(
                     is.logical(stackedPercentage),
                     Msgs[["stackedPercentageTVBP"]])
@@ -1703,7 +1778,7 @@ shinyServer(function(input, output, clientData, session) {
             incProgress(1, detail = Tracking[["calculate"]])
 
             # Update only on button click
-            gg <- vepTabulated()
+            gg <- TVBPggplot()
 
             isolate({
                 legendTextSize <- input$legendTextSizeTVBP
@@ -1738,7 +1813,7 @@ shinyServer(function(input, output, clientData, session) {
     vepTableCount <- reactive({
         # Depeds on: vepTabulated
 
-        vepTabulated <- vepTabulated()$data
+        vepTabulated <- TVBPggplot()$data
 
         vepTable <- as.data.frame(table(vepTabulated))
 
@@ -1759,47 +1834,6 @@ shinyServer(function(input, output, clientData, session) {
                 searching = TRUE),
             filter = "top",
             rownames = FALSE)
-    })
-
-    # Update list of VEP facets if the faceting variable changes
-    observeEvent(eventExpr = input$vepFacetKeyTVBP, handlerExpr = {
-        # Raw variants must exist
-        validate(need(vcf(), Msgs[["importVariants"]]))
-
-        vcf <- RV[["filteredVcf"]]
-        # Give time to filter variants
-        req(vcf)
-
-        validate(need(input$vepKey, label = Msgs[["vepKey"]]))
-        csq <- tryParseCsq(vcf = vcf, vepKey = input$vepKey)
-
-        validate(need(csq, Msgs[["csq"]]))
-
-        vepMcols <- mcols(csq)
-
-        if (input$vepFacetKeyTVBP != "None"){
-            vepFacets.choices <- unique(vepMcols[,input$vepFacetKeyTVBP])
-        } else {
-            vepFacets.choices <- c()
-        }
-
-        # Initialise to avoid crash
-        facetsSelected <- NULL
-        # Keep previous selection if possible
-        if (length(input$vepFacetsTVBP) > 0)
-            facetsSelected <- na.omit(match(
-                x = input$vepFacetsTVBP,
-                table = vepFacets.choices
-            ))
-
-        # Otherwise select all new values
-        if (length(facetsSelected) == 0)
-            facetsSelected <- 1:length(vepFacets.choices)
-
-        updateSelectInput(
-            session, "vepFacetsTVBP",
-            choices = vepFacets.choices,
-            selected = vepFacets.choices[facetsSelected])
     })
 
     # Print the count of consequences in the area hovered.
@@ -1904,6 +1938,166 @@ shinyServer(function(input, output, clientData, session) {
         HTML(paste(
             html1Start, html2Facet, html3Pheno, html4Vep, html5Value, html6End,
             sep = ""))
+    })
+
+    # Density VEP by phenotype (DVBP) ----
+
+    # Phenotype to summarise VEP density: or NULL if "None"
+    varVepPlotPhenoDVBP <- reactive({
+
+        phenotype <- input$phenoDVBP
+        # Give time to initialise the widget
+        req(phenotype)
+
+        if (phenotype == "None"){
+            return("Phenotype")
+        } else {
+            return(phenotype)
+        }
+    })
+
+    # Update list of VEP facets if the faceting variable changes
+    observeEvent(eventExpr = input$vepFacetKeyDVBP, handlerExpr = {
+        # Raw variants must exist
+        validate(need(vcf(), Msgs[["importVariants"]]))
+
+        vcf <- RV[["filteredVcf"]]
+        # Give time to filter variants
+        req(vcf)
+
+        validate(need(input$vepKey, label = Msgs[["vepKey"]]))
+        csq <- tryParseCsq(vcf = vcf, vepKey = input$vepKey)
+
+        validate(need(csq, Msgs[["csq"]]))
+
+        vepMcols <- mcols(csq)
+
+        # Select a subset of VEP facets
+        if (input$vepFacetKeyDVBP != "None"){
+            # List all choices of facets
+            vepFacets.choices <- unique(vepMcols[,input$vepFacetKeyDVBP])
+        } else {
+            vepFacets.choices <- NA_character_
+        }
+
+        updateSelectInput(
+            session, "vepFacetsDVBP",
+            choices = vepFacets.choices,
+            selected = vepFacets.choices)
+    })
+
+    # Base of the ggplot summarising counts of VEP
+    DVBPggplot <- reactive({
+
+        # Update only on button click
+        validate(need(
+            input$buttonDVBP,
+            "Please click \"Apply\" to apply parameters."))
+
+        isolate({
+            vepDVBP <- input$vepDVBP
+            vepFacetKey <- input$vepFacetKeyDVBP
+            vepFacets <- input$vepFacetsDVBP
+            patternDVBP <- input$patternDVBP
+            unique2pheno <- input$unique2phenoDVBP
+        })
+
+        withProgress(min = 0, max = 2, message = "Progress", {
+            incProgress(1, detail = Tracking[["calculate"]])
+
+            if (vepFacetKey != "None"){
+                # req(vepFacets) # Give time to observeEvent
+                validate(need(
+                    length(vepFacets) > 0,
+                    "The plot must contain at least one facet"))
+            }
+
+            # App does not display "NULL" choices
+            if (vepFacetKey == "None"){
+                vepFacetKey <- NULL
+            }
+
+            validate(need(vcf(), Msgs[["importVariants"]]))
+
+            vcf <- RV[["filteredVcf"]]
+
+            validate(need(
+                nrow(vcf) > 0,
+                Msgs[["filterVcfEmpty"]]),
+                errorClass = "optional")
+
+            # Special case of phenotype "None"
+            isolate({phenoDVBP <- input$phenoDVBP})
+            if (input$phenoDVBP == "None"){
+                colData(vcf)[,"Phenotype"] <- factor("All")
+                plotPhenotype <- "Phenotype"
+            } else {
+                plotPhenotype <- phenoDVBP
+            }
+
+            varVepPlotPheno <- varVepPlotPhenoDVBP()
+            validate(need(vepDVBP, Msgs[["vepDVBP"]]))
+
+            # Convert to default value for the method
+            if (patternDVBP == "")
+                patternDVBP <- NULL
+
+            incProgress(1, detail = Tracking[["ggplot"]])
+
+            gg <- densityVepByPhenotype(
+                vcf = vcf,
+                phenoCol = plotPhenotype,
+                vepCol = vepDVBP,
+                param = tparam(),
+                unique = unique2pheno,
+                facet = vepFacetKey,
+                plot = TRUE,
+                pattern = patternDVBP,
+                layer = "density+dotplot" # TODO
+            )
+
+            if (!is.null(vepFacetKey)){
+                gg$data <- gg$data[
+                    gg$data[,vepFacetKey] %in% vepFacets,]
+                gg$data <- droplevels(gg$data)
+            }
+
+            return(gg)
+        })
+
+    })
+
+    # Stacked bars classifying consequence of variants
+    output$vepDensityPlot <- renderPlot({
+        withProgress(min = 0, max = 2, message = "Progress", {
+            incProgress(1, detail = Tracking[["calculate"]])
+
+            # Update only on button click
+            gg <- DVBPggplot()
+
+            isolate({
+                legendTextSize <- input$legendTextSizeDVBP
+                xAxisSize <- input$xAxisSizeDVBP
+                yAxisSize <- input$yAxisSizeDVBP
+                legend <- input$legendTVBP
+            })
+
+            message("Plotting predictions...")
+            incProgress(1, detail = Tracking[["render"]])
+
+            gg <- gg +
+                theme(
+                    axis.text = element_text(size = rel(1.5)),
+                    axis.title = element_text(size = rel(1.5)),
+                    legend.text = element_text(size = rel(legendTextSize)),
+                    legend.title = element_text(size = rel(legendTextSize)),
+                    axis.text.x = element_text(size = rel(xAxisSize)),
+                    axis.text.y = element_text(size = rel(yAxisSize))
+                ) +
+                guides(fill = c("none", "legend")[legend + 1])
+
+            return(gg)
+        })
     })
 
     # Genotype heatmap ----

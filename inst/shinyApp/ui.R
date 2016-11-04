@@ -708,7 +708,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
     navbarMenu(
         title = "Plots", icon = icon("pie-chart"),
 
-        # Variants predictions barplot ----
+        # VEP count barplot ----
 
         tabPanel(
             title = "VEP counts",
@@ -863,6 +863,8 @@ shinyUI(navbarPage(theme = "bootstrap.css",
             )
         ),
 
+        # VEP density plot ----
+
         tabPanel(
             title = "VEP density",
 
@@ -873,15 +875,100 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                     width = 3,
 
                     actionButton(
-                        "densityVep", "Apply",
+                        "buttonDVBP", "Apply",
                         icon = icon("picture"), width = "100%"
                     ),
-                    hr()
+                    hr(),
+
+                    selectInput(
+                        "vepDVBP",
+                        "Variant effect prediction",
+                        choices = c()
+                    ),
+
+                    selectInput(
+                        "phenoDVBP",
+                        "Phenotype field",
+                        choices = c("None"),
+                        selected = "None"
+                    ),
+
+                    conditionalPanel(
+                        condition = "input.phenoDVBP != 'None'",
+                        checkboxInput(
+                            "unique2phenoDVBP",
+                            "Unique to phenotype?",
+                            value = FALSE
+                        )
+                    ),
+
+                    selectInput(
+                        "vepFacetKeyDVBP",
+                        "VEP faceting key",
+                        choices = c("None"),
+                        selected = "None"
+                    ),
+
+                    conditionalPanel(
+                        condition = "input.facetDVBP != 'None'",
+                        selectInput(
+                            "vepFacetsDVBP",
+                            "Facets",
+                            choices = c(),
+                            selected = c(),
+                            multiple = TRUE
+                        )
+                    ),
+
+                    textInput(
+                        "patternDVBP", "Pattern",
+                        value = "", placeholder = ".*:(.*)"
+                    ),
+
+                    checkboxInput(
+                        "advancedDVBP",
+                        "Advanced controls",
+                        value = FALSE),
+
+                    conditionalPanel(
+                        condition = "input.advancedDVBP == true",
+                        checkboxInput(
+                            "legendDVBP",
+                            "Show legend",
+                            value = TRUE)
+                    ),
+
+                    conditionalPanel(
+                        condition = paste(
+                            "input.advancedDVBP == true",
+                            "input.legendDVBP == true",
+                            sep = " && "
+                        ),
+                        sliderInput(
+                            "legendTextSizeDVBP", "Legend font size",
+                            value = 1, min = 0.1, max = 2, step = 0.1)
+                    ),
+
+                    conditionalPanel(
+                        condition = "input.advancedDVBP == true",
+
+                        sliderInput(
+                            "xAxisSizeDVBP",
+                            "Relative size of X text",
+                            value = 1, min = 0.1, max = 2, step = .1
+                        ),
+
+                        sliderInput(
+                            "yAxisSizeDVBP",
+                            "Relative size of Y text",
+                            value = 1, min = 0.1, max = 2, step = .1
+                        )
+                    )
 
                 ),
 
                 mainPanel( # width = 8
-
+                    plotOutput("vepDensityPlot")
                 )
 
             ) #sideBarLayout

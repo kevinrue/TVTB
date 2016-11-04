@@ -111,6 +111,10 @@ Msgs <- list(
     vepFacetKeyTVBP = "Faceting VEP field",
     stackedPercentageTVBP = "Stack percentage?",
 
+    # Density VEP by phenotype (DVBP)
+    vepDVBP = "VEP field tabulated",
+    vepFacetKeyDVBP = "Faceting VEP field",
+
     # Optional inputs
     importVariants = "Please import/refresh variants.",
     genomicRanges = "No genomic range defined. All variants considered.",
