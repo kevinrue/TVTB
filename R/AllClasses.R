@@ -88,6 +88,9 @@ VcfInfoRules <- setClass(
     if (length(vep(object)) != 1)
         errors <- c(errors, "length(vep(x)) must equal 1")
 
+    if (class(vep(object)) != "character")
+        errors <- c(errors, "vep(x) must be \"character\"")
+
     if (length(errors > 0))
         return(errors)
 
