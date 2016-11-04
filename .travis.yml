@@ -12,7 +12,6 @@ r_check_args: --no-build-vignettes
 bioc_use_devel: true
 
 before_install:
-    - R CMD Rscript -e 'source(file = "http://bioconductor.org/biocLite.R")'
-    - R CMD Rscript -e 'useDevel(devel = TRUE)'
+    - R CMD Rscript -e 'source(file = "http://bioconductor.org/biocLite.R");useDevel(devel = TRUE)'
     
 r_github_packages: rstudio/DT
