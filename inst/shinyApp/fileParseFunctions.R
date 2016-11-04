@@ -174,7 +174,7 @@ parseMultipleVcf<- function(
     # The functions gets here in two situations:
     ## 1. genomic ranges span multiple chromosomes/vcfFiles
     ## 2. no genomic range was given: all vcfFiles in the folder are imported
-
+    message("Parsing ", length(vcfFiles), " VCF files ...")
     # Import from each file in parallel (already ExpandedVCF)
     vcfs <- bplapply(
         X = vcfFiles,
@@ -207,7 +207,7 @@ parseMultipleVcf<- function(
 
 parseSingleVcf <- function(
     file, svp = ScanVcfParam(), yieldSize = NA_integer_){
-
+    message("Parsing VCF file: ", file, " ...")
     tf <- TabixFile(file)
 
     # scanTabix: 'yieldSize(file)' must be 'NA_integer_' when range specified
