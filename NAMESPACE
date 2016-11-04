@@ -7,7 +7,6 @@ import("IRanges")
 import("GenomicRanges")
 import("SummarizedExperiment")
 import("methods")
-import("parallel")
 
 importFrom(
     "BiocParallel",
