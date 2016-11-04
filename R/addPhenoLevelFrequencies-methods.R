@@ -57,15 +57,14 @@ setMethod(
     # Deduce all INFO keys needed
     infoKeys <- paste(pheno, level, keySuffixes, sep = "_")
 
-    matches <- match(infoKeys, colnames(info(vcf)))
-    idxMatches <- matches[!is.na(matches)]
+    matches <- as.numeric(na.omit(match(infoKeys, colnames(info(vcf)))))
 
-    if ((length(idxMatches) > 0))
+    if ((length(matches) > 0))
         if (force){
             # Remove data and header
             message("Overwriting INFO fields: ", colnames(info(vcf))[matches])
-            info(vcf) <- info(vcf)[,-idxMatches]
-            info(header(vcf)) <- info(header(vcf))[-idxMatches,]
+            info(vcf) <- info(vcf)[,-matches]
+            info(header(vcf)) <- info(header(vcf))[-matches,]
         } else{
             stop("INFO keys already present:", colnames(info(vcf))[matches])
         }
@@ -102,18 +101,18 @@ setMethod(
         BPPARAM = bp(param))
 
     # Collate description of new headers
-    decription_suffix <- paste(
+    decription_suffix <- paste0(
         "in phenotype \"", pheno, "\", level \"", level, "\"")
     desc_REF <- paste(
-        "Count of homozygote reference genotypes ", decription_suffix)
+        "Count of homozygote reference genotypes", decription_suffix)
     desc_HET <- paste(
-        "Count of heterozygous genotypes ", decription_suffix)
+        "Count of heterozygous genotypes", decription_suffix)
     desc_ALT <- paste(
-        "Count of homozygote alternate genotypes ", decription_suffix)
+        "Count of homozygote alternate genotypes", decription_suffix)
     desc_AAF <- paste(
-        "Alternate allele frequency ", decription_suffix)
+        "Alternate allele frequency", decription_suffix)
     desc_MAF <- paste(
-        "Minor allele frequency ", decription_suffix)
+        "Minor allele frequency", decription_suffix)
 
     # Collate new headers
     newInfoHeader <- DataFrame(
@@ -133,12 +132,9 @@ setMethod(
 
     # Collate new data
     newInfoData <- DataFrame(
-        REF = REF,
-        HET = HET,
-        ALT = ALT,
-        AAF = AAF,
-        MAF = MAF
+        REF, HET, ALT, AAF, MAF
     )
+    colnames(newInfoData) <- rownames(newInfoHeader)
 
     # Append new header fields
     info(header(vcf)) <- rbind(info(header(vcf)), newInfoHeader)

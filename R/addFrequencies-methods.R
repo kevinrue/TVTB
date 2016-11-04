@@ -122,17 +122,18 @@ setMethod(
         simplify = FALSE))
     )
 
-    matches <- match(infoKeys, colnames(info(vcf)))
-    idxMatches <- matches[!is.na(matches)]
+    matches <- as.numeric(na.omit(match(infoKeys, colnames(info(vcf)))))
 
-    if ((length(idxMatches) > 0))
+    if ((length(matches) > 0))
         if (force){
-            # Remove data and header
+            # Remove data and header (append as right-most fields)
             message("Overwriting INFO fields: ", colnames(info(vcf))[matches])
-            info(vcf) <- info(vcf)[,-idxMatches]
-            info(header(vcf)) <- info(header(vcf))[-idxMatches,]
+            info(vcf) <- info(vcf)[,-matches]
+            info(header(vcf)) <- info(header(vcf))[-matches,]
         } else{
-            stop("INFO keys already present:", colnames(info(vcf))[matches])
+            stop(
+                "INFO keys already present: ",
+                paste(colnames(info(vcf))[matches], sep = ", "))
         }
 
     return(vcf)

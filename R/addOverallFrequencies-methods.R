@@ -36,17 +36,18 @@ setMethod(
 
     infoKeys <- c(names(genos(param)), aaf(param), maf(param))
 
-    matches <- match(infoKeys, colnames(info(vcf)))
-    idxMatches <- matches[!is.na(matches)]
+    matches <- as.numeric(na.omit(match(infoKeys, colnames(info(vcf)))))
 
-    if ((length(idxMatches) > 0))
+    if ((length(matches) > 0))
         if (force){
             # Remove data and header
             message("Overwriting INFO fields: ", colnames(info(vcf))[matches])
-            info(vcf) <- info(vcf)[,-idxMatches]
-            info(header(vcf)) <- info(header(vcf))[-idxMatches,]
+            info(vcf) <- info(vcf)[,-matches]
+            info(header(vcf)) <- info(header(vcf))[-matches,]
         } else{
-            stop("INFO keys already present:", colnames(info(vcf))[matches])
+            stop(
+                "INFO keys already present: ",
+                paste(colnames(info(vcf))[matches], sep = ", "))
         }
 
     return(vcf)
@@ -55,7 +56,7 @@ setMethod(
 
 .addOverallFrequencies <- function(vcf, param, force = FALSE){
 
-    .checkOverallInfo(vcf = vcf, param = param, force = force)
+    vcf <- .checkOverallInfo(vcf = vcf, param = param, force = force)
 
     GT <- geno(vcf)[["GT"]]
     # TODO: could launch 3 parallel threads to count genotypes
@@ -94,12 +95,9 @@ setMethod(
 
     # Collate new data
     newInfoData <- DataFrame(
-        REF = REF,
-        HET = HET,
-        ALT = ALT,
-        AAF = AAF,
-        MAF = MAF
+        REF, HET, ALT, AAF, MAF
     )
+    colnames(newInfoData) <- rownames(newInfoHeader)
 
     # Append new header fields
     info(header(vcf)) <- rbind(info(header(vcf)), newInfoHeader)
