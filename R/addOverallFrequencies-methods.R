@@ -82,10 +82,11 @@ setMethod(
     AAF <- (HET + 2 * ALT) / (2 * (REF + HET + ALT))
 
     # Minor allele frequency
-    MAF <- mapply(
+    MAF <- bpmapply(
         function(ref, alt){min(ref, alt)},
         ref = 1 - AAF,
-        alt = AAF) # TODO: re-introduce parallel processing
+        alt = AAF,
+        BPPARAM = bp(param))
 
     # Collate new headers
     newInfoHeader <- DataFrame(

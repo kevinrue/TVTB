@@ -1,6 +1,16 @@
 \name{TVTB-NEWS}
 \title{NEWS: The VCF Tool Box}
 
+\section{Changes in version 0.99.4 2016-10-12}{
+\subsection{Experimental changes}{
+\itemize{
+\item
+    Reverted changes applied in version 0.99.3. \code{BiocParallel} does not
+    seem to be causing the build error on Windows Server.
+}
+}
+}
+
 \section{Changes in version 0.99.3 2016-10-12}{
 \subsection{Experimental changes}{
 \itemize{
