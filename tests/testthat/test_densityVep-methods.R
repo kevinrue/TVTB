@@ -85,7 +85,7 @@ test_that(".checkAlts catches invalid inputs", {
 
 # Arguments ----
 
-test_that("plot & facet & popFreq argument work",{
+test_that("plot & facet & popFreq & layer arguments work",{
 
     expect_s3_class(
         densityVepByPhenotype(

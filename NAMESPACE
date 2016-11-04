@@ -70,10 +70,10 @@ importFrom("ensemblVEP", "parseCSQToGRanges")
 importFrom(
     "ggplot2",
     "ggplot", "aes_string", "facet_wrap",
-    "geom_bar", "geom_density",
+    "geom_bar", "geom_density", "geom_dotplot",
     "ylab",
     "theme", "element_text", "rel",
-    "scale_x_discrete")
+    "scale_x_discrete", "scale_colour_discrete", "scale_fill_discrete")
 
 #import(ggbio)
 
