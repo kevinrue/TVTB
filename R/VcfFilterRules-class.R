@@ -579,7 +579,9 @@ setMethod(
     f = "c",
     signature = c(x="VcfInfoRules"),
     definition = function(x, ..., recursive = FALSE){
-        VcfFilterRules(x, ...)
+        res <- VcfFilterRules(x, ...)
+        res <- .dropVcfFilterRules(x = res)
+        return(res)
     }
 )
 
@@ -587,7 +589,9 @@ setMethod(
     f = "c",
     signature = c(x="VcfVepRules"),
     definition = function(x, ..., recursive = FALSE){
-        VcfFilterRules(x, ...)
+        res <- VcfFilterRules(x, ...)
+        res <- .dropVcfFilterRules(x = res)
+        return(res)
     }
 )
 
@@ -595,6 +599,8 @@ setMethod(
     f = "c",
     signature = c(x="VcfFilterRules"),
     definition = function(x, ..., recursive = FALSE){
-        VcfFilterRules(x, ...)
+        res <- VcfFilterRules(x, ...)
+        res <- .dropVcfFilterRules(x = res)
+        return(res)
     }
 )
