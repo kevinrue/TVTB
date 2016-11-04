@@ -95,7 +95,7 @@ shinyServer(function(input, output, clientData, session) {
         # 1) users can easily look at their raw phenotypes separately
         # 2) all analyses use data stored in the VCF object only
 
-        vcf <- RV[["filteredVcf"]]
+        vcf <- RV[["vcf"]]
         validate(need(vcf, Msgs[["importVariants"]]))
 
         phenos <- colData(vcf)
@@ -196,6 +196,7 @@ shinyServer(function(input, output, clientData, session) {
             filter = "top")
     })
 
+    # Update choice of phenotypes to calculate frequencies, when new VCF
     observeEvent(
         eventExpr = RV[["vcf"]],
         handlerExpr = {
@@ -265,6 +266,7 @@ shinyServer(function(input, output, clientData, session) {
 
     # Calculation of frequencies ----
 
+    # Select all phenotype levels on button click
     observeEvent(
         eventExpr = input$tickAllPhenoLevelsFreq,
         handlerExpr = {
@@ -288,6 +290,7 @@ shinyServer(function(input, output, clientData, session) {
         }
     )
 
+    # Deselect all phenotype levels on button click
     observeEvent(
         eventExpr = input$untickAllPhenoLevelsFreq,
         handlerExpr = {
@@ -301,6 +304,7 @@ shinyServer(function(input, output, clientData, session) {
         }
     )
 
+    # Add overall frequencies on button click
     observeEvent(
         eventExpr = input$addOverallFrequencies,
         handlerExpr = {
@@ -330,6 +334,7 @@ shinyServer(function(input, output, clientData, session) {
 
     })
 
+    # Remove overall frequencies on button click
     observeEvent(
         eventExpr = input$removeOverallFrequencies,
         handlerExpr = {
@@ -359,6 +364,7 @@ shinyServer(function(input, output, clientData, session) {
 
         })
 
+    # Add selected & remove deselected frequencies on button click
     observeEvent(
         eventExpr = input$buttonFrequencies,
         handlerExpr = {
@@ -426,7 +432,7 @@ shinyServer(function(input, output, clientData, session) {
                 if (length(phenoLevelKeysRemove))
                     message(
                         "Removing INFO keys for levels: ",
-                        paste(phenoLevelsUnticked, sep = ", "))
+                        paste(phenoLevelsUnticked, collapse = ", "))
                     RV[["vcf"]] <- dropInfo(
                         vcf = RV[["vcf"]],
                         key = phenoLevelKeysRemove,
@@ -478,7 +484,7 @@ shinyServer(function(input, output, clientData, session) {
                 if (length(phenoLevelsAdd) > 0)
                     message(
                         "Adding INFO keys for levels: ",
-                        paste(phenoLevelsAdd, sep = ", "))
+                        paste(phenoLevelsAdd, collapse = ", "))
                     RV[["vcf"]] <- addFrequencies(
                         vcf = vcf,
                         phenos = phenosAdd,
@@ -488,7 +494,7 @@ shinyServer(function(input, output, clientData, session) {
 
                 RV[["latestFrequenciesAdded"]] <- phenosAdd[[1]]
             } else {
-                RV[["latestFrequenciesAdded"]] <- "NA"
+                RV[["latestFrequenciesAdded"]] <- character()
             }
 
             RV[["latestPhenotypeFrequency"]] <- selectedPhenoName
@@ -512,12 +518,12 @@ shinyServer(function(input, output, clientData, session) {
             if (length(freqAdded) > 0)
                 addedLevels <- paste(freqAdded, collapse = ", ")
             else
-                addedLevels <- "NA"
+                addedLevels <- "<NA>"
 
             if(length(freqRemoved > 0))
                 removedLevels <- paste(freqRemoved, collapse = ", ")
             else
-                removedLevels <- "NA"
+                removedLevels <- "<NA>"
 
             return(tagList(
                 "Phenotype", code(pheno), ":",
@@ -1256,7 +1262,8 @@ shinyServer(function(input, output, clientData, session) {
                             isolate({singleVcf <- singleVcf()})
                             validate(need(singleVcf, Msgs[["singleVcf"]]))
 
-                            shiny::incProgress(1, detail = Tracking[["singleVcf"]])
+                            shiny::incProgress(
+                                amount = 1, detail = Tracking[["singleVcf"]])
 
                             tryParseSingleVcf(
                                 file = singleVcf,
@@ -1267,7 +1274,8 @@ shinyServer(function(input, output, clientData, session) {
 
                         OnePerChr = {
 
-                            shiny::incProgress(1, detail = Tracking[["multiVcfs"]])
+                            shiny::incProgress(
+                                amount = 1, detail = Tracking[["multiVcfs"]])
 
                             isolate({
                                 vcfFolder <- input$vcfFolder
@@ -1285,7 +1293,8 @@ shinyServer(function(input, output, clientData, session) {
                         }
                     )
 
-                    shiny::incProgress(1, detail = Tracking[["postprocessing"]])
+                    shiny::incProgress(
+                        amount = 1, detail = Tracking[["postprocessing"]])
 
                     validate(need(
                         length(vcf) > 0,
@@ -1302,8 +1311,9 @@ shinyServer(function(input, output, clientData, session) {
         }
     )
 
+    # Summary of raw variants
     output$vcfSummary <- renderUI({
-        # Summary of raw variants
+
         vcf <- RV[["vcf"]]
         validate(need(vcf, Msgs[["importVariants"]]))
 
@@ -1314,9 +1324,10 @@ shinyServer(function(input, output, clientData, session) {
         ))
     })
 
+    # Widget to control the meta-columns of VCF shown
     output$vcfCols <- renderUI({
 
-        vcf <- RV[["filteredVcf"]]
+        vcf <- RV[["vcf"]]
         validate(need(vcf, Msgs[["importVariants"]]))
 
         colChoices <- c(colnames(mcols(vcf)))
@@ -1329,6 +1340,7 @@ shinyServer(function(input, output, clientData, session) {
         )
     })
 
+    # Show selected VCF meta-columns
     output$vcfRowRanges <- DT::renderDataTable({
 
         vcf <- RV[["filteredVcf"]]
@@ -1352,9 +1364,10 @@ shinyServer(function(input, output, clientData, session) {
             filter = "top")
     })
 
+    # Widget to control the INFO columns shown
     output$vcfInfoCols <- renderUI({
 
-        vcf <- RV[["filteredVcf"]]
+        vcf <- RV[["vcf"]]
         validate(need(vcf, Msgs[["importVariants"]]))
 
         validate(need(
@@ -1363,7 +1376,7 @@ shinyServer(function(input, output, clientData, session) {
             errorClass = "optional"
         )
 
-        validate(need(ncol(info(vcf)) > 0, Msgs[["importVariants"]])) # TODO
+        validate(need(ncol(info(vcf)) > 0, Msgs[["importVariants"]]))
 
         # All columns except the VEP predictions
         colChoices <- grep(
@@ -1380,6 +1393,7 @@ shinyServer(function(input, output, clientData, session) {
         )
     })
 
+    # Displayed requested VCF INFO fields
     output$vcfInfo <- DT::renderDataTable({
         req(input$vcfInfoCols)
         vcf <- RV[["filteredVcf"]]
@@ -1411,6 +1425,7 @@ shinyServer(function(input, output, clientData, session) {
             filter = "top")
     })
 
+    # Display ExpandedVCF summary
     output$vcf <- renderPrint({
 
         vcf <- RV[["vcf"]]
@@ -1447,6 +1462,7 @@ shinyServer(function(input, output, clientData, session) {
 
     })
 
+    # Boolean whether the rule to add evaluates successfully
     newFilterTestResults <- reactive({
         # Only triggered by addNewFilter (> 0)
         req(input$addNewFilter)
@@ -1631,9 +1647,10 @@ shinyServer(function(input, output, clientData, session) {
             RV[["vcfFilters"]] <- VcfFilterRules(vcfRules[-removeIdx])
     })
 
+    # Updates filteredVcf using raw VCF and VcfFilterRules
+    # updated when raw variants are refreshed & when button is clicked
+    # (makes filtered variants synonym to raw variants in absence of filters)
     observe({
-        # Depend on the actionButton *and* the vcf object
-        # makes filtered variants synonym to raw variants in absence of filters
         input$filterVariants
         vcf <- RV[["vcf"]]
 
@@ -1672,6 +1689,7 @@ shinyServer(function(input, output, clientData, session) {
 
     # Parse genotypes ----
 
+    # Structure of raw genotypes
     output$genotypeStructure <- renderPrint({
 
         vcf <- RV[["vcf"]]
@@ -1684,9 +1702,10 @@ shinyServer(function(input, output, clientData, session) {
         str(genotypes)
     })
 
+    # Widget to control the number of samples shown
     output$genoNumCols <- renderUI({
 
-        vcf <- RV[["filteredVcf"]]
+        vcf <- RV[["vcf"]]
 
         validate(need(vcf, Msgs[["importVariants"]]))
 
@@ -1701,11 +1720,12 @@ shinyServer(function(input, output, clientData, session) {
             step = 1)
     })
 
+    # Widget to control the index of the first sample shown
     output$genoFirstCol <- renderUI({
 
         req(input$genoNumCols)
 
-        vcf <- RV[["filteredVcf"]]
+        vcf <- RV[["vcf"]]
 
         validate(need(vcf, Msgs[["importVariants"]]))
 
@@ -1722,6 +1742,9 @@ shinyServer(function(input, output, clientData, session) {
             step = 1)
     })
 
+    # Widget to control the number of variants shown
+    # Contrary to samples, variants can be filtered after import
+    # therefore the widget is updated using the filteredVcf reactive
     output$genoNumRows <- renderUI({
 
         vcf <- RV[["filteredVcf"]]
@@ -1739,6 +1762,9 @@ shinyServer(function(input, output, clientData, session) {
             step = 1)
     })
 
+    # Widget to control the index of the first variant shown
+    # Contrary to samples, variants can be filtered after import
+    # therefore the widget is updated using the filteredVcf reactive
     output$genoFirstRow <- renderUI({
 
         req(input$genoNumRows)
@@ -1759,6 +1785,7 @@ shinyServer(function(input, output, clientData, session) {
             step = 1)
     })
 
+    # Display requested genotypes as a simple table
     output$genotypesSample <- renderTable({
 
         req(
@@ -1863,7 +1890,7 @@ shinyServer(function(input, output, clientData, session) {
 
     # Parse VEP predictions ----
 
-    # Show information about consequence field
+    # Show information about VEP field
     output$vepStructure <- renderPrint({
 
         vcf <- RV[["vcf"]]
@@ -1883,9 +1910,10 @@ shinyServer(function(input, output, clientData, session) {
         str(csq)
     })
 
+    # Widget to control the VEP fields shown
     output$vepCols <- renderUI({
 
-        vcf <- RV[["filteredVcf"]]
+        vcf <- RV[["vcf"]]
         # First make sure vcf exists
         validate(need(vcf, Msgs[["importVariants"]]))
         # If it exists, check that vepKey exist in INFO fields
@@ -1905,6 +1933,7 @@ shinyServer(function(input, output, clientData, session) {
             multiple = TRUE)
     })
 
+    # Display requested VEP fields
     output$vcfVep <- DT::renderDataTable({
         req(input$vepCols)
 
@@ -1938,9 +1967,11 @@ shinyServer(function(input, output, clientData, session) {
     })
 
     # When variants are updated, update the choices for plotting
-    observeEvent(RV[["filteredVcf"]], {
+    # plot: tabulatedVariantsByPhenotype (TVBP)
+    # plot densityVariantsByPhenotype (DVBP)
+    observeEvent(RV[["vcf"]], {
 
-        vcf <- RV[["filteredVcf"]]
+        vcf <- RV[["vcf"]]
 
         validate(
             need(vcf, Msgs[["importVariants"]]),
@@ -2045,36 +2076,39 @@ shinyServer(function(input, output, clientData, session) {
     })
 
     # Update list of VEP facets if the faceting variable changes
-    observeEvent(eventExpr = input$vepFacetKeyTVBP, handlerExpr = {
-        # Raw variants must exist
-        validate(need(RV[["vcf"]], Msgs[["importVariants"]]))
+    observeEvent(
+        eventExpr = input$vepFacetKeyTVBP,
+        handlerExpr = {
+            # Raw variants must exist
+            validate(need(RV[["vcf"]], Msgs[["importVariants"]]))
 
-        vcf <- RV[["filteredVcf"]]
-        # Give time to filter variants
-        req(vcf)
+            vcf <- RV[["filteredVcf"]]
+            # Give time to filter variants
+            req(vcf)
 
-        validate(need(
-            input$vepKey %in% colnames(info(vcf)),
-            Msgs[["vepKeyNotFound"]]))
-        csq <- tryParseCsq(vcf = vcf, vepKey = input$vepKey)
+            validate(need(
+                input$vepKey %in% colnames(info(vcf)),
+                Msgs[["vepKeyNotFound"]]))
+            csq <- tryParseCsq(vcf = vcf, vepKey = input$vepKey)
 
-        validate(need(csq, Msgs[["csq"]]))
+            validate(need(csq, Msgs[["csq"]]))
 
-        vepMcols <- mcols(csq)
+            vepMcols <- mcols(csq)
 
-        # Initialise to avoid crash
-        facetsSelected <- NULL
-        if (input$vepFacetKeyTVBP != "None"){
-            vepFacets.choices <- unique(vepMcols[,input$vepFacetKeyTVBP])
-        } else {
-            vepFacets.choices <- NA_character_
+            # Initialise to avoid crash
+            facetsSelected <- NULL
+            if (input$vepFacetKeyTVBP != "None"){
+                vepFacets.choices <- unique(vepMcols[,input$vepFacetKeyTVBP])
+            } else {
+                vepFacets.choices <- NA_character_
+            }
+
+            updateSelectInput(
+                session, "vepFacetsTVBP",
+                choices = vepFacets.choices,
+                selected = vepFacets.choices)
         }
-
-        updateSelectInput(
-            session, "vepFacetsTVBP",
-            choices = vepFacets.choices,
-            selected = vepFacets.choices)
-    })
+    )
 
     # Base of the ggplot summarising counts of VEP
     TVBPggplot <- reactive({
@@ -2493,6 +2527,7 @@ shinyServer(function(input, output, clientData, session) {
 
     # Genotype heatmap ----
 
+    # Heatmap of genotypes (ggplot)
     output$heatmapGenotype <- renderPlot({
 
         if (input$doGenoHeatmap == 0)
@@ -2538,12 +2573,14 @@ shinyServer(function(input, output, clientData, session) {
 
             message("Plotting heatmap of genotypes...")
             incProgress(1, detail = Tracking[["render"]])
-            gg
+
+            return(gg)
         })
     })
 
     # Parallel computing ----
 
+    # When config is changed, update choices of type & cores
     observeEvent(input$bpConfig, {
 
         switch(
@@ -2578,6 +2615,7 @@ shinyServer(function(input, output, clientData, session) {
             })
     })
 
+    # Update parallel configuration object
     bpParam <- reactive({
         # Give time to initialise the widget
         req(input$bpConfig)
