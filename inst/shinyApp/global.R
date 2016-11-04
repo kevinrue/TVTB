@@ -20,15 +20,17 @@ stopifnot(
 # .vepCountBarPlotHeight <- "500px"
 # .vepDensityPlotHeight <- "500px"
 
-# R session variables -----------------------------------------------------
 
-.originalOptions <- options()
-options("width" = 120)
 
 # General settings --------------------------------------------------------
 
 # Fetch the environment defined in the package
 .tSVE <- TVTB:::.tSVE
+
+# R session variables -----------------------------------------------------
+
+.originalOptions <- options()
+options("width" = get("options.width", .tSVE))
 
 # Parallel settings -------------------------------------------------------
 

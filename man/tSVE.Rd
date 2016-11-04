@@ -22,7 +22,8 @@ tSVE(
     vepKey = "CSQ",
     refSuffix = "REF", hetSuffix = "HET", altSuffix = "ALT",
     aafSuffix = "AAF", mafSuffix = "MAF",
-    genoHeatmap.height = "500px"
+    genoHeatmap.height = "500px",
+    options.width = 120
 )
 }
 
@@ -63,6 +64,9 @@ Default INFO key suffix used to store the data for minor allele frequency.
     \item{genoHeatmap.height}{
 Default height (in pixels) of the heatmap that represents the genotype of
 each variant in each sample.
+}
+    \item{options.width}{
+Sets \code{options("width")}.
 }
 
 }
