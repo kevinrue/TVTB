@@ -132,12 +132,12 @@ exportMethods(
 #exportClassPattern("^.*$")
 exportClasses(
     "tSVEParam",
-    "NamedFilter"
+    "VcfInfoFilter"
 )
 
 # Constructors ----
 
 exportMethods(
     "tSVEParam",
-    "NamedFilter"
+    "VcfInfoFilter"
 )

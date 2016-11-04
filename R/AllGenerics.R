@@ -257,14 +257,14 @@ setGeneric(
         standardGeneric("bp<-")
 )
 
-# NamedFilter class ----
+# VcfInfoFilter class ----
 
 setGeneric(
-    name = "NamedFilter",
+    name = "VcfInfoFilter",
     signature = c("name", "condition", "value"),
     def = function(
         name, condition, value)
-        standardGeneric("NamedFilter")
+        standardGeneric("VcfInfoFilter")
 )
 
 setGeneric(

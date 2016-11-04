@@ -3,7 +3,7 @@
 
 setMethod(
     f = "initialize",
-    signature = c("NamedFilter"),
+    signature = c("VcfInfoFilter"),
     definition = function(
         .Object, name, condition, value){
 
@@ -19,13 +19,13 @@ setMethod(
 
 
 setMethod(
-    f = "NamedFilter",
+    f = "VcfInfoFilter",
     signature = c(name="character", condition="character", value="ANY"),
     definition = function(
         name, condition, value){
 
         new(
-            Class = "NamedFilter",
+            Class = "VcfInfoFilter",
             name = name, condition = condition, value = value)
     }
 )
@@ -35,13 +35,13 @@ setMethod(
 ### name
 setMethod(
     f = "name",
-    signature = c("NamedFilter"),
+    signature = c("VcfInfoFilter"),
     definition = function(x)
         slot(x, "name")
 )
 
 setReplaceMethod(
-    f = "name", c("NamedFilter", "character"),
+    f = "name", c("VcfInfoFilter", "character"),
     function(x, value){
         slot(x, "name") <- value
         validObject(x)
@@ -52,13 +52,13 @@ setReplaceMethod(
 ### condition
 setMethod(
     f = "condition",
-    signature = c("NamedFilter"),
+    signature = c("VcfInfoFilter"),
     definition = function(x)
         slot(x, "condition")
 )
 
 setReplaceMethod(
-    f = "condition", c("NamedFilter", "character"),
+    f = "condition", c("VcfInfoFilter", "character"),
     function(x, value){
         slot(x, "condition") <- value
         validObject(x)
@@ -69,13 +69,13 @@ setReplaceMethod(
 ### value
 setMethod(
     f = "value",
-    signature = c("NamedFilter"),
+    signature = c("VcfInfoFilter"),
     definition = function(x)
         slot(x, "value")
 )
 
 setReplaceMethod(
-    f = "value", c("NamedFilter", "ANY"),
+    f = "value", c("VcfInfoFilter", "ANY"),
     function(x, value){
         slot(x, "value") <- value
         validObject(x)

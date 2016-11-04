@@ -60,7 +60,7 @@ tSVEParam <- setClass(
 
 # tSVEParam ----
 
-.valid.NamedFilter <- function(object){
+.valid.VcfBasicFilter <- function(object){
 
     errors <- c()
 
@@ -76,8 +76,10 @@ tSVEParam <- setClass(
     return(TRUE)
 }
 
-NamedFilter <- setClass(
-    Class = "NamedFilter",
+VcfBasicFilter <- setClass(
+    Class = "VcfBasicFilter",
+
+    contains = "VIRTUAL",
 
     # Define the slots
     slots = c(
@@ -86,6 +88,13 @@ NamedFilter <- setClass(
         value = "ANY"
     ),
 
-    validity = .valid.NamedFilter
+    validity = .valid.VcfBasicFilter
+
+)
+
+VcfInfoFilter <- setClass(
+    Class = "VcfInfoFilter",
+
+    contains = "VcfBasicFilter"
 
 )

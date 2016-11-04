@@ -1,48 +1,50 @@
-\name{NamedFilter-class}
+\name{VcfBasicFilter-class}
 \docType{class}
 
 % Class
-\alias{class:NamedFilter}
-\alias{NamedFilter-class}
+\alias{class:VcfBasicFilter}
+\alias{VcfBasicFilter-class}
+\alias{class:VcfInfoFilter}
+\alias{VcfInfoFilter-class}
 
 % Constructors/Methods:
-\alias{NamedFilter}
-\alias{NamedFilter-methods}
-\alias{NamedFilter,character,character-method}
-\alias{NamedFilter,character,character,ANY-method}
-\alias{initialize,NamedFilter-method}
+\alias{VcfInfoFilter}
+\alias{VcfInfoFilter-methods}
+\alias{VcfInfoFilter,character,character-method}
+\alias{VcfInfoFilter,character,character,ANY-method}
+\alias{initialize,VcfInfoFilter-method}
 
 % Accessor methods:
 \alias{name}
-\alias{name,NamedFilter-method}
+\alias{name,VcfInfoFilter-method}
 \alias{name<-}
-\alias{name<-,NamedFilter,character-method}
+\alias{name<-,VcfInfoFilter,character-method}
 \alias{condition}
-\alias{condition,NamedFilter-method}
+\alias{condition,VcfInfoFilter-method}
 \alias{condition<-}
-\alias{condition<-,NamedFilter,character-method}
+\alias{condition<-,VcfInfoFilter,character-method}
 \alias{value}
-\alias{value,NamedFilter-method}
+\alias{value,VcfInfoFilter-method}
 \alias{value<-}
-\alias{value<-,NamedFilter-method}
+\alias{value<-,VcfInfoFilter-method}
 
 % Other methods / functions
 
-\title{NamedFilter class objects}
+\title{VcfBasicFilter class objects}
 
 \description{
-The \code{NamedFilter} class stores the name, condition, and value
+The \code{VcfInfoFilter} class stores the name, condition, and value
 that describe a named filter.
 }
 
 \usage{
 ## Constructors
 
-\S4method{NamedFilter}{character,character,ANY}(name, condition, value)
+\S4method{VcfInfoFilter}{character,character,ANY}(name, condition, value)
 }
 
 \section{Accessors}{
-In the following code snippets \code{x} is a \code{NamedFilter} object.
+In the following code snippets \code{x} is a \code{VcfInfoFilter} object.
 \describe{
     \item{\code{name(x)}, \code{name(x) <- value}}{
     Gets or sets the name of the field to filter.
@@ -70,7 +72,7 @@ Target values.
 }
 
 \value{
-A \code{NamedFilter} object that contains recurrent parameters.
+A \code{VcfInfoFilter} object that contains recurrent parameters.
 }
 
 \author{
@@ -78,17 +80,17 @@ Kevin Rue-Albrecht
 }
 
 %\seealso{
-% Soon: NamedFilterList, VcfFilter
+% Soon: VcfInfoFilterList, VcfFilter
 %}
 
 \examples{
 # Constructors ----
 
-NamedFilter(name = "FILTER", condition = "==", value = "PASS")
+VcfInfoFilter(name = "FILTER", condition = "==", value = "PASS")
 
-NamedFilter(name = "MAF", condition = "<=", value = 1e-6)
+VcfInfoFilter(name = "MAF", condition = "<=", value = 1e-6)
 
-nf <- NamedFilter(
+nf <- VcfInfoFilter(
     name = "IMPACT", condition = "\%in\%", value = c("MODERATE", "HIGH"))
 
 # Accessors ----
