@@ -389,10 +389,10 @@ setMethod(
     vcf <- expand(x = vcf, row.names = TRUE)
 
     # If any multi-allelic record is present in the file
-    if (any(lengths(mcols(vcf)[,"ALT"]) > 1)){
+    #if (any(lengths(mcols(vcf)[,"ALT"]) > 1)){
         # Disambiguate their row.names using, appending "_ALT"
-        rownames(vcf) <- paste(rownames(vcf), mcols(vcf)[,"ALT"], sep = "_")
-    }
+    rownames(vcf) <- paste(rownames(vcf), mcols(vcf)[,"ALT"], sep = "_")
+    #}
 
     # Header of all INFO fields were imported but not all data fields,
     # remove headers of fields not imported
