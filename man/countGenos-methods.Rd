@@ -2,31 +2,26 @@
 
 \alias{countGenos}
 
-\alias{countGenos,ExpandedVCF,character-method}
-\alias{countGenos,matrix,character-method}
+\alias{countGenos,ExpandedVCF-method}
 
 \docType{methods}
 \alias{countGenos-methods}
 \title{Count occurences of genotypes}
 \description{
 Counts the total occurences of a set of genotypes by row
-    in a matrix of genotype. All given genotypes are counted toward a single
-    total (\emph{e.g.} grand total of \code{c("0/0", "0|0")}),
-    while other genotypes are silently ignored.
+in a matrix of genotype. All given genotypes are counted toward a single
+total (\emph{e.g.} grand total of \code{c("0/0", "0|0")}),
+while other genotypes are silently ignored.
 }
 
 \usage{
-\S4method{countGenos}{ExpandedVCF,character}(
+\S4method{countGenos}{ExpandedVCF}(
     x, genos, pheno = NULL, level = NULL)
-
-\S4method{countGenos}{matrix,character}(
-    x, genos)
 }
 
 \arguments{
     \item{x}{
-\code{ExpandedVCF} or \code{matrix} of genotypes
-(\emph{e.g.} \code{geno(vcf)[["GT"]]}).
+\code{ExpandedVCF} object.
 }
     \item{genos}{
 \code{character} vector of genotypes to count (toward a common unique total).
@@ -50,8 +45,8 @@ Kevin Rue-Albrecht
 }
 
 \note{
-In the future, \code{x} should also support genotype quality (GQ) to consider
-only genotypes above a given quality cut-off.
+In the future, \code{x} may also support genotype quality (GQ) to consider
+only genotypes above a flexible quality cut-off.
 }
 
 \seealso{

@@ -35,11 +35,12 @@ test_that("countGenos() returns appropriate values",{
             level = "GBR"),
         "integer"
     )
-
+    
     expect_type(
         countGenos(
-            x = geno(vcf)[["GT"]],
-            genos = unlist(het(tparam), use.names = FALSE)),
+            x = vcf,
+            genos = unlist(het(tparam), use.names = FALSE)
+        ),
         "integer"
     )
 

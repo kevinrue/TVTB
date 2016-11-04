@@ -1,9 +1,7 @@
 \name{addCountGenos-methods}
 
 \alias{addCountGenos}
-\alias{addCountGenos,ExpandedVCF,missing-method}
-\alias{addCountGenos,ExpandedVCF,numeric-method}
-\alias{addCountGenos,ExpandedVCF,character-method}
+\alias{addCountGenos,ExpandedVCF-method}
 
 \docType{methods}
 \alias{addCountGenos-methods}
@@ -17,11 +15,9 @@ while other genotypes are silently ignored.
 }
 
 \usage{
-\S4method{addCountGenos}{ExpandedVCF,numeric}(
-        vcf, genos, key, description, samples = 1:ncol(vcf), force = FALSE)
-
-\S4method{addCountGenos}{ExpandedVCF,character}(
-        vcf, genos, key, description, samples = 1:ncol(vcf), force = FALSE)
+\S4method{addCountGenos}{ExpandedVCF}(
+        vcf, genos, key, description,
+        samples = 1:ncol(vcf), force = FALSE)
 }
 
 \arguments{
@@ -32,18 +28,20 @@ while other genotypes are silently ignored.
 \code{character} vector of genotypes to count (toward a common unique total).
 }
     \item{key}{
-\code{character} name of the INFO field to create or update.
+Name of the INFO field to create or update
+(\code{character} vector of length 1). See \emph{Details} below.
 }
     \item{description}{
-\code{character} description of the INFO field to create or update.
+\code{character} description of the INFO field to create or overwrite
+(\code{character} vector of length 1).
 }
     \item{samples}{
 \code{numeric} or \code{character} vector of indicating samples to consider
 in \code{VariantAnnotation::geno(vcf)}.
+If not specified, all samples are considered.
 }
     \item{force}{
-If \code{TRUE}, the field header and data will be overwritten.
-
+If \code{TRUE}, the field header and data will be overwritten if present;
 If \code{FALSE}, an error is thrown if the field already exists.
 }
 }
@@ -56,8 +54,15 @@ If \code{FALSE}, an error is thrown if the field already exists.
 Kevin Rue-Albrecht
 }
 
+\details{
+In all cases, the new INFO field is inserted after the last existing field.
+In other words, overwriting an existing INFO field is achieved by dropping
+it from the data and header of the \code{info} slot,
+and subsequently inserting the new data after the last remaining INFO field.
+}
+
 \seealso{
-\code{\link{countGenos,ExpandedVCF,character-method}},
+\code{\link{countGenos,ExpandedVCF-method}},
 \code{\linkS4class{VCF}},
 and \code{\link{geno,VCF-method}}
 }

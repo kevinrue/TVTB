@@ -20,7 +20,8 @@ setMethod(
             vcf <- .dropInfoData(vcf, key)
             .dropInfoHeader(vcf, key)
         },
-        stop("invalid slot argument"))
+        stop("invalid slot argument")
+    )
 }
 
 .dropInfoHeader <- function(vcf, key = NULL){

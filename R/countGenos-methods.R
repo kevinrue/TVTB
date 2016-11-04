@@ -1,28 +1,28 @@
 # genotypes = ExpandedVCF
 setMethod(
     f = "countGenos",
-    signature = c(x="ExpandedVCF", genos="character"),
+    signature = c(x="ExpandedVCF"),
     definition = function(x, genos, pheno = NULL, level = NULL){
-        if (!is.null(level))
+        # If a phenotype level is supplied
+        if (!is.null(level)){
+            # The corresponding phenotype must be supplied
             if (is.null(pheno)){
-                stop("level argument is invalid if pheno=NULL")}
+                stop("pheno required if level supplied")}
             else {
-                .checkPhenoLevel(x = x, pheno = pheno, level = level)
+                # Check valid inputs
+                .checkPhenoLevel(
+                    x = x,
+                    pheno = pheno,
+                    level = level
+                )
                 # Subset to the samples associated with the phenotype level
                 matrixGenos <- geno(x)[["GT"]][,colData(x)[,pheno] == level]
             }
-
-        .countGenos(
-            x = matrixGenos, genos = genos, pheno = pheno, level = level)
-    }
-)
-
-# genotypes = matrix
-setMethod(
-    f = "countGenos",
-    signature = c(x="matrix", genos="character"),
-    definition = function(x, genos){
-        .countGenos(x, genos, pheno = NULL, level = NULL)
+        } else {
+            matrixGenos <- geno(x)[["GT"]]
+        }
+        # Call internal function
+        .countGenos(x = matrixGenos, genos = genos)
     }
 )
 
@@ -41,8 +41,9 @@ setMethod(
     return(TRUE)
 }
 
-
-.countGenos <- function(x, genos, pheno = NULL, level = NULL){
+# x: matrix
+# genos: character vector
+.countGenos <- function(x, genos){
     as.integer(rowSums(matrix(
         x %in% genos, nrow = nrow(x), ncol = ncol(x))))
 }

@@ -39,7 +39,7 @@ setGeneric(
 # Not used within the package anymore; left for user convenience
 setGeneric(
     name = "addCountGenos",
-    signature = c("vcf", "samples"),
+    signature = c("vcf"),
     def = function(
         vcf, genos, key, description, samples = 1:ncol(vcf), force = FALSE)
         standardGeneric("addCountGenos")
@@ -49,8 +49,8 @@ setGeneric(
 
 setGeneric(
     name = "countGenos",
-    signature = c("x","genos"),
-    def = function(x, genos, ...)
+    signature = c("x"),
+    def = function(x, genos, pheno = NULL, level = NULL)
         standardGeneric("countGenos")
 )
 
@@ -126,7 +126,7 @@ setGeneric(
     name = "TVTBparam",
     signature = "genos",
     def = function(
-        ..., genos,
+        genos,
         ranges = GRangesList(),
         aaf = "AAF", maf = "MAF", vep = "CSQ", bp = SerialParam())
         standardGeneric("TVTBparam")
