@@ -983,7 +983,8 @@ shinyServer(function(input, output, clientData, session) {
         testResult <- newFilterTestResults()
 
         if (testResult)
-            return(strong(tags$span(style="color:green", RV[["newFilterStatus"]])))
+            # return(strong(tags$span(style="color:green", RV[["newFilterStatus"]])))
+            return()
         else
             return(strong(tags$span(style="color:red", RV[["newFilterStatus"]])))
     })
@@ -995,13 +996,13 @@ shinyServer(function(input, output, clientData, session) {
         # Only add new filter if valid
         validate(need(testResult == TRUE, "Invalid VCF filter"))
 
-        RV[["vcfFilters"]] <- VcfFilterRules(
+        newRules <- VcfFilterRules(
             RV[["vcfFilters"]],
             newFilter)
-    })
 
-    output$vcfFilters <- renderPrint({
-        return(str(RV[["vcfFilters"]]))
+        names(newRules) <- paste0("rule", 1:length(newRules))
+
+        RV[["vcfFilters"]] <- newRules
     })
 
     output$vcfFilterControls <- renderUI({
@@ -1021,11 +1022,6 @@ shinyServer(function(input, output, clientData, session) {
                         width = 1,
                         code(type(vcfFilters)[filterIndex])
                     ),
-                    # expression
-                    shiny::column(
-                        width = 8,
-                        code(as.character(vcfFilters[filterIndex][[1]]))
-                    ),
                     # active
                     shiny::column(
                         width = 1,
@@ -1033,10 +1029,39 @@ shinyServer(function(input, output, clientData, session) {
                             inputId = paste0("active", filterIndex),
                             label = NULL,
                             value = active(vcfFilters)[filterIndex])
+                    ),
+                    # expression
+                    shiny::column(
+                        width = 8,
+                        code(as.character(vcfFilters[filterIndex][[1]]))
                     )
             )
         }))
 
+    })
+
+    observe({
+
+        # If the inputs are updated
+        inputs <- input
+
+        # Obtain the status of the VCF filters
+        inputNames <- names(inputs)
+        rulesActiveNames <- grep("^active[[:digit:]]*", inputNames, value = TRUE)
+        rulesActive <- sapply(
+            X = rulesActiveNames,
+            FUN = function(activeName){
+                inputs[[activeName]]
+            },
+            simplify = TRUE)
+
+        # NOTE: cannot work on the reactiveValues themselves
+        # Extract from the reactiveValues
+        isolate({vcfRules <- RV[["vcfFilters"]]})
+        # Update the active status
+        active(vcfRules) <- as.logical(rulesActive)
+        # Update in the reactiveValues
+        RV[["vcfFilters"]] <- vcfRules
     })
 
     # Parse genotypes ----

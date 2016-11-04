@@ -30,8 +30,8 @@ GS <- list(
     choices.vepCols = c(),
     default.vepCols = c(),
     default.refGenotypes = c("0|0"),
-    default.hetGenotypes = c("0|1", "1|0"),
-    default.altGenotypes = c("1|1"),
+    default.hetGenotypes = c("0|1", "1|0", "1|2", "2|1"),
+    default.altGenotypes = c("1|1", "2|2"),
     choices.ensDbType = list(
         "Gene name" = "Genename"),
     default.ensDbType = "gene",
@@ -39,7 +39,9 @@ GS <- list(
     default.ensDbFilters = "=",
     all.genotypes = c(
         "0/0","0/1","1/0","1/1","./0","0/.","./1","1/.","./.",
+        "0/2","2/0", "1/2", "2/1", "2/2", "./2", "2/.",
         "0|0","0|1","1|0","1|1",".|0","0|.",".|1","1|.",
+        "0|2","2|0", "1|2", "2|1", "2|2", ".|2", "2|.",
         "0", "1", "2","."),
     choices.phenoCols = c(),
     default.phenoCols = c(),

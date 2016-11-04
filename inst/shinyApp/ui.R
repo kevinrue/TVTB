@@ -530,10 +530,25 @@ shinyUI(navbarPage(theme = "bootstrap.css",
             fluidRow(
                 shiny::column(
                     width = 1,
+                    br(),
+                    actionButton(
+                        "addNewFilter", "Add filter",
+                        icon = icon("plus")
+                    )
+                ),
+                shiny::column(
+                    width = 1,
                     selectInput(
                         "newFilterClass", "Type",
                         choices = GS[["vcfFilterClass.choices"]],
                         selected = GS[["vcfFilterClass.default"]]
+                    )
+                ),
+                shiny::column(
+                    width = 1,
+                    checkboxInput(
+                        "newFilterActive", "Active?",
+                        value = TRUE
                     )
                 ),
                 shiny::column(
@@ -546,20 +561,6 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                             "IMPACT %in% c(\"HIGH\", \"MODERATE\")",
                             sep = " - or - "
                         )
-                    )
-                ),
-                shiny::column(
-                    width = 1,
-                    checkboxInput(
-                        "newFilterActive", "Active?",
-                        value = TRUE
-                    )
-                ),
-                shiny::column(
-                    width = 1,
-                    actionButton(
-                        "addNewFilter", "Add filter",
-                        icon = icon("plus")
                     )
                 )
             ),
@@ -593,9 +594,6 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                     em("i.e."), code("\""), "and", code("'"), ")"
                 )
             )
-        ),
-        wellPanel(
-            verbatimTextOutput("vcfFilters")
         ),
         wellPanel(
             fluidRow(
