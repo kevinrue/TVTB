@@ -2,7 +2,7 @@
 \alias{NEWS}
 \alias{NEWS.Rd}
 
-\title{The VCF Tool Box NEWS}
+\title{NEWS: The VCF Tool Box}
 
 \section{Changes in version 0.99.0}{
 \subsection{New features}{

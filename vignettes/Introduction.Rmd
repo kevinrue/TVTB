@@ -112,8 +112,8 @@ A `TVTBparam` object may be initialised as follows:
 tparam <- TVTBparam(
     genos = list(
         REF = c("0|0"),
-        HET = c("0|1", "1|0"),
-        ALT = c("1|1")),
+        HET = c("0|1", "1|0", "1|2", "2|1"),
+        ALT = c("1|1", "2|2")),
     ranges = GenomicRanges::GRanges(
         seqnames = "15",
         IRanges::IRanges(
@@ -565,7 +565,7 @@ opts_chunk$set(
 )
 ```
 
-```{r dCBPplot, warning=FALSE}
+```{r dCBPplot, warning=FALSE, message=FALSE}
 densityVepByPhenotype(
         vcf = vcf, phenoCol = "super_pop", vepCol = "CADD_PHRED",
         param = tparam, filter = vcfRules["missense"],

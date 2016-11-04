@@ -218,7 +218,7 @@ setMethod(
         ggPlot <- ggPlot +
         geom_dotplot(
             mapping = aes_string(fill = phenoCol),
-            position = "stack",
+            binpositions = "all",
             stackgroups = TRUE) +
         scale_fill_discrete(phenoCol)
 
