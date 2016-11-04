@@ -127,7 +127,7 @@ setGeneric(
     signature = "genos",
     def = function(
         ..., genos,
-        ranges = GRanges(),
+        ranges = GRangesList(),
         aaf = "AAF", maf = "MAF", vep = "CSQ", bp = SerialParam())
         standardGeneric("TVTBparam")
 )

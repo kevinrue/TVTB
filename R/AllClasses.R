@@ -43,7 +43,7 @@ TVTBparam <- setClass(
     # Define the slots
     slots = c(
         genos = "list",
-        ranges = "GRanges",
+        ranges = "GRangesList",
         aaf = "character",
         maf = "character",
         vep = "character",
@@ -53,7 +53,7 @@ TVTBparam <- setClass(
 
     # Set the default values for the slots. (optional)
     prototype = list(
-        ranges = GRanges(),
+        ranges = GRangesList(),
         aaf = "AAF",
         maf = "MAF",
         vep = "CSQ",

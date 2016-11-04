@@ -2,11 +2,6 @@ context("Pre-process variants from VCF")
 
 # Settings ----
 
-# Genomic region
-bedRegions <- GenomicRanges::GRanges(
-    seqnames = "15",
-    ranges = IRanges::IRanges(start = 48420E3, end = 48421E3))
-
 # VCF file
 vcfFolder <- file.path(system.file(package = "TVTB"), "extdata")
 vcfPattern <- "^chr%s\\..*\\.vcf\\.gz$"

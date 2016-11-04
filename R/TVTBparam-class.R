@@ -37,7 +37,7 @@ setMethod(
     signature = c("TVTBparam"),
     definition = function(
         .Object, genos,
-        ranges = GRanges(),
+        ranges = GRangesList(),
         aaf = "AAF", maf = "MAF", vep = "CSQ", bp = SerialParam()){
 
         # Fill slots with data
@@ -59,7 +59,7 @@ setMethod(
     signature = c(genos="list"),
     definition = function(
         genos,
-        ranges = GRanges(),
+        ranges = GRangesList(),
         aaf = "AAF", maf = "MAF", vep = "CSQ", bp = SerialParam()){
 
         if (is.null(names(genos))){
@@ -83,7 +83,7 @@ setMethod(
     signature = c(genos="missing"),
     definition = function(
         ref, het, alt,
-        ranges = GRanges(),
+        ranges = GRangesList(),
         aaf = "AAF", maf = "MAF", vep = "CSQ", bp = SerialParam()){
 
         genos <- list(REF = ref, HET = het, ALT = alt)
@@ -132,7 +132,7 @@ setMethod(
 )
 
 setReplaceMethod(
-    f = "ranges", c("TVTBparam", "GRanges"),
+    f = "ranges", c("TVTBparam", "GRangesList"),
     function(x, value){
         slot(x, "ranges") <- value
         x

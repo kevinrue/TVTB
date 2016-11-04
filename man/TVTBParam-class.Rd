@@ -20,7 +20,7 @@
 \alias{ranges}
 \alias{ranges,TVTBparam-method}
 \alias{ranges<-}
-\alias{ranges<-,TVTBparam,GRanges-method}
+\alias{ranges<-,TVTBparam,GRangesList-method}
 \alias{aaf}
 \alias{aaf,TVTBparam-method}
 \alias{aaf<-}
@@ -69,12 +69,12 @@ package in a convenient format.
 \usage{
 \S4method{TVTBparam}{list}(
     genos,
-    ranges = GRanges(),
+    ranges = GRangesList(),
     aaf = "AAF", maf = "MAF", vep = "CSQ", bp = SerialParam())
 
 \S4method{TVTBparam}{missing}(
     ref, het, alt,
-    ranges = GRanges(),
+    ranges = GRangesList(),
     aaf = "AAF", maf = "MAF", vep = "CSQ", bp = SerialParam())
 }
 
@@ -93,8 +93,8 @@ In the following code snippets \code{x} is a \code{TVTBparam} object.
     accessors.
     }
     \item{\code{ranges(x)}, \code{ranges(x) <- value}}{
-    Gets or sets a \code{GRanges}
-    that declares the genomic ranges to import and group variants.
+    Gets or sets a \code{GRangesList}
+    that declares a list of genomic ranges to import and group variants.
     }
     \item{\code{hRef(x)}, \code{hRef(x) <- value}}{
     Gets or sets the (named) \code{list} of length 1
@@ -173,7 +173,7 @@ See also \emph{Details} section.
 (\emph{e.g.} \code{c("1|1", "1/1")}).
 }
     \item{ranges}{
-\code{GRanges} of genomic regions to import and group variants.
+\code{GRangesList} of genomic regions to import and group variants.
 }
 \item{aaf}{
 INFO key suffix used to store the alternate allele frequency (AAF).
@@ -229,12 +229,13 @@ genotypes <- list(
     ALT = c("1|1")
 )
 
-gr <- GenomicRanges::GRanges(
+grl <- GenomicRanges::GRangesList(GenomicRanges::GRanges(
     seqnames = "15",
     ranges = IRanges::IRanges(
-        start = 48413170, end = 48434757, names = "SLC24A5"))
+        start = 48413170, end = 48434757, names = "SLC24A5")
+    ))
 
-tparam <- TVTBparam(genos = genotypes, ranges = gr)
+tparam <- TVTBparam(genos = genotypes, ranges = grl)
 
 # Accessors ----
 

@@ -23,6 +23,8 @@ gr <- GenomicRanges::GRanges(
         end = 48434757,
         names = "SLC24A5"))
 
+grl <- GRangesList(gr)
+
 # Constructors ----
 
 test_that("Constructors produce a valid object",{
@@ -130,7 +132,7 @@ test_that("Accessors return valid values",{
 
     expect_s4_class(
         ranges(tparam),
-        "GRanges"
+        "GRangesList"
     )
 
     expect_type(
@@ -207,8 +209,8 @@ test_that("Setters return valid values",{
     )
 
     expect_s4_class(
-        ranges(tparam) <- gr,
-        "GRanges"
+        ranges(tparam) <- grl,
+        "GRangesList"
     )
 
     expect_type(
@@ -260,7 +262,7 @@ test_that("Override method return valid values",{
             ref = "0/0",
             het = "0/1",
             alt = "1/1",
-            ranges = gr,
+            ranges = grl,
             aaf = "Aaf",
             maf = "Maf",
             vep = "ANN",
