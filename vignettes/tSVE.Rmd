@@ -46,6 +46,8 @@ web-application:
 * First-time users are encouraged to follow this vignette
     sequentially (*i.e* without skipping sections),
     as it takes users through the sequence of actions of a typical analysis
+    + Actions are indicated by the word **Action** followed by
+        indented bullet points
 
 [^1]: The `...` argument is called "ellipsis".
 
@@ -451,12 +453,12 @@ This panel demonstrates the use of two methods implemented in the
 `r Biocpkg("TVTB")` package, namely `tabulateVepByPhenotype`
 and `densityVepByPhenotype`.
 
-## Count and tabulate variants by phenotype level {#TVBP}
+## Count and tabulate discrete VEP predictions by phenotype level {#TVBP}
 
 The `tabulateVepByPhenotype` method is designed to count 
 Ensembl VEP predictions associated with variants observed in the distinct
-levels of a given phenotype. The method can display those in two different
-ways:
+levels of a given phenotype.
+The method can display those counts in two different ways:
 
 * a `r CRANpkg("ggplot")` `geom_barplot`
 * a `data.frame` in wide format
@@ -485,6 +487,40 @@ for filtering.
 > 
 > * Use the filtering fields at the top of the table to examine the counts
 >     (e.g. *missense_variant* and *ENST00000341459*)
+
+## Distribution of continuous VEP predictions by phenotype level {#DVBP}
+
+The `densityVepByPhenotype` method is designed to parse continuous 
+Ensembl VEP predictions associated with variants observed in the distinct
+levels of a given phenotype, and display the distribution of those predictions
+in those phenotype levels.
+
+The method can return this information in two different ways:
+
+* a `r CRANpkg("ggplot")` object with `geom_density` and/or `geom_dotplot`
+    layers
+* a `data.frame` of tabulated values in long format
+
+As described above for [discrete VEP predictions](#TVBP), it may be useful
+to tabulate continuous VEP predictions by genomic feature to ensure that
+each variant contributes at most once to each faceted plot.
+
+> **Action**:
+> 
+> * Select or type *CADD_PHRED* (notice the autocompletion feature)
+    as the *Variant effect prediction*
+> * Select *super_pop* as the *Phenotype field*
+> * Leave *Density & Dot plot* as the *Layer(s)*
+> * Select *Feature* as the *VEP faceting key*
+> * Click the *Apply* action button to calculate and display the `ggplot`
+> * See how African and East Asian population tend to display more damaging
+>     mutations
+> 
+> Optionally:
+> * Click the *Advanced controls* checkbox
+> * Decrease the *Relative size of X text* and *Relative size of Y text* to
+>     `0.7`
+> * Click the *Apply* action button to refresh the `ggplot`
 
 # Session info {#SessionInfo}
 
