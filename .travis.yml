@@ -4,6 +4,9 @@ language: R
 r: bioc-devel
 cache: packages
 
-r_github_packages:
-    rstudio/DT,
-    BiocInstaller
+pandoc_version: 1.17.1
+
+r_check_args: --no-build-vignettes
+
+bioc_packages: BiocInstaller
+r_github_packages: rstudio/DT
