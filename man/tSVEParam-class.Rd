@@ -81,8 +81,7 @@ package in a convenient format.
 }
 
 \section{Accessors}{
-In the following code snippets \code{x} is a CollapsedVCF or ExpandedVCF
-object.
+In the following code snippets \code{x} is a \code{tSVEParam} object.
 \describe{
     \item{\code{genos(x)}, \code{genos(x) <- value}}{
     Gets or sets a named \code{list} of length three

@@ -256,3 +256,55 @@ setGeneric(
     def = function(x, value)
         standardGeneric("bp<-")
 )
+
+# NamedFilter class ----
+
+setGeneric(
+    name = "NamedFilter",
+    signature = c("name", "condition", "value"),
+    def = function(
+        name, condition, value)
+        standardGeneric("NamedFilter")
+)
+
+setGeneric(
+    name = "name",
+    signature = "x",
+    def = function(x)
+        standardGeneric("name")
+)
+
+setGeneric(
+    name = "name<-",
+    signature = c("x", "value"),
+    def = function(x, value)
+        standardGeneric("name<-")
+)
+
+setGeneric(
+    name = "condition",
+    signature = "x",
+    def = function(x)
+        standardGeneric("condition")
+)
+
+setGeneric(
+    name = "condition<-",
+    signature = c("x", "value"),
+    def = function(x, value)
+        standardGeneric("condition<-")
+)
+
+setGeneric(
+    name = "value",
+    signature = "x",
+    def = function(x)
+        standardGeneric("value")
+)
+
+setGeneric(
+    name = "value<-",
+    signature = c("x", "value"),
+    def = function(x, value)
+        standardGeneric("value<-")
+)

@@ -122,16 +122,22 @@ exportMethods(
     "vep", "vep<-",
     "bp","bp<-",
 
+    "name", "name<-",
+    "condition", "condition<-",
+    "value","value<-",
+
     "initialize"
 )
 
 #exportClassPattern("^.*$")
 exportClasses(
-    "tSVEParam"
+    "tSVEParam",
+    "NamedFilter"
 )
 
 # Constructors ----
 
 exportMethods(
-    "tSVEParam"
+    "tSVEParam",
+    "NamedFilter"
 )

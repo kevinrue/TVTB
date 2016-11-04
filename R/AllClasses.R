@@ -1,6 +1,8 @@
 
+# tSVEParam ----
+
 .valid.tSVEParam <- function(object){
-    g <- genos(object)
+    g <- slot(object, "genos")
 
     errors <- c()
     if (length(g) != 3)
@@ -12,16 +14,13 @@
     if (sum(lengths(g)) != length(unique(unlist(g))))
         errors <- c(errors, "genos values must not overlap")
 
-    if (length(carrier(object)) != 2)
-        errors <- c(errors, "length(carrier) must equal 2")
-
-    if (length(aaf(object)) != 1)
+    if (length(slot(object, "aaf")) != 1)
         errors <- c(errors, "length(aaf) must equal 1")
 
-    if (length(maf(object)) != 1)
+    if (length(slot(object, "maf")) != 1)
         errors <- c(errors, "length(maf) must equal 1")
 
-    if (length(vep(object)) != 1)
+    if (length(slot(object, "vep")) != 1)
         errors <- c(errors, "length(vep) must equal 1")
 
     if (length(errors > 0))
@@ -56,5 +55,37 @@ tSVEParam <- setClass(
     ),
 
     validity = .valid.tSVEParam
+
+)
+
+# tSVEParam ----
+
+.valid.NamedFilter <- function(object){
+
+    errors <- c()
+
+    if (length(slot(object, "name")) != 1)
+        errors <- c(errors, "name(x) must equal 3")
+
+    if (length(slot(object, "condition")) != 1)
+        errors <- c(errors, "condition(x) must equal 3")
+
+    if (length(errors) > 0)
+        return(errors)
+
+    return(TRUE)
+}
+
+NamedFilter <- setClass(
+    Class = "NamedFilter",
+
+    # Define the slots
+    slots = c(
+        name = "character",
+        condition = "character",
+        value = "ANY"
+    ),
+
+    validity = .valid.NamedFilter
 
 )
