@@ -155,10 +155,9 @@ setMethod(
         if (popFreq) {
             ggData[,csqCol] <- gsub(".*:", "", ggData[,csqCol])
         }
+        # Coerce to numeric
+        ggData[,csqCol] <- as.numeric(ggData[,csqCol])
     }
-
-    # Coerce to numeric
-    ggData[,csqCol] <- as.numeric(ggData[,csqCol])
 
     if (plot){
 

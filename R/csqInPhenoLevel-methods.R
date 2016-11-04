@@ -57,14 +57,14 @@ setMethod(
         param = param,
         unique = unique)
 
+    # parse VEP predictions of those variants
     csq <- parseCSQToGRanges(
-        x = vcf, VCFRowID = rownames(vcf), info.key = vep(param))
+        x = vcf[variantsIdx], info.key = vep(param))
 
-    # Keep the desired consequence for those variants
-    csqFacet <- as.data.frame(
-        mcols(csq[
-            mcols(csq)[,"VCFRowID"] %in% variantsIdx,
-            c(csqCol, facet)]))
+    if (length(csq) == 0)
+        return(data.frame())
+    # Keep the desired consequence(+facet) for those variants
+    csqFacet <- as.data.frame(mcols(csq[,c(csqCol, facet)]))
 
     colnames(csqFacet) <- c(csqCol, facet)
 
