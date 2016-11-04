@@ -54,7 +54,7 @@ test_that("densityCsq* supports all signatures",{
 
     expect_is(
         densityCsqInPhenoLevel(
-            level = "AFR",
+            level = "GBR",
             vcf = vcf,
             phenoCol = "pop",
             csqCol = "CADD_PHRED",
