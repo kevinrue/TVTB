@@ -1,4 +1,4 @@
-# The Variant Tool-Box (TVTB)
+# The VCF Tool Box (TVTB)
 
 ## Software status
 

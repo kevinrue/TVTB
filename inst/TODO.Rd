@@ -2,7 +2,7 @@
 \alias{TODO}
 \alias{TODO.Rd}
 
-\title{The Variant Tool-Box "to-do" list}
+\title{The VCF Tool Box "to-do" list}
 
 \section{Package}{
 
