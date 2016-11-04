@@ -183,12 +183,19 @@ setMethod(
 
 # TODO info.key taken from TVTBParam
 .evalVepFilter <- function(expr, envir){
+    if (any(duplicated(rownames(envir))))
+        rownames(envir) <- paste(
+            rownames(envir),
+            mcols(envir)[,"ALT"],
+            sep = "_")
+    if (any(duplicated(rownames(envir))))
+        stop("<rownames(x)>_<ALT> is not unique")
     csq <- parseCSQToGRanges(
         x = envir, VCFRowID = rownames(envir), info.key = vep(expr))
     # Apply filters to the VEP predictions
     csqBoolean <- eval(expr = expr, envir = csq)
     # Index of variants with 1+ prediction passing the filter
-    vcfPass <- mcols(csq)[csqBoolean,"VCFRowID", drop = TRUE]
+    vcfPass <- unique(mcols(csq)[csqBoolean, "VCFRowID", drop = TRUE])
     # Mark each variant with 1+ prediction passing the filter
     vcfBoolean <- rep(FALSE, length(envir))
     vcfBoolean[vcfPass] <- TRUE

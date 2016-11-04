@@ -41,18 +41,31 @@ functionalities in a programming-free environment.
 
 Currently, major functionalities in the `r Biocpkg("TVTB")` package include:
 
-* Counting discrete Ensembl VEP predictions in levels of a phenotype
+**Genotype counts and allele frequencies**
+
+* Added/overwritten in INFO keys of an `ExpandedVCF` objects
+    + overall counts and frequencies (*i.e.* across all samples)
+    + counts and frequencies within level(s) of phenotype(s)
+
+**VCF filter rules**
+
+* Filter rules on the `fixed` slot of an `ExpandedVCF` object
+* Filter rules on the `info` slot of an `ExpandedVCF` object
+* Filter rules on the Ensembl VEP predictions stored in a given slot
+of an `ExpandedVCF` object
+* The above rules can be combined and used to subset an `ExpandedVCF` object
+
+**Counts of discrete Ensembl VEP predictions**
+
+* in levels of a given phenotype
     + as a `data.frame` or a stacked `r Biocpkg("ggplot2")` `geom_bar`
     + counts faceted by another Ensembl VEP prediction (*e.g.* `"Feature"`)
     + `geom_bar` represented as stacked *percentage* of predictions
-* Density distribution of continuous Ensembl VEP predictions in levels of
-    a phenotype
+
+** Density of continuous Ensembl VEP predictions**
+
+* in levels of a phenotype
     + density faceted by another Ensembl VEP prediction
-* Adding genotype counts and allele frequencies to the `ExpandedVCF` object
-    + counts and frequencies within level(s) of phenotype(s)
-    + overall counts and frequencies (*i.e.* across all samples)
-* Subset `ExpandedVCF` objects using a combination of filters on data in
-    the `fixed` data, `info` data, and Ensembl VEP preditions
 
 # Installation {#Installation}
 
@@ -84,7 +97,7 @@ such as:
         simply named `<suffix>`
 * settings for parallel calculations
 
-To reduce the burden of repetitive programming, and to 
+To reduce the burden of repetition, and to 
 facilitate analyses using consistent sets of parameters,
 `r Biocpkg("TVTB")` implements the `TVTBparam` class.
 `TVTBparam` objects offer a container for parameters recurrently used across
@@ -271,6 +284,8 @@ those methods may benefit from information added to additional INFO keys
 after data import, either manually by the user, or through various
 methods implemented in the `r Biocpkg("TVTB")` package.
 
+## Adding overall frequencies {#FrequenciesOverall}
+
 For instance, the method `addOverallFrequencies` uses the definition of
 reference homozoygote (*REF*), heterozygote (*HET*),
 and homozygote alternate (*ALT*) genotypes stored in a `TVTBparam` object
@@ -300,6 +315,8 @@ to overwrite existing INFO keys
 present either in the `header` or the `info` slots of the `ExpandedVCF` object.
 }
 
+## Adding frequencies in phenotype level {#FrequenciesPhenoLevel}
+
 Similarly, the method `addPhenoLevelFrequencies` obtains the count of each genotype in samples associated with a given level of a given phenotype,
 and stores the calculated values in INFO keys defined as 
 `<pheno>_<level>_<suffix>`, with suffixes defined in the `TVTBparam` object.
@@ -318,9 +335,110 @@ process within each phenotype:
 ```{r addFrequenciesPhenoLevel}
 initialInfo <- colnames(info(vcf))
 vcf <- addFrequencies(
-    vcf = vcf, phenos = list(super_pop = c("EUR")), param = tparam)
+    vcf = vcf, phenos = list(super_pop = c("EUR", "AFR")), param = tparam,
+    force = TRUE)
 setdiff(colnames(info(vcf)), initialInfo)
 ```
+
+# Filtering variants {#Filter}
+
+Although `VCF` objects are straightforward to subset
+using either indices and row names
+(as they inherit from the `r Biocpkg("SummarizedExperiment")` 
+`RangedSummarizedExperiment` class),
+users may wish to identify variants that pass combinations of criteria based on
+information in their `fixed` slot, `info` slot, and Ensembl VEP predictions,
+a non-trivial task due to those pieces of information being stored in
+different slots of the `VCF` object, and the *1:N* relationship
+between variants and EnsemblVEP predictions.
+
+## Definition of VCF filter rules {#FilterDefine}
+
+To facilitate the definition of VCF filter rules, and their application to
+`ExpandedVCF` objects, `r Biocpkg("TVTB")` extends the `r Biocpkg("S4Vectors")`
+`FilterRules` class in four new classes of filter rules:
+
+|       Class       | Motivation                                              |
+| :--------------:  | :------------------------------------------------------ | 
+|  VcfFixedRules    | Filter rules applicable to the `fixed` slot of an       |
+|                   | `ExpandedVCF` object.                                   |
+|                   |                                                         | 
+|   VcfInfoRules    | Filter rules applicable to the `info` slot of an        |
+|                   | `ExpandedVCF` object.                                   |
+|                   |                                                         | 
+|   VcfVepRules     | Filter rules applicable to the Ensembl VEP predictions  |
+|                   | stored in a given INFO key of an `ExpandedVCF` object.  |
+|                   |                                                         | 
+|  VcfFilterRules   | Combination of `VcfFixedRules`, `VcfInfoRules`, and     |
+|                   |  `VcfVepRules` applicable to an `ExpandedVCF` object.   |
+
+Table: Motivation for each of the new classes extending `FilterRules`
+to define VCF filter rules.
+
+Instances of those classes may be initialised as follows:
+
+**VcfFixedRules**
+
+```{r VcfFixedRules}
+fixedR <- VcfFixedRules(exprs = list(
+    pass = expression(FILTER == "PASS"),
+    qual = expression(QUAL > 20)
+))
+fixedR
+```
+
+**VcfInfoRules**
+
+```{r VcfInfoRules}
+infoR <- VcfInfoRules(exprs = list(
+    common = expression(MAF > 0.1), # minor allele frequency
+    present = expression(ALT + HET > 0) # count of non-REF homozygotes
+))
+```
+
+**VcfFixedRules**
+
+```{r VcfVepRules}
+vepR <- VcfVepRules(exprs = list(
+    missense = expression(Consequence %in% c("missense_variant")),
+    CADD = expression(CADD_PHRED > 15)
+))
+vepR
+```
+
+**VcfFixedRules**
+
+```{r VcfFilterRules}
+vcfRules <- VcfFilterRules(fixedR, infoR, vepR)
+vcfRules
+```
+
+## Control of VCF filter rules {#FilterControl}
+
+As the above VCF filter rules classes inherit from the `r Biocpkg("S4Vectors")`
+`FilterRules` class, they also benefit from its accessors and methods.
+For instance, VCF filter rules can easily be toggled
+between active and inactive states:
+
+```{r deactivateCADD}
+active(vcfRules)["CADD"] <- FALSE
+active(vcfRules)
+```
+
+## Definition of VCF filter rules {#FilterUse}
+
+Once defined, the above filter rules can be applied to `ExpandedVCF` objects,
+in the same way as `FilterRules` are evaluated in a given environment:
+
+```{r}
+summary(eval(expr = vcfRules, envir = vcf))
+summary(evalSeparately(expr = vcfRules, envir = vcf))
+```
+
+\bioccomment{
+Note how the inactive `VcfVepRules` named `CADD` returns `TRUE`
+for all variants.
+}
 
 # Summarising Ensembl VEP predictions {#Summarise}
 
@@ -387,7 +505,7 @@ subset(tCBPwide, Consequence == "missense_variant")
 knitr::kable(
     x = subset(tCBPwide, Consequence == "missense_variant"),
     row.names = FALSE,
-    caption = "Table of consequence by phenotype by feature in wide format")
+    caption = "Table of consequence by phenotype by feature in wide format.")
 ```
 
 ## Distribution of continuous Ensembl VEP predictions {#SummariseContinuous}

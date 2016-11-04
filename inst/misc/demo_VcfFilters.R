@@ -1,3 +1,12 @@
+## ---- optChunkDefault, include=FALSE-----------------------------
+library(knitr)
+optChunkDefault <- opts_chunk$get()
+
+## ----biocLite, eval=FALSE----------------------------------------
+#  source("http://bioconductor.org/biocLite.R")
+#  biocLite("TVTB")
+
+## ----library, message=FALSE--------------------------------------
 library(TVTB)
 
 ## ----TVTBparamCreate---------------------------------------------
@@ -31,8 +40,8 @@ tabixVcf <- Rsamtools::TabixFile(file = vcfFile)
 ## ----ScanVcfParam------------------------------------------------
 svp <- VariantAnnotation::ScanVcfParam(
     fixed = c("ALT", "QUAL", "FILTER"), # all fields: could be omitted
-    info = c(vep(tparam)),
-    geno = "GT", # all fields: could be omitted
+    info = c(vep(tparam)), # an application of the TVTBparam class
+    geno = "GT", # all fields: could be omitted in this case
     samples = rownames(phenotypes),
     which = ranges(tparam))
 
@@ -45,10 +54,28 @@ colData(vcf) <- phenotypes
 # Expand into a ExpandedVCF object (bi-allelic records)
 vcf <- VariantAnnotation::expand(x = vcf, row.names = TRUE)
 
-## ----addOverallFrequencies, message=FALSE------------------------
+## ----vcf, echo=FALSE---------------------------------------------
+vcf
+
+## ----addOverallFrequencies---------------------------------------
+initialInfo <- colnames(info(vcf))
 vcf <- addOverallFrequencies(vcf = vcf, param = tparam)
+setdiff(colnames(info(vcf)), initialInfo)
+
+## ----addFrequenciesOverall---------------------------------------
+vcf <- addFrequencies(vcf = vcf, param = tparam, force = TRUE)
+
+## ----addPhenoLevelFrequencies------------------------------------
+initialInfo <- colnames(info(vcf))
 vcf <- addPhenoLevelFrequencies(
     vcf = vcf, pheno = "super_pop", level = "AFR", param = tparam)
+setdiff(colnames(info(vcf)), initialInfo)
+
+## ----addFrequenciesPhenoLevel------------------------------------
+initialInfo <- colnames(info(vcf))
+vcf <- addFrequencies(
+    vcf = vcf, phenos = list(super_pop = c("EUR")), param = tparam)
+setdiff(colnames(info(vcf)), initialInfo)
 
 ## ----addOverallFrequencies, message=FALSE------------------------
 fixedR <- VcfFixedRules(exprs = list(
