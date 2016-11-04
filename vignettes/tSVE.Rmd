@@ -77,7 +77,7 @@ if (!require(EnsDb.Hsapiens.v75, quietly = TRUE))
 
 * The latest version of the `r Githubpkg("rstudio/DT")` package is recommended
     to benefit from the latest developments (*e.g.* column filters inactivated
-    if a single value exist in that column; version `>=0.2.2`)
+    if a single value exist in that column; version *>= 0.2.2*)
 * The `r Githubpkg("rstudio/shiny")` package is required for all Shiny
     web-applications
 
@@ -355,7 +355,7 @@ only in those genomic ranges.
 
 # Frequencies panel {#Frequencies}
 
-This panel demonstrates the use of three functions implemented in the
+This panel demonstrates the use of three methods implemented in the
 `r Biocpkg("TVTB")` package, namely `addFrequencies`, `addOverallFrequencies`,
 and `addPhenoLevelFrequencies`.
 
@@ -417,7 +417,7 @@ that contain *VCF filter rules*. A simple example is shown below.
 
 > **Action**:
 > 
-> * Select *VEP* in the list of filter types
+> * Select *VEP* as the *Type* of filter
 > * Paste `grepl("missense",Consequence)` in the text field
 > * Leave the *Active?* checkbox ticked
 > * Click the *Add filter* action button
@@ -444,6 +444,47 @@ namely:
 > * In the various panels, select fields to examine each object
 > * In the *Heatmap* tab of the *Genotypes* panel
 > * Click the *Go!* action button to calculate and display the heatmap
+
+# Plots {#Plots}
+
+This panel demonstrates the use of two methods implemented in the
+`r Biocpkg("TVTB")` package, namely `tabulateVepByPhenotype`
+and `densityVepByPhenotype`.
+
+## Count and tabulate variants by phenotype level {#TVBP}
+
+The `tabulateVepByPhenotype` method is designed to count 
+Ensembl VEP predictions associated with variants observed in the distinct
+levels of a given phenotype. The method can display those in two different
+ways:
+
+* a `r CRANpkg("ggplot")` `geom_barplot`
+* a `data.frame` in wide format
+
+Typically, those counts may be faceted by genomic feature (*i.e.* transcript),
+as the VEP script may produce one prediction per *Variant : Feature*
+combination. In other words, faceting counts by feature ensures that
+each variant contributes at most one count to each feature.
+
+> **Action**:
+> 
+> * Select *Consequence* as the *Variant effect prediction*
+> * Select *super_pop* as the *Phenotype field*
+> * Select *Feature* as the *VEP faceting key*
+> * Click the *Advanced controls* checkbox
+> * Decrease the *Legend font size* to `0.6`
+> * Rotate the *Angle of X labels* to `90` degrees
+> * Click the *Apply* action button to calculate and display the barplot
+> * Hover the plot with the cursor to display useful information!
+
+In addition, the web-application also displays the counts of VEP predictions
+in long format in the *Table* panel, more convenient than the wide format
+for filtering.
+
+> **Action**:
+> 
+> * Use the filtering fields at the top of the table to examine the counts
+>     (e.g. *missense_variant* and *ENST00000341459*)
 
 # Session info {#SessionInfo}
 
