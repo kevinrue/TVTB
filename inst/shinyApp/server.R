@@ -15,6 +15,12 @@ source("~/Dropbox/TVTB/inst/shinyApp/fileParseFunctions.R")
 
 shinyServer(function(input, output, clientData, session) {
 
+    # Reactive values ----
+
+    RV <- reactiveValues(
+        vcfFilters = VcfFilterRules()
+    )
+
     # Import phenotype information ----
 
     # Path to phenotype file, or NULL
@@ -925,46 +931,72 @@ shinyServer(function(input, output, clientData, session) {
         vcf
     })
 
-    # Filter variants post-import ----
+    # Filter variants ----
 
     newVcfFilter <- reactive({
 
         if (input$newFilterExpression == "")
             return(NULL)
-        print(input$newFilterExpression)
-        quickFix <- gsub("[“‘]", "\"", input$newFilterExpression)
-        quickFix <- gsub("[‘]", "\'", quickFix)
-        print(quickFix)
+
+        quickFix <- gsub("[“”]", "\"", input$newFilterExpression)
+        quickFix <- gsub("[‘’]", "\'", quickFix)
+
         return(tryCatch(
             new(
                 Class = input$newFilterClass,
                 exprs = list(quickFix),
                 active = input$newFilterActive),
-            error = NULL
+            warning = function(e) NULL,
+            error = function(e) NULL
         ))
 
     })
 
-    # TODO
     output$vcfFilterTest <- renderUI({
+        # Only triggered by testNewFilter
         req(input$testNewFilter)
+        isolate({
+            newFilter <- newVcfFilter()
+            vcf <- head(vcf()) # Speed up testing!
+        })
 
-        isolate({newFilter <- newVcfFilter()})
-        print("newFilter")
-        print(str(newFilter))
-        print(S4Vectors::eval(newFilter, vcf()))
-        # print(vcf())
         if (is.null(newFilter))
             return(p("No expression provided."))
+
         successfulTest <- tryCatch(
-            is.logical(S4Vectors::eval(newFilter, vcf())),
-            error = FALSE
+            is.logical(S4Vectors::eval(newFilter, vcf)),
+            warning = function(e) FALSE,
+            error = function(e) FALSE
         )
-        print(successfulTest)
+
         if (successfulTest)
             return(tagList(strong(tags$span(style="color:green", "Valid"))))
         else
             return(strong(tags$span(style="color:red", "Invalid")))
+    })
+
+    observeEvent(input$addNewFilter, {
+        # Only triggered by addNewFilter
+        newFilter <- newVcfFilter()
+
+        if (is.null(newFilter))
+            return(p("No expression provided."))
+
+        successfulTest <- tryCatch(
+            is.logical(S4Vectors::eval(newFilter, vcf())),
+            warning = function(e) FALSE,
+            error = function(e) FALSE
+        )
+
+        validate(need(successfulTest, "Invalid filter"))
+
+        RV[["vcfFilters"]] <- VcfFilterRules(
+            RV[["vcfFilters"]],
+            newFilter)
+    })
+
+    output$vcfFilters <- renderPrint({
+        return(str(RV[["vcfFilters"]]))
     })
 
     # Parse genotypes ----

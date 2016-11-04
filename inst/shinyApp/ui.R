@@ -584,8 +584,10 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                     "User can simply ignore the auto-corrected quotes."
                 )
             )
+        ),
+        wellPanel(
+            verbatimTextOutput("vcfFilters")
         )
-
     ),
 
     tabPanel(
