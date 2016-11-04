@@ -45,7 +45,7 @@ setMethod(
         # named list of all levels of given phenotypes
         phenos <- sapply(X = phenos, FUN = function(x){
             unique(colData(vcf)[,x])
-        })
+        }, simplify = FALSE)
 
         .addFrequencies(
             vcf = vcf, param = param, phenos = phenos, force = force)
@@ -66,7 +66,7 @@ setMethod(
         # named list of all levels of given phenotypes
         phenos <- sapply(X = phenos, FUN = function(x){
             unique(colData(vcf)[,x])
-        })
+        }, simplify = FALSE)
 
         .addFrequencies(
             vcf = vcf, param = param, phenos = phenos, force = force)

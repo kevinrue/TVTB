@@ -36,3 +36,79 @@ setMethod(
         print(object@bp)
     }
 )
+
+# VcfFixedRules ----
+
+# setMethod(
+#     f = "show",
+#     signature = "VcfFixedRules",
+#     definition = function(object){
+#         cat(sprintf("VcfFilterRules of length %i\n", length(object)))
+#         cat(sprintf(
+#             "names: %s\n",
+#             paste(names(object), collapse = " ")
+#         ))
+#         cat(sprintf(
+#             "active: %s\n",
+#             paste(active(object), collapse = " ")
+#         ))
+#     }
+# )
+
+# VcfInfoRules ----
+
+# setMethod(
+#     f = "show",
+#     signature = "VcfInfoRules",
+#     definition = function(object){
+#         cat(sprintf("VcfFilterRules of length %i\n", length(object)))
+#         cat(sprintf(
+#             "names: %s\n",
+#             paste(names(object), collapse = " ")
+#         ))
+#         cat(sprintf(
+#             "active: %s\n",
+#             paste(active(object), collapse = " ")
+#         ))
+#     }
+# )
+
+# VcfVepRules ----
+
+# setMethod(
+#     f = "show",
+#     signature = "VcfVepRules",
+#     definition = function(object){
+#         cat(sprintf("VcfFilterRules of length %i\n", length(object)))
+#         cat(sprintf(
+#             "names: %s\n",
+#             paste(names(object), collapse = " ")
+#         ))
+#         cat(sprintf(
+#             "active: %s\n",
+#             paste(active(object), collapse = " ")
+#         ))
+#     }
+# )
+
+# VcfFilterRules ----
+
+# setMethod(
+#     f = "show",
+#     signature = "VcfFilterRules",
+#     definition = function(object){
+#         cat(sprintf("VcfFilterRules of length %i\n", length(object)))
+#         cat(sprintf(
+#             "names: %s\n",
+#             paste(names(object), collapse = " ")
+#             ))
+#         cat(sprintf(
+#             "type: %s\n",
+#             paste(type(object), collapse = " ")
+#         ))
+#         cat(sprintf(
+#             "active: %s\n",
+#             paste(active(object), collapse = " ")
+#         ))
+#     }
+# )

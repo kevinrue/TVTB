@@ -12,7 +12,7 @@ setGeneric(
 setGeneric(
     name = "addPhenoLevelFrequencies",
     signature = c("vcf", "param"),
-    def = function(vcf, param, ...)
+    def = function(vcf, pheno, level, param, ...)
         standardGeneric("addPhenoLevelFrequencies")
 )
 

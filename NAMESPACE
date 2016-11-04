@@ -148,7 +148,7 @@ exportMethods(
     # S4Vectors
     "eval", "evalSeparately", "subsetByFilter", "active",
     # SummarizedExperiment
-    "colData<-", "colData<-",
+    "colData", "colData<-",
     # VariantAnnotation
     "readVcf", "ScanVcfParam",
     "header", "header<-", "geno", "fixed", "info", "info<-"
