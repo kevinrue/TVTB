@@ -11,6 +11,7 @@ os:
 before_install:
     - Rscript -e 'source(file = "http://bioconductor.org/biocLite.R");tryCatch(useDevel(devel = TRUE), error = function(err){message(err)})'
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then tlmgr install bera nowidow parnotes marginfix; fi
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then tlmgr install titling titlesec bera nowidow parnotes marginfix; fi
 
 warnings_are_errors: false
 
