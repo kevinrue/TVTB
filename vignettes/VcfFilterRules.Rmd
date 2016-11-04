@@ -173,10 +173,10 @@ but also as a reminder of the purpose of each particular rule.
 For instance, in the chunk of code below, two filter rules are defined
 using fields of the `fixed` slot:
 
-* A rule named `"pass"` identifies variants for which the value in the `FILTER` 
-    field is `"PASS"`
-* A rule named `"qual20"` identifies variants where the value in the `QUAL` field
-    is greater than or equal to `20`
+* A rule named `"pass"` identifies variants for which the value in the
+    `FILTER` field is `"PASS"`
+* A rule named `"qual20"` identifies variants where the value in the `QUAL`
+    field is greater than or equal to `20`
 
 ```{r simpleFixedRules}
 fixedRules <- VcfFixedRules(exprs = list(
@@ -249,8 +249,8 @@ using fields of the `info` slot:
 * A rule named `"samples"` identifies variants where at least 90% of samples
     have data (*i.e.* the `NS` value is greater than or equal to `0.9`
     times the total number of samples)
-* A rule named `"avgSuperPopAF"` calculates the average of the allele frequencies
-    calculated in each the five super-populations
+* A rule named `"avgSuperPopAF"` calculates the average of the allele
+    frequencies calculated in each the five super-populations
     (available in several INFO fields), and
     subsequently identifies variants with an average value greater than `0.05`.
 
