@@ -145,8 +145,8 @@ shinyServer(function(input, output, clientData, session) {
 
     # Display structure of phenotypes attached to variants
     output$phenotypesStructure <- renderPrint({
-        # Depends on vcf()
-        vcf <- vcf()
+        # Depends on RV[["vcf"]]
+        vcf <- RV[["vcf"]]
         phenos <- SummarizedExperiment::colData(vcf)
 
         validate(need(
@@ -183,6 +183,276 @@ shinyServer(function(input, output, clientData, session) {
                 pageLength = 10,
                 searching = TRUE),
             filter = "top")
+    })
+
+    observeEvent(
+        eventExpr = RV[["vcf"]],
+        handlerExpr = {
+
+            # raw VCF
+            vcf <- RV[["vcf"]]
+
+            # phenotypes
+            phenos <- colData(vcf)
+
+            updateSelectInput(
+                session, "phenoAddFrequencies",
+                choices = colnames(phenos))
+    })
+
+    # For each phenotype
+    # Create a group of checkboxes for each level
+    # to select those for which frequencies should be calculated
+    observeEvent(
+        eventExpr = input$phenoAddFrequencies,
+        handlerExpr = {
+
+            # raw VCF
+            vcf <- RV[["vcf"]]
+            validate(need(vcf, Msgs[["importVariants"]]))
+
+            # phenotypes
+            phenos <- colData(vcf)
+            phenoNames <- colnames(phenos)
+            phenoLevels <- levels(phenos[,input$phenoAddFrequencies])
+
+            ## pre-tick phenoLevels already calculated
+            infoCols <- colnames(info(vcf))
+            # phenoLevels already calculated have all suffixes present
+            tparam <- tparam()
+            suffixes <- c(
+                names(genos(tparam)),
+                aaf(tparam),
+                maf(tparam))
+
+            levelsPresent <- sapply(
+                X = phenoLevels,
+                FUN = function(phenoLevel){
+                    all(
+                        paste(
+                            input$phenoAddFrequencies,
+                            phenoLevel,
+                            suffixes,
+                            sep = "_"
+                            ) %in% infoCols
+                        )
+                })
+
+
+            updateCheckboxGroupInput(
+                session, "phenoLevelFreqCheckboxes",
+                label = paste0(
+                    "Levels in phenotype \"",
+                    input$phenoAddFrequencies,
+                    "\""),
+                choices = phenoLevels,
+                selected = names(which(levelsPresent)),
+                inline = TRUE
+            )
+
+    })
+
+    # Calculation of frequencies ----
+
+    observeEvent(
+        eventExpr = input$tickAllPhenoLevelsFreq,
+        handlerExpr = {
+
+            # raw VCF
+            vcf <- RV[["vcf"]]
+
+            # phenotypes
+            phenos <- colData(vcf)
+            phenoNames <- colnames(phenos)
+            choices <- levels(phenos[,input$phenoAddFrequencies])
+
+            updateCheckboxGroupInput(
+                session, "phenoLevelFreqCheckboxes",
+                choices = choices,
+                selected = choices,
+                inline = TRUE
+            )
+
+        }
+    )
+
+    observeEvent(
+        eventExpr = input$untickAllPhenoLevelsFreq,
+        handlerExpr = {
+
+            updateCheckboxGroupInput(
+                session, "phenoLevelFreqCheckboxes",
+                selected = character(),
+                inline = TRUE
+            )
+
+        }
+    )
+
+    observeEvent(
+        eventExpr = input$buttonFrequencies,
+        handlerExpr = {
+
+            # Remove INFO keys for unticked boxes
+            # Add values for ticked boxes
+
+            # Phenotypes selected
+            selectedPhenoName <- input$phenoAddFrequencies
+            selectedPhenoLevels <- input$phenoLevelFreqCheckboxes
+
+            # Info in VCF
+            vcf <- RV[["vcf"]]
+            vcfInfoCols <- colnames(info(vcf))
+
+            # Phenotype levels available
+            phenos <- colData(vcf)
+            choices <- levels(phenos[,input$phenoAddFrequencies])
+
+            # pre1) collect all suffixes (to check existence of fields)
+            tparam <- tparam()
+            suffixes <- c(
+                names(genos(tparam)),
+                aaf(tparam),
+                maf(tparam))
+
+            # pre2) identify unticked phenoLevels
+
+            phenoLevelsUnticked <- choices[which(
+                !choices %in% selectedPhenoLevels
+            )]
+
+            if (length(phenoLevelsUnticked) > 0){
+
+                # Identify unticked phenoLevels present in vcf INFO (to remove)
+                # 1) Generate all expected key names for those phenoLevels
+                untickedPhenoLevelKeys <- sapply(
+                    X = phenoLevelsUnticked,
+                    FUN = function(phenoLevel){
+                        return(paste(
+                            input$phenoAddFrequencies,
+                            phenoLevel,
+                            suffixes,
+                            sep = "_"
+                        ))
+                    },
+                    simplify = FALSE
+                ) # named list: names=phenoLevel, value=keys
+
+                # 4) identify phenoLevels with all keys present
+                # (in data, not header)
+                areAllPhenoLevelKeysPresent <- sapply(
+                    X = untickedPhenoLevelKeys,
+                    FUN = function(keys){
+                        return(all(keys %in% vcfInfoCols))
+                    }
+                ) # named boolean vector: names=phenoLevel
+
+                phenoLevelKeysRemove <- do.call(
+                    c,
+                    untickedPhenoLevelKeys[which(areAllPhenoLevelKeysPresent)]
+                ) # vector of keys to remove
+
+                if (length(phenoLevelKeysRemove))
+                    RV[["vcf"]] <- dropInfo(
+                        vcf = RV[["vcf"]],
+                        key = phenoLevelKeysRemove,
+                        slot = "both")
+
+                RV[["latestFrequenciesRemoved"]] <-
+                    names(areAllPhenoLevelKeysPresent)[
+                        which(areAllPhenoLevelKeysPresent)
+                        ]
+            } else {
+                RV[["latestFrequenciesRemoved"]] <- character()
+            }
+
+            # Identify ticked phenoLevels absent in info slot (to calculate)
+
+            if (length(selectedPhenoLevels) > 0){
+
+                # 1) generate all keys expected for each phenoLevel (named list)
+                tickedPhenoLevelKeys <- sapply(
+                    X = selectedPhenoLevels,
+                    FUN = function(phenoLevel){
+                        return(paste(
+                            input$phenoAddFrequencies,
+                            phenoLevel,
+                            suffixes,
+                            sep = "_"
+                        ))
+                    },
+                    simplify = FALSE
+                ) # list: names=phenoLevels, value=keys
+
+                # 2) identify phenoLevels with all keys absent
+                # (in data, not header)
+                areAllPhenoLevelKeysAbsent <- sapply(
+                    X = tickedPhenoLevelKeys,
+                    FUN = function(keys){
+                        return(!any(keys %in% vcfInfoCols))
+                    }
+                ) # named boolean vector: names=phenoLevels
+
+                phenoLevelsAdd <- names(areAllPhenoLevelKeysAbsent)[which(
+                    areAllPhenoLevelKeysAbsent
+                )] # phenoLevels to add
+
+                # Format for addFrequencies input
+                phenosAdd <- list(phenoLevelsAdd)
+                names(phenosAdd)[[1]] <- selectedPhenoName
+
+                if (length(phenoLevelsAdd) > 0)
+                    RV[["vcf"]] <- addFrequencies(
+                        vcf = vcf,
+                        phenos = phenosAdd,
+                        param = tparam(),
+                        force = TRUE # keep an eye on the console for warnings
+                    )
+
+                RV[["latestFrequenciesAdded"]] <- phenosAdd[[1]]
+            } else {
+                RV[["latestFrequenciesAdded"]] <- "NA"
+            }
+
+            RV[["latestPhenotypeFrequency"]] <- selectedPhenoName
+
+        }
+
+    )
+
+    output$latestFrequenciesCalculated <- renderUI({
+
+        pheno <- RV[["latestPhenotypeFrequency"]]
+        freqAdded <- RV[["latestFrequenciesAdded"]]
+        freqRemoved <- RV[["latestFrequenciesRemoved"]]
+
+        # If no calculations were done yet
+        if (all(is.null(freqAdded), is.null(freqRemoved)))
+            return("No frequencies calculated yet.")
+
+        # If phenotype level frequencies were last calculated
+        if (pheno != "Overall"){
+            if (length(freqAdded) > 0)
+                addedLevels <- paste(freqAdded, collapse = ", ")
+            else
+                addedLevels <- "NA"
+
+            if(length(freqRemoved > 0))
+                removedLevels <- paste(freqRemoved, collapse = ", ")
+            else
+                removedLevels <- "NA"
+
+            return(tagList(
+                "Phenotype", code(pheno), ":",
+                tags$ul(
+                    tags$li("Added level(s):", code(addedLevels)),
+                    tags$li("Removed level(s):", code(removedLevels))
+                )
+            ))
+        }
+
+        # TODO: overall frequencies
+
     })
 
     # Define genomic ranges ----
@@ -823,7 +1093,9 @@ shinyServer(function(input, output, clientData, session) {
 
     # Import VCF information ----
 
-    observeEvent(input$importVariants, {
+    observeEvent(
+        eventExpr = input$importVariants,
+        handlerExpr = {
 
         updateActionButton(
             session, "importVariants",
@@ -831,15 +1103,11 @@ shinyServer(function(input, output, clientData, session) {
 
     })
 
-    # Import Vcf object
-    vcf <- reactive({
+    # Import and expand VCF object
+    observeEvent(
+        eventExpr = input$importVariants,
+        handlerExpr = {
 
-        # Only proceed if the variants should be refreshed
-        validate(need(
-            input$importVariants > 0,
-            Msgs[["importVariants"]]))
-
-        isolate({
             vcfInputMode <- input$vcfInputMode
             genomicRanges <- genomicRanges()
             tparam <- tparam()
@@ -856,90 +1124,91 @@ shinyServer(function(input, output, clientData, session) {
             } else {
                 phenotypes <- phenotypes()
             }
-        })
 
-        validate(
-            need(vepKey, label = Msgs[["vepKey"]]),
-            need(genomeSeqinfo, Msgs[["genomeSeqinfo"]])
-        )
+            validate(
+                need(vepKey, label = Msgs[["vepKey"]]),
+                need(genomeSeqinfo, Msgs[["genomeSeqinfo"]])
+            )
 
-        shiny::withProgress(
-            min = 0, max = 3, value = 1,
-            message = "Progress", detail = Tracking[["preprocessing"]],
-            {
+            shiny::withProgress(
+                min = 0, max = 3, value = 1,
+                message = "Progress", detail = Tracking[["preprocessing"]],
+                {
 
-                # NOTE: ALL FIXED fields imported
-                svp <- ScanVcfParam(
-                    info = infoKeys,
-                    geno = genoKeys
-                )
+                    # NOTE: ALL FIXED fields imported
+                    svp <- ScanVcfParam(
+                        info = infoKeys,
+                        geno = genoKeys
+                    )
 
-                # Only import samples with phenotype information
-                if (nrow(phenotypes) > 0)
-                    vcfSamples(svp) <- rownames(phenotypes)
+                    # Only import samples with phenotype information
+                    if (nrow(phenotypes) > 0)
+                        vcfSamples(svp) <- rownames(phenotypes)
 
-                # Only import variants in targeted regions
-                if (length(genomicRanges) > 0)
-                    vcfWhich(svp) <- reduce(genomicRanges) # optimise import
+                    # Only import variants in targeted regions
+                    if (length(genomicRanges) > 0)
+                        vcfWhich(svp) <- reduce(genomicRanges) # optimise import
 
 
-                # # Timing
-                # t1 <- Sys.time()
+                    # # Timing
+                    # t1 <- Sys.time()
 
-                vcf <- switch (
-                    vcfInputMode,
-                    SingleVcf = {
+                    vcf <- switch (
+                        vcfInputMode,
+                        SingleVcf = {
 
-                        isolate({singleVcf <- singleVcf()})
-                        validate(need(singleVcf, Msgs[["singleVcf"]]))
+                            isolate({singleVcf <- singleVcf()})
+                            validate(need(singleVcf, Msgs[["singleVcf"]]))
 
-                        shiny::incProgress(1, detail = Tracking[["singleVcf"]])
+                            shiny::incProgress(1, detail = Tracking[["singleVcf"]])
 
-                        tryParseSingleVcf(
-                            file = singleVcf,
-                            svp = svp,
-                            yieldSize = yieldSize
-                        )
-                    },
+                            tryParseSingleVcf(
+                                file = singleVcf,
+                                svp = svp,
+                                yieldSize = yieldSize
+                            )
+                        },
 
-                    OnePerChr = {
+                        OnePerChr = {
 
-                        shiny::incProgress(1, detail = Tracking[["multiVcfs"]])
+                            shiny::incProgress(1, detail = Tracking[["multiVcfs"]])
 
-                        isolate({
-                            vcfFolder <- input$vcfFolder
-                            vcfPattern <- input$vcfPattern
-                        })
-                        validate(need(singleVcf, Msgs[["singleVcf"]]))
+                            isolate({
+                                vcfFolder <- input$vcfFolder
+                                vcfPattern <- input$vcfPattern
+                            })
+                            validate(need(singleVcf, Msgs[["singleVcf"]]))
 
-                        tryParseMultipleVcf(
-                            folder = vcfFolder,
-                            pattern = vcfPattern,
-                            svp = svp,
-                            yieldSize = yieldSize,
-                            BPPARAM = bp(tparam)
-                        )
-                    }
-                )
+                            tryParseMultipleVcf(
+                                folder = vcfFolder,
+                                pattern = vcfPattern,
+                                svp = svp,
+                                yieldSize = yieldSize,
+                                BPPARAM = bp(tparam)
+                            )
+                        }
+                    )
 
-                shiny::incProgress(1, detail = Tracking[["postprocessing"]])
+                    shiny::incProgress(1, detail = Tracking[["postprocessing"]])
 
-                validate(need(
-                    length(vcf) > 0,
-                    "No variant found in BED region(s)"))
+                    validate(need(
+                        length(vcf) > 0,
+                        "No variant found in BED region(s)"))
 
-                if (nrow(phenotypes) == 0)
-                    phenotypes <- DataFrame(row.names = colnames(vcf))
+                    if (nrow(phenotypes) == 0)
+                        phenotypes <- DataFrame(row.names = colnames(vcf))
 
-                colData(vcf) <- phenotypes
-            })
+                    colData(vcf) <- phenotypes
+                })
 
-        return(vcf)
-    })
+            RV[["vcf"]] <- vcf
+
+        }
+    )
 
     output$vcfSummary <- renderUI({
         # Summary of raw variants
-        vcf <- vcf()
+        vcf <- RV[["vcf"]]
         validate(need(vcf, Msgs[["importVariants"]]))
 
         return(tagList(
@@ -994,7 +1263,7 @@ shinyServer(function(input, output, clientData, session) {
 
         validate(need(
             ncol(info(vcf)) > 1, # VEP field are an implicite field
-            "No INFO field imported."),
+            "No INFO field available."),
             errorClass = "optional"
         )
 
@@ -1020,7 +1289,7 @@ shinyServer(function(input, output, clientData, session) {
         vcf <- RV[["filteredVcf"]]
 
         validate(need(
-            ncol(info(vcf())) > 1, # At least one non-VEP column
+            ncol(info(RV[["vcf"]])) > 1, # At least one non-VEP column
             "No INFO data imported."
         ),
         errorClass = "optional")
@@ -1048,7 +1317,7 @@ shinyServer(function(input, output, clientData, session) {
 
     output$vcf <- renderPrint({
 
-        vcf <- vcf()
+        vcf <- RV[["vcf"]]
         validate(need(vcf, Msgs[["importVariants"]]))
 
         vcf
@@ -1088,7 +1357,7 @@ shinyServer(function(input, output, clientData, session) {
 
         isolate({
             newFilter <- newVcfFilter()
-            vcf <- head(vcf()) # Speed up testing!
+            vcf <- head(RV[["vcf"]]) # Speed up testing!
         })
 
         if (is.null(newFilter)){
@@ -1270,7 +1539,7 @@ shinyServer(function(input, output, clientData, session) {
         # Depend on the actionButton *and* the vcf object
         # makes filtered variants synonym to raw variants in absence of filters
         input$filterVariants
-        vcf <- vcf()
+        vcf <- RV[["vcf"]]
 
         # Do not update when filters change, wait for actionButton/vcf
         isolate({vcfFilters <- RV[["vcfFilters"]]})
@@ -1283,7 +1552,7 @@ shinyServer(function(input, output, clientData, session) {
         filteredVcf <- RV[["filteredVcf"]]
 
         # Before filtered variants can be shown, raw variants must be loaded
-        validate(need(vcf(), Msgs[["importVariants"]]))
+        validate(need(RV[["vcf"]], Msgs[["importVariants"]]))
         # filtered variants are calculated as soon as raw variants are loaded
         # to avoid confusing users if they don't want to apply
         # validate(need(filteredVcf, Msgs[["filteredVcf"]]))
@@ -1309,7 +1578,7 @@ shinyServer(function(input, output, clientData, session) {
 
     output$genotypeStructure <- renderPrint({
 
-        vcf <- vcf()
+        vcf <- RV[["vcf"]]
 
         validate(need(vcf, Msgs[["importVariants"]]))
 
@@ -1403,7 +1672,7 @@ shinyServer(function(input, output, clientData, session) {
 
         vcf <- RV[["filteredVcf"]]
 
-        validate(need(vcf, Msgs[["vcf"]]))
+        validate(need(vcf, Msgs[["filteredVcf"]]))
 
         req(
             input$genoFirstRow, input$genoNumRows,
@@ -1501,7 +1770,7 @@ shinyServer(function(input, output, clientData, session) {
     # Show information about consequence field
     output$vepStructure <- renderPrint({
 
-        vcf <- vcf()
+        vcf <- RV[["vcf"]]
 
         validate(
             need(vcf, Msgs[["importVariants"]]),
@@ -1680,7 +1949,7 @@ shinyServer(function(input, output, clientData, session) {
     # Update list of VEP facets if the faceting variable changes
     observeEvent(eventExpr = input$vepFacetKeyTVBP, handlerExpr = {
         # Raw variants must exist
-        validate(need(vcf(), Msgs[["importVariants"]]))
+        validate(need(RV[["vcf"]], Msgs[["importVariants"]]))
 
         vcf <- RV[["filteredVcf"]]
         # Give time to filter variants
@@ -1740,7 +2009,7 @@ shinyServer(function(input, output, clientData, session) {
                 vepFacetKey <- NULL
             }
 
-            validate(need(vcf(), Msgs[["importVariants"]]))
+            validate(need(RV[["vcf"]], Msgs[["importVariants"]]))
 
             vcf <- RV[["filteredVcf"]]
 
@@ -1758,7 +2027,7 @@ shinyServer(function(input, output, clientData, session) {
                 plotPhenotype <- phenoTVBP
             }
 
-            varVepPlotPheno <- varVepPlotPhenoTVBP()
+            isolate({varVepPlotPheno <- varVepPlotPhenoTVBP()})
             validate(
                 need(vepTVBP, Msgs[["vepTVBP"]]),
                 need(
@@ -1977,7 +2246,7 @@ shinyServer(function(input, output, clientData, session) {
     # Update list of VEP facets if the faceting variable changes
     observeEvent(eventExpr = input$vepFacetKeyDVBP, handlerExpr = {
         # Raw variants must exist
-        validate(need(vcf(), Msgs[["importVariants"]]))
+        validate(need(RV[["vcf"]], Msgs[["importVariants"]]))
 
         vcf <- RV[["filteredVcf"]]
         # Give time to filter variants
@@ -2037,7 +2306,7 @@ shinyServer(function(input, output, clientData, session) {
                 vepFacetKey <- NULL
             }
 
-            validate(need(vcf(), Msgs[["importVariants"]]))
+            validate(need(RV[["vcf"]], Msgs[["importVariants"]]))
 
             vcf <- RV[["filteredVcf"]]
 
@@ -2055,7 +2324,7 @@ shinyServer(function(input, output, clientData, session) {
                 plotPhenotype <- phenoDVBP
             }
 
-            varVepPlotPheno <- varVepPlotPhenoDVBP()
+            isolate({varVepPlotPheno <- varVepPlotPhenoDVBP()})
             validate(need(vepDVBP, Msgs[["vepDVBP"]]))
 
             # Convert to default value for the method

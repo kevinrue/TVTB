@@ -271,19 +271,19 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                         ),
                         fluidRow(
                             shiny::column(
-                                width = 2,
+                                width = 1,
                                 actionButton(
                                     "tickAllInfo", "Select all",
                                     icon = icon("check-square-o"))
                             ),
                             shiny::column(
-                                width = 2,
+                                width = 1,
                                 actionButton(
                                     "untickAllInfo", "Deselect all",
                                     icon = icon("square-o"))
                             ),
                             shiny::column(
-                                width = 7, offset = 1,
+                                width = 7, offset = 2,
                                 strong("Note:"),
                                 "VEP field implicitely required"
                             )
@@ -402,6 +402,73 @@ shinyUI(navbarPage(theme = "bootstrap.css",
         )
 
     ),
+
+    # Calculate frequencies ----
+
+    tabPanel(
+        title = "Frequencies", icon = icon("calculator "),
+
+        wellPanel(
+            fluidRow(
+                shiny::column(
+                    width = 2,
+                    br(),
+                    actionButton(
+                        "buttonFrequencies", "Refresh",
+                        icon = icon("refresh"), width = "100%"
+                    )
+                ),
+                shiny::column(
+                    width = 8,
+                    strong("Latest changes:")
+                ),
+                shiny::column(
+                    width = 8,
+                    uiOutput("latestFrequenciesCalculated")
+                )
+            )
+        ),
+        wellPanel(
+            fluidRow(
+                shiny::column(
+                    width = 2,
+                    selectInput(
+                        "phenoAddFrequencies",
+                        "Phenotype",
+                        choices = c()
+                    )
+                )
+            ),
+            fluidRow(
+                shiny::column(
+                    width = 1,
+                    actionButton(
+                        "tickAllPhenoLevelsFreq",
+                        "Select all",
+                        icon = icon("check-square-o")
+                    )
+                ),
+                shiny::column(
+                    width = 1,
+                    actionButton(
+                        "untickAllPhenoLevelsFreq",
+                        "Deselect all",
+                        icon = icon("square-o")
+                    )
+                ),
+                shiny::column(
+                    width = 10,
+                    checkboxGroupInput(
+                        "phenoLevelFreqCheckboxes", "Phenotype levels",
+                        choices = c(), inline = TRUE
+                    )
+                )
+            )
+        )
+
+    ),
+
+    # VCF filter Rules ----
 
     tabPanel(
         title = "Filters", icon = icon("filter"),
@@ -859,8 +926,10 @@ shinyUI(navbarPage(theme = "bootstrap.css",
 
                     )
 
-                )
-            )
+                ) # main panel
+
+            ) # sidebar layout
+
         ),
 
         # VEP density plot ----
