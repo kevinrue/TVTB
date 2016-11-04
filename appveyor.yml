@@ -22,8 +22,8 @@ environment:
     - R_VERSION: devel
       R_ARCH: x64
 
-    - R_VERSION: devel
-      R_ARCH: i386
+    #- R_VERSION: devel
+    #  R_ARCH: i386
 
     #- R_VERSION: devel
     #  R_ARCH: x64
@@ -32,16 +32,16 @@ environment:
     #  R_CHECK_ARGS: "--no-vignettes --timings"
     #  R_BUILD_ARGS: "--keep-empty-dirs --no-resave-data"
 
-#branches:
-#  only:
-#    - master
+branches:
+  only:
+    - master
 
 #cache:
   #- C:\RLibrary
 
 build_script:
   - echo Current directory=%CD%
-  - travis-tools.sh install_github Bioconductor-mirror/S4Vectors Bioconductor-mirror/SummarizedExperiment Bioconductor-mirror/Rsamtools
+  #- travis-tools.sh install_github Bioconductor-mirror/S4Vectors Bioconductor-mirror/SummarizedExperiment Bioconductor-mirror/Rsamtools
   - travis-tool.sh install_bioc_deps
   - travis-tool.sh install_bioc ensemblVEP
 
