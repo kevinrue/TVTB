@@ -43,9 +43,13 @@ if (!require(tSVE)){
 }
 ```
 
-\bioccomment{Use the `biocLite` function alone to update the package.}
+\bioccomment{
+Here, the 'if' statement ensures that the package is not updated if it is
+already installed. To update the package, run the code ignoring the 'if'
+statement.
+}
 
-Once installed, the package functions can be loaded as follows:
+Once installed, the package can be loaded and attached as follows:
 
 ```{r library, message=FALSE}
 library(tSVE)
@@ -66,8 +70,7 @@ such as:
         simply named `<suffix>`
 * settings for parallel calculations
 
-To reduce the burden of repetitive programming
-and to 
+To reduce the burden of repetitive programming, and to 
 facilitate analyses using consistent sets of parameters,
 `r Biocpkg("tSVE")` implements the `tSVEParam` class.
 `tSVEParam` objects offer a container for parameters recurrently used across
@@ -89,6 +92,11 @@ tParam <- tSVEParam(
     vep = "CSQ", # default
     bp = BiocParallel::SerialParam()) # default
 ```
+\fixme{
+In the future, add a second region to the `ranges` slot, to demonstrate
+fancy features that I have in mind
+(*e.g.* plots faceted by range, showing positive and negative hits).
+}
 
 In this example:
 
