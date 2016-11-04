@@ -77,24 +77,6 @@ setMethod(
     }
 )
 
-# genos = missing
-setMethod(
-    f = "TVTBparam",
-    signature = c(genos="missing"),
-    definition = function(
-        ref, het, alt,
-        ranges = GRangesList(),
-        aaf = "AAF", maf = "MAF", vep = "CSQ", bp = SerialParam()){
-
-        genos <- list(REF = ref, HET = het, ALT = alt)
-
-        new(
-            Class = "TVTBparam",
-            genos = genos, ranges = ranges,
-            aaf = aaf, maf = maf, vep = vep, bp = bp)
-    }
-)
-
 # Getters and Setters ----
 
 ### genos

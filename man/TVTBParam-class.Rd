@@ -9,7 +9,6 @@
 \alias{TVTBparam}
 \alias{TVTBparam-methods}
 \alias{TVTBparam,list-method}
-\alias{TVTBparam,missing-method}
 \alias{initialize,TVTBparam-method}
 
 % Accessor methods:
@@ -69,11 +68,6 @@ package in a convenient format.
 \usage{
 \S4method{TVTBparam}{list}(
     genos,
-    ranges = GRangesList(),
-    aaf = "AAF", maf = "MAF", vep = "CSQ", bp = SerialParam())
-
-\S4method{TVTBparam}{missing}(
-    ref, het, alt,
     ranges = GRangesList(),
     aaf = "AAF", maf = "MAF", vep = "CSQ", bp = SerialParam())
 }
@@ -149,10 +143,10 @@ In the following code snippets \code{x} is a \code{TVTBparam} object.
 
 \arguments{
     \item{genos}{
-A (named) \code{list} of length three
-containing \code{character} vectors that declare
+A \code{list} of length three
+containing \code{character} vectors that declares the three sets of
 homozygote reference, heterozygote, and homozygote alternate genotypes,
-respectively.
+in this order.
 
 If named, \code{names} set the individual INFO key suffix used to
 store the counts of each set of genotypes.
@@ -160,20 +154,9 @@ If unnamed, \code{c("REF","HET","ALT")} are used as default key
 suffixes.
 See also \emph{Details} section.
 }
-    \item{ref}{
-\code{character} vector of valid reference homozygote genotypes
-(\emph{e.g.} \code{c("0|0", "0/0")}).
-}
-    \item{het}{
-\code{character} vector of valid heterozygote genotypes
-(\emph{e.g.} \code{c("0|1", "0/1")}).
-}
-    \item{alt}{
-\code{character} vector of valid alternate homozygote genotypes
-(\emph{e.g.} \code{c("1|1", "1/1")}).
-}
     \item{ranges}{
-\code{GRangesList} of genomic regions to import and group variants.
+A \code{GRangesList} of genomic regions.
+\emph{In the future, may be used to facet statistics and figures.}
 }
 \item{aaf}{
 INFO key suffix used to store the alternate allele frequency (AAF).
@@ -193,16 +176,18 @@ A \code{TVTBparam} object that contains recurrent parameters.
 }
 
 \details{
-For each key suffix stored in the \code{TVTBparam} object, \code{TVTB}
-reserves the following INFO keys to store the associated values.
-Users are recommended to avoid using those INFO keys for other purposes:
+For each \emph{suffix} stored in the \code{TVTBparam} object, \code{TVTB}
+may store data in the \code{VCF} object under the INFO keys defined as follows:
 \describe{
     \item{\emph{suffix}}{
-    Statistics across all samples in the \code{ExpandedVCF}.}
+    Statistics across all samples in the \code{ExpandedVCF}
+    (\emph{e.g.} "MAF").}
     \item{\emph{phenotype_level_suffix}}{
     Statistics across samples associated with a given level of a given
-    phenotype.}
+    phenotype (\emph{e.g.} "gender_male_MAF").}
     }
+    
+Users are recommended to avoid using those INFO keys for other purposes.
 }
 
 \author{
@@ -268,6 +253,9 @@ names(carrier(tparam))
 aaf(tparam)
 maf(tparam)
 
-## INFO key of the VEP predictions returned by the vep() accessor.
+## INFO key suffix of the VEP predictions returned by the vep() accessor.
 vep(tparam)
+
+## BiocParallel parameters
+bp(tparam)
 }

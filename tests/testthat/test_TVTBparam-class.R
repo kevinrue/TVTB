@@ -34,14 +34,6 @@ test_that("Constructors produce a valid object",{
         "TVTBparam"
     )
 
-    expect_s4_class(
-        TVTBparam(
-            ref = genotypes[["REF"]],
-            het = genotypes[["HET"]],
-            alt = genotypes[["ALT"]]),
-        "TVTBparam"
-    )
-
 })
 
 # Conflict of suffixes ----
