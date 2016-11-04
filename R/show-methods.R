@@ -19,7 +19,7 @@ setMethod(
             names(object@genos)[3],
             paste(object@genos[[3]], collapse = ", ")))
         cat(sprintf(
-            "ranges: %i range(s) on %i sequence(s)\n",
+            "ranges: %i GRanges on %i sequence(s)\n",
             length(object@ranges),
             length(seqlevels(object@ranges))))
         cat(sprintf(

@@ -8,12 +8,11 @@ author:
 date: "`r doc_date()`"
 package: "`r pkg_ver('TVTB')`"
 abstract: >
-    Currently,
-    `VCF` objects of the *VariantAnnotation* package may be subsetted
-    by indices or names of variant records.
-    The *TVTB* package extends `FilterRules`
-    of the *S4Vectors* package to provide filter rules applicable to
-    `VCF` objects. These new *VCF filter rules* provide containers
+    Currently, *VCF* objects of the `r Biocpkg("VariantAnnotation")` package
+    may be subsetted by indices or names of variant records.
+    The `r Biocpkg("TVTB")` package extends *FilterRules* of the
+    `r Biocpkg("S4Vectors")` package to provide filter rules applicable to
+    *VCF* objects. These new classes of filter rules provide containers
     for powerful expressions and functions to facilitate filtering of variants
     using combinations of filters applicable to FIXED fields, INFO fields,
     and Ensembl VEP predictions stored in a given INFO field of VCF files.
@@ -81,9 +80,9 @@ parent class, including:
 
 * *VCF filter rules* can be toggled individually between an active and
     an inactive states
-* *VCF filter rules* can be subsetted, replaced, and deleted
+* *VCF filter rules* can be subsetted, edited, replaced, and deleted
 
-To account for the structure of `VCF` objects, some of the new
+To account for the structural complexity of `VCF` objects, some of the new
 *VCF filter rules* classes implemented in the `r Biocpkg("TVTB")` package
 require additional information stored in new slots of the 
 filter objects, associated with new accessor methods.
@@ -187,9 +186,9 @@ active(fixedRules)["qual20"] <- FALSE
 summary(evalSeparately(fixedRules, vcf))
 ```
 
-\bioccomment{
-Deactivated rules (*e.g.* `qual20`) return `TRUE` for all variants.
-}
+In the example above, all variants pass the active `"pass"` filter,
+while the deactivated rules `"qual20"`) automatically returns `TRUE`
+for all variants.
 
 \bioccomment{
 `active(fixedRules["qual20"]) <- FALSE` would be wrong syntax, as it
@@ -226,19 +225,6 @@ Some considerations regarding the above filter rule:
 * `"REF"` and `"ALT"` are stored as `DNAStringSet` in `CollapsedVCF` objects
     and must be converted to `character`
     in order to successfully apply the method `%in%`.
-
-\fixme{
-The `append` method currently returns a `FilterRules`
-object when applying it to any of the child classes.
-The `append` method must be overridden for each child class defined in `TVTB`,
-to return an object of the same class.
-For instance, the following code should return a `VcfFixedRules` object:
-    fixedRules <- append(fixedRules, VcfFixedRules(list(
-        SNP = expression(
-        as.character(REF) %in% nucleotides &
-            as.character(ALT) %in% nucleotides)
-    )))
-}
 
 ## Calculations in filter rules {#CalculationFilter}
 
@@ -333,11 +319,13 @@ summary(evalSeparately(missenseFilter, evcf))
 
 In the above chunk of code:
 
-* the filter rule named `"exact"` matches only the given value associated
+* the filter rule named `"exact"` matches only the given value, associated
     with `27` variants,
 * the filter rule named `"grepl"` also matches an extra two variants
     associated with the value `"missense_variant&splice_region_variant"`
-    (but not the `"missense_variant"` value )
+    matched by the given pattern. By deduction, the two rules indicate
+    together that those two variants were not assigned the
+    `"missense_variant"` prediction.
 
 # Using ALT data in the `fixed` slot of `VCF` objects {#AltField}
 
@@ -350,7 +338,7 @@ As as result, *VCF filter rules* using
 data from this field must take into account the `VCF` class in order to
 handle the data appropriately:
 
-## `ExpandedVCF` {#ALTExpandedVCF}
+## `ExpandedVCF` objects {#ALTExpandedVCF}
 
 A key aspect of `ExpandedVCF` objects is that the `"ALT"` field of their
 `fixed` slot may store only a single allele per record as a `DNAStringSet`
@@ -363,8 +351,8 @@ from `DNAStringSet` to `character` before the `%in%` function could be applied.
 
 Nevertheless, *VCF filter rules* may also make use of methods associated with
 the `DNAStringSet` class.
-For instance, insertions may be identified using the fields `"REF"` and `"ALT"`
-fields of the `fixed` slot:
+For instance, genetic insertions may be identified
+using the fields `"REF"` and `"ALT"` fields of the `fixed` slot:
 
 ```{r fixedInsertionFilter}
 fixedInsertionFilter <- VcfFixedRules(exprs = list(
@@ -387,7 +375,7 @@ evcf_vepIns <- subsetByFilter(evcf, vepInsertionFilter)
 as.data.frame(fixed(evcf_vepIns)[,c("REF", "ALT")])
 ```
 
-## `CollapsedVCF` {#ALTCollapsedVCF}
+## `CollapsedVCF` objects {#ALTCollapsedVCF}
 
 In contrast to `ExpandedVCF`, `CollapsedVCF` may contain more than one allele
 per record in their `"ALT"` field (`fixed` slot),
@@ -440,6 +428,12 @@ type(vignetteRules)
 summary(evalSeparately(vignetteRules, evcf, enclos = .GlobalEnv))
 ```
 
+\bioccomment{
+The "Clearly" statement below would be more evident if the `summary` method
+was displaying the result of `evalSeparately` in this vignette as it does it
+in an R session.
+}
+
 Clearly, the *VCF filter rules* `SNP` and `isInsertion` are mutually exclusive,
 which explains the final `0` variants left after filtering.
 Conveniently, either of these rules may be deactivated before evaluating the
@@ -455,7 +449,6 @@ for all variants,
 which leaves a final `2` variants passing the remaining active filter rules:
 
 * INFO/FILTER equal to `"PASS"`
-* INFO/QUAL greater than or equal to `20`
 * INFO/NS greater than 90% of the number of samples in the data set
 * Average of super-population allele frequencies greater than `0.05`
 * Ensembl VEP prediction `VARIANT_CLASS` equal to `"insertion"`
@@ -466,7 +459,7 @@ combination of `VcfFilterRules`, either with themselves
 or with any of the classes that define more specific *VCF filter rules*.
 Notably, when `VcfFilterRules` objects are being combined,
 the `type` and `active` value of each filter rule is transferred to
-the combined object.
+the combined object:
 
 **Combine `VcfFilterRules` with `VcfVepRules`**
 ```{r combineFilterVep}
@@ -483,7 +476,8 @@ active(combinedFilters)
 
 **Combine multiple `VcfFilterRules` with `VcfFilterRules` (and more)**
 
-To demonstrate this action, another `VcfFilterRules` must first be created:
+To demonstrate this action, another `VcfFilterRules` must first be created.
+This can be achieve by simply re-typing a `VcfVepRules` defined earlier:
 
 ```{r combineFilterFilter}
 secondVcfFilter <- VcfFilterRules(missenseFilter)
