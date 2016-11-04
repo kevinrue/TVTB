@@ -22,7 +22,7 @@ Imports:
     GenomeInfoDb,
     reshape2,
     Rsamtools,
-    VariantAnnotation
+    VariantAnnotation (>= 1.19.9)
 Suggests:
     EnsDb.Hsapiens.v75 (>= 0.99.7),
     shiny (>= 0.13.2.9004),
