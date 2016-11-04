@@ -18,8 +18,8 @@ environment:
       R_ARCH: x64
       BIOC_USE_DEVEL: TRUE
       _R_CHECK_FORCE_SUGGESTS_: false
-      R_CHECK_ARGS="--no-vignettes --timings"
-      R_BUILD_ARGS="--keep-empty-dirs --no-resave-data"
+      R_CHECK_ARGS: "--no-vignettes --timings"
+      R_BUILD_ARGS: "--keep-empty-dirs --no-resave-data"
 
 cache:
   - packages
