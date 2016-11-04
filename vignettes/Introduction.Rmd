@@ -43,7 +43,7 @@ Currently, major functionalities in the `r Biocpkg("TVTB")` package include:
 
 **Genotype counts and allele frequencies**
 
-* Added/overwritten in INFO keys of an `ExpandedVCF` objects
+* Stored in INFO keys of an `ExpandedVCF` objects
     + overall counts and frequencies (*i.e.* across all samples)
     + counts and frequencies within level(s) of phenotype(s)
 
@@ -59,13 +59,14 @@ of an `ExpandedVCF` object
 
 * in levels of a given phenotype
     + as a `data.frame` or a stacked `r Biocpkg("ggplot2")` `geom_bar`
-    + counts faceted by another Ensembl VEP prediction (*e.g.* `"Feature"`)
+    + optionally faceted by another Ensembl VEP prediction (*e.g.* `"Feature"`)
     + `geom_bar` represented as stacked *percentage* of predictions
 
-** Density of continuous Ensembl VEP predictions**
+**Density of continuous Ensembl VEP predictions**
 
 * in levels of a phenotype
-    + density faceted by another Ensembl VEP prediction
+    + as a `geom_density`
+    + optionally faceted by another Ensembl VEP prediction
 
 # Installation {#Installation}
 
@@ -119,7 +120,7 @@ tparam <- TVTBparam(
     vep = "CSQ", # default
     bp = BiocParallel::SerialParam()) # default
 ```
-\fixme{
+\bioccomment{
 In the future, add a second region to the `ranges` slot, to demonstrate
 relevant features (e.g. plots faceted by range).
 }
@@ -192,6 +193,11 @@ To reduce memory requirements and the duration of the calculations steps,
 users may wish to import only a subset of variants from specific genomic
 region(s) (*e.g.* gene-coding, exons, promoters).
 
+\bioccomment{
+In the future, genomic ranges may be used to produce summary statistics
+and plots faceted by range (*e.g.* burden).
+}
+
 The `r Biocpkg("VariantAnnotation")` `ScanVcfParam` class accepts
 `r Biocpkg("GenomicRanges")` `GRanges` objects
 (in the `which` slot) that describes
@@ -263,11 +269,6 @@ colData(vcf) <- phenotypes
 vcf <- VariantAnnotation::expand(x = vcf, row.names = TRUE)
 ```
 
-\fixme{
-Currently, the package relies on the ExpandedVCF object to have
-unique row names. A fix will be implemented soon.
-}
-
 The result is an `ExpandedVCF` object including variants
 in the desired genomic ranges and samples:
 
@@ -337,8 +338,8 @@ process within each phenotype:
 ```{r addFrequenciesPhenoLevel}
 initialInfo <- colnames(info(vcf))
 vcf <- addFrequencies(
-    vcf = vcf, phenos = list(super_pop = c("EUR", "AFR")), param = tparam,
-    force = TRUE)
+    vcf = vcf, phenos = list(super_pop = c("EUR", "AFR")),
+    param = tparam, force = TRUE)
 setdiff(colnames(info(vcf)), initialInfo)
 ```
 
@@ -427,7 +428,7 @@ active(vcfRules)["CADD"] <- FALSE
 active(vcfRules)
 ```
 
-## Definition of VCF filter rules {#FilterUse}
+## Evaluation of VCF filter rules {#FilterEval}
 
 Once defined, the above filter rules can be applied to `ExpandedVCF` objects,
 in the same way as `FilterRules` are evaluated in a given environment:

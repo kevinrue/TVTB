@@ -44,30 +44,30 @@ setMethod(
         if (force){
             # Remove data and header
             message(
-                "Overwriting INFO keys in data: ",
-                paste(colnames(info(vcf))[matchesData], collapse = ", "))
+                "Overwriting INFO keys in data:\n- ",
+                paste(colnames(info(vcf))[matchesData], collapse = "\n- "))
             info(vcf) <- info(vcf)[,-matchesData, drop = FALSE]
         } else{
             stop(
                 "INFO keys already present in data: ",
-                paste(colnames(info(vcf))[matchesData], collapse = ", "))
+                paste(colnames(info(vcf))[matchesData], collapse = "\n- "))
         }
 
     if ((length(matchesHeader) > 0))
         if (force){
             # Remove data and header
             message(
-                "Overwriting INFO keys in header: ",
+                "Overwriting INFO keys in header:\n- ",
                 paste(
                     rownames(info(header(vcf)))[matchesHeader],
-                    collapse = ", "))
+                    collapse = "\n- "))
             info(header(vcf)) <- info(header(vcf))[-matchesHeader,]
         } else{
             stop(
-                "INFO keys already present in header: ",
+                "INFO keys already present in header:\n- ",
                 paste(
                     rownames(info(header(vcf)))[matchesHeader],
-                    collapse = ", "))
+                    collapse = "\n- "))
         }
 
     return(vcf)
