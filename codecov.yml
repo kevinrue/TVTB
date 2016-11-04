@@ -15,10 +15,6 @@ coverage:
 
     changes: true
 
-    ignore:
-        - R/AllClasses.R
-        - R/tSVE.R
-
 comment:
     layout: "header, diff, changes, suggestions"
     behavior: default
