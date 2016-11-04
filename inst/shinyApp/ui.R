@@ -1288,7 +1288,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
             p(
                 tags$sup("2"),
                 "Known issue on", code("Mac OS X El Capitan"), ":",
-                "Application hangs while CPUs work infinitely at full speed."
+                "Web-app hangs while CPUs work infinitely at full capacity."
             )
         )
 
