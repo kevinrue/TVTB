@@ -56,7 +56,13 @@ GS <- list(
     choices.vcfInputMode = list(
         "Single VCF" = "SingleVcf",
         "One per chromosome" = "OnePerChr"),
-    default.vcfInputMode = "OnePerChr"
+    default.vcfInputMode = "OnePerChr",
+    vcfFilterClass.choices = list(
+        "fixed" = "VcfFixedRules",
+        "info" = "VcfInfoRules",
+        "VEP" = "VcfVepRules"
+    ),
+    vcfFilterClass.default = "VcfFixedRules"
 )
 
 # Parallel settings -------------------------------------------------------

@@ -519,6 +519,76 @@ shinyUI(navbarPage(theme = "bootstrap.css",
     ),
 
     tabPanel(
+        title = "Filters",
+
+        tags$span(
+            style="color:red",
+            tags$em("In development. No effect.")),
+
+        wellPanel(
+            h4("Add filter"),
+            fluidRow(
+                shiny::column(
+                    width = 1,
+                    selectInput(
+                        "newFilterClass", "Type",
+                        choices = GS[["vcfFilterClass.choices"]],
+                        selected = GS[["vcfFilterClass.default"]]
+                    )
+                ),
+                shiny::column(
+                    width = 6,
+                    textInput(
+                        "newFilterExpression", "Expression",
+                        placeholder = paste(
+                            "FILTER == \"PASS\"",
+                            "(MAF < 1e-2) & (ALT + HET > 0)",
+                            "IMPACT %in% c(\"HIGH\", \"MODERATE\")",
+                            sep = " - or - "
+                        )
+                    )
+                ),
+                shiny::column(
+                    width = 1,
+                    checkboxInput(
+                        "newFilterActive", "Active?",
+                        value = TRUE
+                    )
+                ),
+                shiny::column(
+                    width = 1,
+                    actionButton(
+                        "testNewFilter", "Test filter",
+                        icon = icon("flask")
+                    )
+                ),
+                shiny::column(
+                    width = 2,
+                    uiOutput("vcfFilterTest")
+                ),
+                shiny::column(
+                    width = 1,
+                    actionButton(
+                        "addNewFilter", "Add filter",
+                        icon = icon("plus")
+                    )
+                )
+            ),
+            fluidRow(
+                p(
+                    tags$sup("1"),
+                    "Known issue: quotes are auto-corrected to smart quotes,",
+                    "making the expression appear invalid.",
+                    "Current fix: curly quotes are substituted by their",
+                    "corresponding regular quote (double or simple).",
+                    "User can simply ignore the auto-corrected quotes."
+                )
+            )
+        )
+
+    ),
+
+    tabPanel(
         title = "Barplot",
 
         # Variants predictions barplot ----

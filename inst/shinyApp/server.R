@@ -927,7 +927,45 @@ shinyServer(function(input, output, clientData, session) {
 
     # Filter variants post-import ----
 
+    newVcfFilter <- reactive({
+
+        if (input$newFilterExpression == "")
+            return(NULL)
+        print(input$newFilterExpression)
+        quickFix <- gsub("[“‘]", "\"", input$newFilterExpression)
+        quickFix <- gsub("[‘]", "\'", quickFix)
+        print(quickFix)
+        return(tryCatch(
+            new(
+                Class = input$newFilterClass,
+                exprs = list(quickFix),
+                active = input$newFilterActive),
+            error = NULL
+        ))
+
+    })
+
     # TODO
+    output$vcfFilterTest <- renderUI({
+        req(input$testNewFilter)
+
+        isolate({newFilter <- newVcfFilter()})
+        print("newFilter")
+        print(str(newFilter))
+        print(S4Vectors::eval(newFilter, vcf()))
+        # print(vcf())
+        if (is.null(newFilter))
+            return(p("No expression provided."))
+        successfulTest <- tryCatch(
+            is.logical(S4Vectors::eval(newFilter, vcf())),
+            error = FALSE
+        )
+        print(successfulTest)
+        if (successfulTest)
+            return(tagList(strong(tags$span(style="color:green", "Valid"))))
+        else
+            return(strong(tags$span(style="color:red", "Invalid")))
+    })
 
     # Parse genotypes ----
 
