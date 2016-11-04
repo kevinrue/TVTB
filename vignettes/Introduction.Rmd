@@ -452,6 +452,12 @@ the scientific value of the data may be revealed by
 an immense variety of summary statistics and graphical representations.
 This section presents severeal ideas implemented in `r Biocpkg("TVTB")`.
 
+\bioccomment{
+Note that `ggplot` objects include the data used for plotting.
+Those data may be extracted, replaced, subsetted to produce plots and
+summary tables not yet implemented in the package.
+}
+
 ## Counts of discrete Ensembl VEP predictions {#SummariseDiscrete}
 
 ### Barplot {#SummariseDiscreteBarplot}
