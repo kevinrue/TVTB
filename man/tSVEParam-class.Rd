@@ -17,6 +17,10 @@
 \alias{genos,tSVEParam-method}
 \alias{genos<-}
 \alias{genos<-,tSVEParam,list-method}
+\alias{ranges}
+\alias{ranges,tSVEParam-method}
+\alias{ranges<-}
+\alias{ranges<-,tSVEParam,GRanges-method}
 \alias{aaf}
 \alias{aaf,tSVEParam-method}
 \alias{aaf<-}
@@ -66,10 +70,14 @@ package in a convenient format.
 ## Constructors
 
 \S4method{tSVEParam}{list}(
-    genos, aaf = "AAF", maf = "MAF", vep = "CSQ", bp = SerialParam())
+    genos,
+    ranges = GRanges(),
+    aaf = "AAF", maf = "MAF", vep = "CSQ", bp = SerialParam())
 
 \S4method{tSVEParam}{missing}(
-    ref, het, alt, aaf = "AAF", maf = "MAF", vep = "CSQ", bp = SerialParam())
+    ref, het, alt,
+    ranges = GRanges(),
+    aaf = "AAF", maf = "MAF", vep = "CSQ", bp = SerialParam())
 }
 
 \section{Accessors}{
@@ -86,6 +94,10 @@ object.
     \code{VCF} object.
     See also \code{hRef}, \code{het}, \code{hAlt}, and \code{carrier}
     accessors.
+    }
+    \item{\code{ranges(x)}, \code{ranges(x) <- value}}{
+    Gets or sets a \code{GRanges}
+    that declares the genomic ranges to import and group variants.
     }
     \item{\code{hRef(x)}, \code{hRef(x) <- value}}{
     Gets or sets the (named) \code{list} of length 1
@@ -163,7 +175,10 @@ See also \emph{Details} section.
 \code{character} vector of valid alternate homozygote genotypes
 (\emph{e.g.} \code{c("1|1", "1/1")}).
 }
-    \item{aaf}{
+    \item{ranges}{
+\code{GRanges} of genomic regions to import and group variants.
+}
+\item{aaf}{
 INFO key suffix used to store the alternate allele frequency (AAF).
 }
     \item{maf}{
@@ -218,13 +233,22 @@ genotypes <- list(
     ALT = c("1|1")
 )
 
-tParam <- tSVEParam(genos = genotypes)
+gr <- GenomicRanges::GRanges(
+    seqnames = "15",
+    ranges = IRanges::IRanges(
+        start = 48413170, end = 48434757, names = "SLC24A5"))
+
+tParam <- tSVEParam(genos = genotypes, ranges = gr)
 
 # Accessors ----
 
 ## Homozygote reference, heterozygote, and alternate heterozygote genotypes
 ## stored in the tSVEParam object returned by the genos() accessor.
 genos(tParam)
+
+## Genomic ranges stored in the tSVEParam object returned by the ranges()
+## accessor.
+ranges(tParam)
 
 ## Individual genotypes can be extracted with hRef(), het(), hAlt() accessors.
 hRef(tParam)

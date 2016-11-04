@@ -5,7 +5,7 @@ context("densityCsqByPhenotype")
 # Genomic region
 regions <- GenomicRanges::GRanges(
     seqnames = "15",
-    ranges = IRanges(start = 48413170, end = 48434757)) # all variants
+    ranges = IRanges::IRanges(start = 48413170, end = 48434757)) # all variants
 
 # VCF file
 extdata <- file.path(system.file(package = "tSVE"), "extdata")

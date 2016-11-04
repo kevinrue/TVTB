@@ -80,6 +80,10 @@ tParam <- tSVEParam(
         REF = c("0|0"),
         HET = c("0|1", "1|0"),
         ALT = c("1|1")),
+    ranges = GenomicRanges::GRanges(
+        seqnames = "15",
+        IRanges::IRanges(
+            start = 48413170, end = 48434757, names = "SLC24A5")),
     aaf = "AAF", # default
     maf = "MAF", # default
     vep = "CSQ", # default
@@ -95,6 +99,8 @@ In this example:
         - counts of genotypes are stored in INFO fields suffixed with `HET`
     + homozygote alternate  genotype is encoded `1|1`
         - counts of genotypes are stored in INFO fields suffixed with `ALT`
+* **Genomic ranges**
+    + a gene-coding region on chromosome 15
 * **Alternate allele frequency**
     + stored in INFO fields suffixed with `AAF`
 * **Minor allele frequency**
@@ -190,19 +196,9 @@ vcfFile <- system.file(
 
 tabixVcf <- Rsamtools::TabixFile(file = vcfFile)
 
-# Define genomic region(s) from which to import variants ----
-library(GenomicRanges)
-gr <- GenomicRanges::GRanges(
-    seqnames = "15",
-    IRanges::IRanges(
-        start = 48413170,
-        end = 48434757,
-        names = "SLC24A5"))
-
 # Import variants and phenotypes ----
 vcf <- preprocessVariants(
     file = tabixVcf,
-    regions = gr,
     param = tParam,
     phenos = phenoFile)
 ```

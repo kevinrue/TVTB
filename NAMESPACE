@@ -21,7 +21,7 @@ importFrom(
     "GenenameFilter")
 importMethodsFrom(
     "ensembldb",
-    "genes")
+    "genes", "seqlevels")
 
 importMethodsFrom(
     "GenomeInfoDb",
@@ -53,11 +53,15 @@ importClassesFrom(
     "VCF", "VCFHeader")
 importMethodsFrom(
     "VariantAnnotation",
-    "scanVcfHeader", "ScanVcfParam", "readVcf", "geno", "samples",
+    "scanVcfHeader", "ScanVcfParam",
+    "readVcf", "geno", "samples",
     "expand",
-
     "info", "header",
     "info<-", "header<-", "mcols<-"
+)
+importFrom(
+    "VariantAnnotation",
+    "vcfSamples<-", "vcfWhich<-", "vcfFixed<-", "vcfInfo<-", "vcfGeno<-"
 )
 
 importFrom("ensemblVEP", "parseCSQToGRanges")
@@ -108,6 +112,7 @@ exportMethods(
     "csqInPhenoLevel", "variantsInSamples",
 
     "genos", "genos<-",
+    "ranges", "ranges<-",
     "aaf", "aaf<-",
     "maf", "maf<-",
     "hRef", "hRef<-",
@@ -130,4 +135,3 @@ exportClasses(
 exportMethods(
     "tSVEParam"
 )
-

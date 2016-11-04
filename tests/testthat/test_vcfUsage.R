@@ -3,16 +3,16 @@ context("Pre-process variants from VCF")
 # Settings ----
 
 # Genomic region
-bedRegions <- GRanges(
+bedRegions <- GenomicRanges::GRanges(
     seqnames = "15",
-    ranges = IRanges(start = 48420E3, end = 48421E3))
+    ranges = IRanges::IRanges(start = 48420E3, end = 48421E3))
 
 # VCF file
 vcfFolder <- file.path(system.file(package = "tSVE"), "extdata")
 vcfPattern <- "^chr%s\\..*\\.vcf\\.gz$"
 vcfFilePattern <- gsub("%s", "15", vcfPattern)
 vcfFile <- list.files(vcfFolder, vcfFilePattern, full.names = TRUE)
-tabixVcf <- TabixFile(file = vcfFile)
+tabixVcf <- Rsamtools::TabixFile(file = vcfFile)
 
 # Good phenotype file
 # phenoFile <- file.path(

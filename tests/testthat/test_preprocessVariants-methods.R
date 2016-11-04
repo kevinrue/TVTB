@@ -3,41 +3,41 @@ context("preprocessVariants")
 # Settings ----
 
 # Genomic region
-regions <- GRanges(
+gr <- GenomicRanges::GRanges(
     seqnames = "15",
-    ranges = IRanges(start = 48420E3, end = 48421E3))
+    ranges = IRanges::IRanges(start = 48420E3, end = 48421E3))
+
+# tSVEParam
+tparam <- tSVEParam(
+    ref = c("0|0"),
+    het = c("0|1","1|0"),
+    alt = c("1|1"))
+# ... with ranges
+tparam.gr <- tSVEParam
+ranges(tparam) <- gr
 
 # VCF file
 extdata <- file.path(system.file(package = "tSVE"), "extdata")
-vcfFile <- file.path(extdata, "chr15.phase3_integrated.vcf.gz")
-tabixVcf <- TabixFile(file = vcfFile)
+vcfFile <- file.path(extdata, "moderate.vcf")
+vcfgzFile <- paste(vcfFile, "gz", sep = ".")
+tabixVcf <- Rsamtools::TabixFile(file = vcfgzFile)
 
 # Good and bad phenotype files
-phenoFile <- file.path(extdata, "integrated_samples.txt")
-phenotypes <- DataFrame(read.table(
+phenoFile <- file.path(extdata, "moderate_pheno.txt")
+phenotypes <- S4Vectors::DataFrame(read.table(
     file = phenoFile, header = TRUE, row.names = 1))
-# Subset phenotypes to test with a small number of samples
-samplePhenotypes <- phenotypes[
-    sample(x = 1:nrow(phenotypes), size = 100),]
 
 # Bad phenotype file (not all phenoSamples are present in VCF)
 phenoFilePartial <- file.path(system.file(
     package = "tSVE"), "badexamples", "pheno_PartialOverlap.txt")
-phenotypesPartial <- DataFrame(read.table(
+phenotypesPartial <- S4Vectors::DataFrame(read.table(
     file = phenoFilePartial, header = TRUE, row.names = 1))
 
 # Bad phenotype file (no phenoSample is present in VCF)
 phenoFileNoOverlap <- file.path(system.file(
     package = "tSVE"), "badexamples", "pheno_NoOverlap.txt")
-phenotypesNoOverlap <- DataFrame(read.table(
+phenotypesNoOverlap <- S4Vectors::DataFrame(read.table(
     file = phenoFileNoOverlap, header = TRUE, row.names = 1))
-
-# Actually, only the vep parameter is used at this step
-tparam <- tSVEParam(
-    ref = c("0|0"),
-    het = c("0|1","1|0"),
-    alt = c("1|1"),
-    vep = "CSQ")
 
 # Signatures ----
 
@@ -49,23 +49,23 @@ test_that("preprocessVariants supports all signatures",{
     # file=TabixFile,param=tSVEParam,phenos=DataFrame
     expect_s4_class(
         preprocessVariants(
-            file = tabixVcf, regions = regions,
-            param = tparam, phenos = samplePhenotypes),
+            file = tabixVcf,
+            param = tparam, phenos = phenotypes),
         "ExpandedVCF"
     )
 
     # file=TabixFile,param=tSVEParam,phenos=data.frame
     expect_s4_class(
         preprocessVariants(
-            file = tabixVcf, regions = regions,
-            param = tparam, phenos = as.data.frame(samplePhenotypes)),
+            file = tabixVcf,
+            param = tparam, phenos = as.data.frame(phenotypes)),
         "ExpandedVCF"
     )
 
     # file=TabixFile,param=tSVEParam,phenos=character
     expect_s4_class(
         preprocessVariants(
-            file = tabixVcf, regions = regions,
+            file = tabixVcf,
             param = tparam, phenos = phenoFile),
         "ExpandedVCF"
     )
@@ -73,7 +73,7 @@ test_that("preprocessVariants supports all signatures",{
     # file=TabixFile,param=tSVEParam,phenos=missing
     expect_s4_class(
         preprocessVariants(
-            file = tabixVcf, regions = regions,
+            file = tabixVcf,
             param = tparam),
         "ExpandedVCF"
     )
@@ -83,23 +83,23 @@ test_that("preprocessVariants supports all signatures",{
     # file=TabixFile,param=missing,phenos=DataFrame
     expect_s4_class(
         preprocessVariants(
-            file = tabixVcf, regions = regions,
-            phenos = samplePhenotypes),
+            file = tabixVcf,
+            phenos = phenotypes),
         "ExpandedVCF"
     )
 
     # file=TabixFile,param=missing,phenos=data.frame
     expect_s4_class(
         preprocessVariants(
-            file = tabixVcf, regions = regions,
-            phenos = as.data.frame(samplePhenotypes)),
+            file = tabixVcf,
+            phenos = as.data.frame(phenotypes)),
         "ExpandedVCF"
     )
 
     # file=TabixFile,param=missing,phenos=character
     expect_s4_class(
         preprocessVariants(
-            file = tabixVcf, regions = regions,
+            file = tabixVcf,
             phenos = phenoFile),
         "ExpandedVCF"
     )
@@ -107,7 +107,7 @@ test_that("preprocessVariants supports all signatures",{
     # file=TabixFile,param=missing,phenos=missing
     expect_s4_class(
         preprocessVariants(
-            file = tabixVcf, regions = regions),
+            file = tabixVcf),
         "ExpandedVCF"
     )
 
@@ -117,23 +117,23 @@ test_that("preprocessVariants supports all signatures",{
     # file=character,param=tSVEParam,phenos=DataFrame
     expect_s4_class(
         preprocessVariants(
-            file = path(tabixVcf), regions = regions,
-            param = tparam, phenos = samplePhenotypes),
+            file = path(tabixVcf),
+            param = tparam, phenos = phenotypes),
         "ExpandedVCF"
     )
 
     # file=character,param=tSVEParam,phenos=data.frame
     expect_s4_class(
         preprocessVariants(
-            file = path(tabixVcf), regions = regions,
-            param = tparam, phenos = as.data.frame(samplePhenotypes)),
+            file = path(tabixVcf),
+            param = tparam, phenos = as.data.frame(phenotypes)),
         "ExpandedVCF"
     )
 
     # file=character,param=tSVEParam,phenos=character
     expect_s4_class(
         preprocessVariants(
-            file = path(tabixVcf), regions = regions,
+            file = path(tabixVcf),
             param = tparam, phenos = phenoFile),
         "ExpandedVCF"
     )
@@ -141,7 +141,7 @@ test_that("preprocessVariants supports all signatures",{
     # file=character,param=tSVEParam,phenos=missing
     expect_s4_class(
         preprocessVariants(
-            file = path(tabixVcf), regions = regions,
+            file = path(tabixVcf),
             param = tparam),
         "ExpandedVCF"
     )
@@ -151,23 +151,23 @@ test_that("preprocessVariants supports all signatures",{
     # file=character,param=missing,phenos=DataFrame
     expect_s4_class(
         preprocessVariants(
-            file = path(tabixVcf), regions = regions,
-            phenos = samplePhenotypes),
+            file = path(tabixVcf),
+            phenos = phenotypes),
         "ExpandedVCF"
     )
 
     # file=character,param=missing,phenos=data.frame
     expect_s4_class(
         preprocessVariants(
-            file = path(tabixVcf), regions = regions,
-            phenos = as.data.frame(samplePhenotypes)),
+            file = path(tabixVcf),
+            phenos = as.data.frame(phenotypes)),
         "ExpandedVCF"
     )
 
     # file=character,param=missing,phenos=character
     expect_s4_class(
         preprocessVariants(
-            file = path(tabixVcf), regions = regions,
+            file = path(tabixVcf),
             phenos = phenoFile),
         "ExpandedVCF"
     )
@@ -175,24 +175,11 @@ test_that("preprocessVariants supports all signatures",{
     # file=character,param=missing,phenos=missing
     expect_s4_class(
         preprocessVariants(
-            file = path(tabixVcf), regions = regions),
+            file = path(tabixVcf)),
         "ExpandedVCF"
     )
 
 })
-
-# test_that("vep are mandatory in the absence of tSVEParam",{
-#
-#     ## param=tSVEParam
-#
-#     # file=TabixFile,phenos=DataFrame,param=missing
-#     expect_error(
-#         preprocessVariants(
-#             file = tabixVcf, regions = regions, phenos = samplePhenotypes,
-#             vep = "CSQ")
-#     )
-#
-# })
 
 # Invalid phenos arguments ----
 
@@ -200,14 +187,14 @@ test_that("invalid phenos= arguments are detected",{
 
     expect_error(
         preprocessVariants(
-            file = tabixVcf, regions = regions,
+            file = tabixVcf,
             param = tparam,
             phenos = phenotypesPartial)
     )
 
     expect_error(
         preprocessVariants(
-            file = tabixVcf, regions = regions,
+            file = tabixVcf,
             param = tparam,
             phenos = phenotypesNoOverlap)
     )
@@ -220,8 +207,20 @@ test_that("invalid vep arguments are detected",{
 
     expect_error(
         preprocessVariants(
-            file = tabixVcf, regions = regions, vep = "ERROR",
+            file = tabixVcf, vep = "ERROR",
             param = tparam)
+    )
+
+})
+
+# file=character;ranges=GRanges(0) is incompatible ----
+
+test_that("ranges cannot be used if VCF is not indexed",{
+
+    expect_error(
+        preprocessVariants(
+            file = path(tabixVcf),
+            param = tparam.gr, phenos = phenotypes)
     )
 
 })

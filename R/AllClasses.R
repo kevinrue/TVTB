@@ -37,6 +37,7 @@ tSVEParam <- setClass(
     # Define the slots
     slots = c(
         genos = "list",
+        ranges = "GRanges",
         aaf = "character",
         maf = "character",
         vep = "character",
@@ -46,6 +47,7 @@ tSVEParam <- setClass(
 
     # Set the default values for the slots. (optional)
     prototype = list(
+        ranges = GRanges(),
         aaf = "AAF",
         maf = "MAF",
         vep = "CSQ",

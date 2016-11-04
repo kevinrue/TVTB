@@ -63,6 +63,11 @@ test_that("Accessors return valid values",{
         "list"
     )
 
+    expect_s4_class(
+        ranges(tparam),
+        "GRanges"
+    )
+
     expect_type(
         aaf(tparam),
         "character"
@@ -114,6 +119,15 @@ test_that("Setters return valid values",{
             het = c("0/1", "1/0"),
             alt = "1/1"),
         "list"
+    )
+
+    expect_s4_class(
+        ranges(tparam) <- GRanges(
+            seqnames = "15", ranges = IRanges(
+                start = 48413170,
+                end = 48434757,
+                names = "SLC24A5")),
+        "GRanges"
     )
 
     expect_type(

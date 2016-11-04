@@ -1,33 +1,30 @@
-#### regions = GRanges ----
 ### file = TabixFile ----
 ## param = tSVEParam ----
 
 setMethod(
     f = "preprocessVariants",
     signature = c(
-        file="TabixFile", regions="GRanges", param="tSVEParam",
+        file="TabixFile", param="tSVEParam",
         phenos="DataFrame"),
-    definition = function(file, regions, param, phenos, ...){
+    definition = function(file, param, phenos, ...){
 
         param <- .override.tSVEParam(param = param, ...)
 
-        .preprocessVariants(
-            file = file, regions = regions, param = param,
-            phenos = phenos, ...)
+        .preprocessVariants(file = file, param = param, phenos = phenos, ...)
     }
 )
 
 setMethod(
     f = "preprocessVariants",
     signature = c(
-        file="TabixFile", regions="GRanges", param="tSVEParam",
+        file="TabixFile", param="tSVEParam",
         phenos="data.frame"),
-    definition = function(file, regions, param, phenos, ...){
+    definition = function(file, param, phenos, ...){
 
         param <- .override.tSVEParam(param = param, ...)
 
         .preprocessVariants(
-            file = file, regions = regions, param = param,
+            file = file, param = param,
             phenos = DataFrame(phenos), ...)
     }
 )
@@ -35,9 +32,9 @@ setMethod(
 setMethod(
     f = "preprocessVariants",
     signature = c(
-        file="TabixFile", regions="GRanges", param="tSVEParam",
+        file="TabixFile", param="tSVEParam",
         phenos="character"),
-    definition = function(file, regions, param, phenos, ...){
+    definition = function(file, param, phenos, ...){
 
         param <- .override.tSVEParam(param = param, ...)
 
@@ -48,7 +45,7 @@ setMethod(
             ...))
 
         .preprocessVariants(
-            file = file, regions = regions, param = param,
+            file = file, param = param,
             phenos = phenosDF, ...)
     }
 )
@@ -56,14 +53,14 @@ setMethod(
 setMethod(
     f = "preprocessVariants",
     signature = c(
-        file="TabixFile", regions="GRanges", param="tSVEParam",
+        file="TabixFile", param="tSVEParam",
         phenos="missing"),
-    definition = function(file, regions, param, phenos = DataFrame(), ...){
+    definition = function(file, param, phenos = DataFrame(), ...){
 
         param <- .override.tSVEParam(param = param, ...)
 
         .preprocessVariants(
-            file = file, regions = regions, param = param,
+            file = file, param = param,
             phenos = DataFrame(), ...)
     }
 )
@@ -73,10 +70,10 @@ setMethod(
 setMethod(
     f = "preprocessVariants",
     signature = c(
-        file="TabixFile", regions="GRanges", param="missing",
+        file="TabixFile", param="missing",
         phenos="DataFrame"),
     definition = function(
-        file, regions,
+        file,
         param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
         phenos, ...){
 
@@ -86,7 +83,7 @@ setMethod(
         param <- .override.tSVEParam(param = param, ...)
 
         .preprocessVariants(
-            file = file, regions = regions, param = param,
+            file = file, param = param,
             phenos = phenos, ...)
     }
 )
@@ -94,10 +91,10 @@ setMethod(
 setMethod(
     f = "preprocessVariants",
     signature = c(
-        file="TabixFile", regions="GRanges", param="missing",
+        file="TabixFile", param="missing",
         phenos="data.frame"),
     definition = function(
-        file, regions,
+        file,
         param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
         phenos, ...){
 
@@ -107,7 +104,7 @@ setMethod(
         param <- .override.tSVEParam(param = param, ...)
 
         .preprocessVariants(
-            file = file, regions = regions, param = param,
+            file = file, param = param,
             phenos = DataFrame(phenos), ...)
     }
 )
@@ -115,10 +112,10 @@ setMethod(
 setMethod(
     f = "preprocessVariants",
     signature = c(
-        file="TabixFile", regions="GRanges", param="missing",
+        file="TabixFile", param="missing",
         phenos="character"),
     definition = function(
-        file, regions,
+        file,
         param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
         phenos, ...){
 
@@ -134,7 +131,7 @@ setMethod(
             ...))
 
         .preprocessVariants(
-            file = file, regions = regions, param = param,
+            file = file, param = param,
             phenos = phenosDF, ...)
     }
 )
@@ -142,10 +139,10 @@ setMethod(
 setMethod(
     f = "preprocessVariants",
     signature = c(
-        file="TabixFile", regions="GRanges", param="missing",
+        file="TabixFile", param="missing",
         phenos="missing"),
     definition = function(
-        file, regions,
+        file,
         param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
         phenos = DataFrame(), ...){
 
@@ -155,7 +152,7 @@ setMethod(
         param <- .override.tSVEParam(param = param, ...)
 
         .preprocessVariants(
-            file = file, regions = regions, param = param,
+            file = file, param = param,
             phenos = DataFrame(), ...)
     }
 )
@@ -166,14 +163,14 @@ setMethod(
 setMethod(
     f = "preprocessVariants",
     signature = c(
-        file="character", regions="GRanges", param="tSVEParam",
+        file="character", param="tSVEParam",
         phenos="DataFrame"),
-    definition = function(file, regions, param, phenos, ...){
+    definition = function(file, param, phenos, ...){
 
         param <- .override.tSVEParam(param = param, ...)
 
         .preprocessVariants(
-            file = file, regions = regions, param = param,
+            file = file, param = param,
             phenos = phenos, ...)
     }
 )
@@ -181,14 +178,14 @@ setMethod(
 setMethod(
     f = "preprocessVariants",
     signature = c(
-        file="character", regions="GRanges", param="tSVEParam",
+        file="character", param="tSVEParam",
         phenos="data.frame"),
-    definition = function(file, regions, param, phenos, ...){
+    definition = function(file, param, phenos, ...){
 
         param <- .override.tSVEParam(param = param, ...)
 
         .preprocessVariants(
-            file = file, regions = regions, param = param,
+            file = file, param = param,
             phenos = DataFrame(phenos), ...)
     }
 )
@@ -196,9 +193,9 @@ setMethod(
 setMethod(
     f = "preprocessVariants",
     signature = c(
-        file="character", regions="GRanges", param="tSVEParam",
+        file="character", param="tSVEParam",
         phenos="character"),
-    definition = function(file, regions, param, phenos, ...){
+    definition = function(file, param, phenos, ...){
 
         param <- .override.tSVEParam(param = param, ...)
 
@@ -209,7 +206,7 @@ setMethod(
             ...))
 
         .preprocessVariants(
-            file = file, regions = regions, param = param,
+            file = file, param = param,
             phenos = phenosDF, ...)
     }
 )
@@ -217,14 +214,14 @@ setMethod(
 setMethod(
     f = "preprocessVariants",
     signature = c(
-        file="character", regions="GRanges", param="tSVEParam",
+        file="character", param="tSVEParam",
         phenos="missing"),
-    definition = function(file, regions, param, phenos = DataFrame(), ...){
+    definition = function(file, param, phenos = DataFrame(), ...){
 
         param <- .override.tSVEParam(param = param, ...)
 
         .preprocessVariants(
-            file = file, regions = regions, param = param,
+            file = file, param = param,
             phenos = DataFrame(), ...)
     }
 )
@@ -234,10 +231,10 @@ setMethod(
 setMethod(
     f = "preprocessVariants",
     signature = c(
-        file="character", regions="GRanges", param="missing",
+        file="character", param="missing",
         phenos="DataFrame"),
     definition = function(
-        file, regions,
+        file,
         param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
         phenos, ...){
 
@@ -247,7 +244,7 @@ setMethod(
         param <- .override.tSVEParam(param = param, ...)
 
         .preprocessVariants(
-            file = file, regions = regions, param = param,
+            file = file, param = param,
             phenos = phenos, ...)
     }
 )
@@ -255,10 +252,10 @@ setMethod(
 setMethod(
     f = "preprocessVariants",
     signature = c(
-        file="character", regions="GRanges", param="missing",
+        file="character", param="missing",
         phenos="data.frame"),
     definition = function(
-        file, regions,
+        file,
         param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
         phenos, ...){
 
@@ -268,7 +265,7 @@ setMethod(
         param <- .override.tSVEParam(param = param, ...)
 
         .preprocessVariants(
-            file = file, regions = regions, param = param,
+            file = file, param = param,
             phenos = DataFrame(phenos), ...)
     }
 )
@@ -276,10 +273,10 @@ setMethod(
 setMethod(
     f = "preprocessVariants",
     signature = c(
-        file="character", regions="GRanges", param="missing",
+        file="character", param="missing",
         phenos="character"),
     definition = function(
-        file, regions,
+        file,
         param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
         phenos, ...){
 
@@ -295,7 +292,7 @@ setMethod(
             ...))
 
         .preprocessVariants(
-            file = file, regions = regions, param = param,
+            file = file, param = param,
             phenos = phenosDF, ...)
     }
 )
@@ -303,10 +300,10 @@ setMethod(
 setMethod(
     f = "preprocessVariants",
     signature = c(
-        file="character", regions="GRanges", param="missing",
+        file="character", param="missing",
         phenos="missing"),
     definition = function(
-        file, regions,
+        file,
         param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
         phenos = DataFrame(), ...){
 
@@ -316,330 +313,7 @@ setMethod(
         param <- .override.tSVEParam(param = param, ...)
 
         .preprocessVariants(
-            file = file, regions = regions, param = param,
-            phenos = DataFrame(), ...)
-    }
-)
-
-#### regions = missing ----
-### file = TabixFile ----
-## param = tSVEParam ----
-
-setMethod(
-    f = "preprocessVariants",
-    signature = c(
-        file="TabixFile", regions="missing", param="tSVEParam",
-        phenos="DataFrame"),
-    definition = function(file, regions, param, phenos, ...){
-
-        param <- .override.tSVEParam(param = param, ...)
-
-        .preprocessVariants(
-            file = file, regions = regions, param = param,
-            phenos = phenos, ...)
-    }
-)
-
-setMethod(
-    f = "preprocessVariants",
-    signature = c(
-        file="TabixFile", regions="missing", param="tSVEParam",
-        phenos="data.frame"),
-    definition = function(file, regions, param, phenos, ...){
-
-        param <- .override.tSVEParam(param = param, ...)
-
-        .preprocessVariants(
-            file = file, regions = regions, param = param,
-            phenos = DataFrame(phenos), ...)
-    }
-)
-
-setMethod(
-    f = "preprocessVariants",
-    signature = c(
-        file="TabixFile", regions="missing", param="tSVEParam",
-        phenos="character"),
-    definition = function(file, regions, param, phenos, ...){
-
-        param <- .override.tSVEParam(param = param, ...)
-
-        phenosDF <- DataFrame(read.table(
-            file = phenos,
-            header = TRUE,
-            row.names = 1,
-            ...))
-
-        .preprocessVariants(
-            file = file, regions = regions, param = param,
-            phenos = phenosDF, ...)
-    }
-)
-
-setMethod(
-    f = "preprocessVariants",
-    signature = c(
-        file="TabixFile", regions="missing", param="tSVEParam",
-        phenos="missing"),
-    definition = function(file, regions, param, phenos = DataFrame(), ...){
-
-        param <- .override.tSVEParam(param = param, ...)
-
-        .preprocessVariants(
-            file = file, regions = regions, param = param,
-            phenos = DataFrame(), ...)
-    }
-)
-
-### param = missing ----
-
-setMethod(
-    f = "preprocessVariants",
-    signature = c(
-        file="TabixFile", regions="missing", param="missing",
-        phenos="DataFrame"),
-    definition = function(
-        file, regions,
-        param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
-        phenos, ...){
-
-        # Only required for vep field
-        param <- tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA")
-        # override defaults (vep)
-        param <- .override.tSVEParam(param = param, ...)
-
-        .preprocessVariants(
-            file = file, regions = regions, param = param,
-            phenos = phenos, ...)
-    }
-)
-
-setMethod(
-    f = "preprocessVariants",
-    signature = c(
-        file="TabixFile", regions="missing", param="missing",
-        phenos="data.frame"),
-    definition = function(
-        file, regions,
-        param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
-        phenos, ...){
-
-        # Only required for vep field
-        param <- tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA")
-        # override defaults (vep)
-        param <- .override.tSVEParam(param = param, ...)
-
-        .preprocessVariants(
-            file = file, regions = regions, param = param,
-            phenos = DataFrame(phenos), ...)
-    }
-)
-
-setMethod(
-    f = "preprocessVariants",
-    signature = c(
-        file="TabixFile", regions="missing", param="missing",
-        phenos="character"),
-    definition = function(
-        file, regions,
-        param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
-        phenos, ...){
-
-        # Only required for vep field
-        param <- tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA")
-        # override defaults (vep)
-        param <- .override.tSVEParam(param = param, ...)
-
-        phenosDF <- DataFrame(read.table(
-            file = phenos,
-            header = TRUE,
-            row.names = 1,
-            ...))
-
-        .preprocessVariants(
-            file = file, regions = regions, param = param,
-            phenos = phenosDF, ...)
-    }
-)
-
-setMethod(
-    f = "preprocessVariants",
-    signature = c(
-        file="TabixFile", regions="missing", param="missing",
-        phenos="missing"),
-    definition = function(
-        file, regions,
-        param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
-        phenos = DataFrame(), ...){
-
-        # Only required for vep field
-        param <- tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA")
-        # override defaults (vep)
-        param <- .override.tSVEParam(param = param, ...)
-
-        .preprocessVariants(
-            file = file, regions = regions, param = param,
-            phenos = DataFrame(), ...)
-    }
-)
-
-### file = character ----
-## param = tSVEParam ----
-
-setMethod(
-    f = "preprocessVariants",
-    signature = c(
-        file="character", regions="missing", param="tSVEParam",
-        phenos="DataFrame"),
-    definition = function(file, regions, param, phenos, ...){
-
-        param <- .override.tSVEParam(param = param, ...)
-
-        .preprocessVariants(
-            file = file, regions = regions, param = param,
-            phenos = phenos, ...)
-    }
-)
-
-setMethod(
-    f = "preprocessVariants",
-    signature = c(
-        file="character", regions="missing", param="tSVEParam",
-        phenos="data.frame"),
-    definition = function(file, regions, param, phenos, ...){
-
-        param <- .override.tSVEParam(param = param, ...)
-
-        .preprocessVariants(
-            file = file, regions = regions, param = param,
-            phenos = DataFrame(phenos), ...)
-    }
-)
-
-setMethod(
-    f = "preprocessVariants",
-    signature = c(
-        file="character", regions="missing", param="tSVEParam",
-        phenos="character"),
-    definition = function(file, regions, param, phenos, ...){
-
-        param <- .override.tSVEParam(param = param, ...)
-
-        phenosDF <- DataFrame(read.table(
-            file = phenos,
-            header = TRUE,
-            row.names = 1,
-            ...))
-
-        .preprocessVariants(
-            file = file, regions = regions, param = param,
-            phenos = phenosDF, ...)
-    }
-)
-
-setMethod(
-    f = "preprocessVariants",
-    signature = c(
-        file="character", regions="missing", param="tSVEParam",
-        phenos="missing"),
-    definition = function(file, regions, param, phenos = DataFrame(), ...){
-
-        param <- .override.tSVEParam(param = param, ...)
-
-        .preprocessVariants(
-            file = file, regions = regions, param = param,
-            phenos = DataFrame(), ...)
-    }
-)
-
-## param = missing ----
-
-setMethod(
-    f = "preprocessVariants",
-    signature = c(
-        file="character", regions="missing", param="missing",
-        phenos="DataFrame"),
-    definition = function(
-        file, regions,
-        param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
-        phenos, ...){
-
-        # Only required for vep field
-        param <- tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA")
-        # override defaults (vep)
-        param <- .override.tSVEParam(param = param, ...)
-
-        .preprocessVariants(
-            file = file, regions = regions, param = param,
-            phenos = phenos, ...)
-    }
-)
-
-setMethod(
-    f = "preprocessVariants",
-    signature = c(
-        file="character", regions="missing", param="missing",
-        phenos="data.frame"),
-    definition = function(
-        file, regions,
-        param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
-        phenos, ...){
-
-        # Only required for vep field
-        param <- tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA")
-        # override defaults (vep)
-        param <- .override.tSVEParam(param = param, ...)
-
-        .preprocessVariants(
-            file = file, regions = regions, param = param,
-            phenos = DataFrame(phenos), ...)
-    }
-)
-
-setMethod(
-    f = "preprocessVariants",
-    signature = c(
-        file="character", regions="missing", param="missing",
-        phenos="character"),
-    definition = function(
-        file, regions,
-        param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
-        phenos, ...){
-
-        # Only required for vep field
-        param <- tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA")
-        # override defaults (vep)
-        param <- .override.tSVEParam(param = param, ...)
-
-        phenosDF <- DataFrame(read.table(
-            file = phenos,
-            header = TRUE,
-            row.names = 1,
-            ...))
-
-        .preprocessVariants(
-            file = file, regions = regions, param = param,
-            phenos = phenosDF, ...)
-    }
-)
-
-setMethod(
-    f = "preprocessVariants",
-    signature = c(
-        file="character", regions="missing", param="missing",
-        phenos="missing"),
-    definition = function(
-        file, regions,
-        param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
-        phenos = DataFrame(), ...){
-
-        # Only required for vep field
-        param <- tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA")
-        # override defaults (vep)
-        param <- .override.tSVEParam(param = param, ...)
-
-        .preprocessVariants(
-            file = file, regions = regions, param = param,
+            file = file, param = param,
             phenos = DataFrame(), ...)
     }
 )
@@ -647,7 +321,7 @@ setMethod(
 # Main method ----
 
 .preprocessVariants <- function(
-    file, regions, param,
+    file, param,
     phenos = DataFrame(), ...){
 
     vcfPath <- switch (class(file),
@@ -661,6 +335,12 @@ setMethod(
         stop(vep(param), " not found in VCF header")
     }
 
+    svp <- ScanVcfParam(
+        fixed = "ALT",
+        info = vep(param),
+        geno = c("GT")
+    )
+
     if (nrow(phenos) > 0){
         if (!any(rownames(phenos) %in% samples(vcfHead))){
             stop("All samples in Phenotype file are missing from VCF header")
@@ -671,19 +351,12 @@ setMethod(
                 " header")
         }
         # All phenoSamples in VCF: import only phenoSamples from VCF
-        phenoSamples <- rownames(phenos)
-    } else {
-        # No phenotypes: import all samples
-        phenoSamples <- character()
+        vcfSamples(svp) <- rownames(phenos)
     }
 
-    svp <- ScanVcfParam(
-        fixed = "ALT",
-        info = vep(param),
-        geno = c("GT"),
-        samples = phenoSamples,
-        which = regions
-    )
+    if (length(ranges(param)) > 0){
+        vcfWhich(svp) <- ranges(param)
+    }
 
     message(
         "Importing VCF fields ",
@@ -691,7 +364,7 @@ setMethod(
         "FORMAT/GT ",
         "INFO/", vep(param),
         ") from ",
-        length(regions), " region(s) in ",
+        length(ranges(param)), " region(s) in ",
         vcfPath,
         " ...")
 
@@ -723,8 +396,9 @@ setMethod(
 
     # Header of all INFO fields were imported but not all data fields,
     # remove headers of fields not imported
-    extraInfo <- which(!rownames(info(header(vcf))) %in% colnames(info(vcf)))
-    info(header(vcf)) <- info(header(vcf))[-extraInfo,]
+    info(header(vcf)) <- subset(
+        x = info(header(vcf)),
+        subset = rownames(info(header(vcf))) %in% colnames(info(vcf)))
 
     return(vcf)
 }

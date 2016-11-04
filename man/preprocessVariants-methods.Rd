@@ -2,45 +2,25 @@
 
 \alias{preprocessVariants}
 
-\alias{preprocessVariants,TabixFile,GRanges,tSVEParam,DataFrame-method}
-\alias{preprocessVariants,TabixFile,GRanges,tSVEParam,data.frame-method}
-\alias{preprocessVariants,TabixFile,GRanges,tSVEParam,character-method}
-\alias{preprocessVariants,TabixFile,GRanges,tSVEParam,missing-method}
+\alias{preprocessVariants,TabixFile,tSVEParam,DataFrame-method}
+\alias{preprocessVariants,TabixFile,tSVEParam,data.frame-method}
+\alias{preprocessVariants,TabixFile,tSVEParam,character-method}
+\alias{preprocessVariants,TabixFile,tSVEParam,missing-method}
 
-\alias{preprocessVariants,TabixFile,GRanges,missing,DataFrame-method}
-\alias{preprocessVariants,TabixFile,GRanges,missing,data.frame-method}
-\alias{preprocessVariants,TabixFile,GRanges,missing,character-method}
-\alias{preprocessVariants,TabixFile,GRanges,missing,missing-method}
+\alias{preprocessVariants,TabixFile,missing,DataFrame-method}
+\alias{preprocessVariants,TabixFile,missing,data.frame-method}
+\alias{preprocessVariants,TabixFile,missing,character-method}
+\alias{preprocessVariants,TabixFile,missing,missing-method}
 
-\alias{preprocessVariants,character,GRanges,tSVEParam,DataFrame-method}
-\alias{preprocessVariants,character,GRanges,tSVEParam,data.frame-method}
-\alias{preprocessVariants,character,GRanges,tSVEParam,character-method}
-\alias{preprocessVariants,character,GRanges,tSVEParam,missing-method}
+\alias{preprocessVariants,character,tSVEParam,DataFrame-method}
+\alias{preprocessVariants,character,tSVEParam,data.frame-method}
+\alias{preprocessVariants,character,tSVEParam,character-method}
+\alias{preprocessVariants,character,tSVEParam,missing-method}
 
-\alias{preprocessVariants,character,GRanges,missing,DataFrame-method}
-\alias{preprocessVariants,character,GRanges,missing,data.frame-method}
-\alias{preprocessVariants,character,GRanges,missing,character-method}
-\alias{preprocessVariants,character,GRanges,missing,missing-method}
-
-\alias{preprocessVariants,TabixFile,missing,tSVEParam,DataFrame-method}
-\alias{preprocessVariants,TabixFile,missing,tSVEParam,data.frame-method}
-\alias{preprocessVariants,TabixFile,missing,tSVEParam,character-method}
-\alias{preprocessVariants,TabixFile,missing,tSVEParam,missing-method}
-
-\alias{preprocessVariants,TabixFile,missing,missing,DataFrame-method}
-\alias{preprocessVariants,TabixFile,missing,missing,data.frame-method}
-\alias{preprocessVariants,TabixFile,missing,missing,character-method}
-\alias{preprocessVariants,TabixFile,missing,missing,missing-method}
-
-\alias{preprocessVariants,character,missing,tSVEParam,DataFrame-method}
-\alias{preprocessVariants,character,missing,tSVEParam,data.frame-method}
-\alias{preprocessVariants,character,missing,tSVEParam,character-method}
-\alias{preprocessVariants,character,missing,tSVEParam,missing-method}
-
-\alias{preprocessVariants,character,missing,missing,DataFrame-method}
-\alias{preprocessVariants,character,missing,missing,data.frame-method}
-\alias{preprocessVariants,character,missing,missing,character-method}
-\alias{preprocessVariants,character,missing,missing,missing-method}
+\alias{preprocessVariants,character,missing,DataFrame-method}
+\alias{preprocessVariants,character,missing,data.frame-method}
+\alias{preprocessVariants,character,missing,character-method}
+\alias{preprocessVariants,character,missing,missing-method}
 
 \docType{methods}
 \alias{preprocessVariants-methods}
@@ -53,141 +33,69 @@ analyses.
 }
 
 \usage{
-\S4method{preprocessVariants}{TabixFile,GRanges,tSVEParam,DataFrame}(
-    file, regions, param, phenos, ...)
+\S4method{preprocessVariants}{TabixFile,tSVEParam,DataFrame}(
+    file, param, phenos, ...)
 
-\S4method{preprocessVariants}{TabixFile,GRanges,tSVEParam,data.frame}(
-    file, regions, param, phenos, ...)
+\S4method{preprocessVariants}{TabixFile,tSVEParam,data.frame}(
+    file, param, phenos, ...)
 
-\S4method{preprocessVariants}{TabixFile,GRanges,tSVEParam,character}(
-    file, regions, param, phenos, ...)
+\S4method{preprocessVariants}{TabixFile,tSVEParam,character}(
+    file, param, phenos, ...)
 
-\S4method{preprocessVariants}{TabixFile,GRanges,tSVEParam,missing}(
-    file, regions, param, phenos = DataFrame(), ...)
+\S4method{preprocessVariants}{TabixFile,tSVEParam,missing}(
+    file, param, phenos = DataFrame(), ...)
 
-\S4method{preprocessVariants}{TabixFile,GRanges,missing,DataFrame}(
-    file, regions,
+\S4method{preprocessVariants}{TabixFile,missing,DataFrame}(
+    file,
     param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
     phenos, ...)
 
-\S4method{preprocessVariants}{TabixFile,GRanges,missing,data.frame}(
-    file, regions,
+\S4method{preprocessVariants}{TabixFile,missing,data.frame}(
+    file,
     param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
     phenos, ...)
 
-\S4method{preprocessVariants}{TabixFile,GRanges,missing,character}(
-    file, regions,
+\S4method{preprocessVariants}{TabixFile,missing,character}(
+    file,
     param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
     phenos, ...)
 
-\S4method{preprocessVariants}{TabixFile,GRanges,missing,missing}(
-    file, regions,
+\S4method{preprocessVariants}{TabixFile,missing,missing}(
+    file,
     param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
     phenos = DataFrame(), ...)
 
-\S4method{preprocessVariants}{character,GRanges,tSVEParam,DataFrame}(
-    file, regions, param, phenos, ...)
+\S4method{preprocessVariants}{character,tSVEParam,DataFrame}(
+    file, param, phenos, ...)
 
-\S4method{preprocessVariants}{character,GRanges,tSVEParam,data.frame}(
-    file, regions, param, phenos, ...)
+\S4method{preprocessVariants}{character,tSVEParam,data.frame}(
+    file, param, phenos, ...)
 
-\S4method{preprocessVariants}{character,GRanges,tSVEParam,character}(
-    file, regions, param, phenos, ...)
+\S4method{preprocessVariants}{character,tSVEParam,character}(
+    file, param, phenos, ...)
 
-\S4method{preprocessVariants}{character,GRanges,tSVEParam,missing}(
-    file, regions, param, phenos = DataFrame(), ...)
+\S4method{preprocessVariants}{character,tSVEParam,missing}(
+    file, param, phenos = DataFrame(), ...)
 
-\S4method{preprocessVariants}{character,GRanges,missing,DataFrame}(
-    file, regions,
+\S4method{preprocessVariants}{character,missing,DataFrame}(
+    file,
     param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
     phenos, ...)
 
-\S4method{preprocessVariants}{character,GRanges,missing,data.frame}(
-    file, regions,
+\S4method{preprocessVariants}{character,missing,data.frame}(
+    file,
     param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
     phenos, ...)
 
-\S4method{preprocessVariants}{character,GRanges,missing,data.frame}(
-    file, regions,
+\S4method{preprocessVariants}{character,missing,data.frame}(
+    file,
     param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
     phenos, ...)
-
-\S4method{preprocessVariants}{character,GRanges,missing,missing}(
-    file, regions,
-    param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
-    phenos = DataFrame(), ...)
-
-\S4method{preprocessVariants}{TabixFile,missing,tSVEParam,DataFrame}(
-    file, regions, param, phenos, ...)
-
-\S4method{preprocessVariants}{TabixFile,missing,tSVEParam,data.frame}(
-    file, regions, param, phenos, ...)
-
-\S4method{preprocessVariants}{TabixFile,missing,tSVEParam,character}(
-    file, regions, param, phenos, ...)
-
-\S4method{preprocessVariants}{TabixFile,missing,tSVEParam,missing}(
-    file, regions, param, phenos = DataFrame(), ...)
-
-\S4method{preprocessVariants}{TabixFile,missing,missing,DataFrame}(
-    file, regions,
-    param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
-    phenos, ...)
-
-\S4method{preprocessVariants}{TabixFile,missing,missing,data.frame}(
-    file, regions,
-    param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
-    phenos, ...)
-
-\S4method{preprocessVariants}{TabixFile,missing,missing,character}(
-    file, regions,
-    param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
-    phenos, ...)
-
-\S4method{preprocessVariants}{TabixFile,missing,missing,missing}(
-    file, regions,
-    param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
-    phenos = DataFrame(), ...)
-
-\S4method{preprocessVariants}{character,missing,tSVEParam,DataFrame}(
-    file, regions, param, phenos, ...)
-
-\S4method{preprocessVariants}{character,missing,tSVEParam,data.frame}(
-    file, regions, param, phenos, ...)
-
-\S4method{preprocessVariants}{character,missing,tSVEParam,character}(
-    file, regions, param, phenos, ...)
-
-\S4method{preprocessVariants}{character,missing,tSVEParam,missing}(
-    file, regions, param, phenos = DataFrame(), ...)
-
-\S4method{preprocessVariants}{character,missing,missing,DataFrame}(
-    file, regions,
-    param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
-    phenos, ...)
-
-\S4method{preprocessVariants}{character,missing,missing,data.frame}(
-    file, regions,
-    param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
-    phenos, ...)
-
-\S4method{preprocessVariants}{character,missing,missing,data.frame}(
-    file, regions,
-    param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
-    phenos, ...)
-
-\S4method{preprocessVariants}{character,missing,missing,missing}(
-    file, regions,
-    param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
-    phenos = DataFrame(), ...)
 }
 
 \arguments{
     \item{file}{
 File (\code{TabixFile} or \code{character}) from which to import variants.
-}
-    \item{regions}{
-\code{GRanges} object specifying genomic regions from which to import variants.
 }
     \item{param}{
 \code{tSVEParam} object that contains recurrent parameters.
@@ -249,11 +157,8 @@ library(VariantAnnotation)
 # Example data ----
 
 extdata <- file.path(system.file(package = "tSVE"), "extdata")
-vcfFile <- file.path(extdata, "chr15.phase3_integrated.vcf.gz")
-phenoFile <- file.path(extdata, "integrated_samples.txt")
-regions <- GenomicRanges::GRanges(
-    seqnames = "15",
-    ranges = IRanges::IRanges(start = 48420E3, end = 48421E3))
+vcfFile <- file.path(extdata, "moderate.vcf")
+phenoFile <- file.path(extdata, "moderate_pheno.txt")
 
 # Import phenotype data ----
 
@@ -262,21 +167,18 @@ phenotypes <- S4Vectors::DataFrame(read.table(
     header = TRUE,
     row.names = 1))
 
-# Define VCF and index files ----
-
-tf <- Rsamtools::TabixFile(vcfFile)
-
 # Define tSVEParam
 
-tParam <- tSVEParam(
-    ref = "0|0", het = c("0|1", "1|0"), alt = "1|1",
-    vep = "CSQ")
+tparam <- tSVEParam(
+    genos = list(
+    REF = "0|0",
+    HET = c("0|1", "1|0"),
+    ALT = "1|1"))
 
 # Example usage ----
 
 preprocessVariants(
-    file = tf, regions = regions, param = tParam,
-    phenos = phenotypes)
+    file = vcfFile, param = tparam, phenos = phenotypes)
 }
 
 \keyword{methods}

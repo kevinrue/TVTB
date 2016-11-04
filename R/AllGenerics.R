@@ -29,9 +29,9 @@ setGeneric(
 
 setGeneric(
     name = "preprocessVariants",
-    signature = c("file", "regions", "param", "phenos"),
+    signature = c("file", "param", "phenos"),
     def = function(
-        file, regions, param, phenos, ...)
+        file, param, phenos, ...)
         standardGeneric("preprocessVariants")
 )
 
@@ -119,13 +119,15 @@ setGeneric(
         standardGeneric("tabulateCsqInPhenoLevel")
 )
 
-# VCF class ----
+# tSVEParam class ----
 
 setGeneric(
     name = "tSVEParam",
     signature = "genos",
     def = function(
-        ..., genos, aaf = "AAF", maf = "MAF", vep = "CSQ", bp = SerialParam())
+        ..., genos,
+        ranges = GRanges(),
+        aaf = "AAF", maf = "MAF", vep = "CSQ", bp = SerialParam())
         standardGeneric("tSVEParam")
 )
 

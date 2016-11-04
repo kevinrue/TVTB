@@ -11,6 +11,9 @@
     if ("alt" %in% n)
         hAlt(param)[[1]] <- dots[["alt"]]
 
+    if ("ranges" %in% n)
+        ranges(param) <- dots[["ranges"]]
+
     if ("aaf" %in% n)
         aaf(param) <- dots[["aaf"]]
 
@@ -34,17 +37,15 @@ setMethod(
     signature = c("tSVEParam"),
     definition = function(
         .Object, genos,
+        ranges = GRanges(),
         aaf = "AAF", maf = "MAF", vep = "CSQ", bp = SerialParam()){
 
         # hRef, het, and hAlt genos required
         .checkGenos(x = genos, length = 3)
 
-        # For unnamed elements, use default value (defined by order)
-        unnamedIdx <- which(names(genos) == "")
-        names(genos)[unnamedIdx] <- c("REF", "HET", "ALT")[unnamedIdx]
-
         # Fill slots with data
         .Object@genos <- genos
+        .Object@ranges <- ranges
         .Object@aaf <- aaf
         .Object@maf <- maf
         .Object@vep <- vep
@@ -61,6 +62,7 @@ setMethod(
     signature = c(genos="list"),
     definition = function(
         genos,
+        ranges = GRanges(),
         aaf = "AAF", maf = "MAF", vep = "CSQ", bp = SerialParam()){
 
         if (is.null(names(genos))){
@@ -71,7 +73,9 @@ setMethod(
             }
         }
 
-        .tSVEParam(genos = genos, aaf = aaf, maf = maf, vep = vep, bp = bp)
+        .tSVEParam(
+            genos = genos, ranges = ranges,
+            aaf = aaf, maf = maf, vep = vep, bp = bp)
     }
 )
 
@@ -81,24 +85,29 @@ setMethod(
     signature = c(genos="missing"),
     definition = function(
         ref, het, alt,
+        ranges = GRanges(),
         aaf = "AAF", maf = "MAF", vep = "CSQ", bp = SerialParam()){
 
         genos <- list(REF = ref, HET = het, ALT = alt)
 
         .checkGenos(x = genos, length = 3)
 
-        .tSVEParam(genos = genos, aaf = aaf, maf = maf, vep = vep, bp = bp)
+        .tSVEParam(
+            genos = genos, ranges = ranges,
+            aaf = aaf, maf = maf, vep = vep, bp = bp)
     }
 )
 
 # Main method ----
 
 .tSVEParam <- function(
-    genos, aaf = "AAF", maf = "MAF", vep = "CSQ", bp = SerialParam()){
-
+    genos,
+    ranges = GRanges(),
+    aaf = "AAF", maf = "MAF", vep = "CSQ", bp = SerialParam()){
     new(
         Class = "tSVEParam",
-        genos = genos, aaf = aaf, maf = maf, vep = vep, bp = bp)
+        genos = genos, ranges = ranges,
+        aaf = aaf, maf = maf, vep = vep, bp = bp)
 }
 
 # Helpers ----
@@ -144,6 +153,22 @@ setReplaceMethod(
         .checkGenos(x = value, length = 3)
 
         slot(x, "genos") <- value
+        x
+    }
+)
+
+### genos
+setMethod(
+    f = "ranges",
+    signature = c("tSVEParam"),
+    definition = function(x)
+        slot(x, "ranges")
+)
+
+setReplaceMethod(
+    f = "ranges", c("tSVEParam", "GRanges"),
+    function(x, value){
+        slot(x, "ranges") <- value
         x
     }
 )
