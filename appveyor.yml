@@ -41,8 +41,10 @@ environment:
 
 build_script:
   - echo Current directory=%CD%
+  - travis-tools.sh install_github Bioconductor-mirror/S4Vectors Bioconductor-mirror/SummarizedExperiment Bioconductor-mirror/Rsamtools
   - travis-tool.sh install_bioc_deps
   - travis-tool.sh install_bioc ensemblVEP
+
   #- Rscript -e 'BiocInstaller::biocValid(fix=TRUE)'
   #- Rscript -e 'print(c);showMethods(\"c\", classes = \"GenomicRanges\", includeDefs = TRUE)'
   #- Rscript -e 'library(GenomicRanges);print(c);showMethods(\"\c", classes = \"GenomicRanges\", includeDefs = TRUE)'
