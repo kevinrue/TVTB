@@ -1565,13 +1565,13 @@ shinyServer(function(input, output, clientData, session) {
         vepKey.choices <- colnames(vepMcols)
 
         # Initialise by order of preference if present:
-        # Consequence > Impact > First field
+        # Current selection > Consequence > Impact > First field
         vepAnalysed.default <- max(
             1,
             head(x = na.omit(
                 match(
-                    x = c("consequence","impact"),
-                    table = tolower(vepKey.choices)
+                    x = c(input$vepAnalysed, "Consequence","IMPACT"),
+                    table = vepKey.choices
                     )
                 ), n = 1)
             )
@@ -1583,9 +1583,22 @@ shinyServer(function(input, output, clientData, session) {
 
         vepKey.choices <- c("None", vepKey.choices)
 
+        # Initialise by order of preference if present:
+        # Current selection > None
+        vepFacetKey.selected <- max(
+            1,
+            head(x = na.omit(
+                match(
+                    x = c(input$vepFacetKey),
+                    table = vepKey.choices
+                )
+            ), n = 1)
+        )
+
         updateSelectInput(
             session, "vepFacetKey",
-            choices = vepKey.choices)
+            choices = vepKey.choices,
+            selected = vepKey.choices[vepFacetKey.selected])
     })
 
     # Summarise consequences ----
