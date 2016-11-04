@@ -390,17 +390,23 @@ Instances of those classes may be initialised as follows:
 fixedR <- VcfFixedRules(exprs = list(
     pass = expression(FILTER == "PASS"),
     qual = expression(QUAL > 20)
-))
+    ))
 fixedR
 ```
 
 **VcfInfoRules**
 
+`FilterRules` are initialised in an active state by default.
+The `active` argument of their constructor may be used to initialise
+certain filter rules in an inactive state.
+
 ```{r VcfInfoRules}
 infoR <- VcfInfoRules(exprs = list(
     common = expression(MAF > 0.1), # minor allele frequency
     present = expression(ALT + HET > 0) # count of non-REF homozygotes
-))
+    ),
+    active = c(TRUE, FALSE))
+infoR
 ```
 
 **VcfVepRules**
@@ -409,11 +415,14 @@ infoR <- VcfInfoRules(exprs = list(
 vepR <- VcfVepRules(exprs = list(
     missense = expression(Consequence %in% c("missense_variant")),
     CADD = expression(CADD_PHRED > 15)
-))
+    ))
 vepR
 ```
 
 **VcfFilterRules**
+
+`VcfFilterRules` combine VCF filter rules of  different classes in a single
+object.
 
 ```{r VcfFilterRules}
 vcfRules <- VcfFilterRules(fixedR, infoR, vepR)

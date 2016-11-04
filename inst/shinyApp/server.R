@@ -941,11 +941,11 @@ shinyServer(function(input, output, clientData, session) {
         quickFix <- gsub("[‘’]", "\'", quickFix)
 
         return(tryCatch(
-            new(
+            newFilter <- new(
                 Class = input$newFilterClass,
                 exprs = list(quickFix),
                 active = input$newFilterActive),
-            warning = function(e) NULL,
+            # warning = function(w) NULL,
             error = function(e) NULL
         ))
 
@@ -954,19 +954,28 @@ shinyServer(function(input, output, clientData, session) {
     newFilterTestResults <- reactive({
         # Only triggered by addNewFilter (> 0)
         req(input$addNewFilter)
-        print("test")
+
         isolate({
             newFilter <- newVcfFilter()
             vcf <- head(vcf()) # Speed up testing!
         })
 
-        if (is.null(newFilter))
-            return("No expression provided.")
+        if (is.null(newFilter)){
+            RV[["newFilterStatus"]] <- "Invalid expression"
+            return(FALSE)
+        }
 
         return(tryCatch(
-            is.logical(S4Vectors::eval(newFilter, vcf)),
+            expr = {
+                testResult <- is.logical(S4Vectors::eval(newFilter, vcf))
+                RV[["newFilterStatus"]] <- "Valid"
+                return(testResult)
+            },
             #warning = function(e) FALSE,
-            error = function(e) FALSE
+            error = function(e){
+                RV[["newFilterStatus"]] <- geterrmessage()
+                return(FALSE)
+            }
         ))
     })
 
@@ -974,16 +983,16 @@ shinyServer(function(input, output, clientData, session) {
         testResult <- newFilterTestResults()
 
         if (testResult)
-            return(strong(tags$span(style="color:green", "Valid")))
+            return(strong(tags$span(style="color:green", RV[["newFilterStatus"]])))
         else
-            return(strong(tags$span(style="color:red", geterrmessage())))
+            return(strong(tags$span(style="color:red", RV[["newFilterStatus"]])))
     })
 
     observeEvent(input$addNewFilter, {
         newFilter <- newVcfFilter()
         testResult <- newFilterTestResults()
-        print("testResult")
-        print(testResult)
+
+        # Only add new filter if valid
         validate(need(testResult == TRUE, "Invalid VCF filter"))
 
         RV[["vcfFilters"]] <- VcfFilterRules(
@@ -993,6 +1002,41 @@ shinyServer(function(input, output, clientData, session) {
 
     output$vcfFilters <- renderPrint({
         return(str(RV[["vcfFilters"]]))
+    })
+
+    output$vcfFilterControls <- renderUI({
+
+        vcfFilters <- RV[["vcfFilters"]]
+        countFilters <- length(vcfFilters)
+
+        if (countFilters == 0)
+            return(p("No filter."))
+
+        return(lapply(
+            X = 1:countFilters,
+            FUN = function(filterIndex){
+                fluidRow(
+                    # type
+                    shiny::column(
+                        width = 1,
+                        code(type(vcfFilters)[filterIndex])
+                    ),
+                    # expression
+                    shiny::column(
+                        width = 8,
+                        code(as.character(vcfFilters[filterIndex][[1]]))
+                    ),
+                    # active
+                    shiny::column(
+                        width = 1,
+                        checkboxInput(
+                            inputId = paste0("active", filterIndex),
+                            label = NULL,
+                            value = active(vcfFilters)[filterIndex])
+                    )
+            )
+        }))
+
     })
 
     # Parse genotypes ----

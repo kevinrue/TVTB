@@ -6,7 +6,7 @@ setMethod(
     signature = c("VcfFixedRules"),
     definition = function(.Object, exprs = list(), ..., active = TRUE){
 
-        parentRules <- FilterRules(exprs = exprs, ..., active = TRUE)
+        parentRules <- FilterRules(exprs = exprs, ..., active = active)
 
         .Object@listData <- slot(parentRules, "listData")
         .Object@active <- slot(parentRules, "active")
@@ -29,7 +29,7 @@ setMethod(
     signature = c("VcfInfoRules"),
     definition = function(.Object, exprs = list(), ..., active = TRUE){
 
-        parentRules <- FilterRules(exprs = exprs, ..., active = TRUE)
+        parentRules <- FilterRules(exprs = exprs, ..., active = active)
 
         .Object@listData <- slot(parentRules, "listData")
         .Object@active <- slot(parentRules, "active")
@@ -53,7 +53,7 @@ setMethod(
     definition = function(
         .Object, exprs = list(), ..., active = TRUE, vep = "CSQ"){
 
-        parentRules <- FilterRules(exprs = exprs, ..., active = TRUE)
+        parentRules <- FilterRules(exprs = exprs, ..., active = active)
 
         .Object@listData <- slot(parentRules, "listData")
         .Object@active <- slot(parentRules, "active")
@@ -186,6 +186,9 @@ setMethod(
 
 # TODO info.key taken from TVTBParam
 .evalVepFilter <- function(expr, envir){
+    # If empty filter
+    if (length(expr) == 0)
+        return(rep(TRUE, length(envir)))
     # This filter requires unique rownames in the ExpandedVCF
     if (any(duplicated(rownames(envir))))
         rownames(envir) <- paste(
@@ -286,11 +289,11 @@ setMethod(
     listData <- slot(x, "listData")
 
     res <- switch (filterType,
-        fixed = VcfFixedRules(exprs = listData, active = slot(x, "listData")),
-        info = VcfInfoRules(exprs = listData, active = slot(x, "listData")),
+        fixed = VcfFixedRules(exprs = listData, active = slot(x, "active")),
+        info = VcfInfoRules(exprs = listData, active = slot(x, "active")),
         vep = VcfVepRules(
             exprs = listData,
-            active = slot(x, "listData"),
+            active = slot(x, "active"),
             vep = slot(x, "vep")),
         stop("Invalid type")
     )

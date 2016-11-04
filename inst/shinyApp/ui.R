@@ -596,6 +596,24 @@ shinyUI(navbarPage(theme = "bootstrap.css",
         ),
         wellPanel(
             verbatimTextOutput("vcfFilters")
+        ),
+        wellPanel(
+            fluidRow(
+                shiny::column(
+                    width = 1,
+                    strong("Class")
+                ),
+                shiny::column(
+                    width = 8,
+                    strong("Expression")
+                ),
+                shiny::column(
+                    width = 1,
+                    strong("Active?")
+                )
+            ),
+            br(),
+            uiOutput("vcfFilterControls")
         )
     ),
 
