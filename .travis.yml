@@ -15,3 +15,4 @@ r_check_args: --no-vignettes --timings
 
 after_success:
     - Rscript -e 'covr::codecov()'
+    - bash <(curl -s https://codecov.io/bash)
