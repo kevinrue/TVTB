@@ -3,11 +3,11 @@ context("addPhenoLevelFrequencies")
 # Settings ----
 
 # VCF file
-extdata <- file.path(system.file(package = "tSVE"), "extdata")
+extdata <- file.path(system.file(package = "TVTB"), "extdata")
 vcfFile <- file.path(extdata, "moderate.vcf")
 phenoFile <- file.path(extdata, "moderate_pheno.txt")
 
-tparam <- tSVEParam(
+tparam <- TVTBparam(
     genos = list(
         REF = "0|0",
         HET = c("0|1", "1|0"),
@@ -38,7 +38,7 @@ info(vcfInfoExist) <- cbind(info(vcfInfoExist), newInfoData)
 
 test_that("addPhenoLevelFrequencies supports all signatures",{
 
-    # \alias{addPhenoLevelFrequencies,ExpandedVCF,tSVEParam-method}
+    # \alias{addPhenoLevelFrequencies,ExpandedVCF,TVTBparam-method}
     expect_s4_class(
         addPhenoLevelFrequencies(
             vcf = vcf, pheno = "pop", level = "GBR", param = tparam),

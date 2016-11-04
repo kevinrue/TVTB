@@ -1,8 +1,8 @@
-\name{tSVE-TODO}
+\name{TVTB-TODO}
 \alias{TODO}
 \alias{TODO.Rd}
 
-\title{tSVE TODO list}
+\title{The Variant Tool-Box "to-do" list}
 
 \section{Package}{
 

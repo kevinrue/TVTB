@@ -1,87 +1,87 @@
-\name{tSVEParam-class}
+\name{TVTBparam-class}
 \docType{class}
 
 % Class
-\alias{class:tSVEParam}
-\alias{tSVEParam-class}
+\alias{class:TVTBparam}
+\alias{TVTBparam-class}
 
 % Constructors/Methods:
-\alias{tSVEParam}
-\alias{tSVEParam-methods}
-\alias{tSVEParam,list-method}
-\alias{tSVEParam,missing-method}
-\alias{initialize,tSVEParam-method}
+\alias{TVTBparam}
+\alias{TVTBparam-methods}
+\alias{TVTBparam,list-method}
+\alias{TVTBparam,missing-method}
+\alias{initialize,TVTBparam-method}
 
 % Accessor methods:
 \alias{genos}
-\alias{genos,tSVEParam-method}
+\alias{genos,TVTBparam-method}
 \alias{genos<-}
-\alias{genos<-,tSVEParam,list-method}
+\alias{genos<-,TVTBparam,list-method}
 \alias{ranges}
-\alias{ranges,tSVEParam-method}
+\alias{ranges,TVTBparam-method}
 \alias{ranges<-}
-\alias{ranges<-,tSVEParam,GRanges-method}
+\alias{ranges<-,TVTBparam,GRanges-method}
 \alias{aaf}
-\alias{aaf,tSVEParam-method}
+\alias{aaf,TVTBparam-method}
 \alias{aaf<-}
-\alias{aaf<-,tSVEParam,character-method}
+\alias{aaf<-,TVTBparam,character-method}
 \alias{maf}
-\alias{maf,tSVEParam-method}
+\alias{maf,TVTBparam-method}
 \alias{maf<-}
-\alias{maf<-,tSVEParam,character-method}
+\alias{maf<-,TVTBparam,character-method}
 \alias{vep}
-\alias{vep,tSVEParam-method}
+\alias{vep,TVTBparam-method}
 \alias{vep<-}
-\alias{vep<-,tSVEParam,character-method}
+\alias{vep<-,TVTBparam,character-method}
 \alias{bp}
-\alias{bp,tSVEParam-method}
+\alias{bp,TVTBparam-method}
 \alias{bp<-}
-\alias{bp<-,tSVEParam,BiocParallelParam-method}
+\alias{bp<-,TVTBparam,BiocParallelParam-method}
 
 % Other methods / functions
 \alias{hRef}
-\alias{hRef,tSVEParam-method}
+\alias{hRef,TVTBparam-method}
 \alias{hRef<-}
-\alias{hRef<-,tSVEParam,list-method}
-\alias{hRef<-,tSVEParam,character-method}
+\alias{hRef<-,TVTBparam,list-method}
+\alias{hRef<-,TVTBparam,character-method}
 \alias{het}
-\alias{het,tSVEParam-method}
+\alias{het,TVTBparam-method}
 \alias{het<-}
-\alias{het<-,tSVEParam,list-method}
-\alias{het<-,tSVEParam,character-method}
+\alias{het<-,TVTBparam,list-method}
+\alias{het<-,TVTBparam,character-method}
 \alias{hAlt}
-\alias{hAlt,tSVEParam-method}
+\alias{hAlt,TVTBparam-method}
 \alias{hAlt<-}
-\alias{hAlt<-,tSVEParam,list-method}
-\alias{hAlt<-,tSVEParam,character-method}
+\alias{hAlt<-,TVTBparam,list-method}
+\alias{hAlt<-,TVTBparam,character-method}
 \alias{carrier}
-\alias{carrier,tSVEParam-method}
+\alias{carrier,TVTBparam-method}
 \alias{carrier<-}
-\alias{carrier<-,tSVEParam,list-method}
+\alias{carrier<-,TVTBparam,list-method}
 
-\title{tSVEParam class objects}
+\title{TVTBparam class objects}
 
 \description{
-The \code{tSVEParam} class stores recurrent parameters of the \code{tSVE}
+The \code{TVTBparam} class stores recurrent parameters of the \code{TVTB}
 package in a convenient format.
 }
 
 \usage{
 ## Constructors
 
-\S4method{tSVEParam}{list}(
+\S4method{TVTBparam}{list}(
     genos,
     ranges = GRanges(),
     aaf = "AAF", maf = "MAF", vep = "CSQ", bp = SerialParam())
 
-\S4method{tSVEParam}{missing}(
+\S4method{TVTBparam}{missing}(
     ref, het, alt,
     ranges = GRanges(),
     aaf = "AAF", maf = "MAF", vep = "CSQ", bp = SerialParam())
 }
 
 \section{Accessors}{
-In the following code snippets \code{x} is a \code{tSVEParam} object.
+In the following code snippets \code{x} is a \code{TVTBparam} object.
 \describe{
     \item{\code{genos(x)}, \code{genos(x) <- value}}{
     Gets or sets a named \code{list} of length three
@@ -191,11 +191,11 @@ INFO key suffix used to extract the VEP predictions.
 }
 
 \value{
-A \code{tSVEParam} object that contains recurrent parameters.
+A \code{TVTBparam} object that contains recurrent parameters.
 }
 
 \details{
-For each key suffix stored in the \code{tSVEParam} object, \code{tSVE}
+For each key suffix stored in the \code{TVTBparam} object, \code{TVTB}
 reserves the following INFO keys to store the associated values.
 Users are recommended to avoid using those INFO keys for other purposes:
 \describe{
@@ -237,15 +237,15 @@ gr <- GenomicRanges::GRanges(
     ranges = IRanges::IRanges(
         start = 48413170, end = 48434757, names = "SLC24A5"))
 
-tparam <- tSVEParam(genos = genotypes, ranges = gr)
+tparam <- TVTBparam(genos = genotypes, ranges = gr)
 
 # Accessors ----
 
 ## Homozygote reference, heterozygote, and alternate heterozygote genotypes
-## stored in the tSVEParam object returned by the genos() accessor.
+## stored in the TVTBparam object returned by the genos() accessor.
 genos(tparam)
 
-## Genomic ranges stored in the tSVEParam object returned by the ranges()
+## Genomic ranges stored in the TVTBparam object returned by the ranges()
 ## accessor.
 ranges(tparam)
 

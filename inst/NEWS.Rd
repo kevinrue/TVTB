@@ -1,8 +1,8 @@
-\name{tSVE-NEWS}
+\name{TVTB-NEWS}
 \alias{NEWS}
 \alias{NEWS.Rd}
 
-\title{tSVE NEWS file}
+\title{TVTB NEWS file}
 
 \section{Changes in version 0.99.0}{
 \subsection{New features}{

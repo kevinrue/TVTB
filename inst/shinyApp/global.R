@@ -1,6 +1,6 @@
 
 stopifnot(
-    require(tSVE),
+    require(TVTB),
     require(BiocParallel),
     require(rtracklayer),
     require(Rsamtools),
@@ -51,7 +51,7 @@ GS <- list(
     default.regionInputMode = c("BedFile"),
     choices.vcfCols = c(),
     default.vcfCols = c(),
-    default.vcfFolder = system.file("extdata", package = "tSVE"),
+    default.vcfFolder = system.file("extdata", package = "TVTB"),
     default.vcfPattern = "^chr%s\\..*\\.vcf\\.gz$",
     choices.vcfInputMode = list(
         "Single VCF" = "SingleVcf",

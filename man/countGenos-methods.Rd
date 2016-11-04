@@ -62,14 +62,14 @@ only genotypes above a given quality cut-off.
 # Example data ----
 
 # VCF file
-extdata <- file.path(system.file(package = "tSVE"), "extdata")
+extdata <- file.path(system.file(package = "TVTB"), "extdata")
 vcfFile <- file.path(extdata, "moderate.vcf")
 
 # Phenotype file
 phenoFile <- file.path(extdata, "moderate_pheno.txt")
 
 # Parameters
-tparam <- tSVEParam(
+tparam <- TVTBparam(
     genos = list(
         REF = "0|0",
         HET = c("0|1", "1|0"),

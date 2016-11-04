@@ -1,13 +1,13 @@
-### param = tSVEParam ----
+### param = TVTBparam ----
 ## samples = column index ----
 
 setMethod(
     f = "variantsInSamples",
-    signature = c("ExpandedVCF", "numeric", "tSVEParam"),
+    signature = c("ExpandedVCF", "numeric", "TVTBparam"),
 
     definition = function(vcf, samples, param = NULL, ..., unique = FALSE){
 
-        param <- .override.tSVEParam(param, ...)
+        param <- .override.TVTBparam(param, ...)
 
         .variantsInSamples(
             vcf = vcf, samples = samples, param = param,
@@ -17,11 +17,11 @@ setMethod(
 # samples as column names
 setMethod(
     f = "variantsInSamples",
-    signature = c("ExpandedVCF", "character", "tSVEParam"),
+    signature = c("ExpandedVCF", "character", "TVTBparam"),
 
     definition = function(vcf, samples, param = NULL, ..., unique = FALSE){
 
-        param <- .override.tSVEParam(param, ...)
+        param <- .override.TVTBparam(param, ...)
 
         .variantsInSamples(
             vcf = vcf, samples = samples, param = param,
@@ -43,7 +43,7 @@ setMethod(
                 "length(alts) must be >= 2: ",
                 "Heterozygote and Homozygote alternate genotypes")
         # ref will not be used
-        param <- tSVEParam(genos = list("", alts[1], alts[2:length(alts)]))
+        param <- TVTBparam(genos = list("", alts[1], alts[2:length(alts)]))
 
         .variantsInSamples(
             vcf = vcf, samples = samples, param = param,
@@ -63,7 +63,7 @@ setMethod(
                 "length(alts) must be >= 2: ",
                 "Heterozygote and Homozygote alternate genotypes")
         # ref will not be used
-        param <- tSVEParam(genos = list("", alts[1], alts[2:length(alts)]))
+        param <- TVTBparam(genos = list("", alts[1], alts[2:length(alts)]))
 
         .variantsInSamples(
             vcf = vcf, samples = samples, param = param,

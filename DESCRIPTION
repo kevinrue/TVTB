@@ -1,13 +1,14 @@
-Package: tSVE
+Package: TVTB
 Type: Package
-Title: tSVE: The Shiny Variant Explorer
-Version: 0.1.8
-Date: 2016-08-02
+Title: TVTB: The Variant Tool-Box
+Version: 0.1.9
+Date: 2016-08-04
 Author: Kevin Rue-Albrecht
 Maintainer: Kevin Rue-Albrecht <kevinrue67@gmail.com>
 Description: The package provides functions to summarise and visualise
-  gene centric genetic variation data stored in VCF files.
-  Functionalities are also demonstrated in a Shiny web-application.
+    gene centric genetic variation data stored in VCF files.
+    Functionalities are also demonstrated in a Shiny web-application,
+    the Shiny Variant Explorer (tSVE).
 License: Artistic-2.0
 Depends:
     R (>= 3.3), methods, utils, stats
@@ -60,7 +61,7 @@ Collates:
     runShinyApp.R,
     AllClasses.R,
     AllGenerics.R,
-    tSVEParam-class.R,
+    TVTBparam-class.R,
     VcfBasicFilter-class.R,
     preprocessVariants-methods.R,
     VcfFilters.R,
@@ -77,4 +78,4 @@ Collates:
     densityCsq-methods.R,
     show-methods.R
 VignetteBuilder: knitr
-BugReports: https://github.com/kevinrue/tSVE/issues
+BugReports: https://github.com/kevinrue/TVTB/issues

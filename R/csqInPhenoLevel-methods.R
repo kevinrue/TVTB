@@ -1,14 +1,14 @@
-### param = tSVEParam ----
+### param = TVTBparam ----
 ## phenotypes = DataFrame ----
 
 setMethod(
     f = "csqInPhenoLevel",
-    signature = c(vcf="ExpandedVCF", param="tSVEParam"),
+    signature = c(vcf="ExpandedVCF", param="TVTBparam"),
     definition = function(
         vcf, phenoCol, level, csqCol, param = NULL, ...,
         unique = FALSE, facet = NULL){
 
-        param <- .override.tSVEParam(param, ...)
+        param <- .override.TVTBparam(param, ...)
 
         .csqInPhenoLevel(
             vcf = vcf, phenoCol = phenoCol, level = level, csqCol = csqCol,
@@ -31,9 +31,9 @@ setMethod(
                 "length(alts) must be >= 2: ",
                 "Heterozygote and Homozygote alternate genotypes")
         # ref will not be used
-        param <- tSVEParam(genos = list("", alts[1], alts[2:length(alts)]))
+        param <- TVTBparam(genos = list("", alts[1], alts[2:length(alts)]))
 
-        param <- .override.tSVEParam(param, ...)
+        param <- .override.TVTBparam(param, ...)
 
         .csqInPhenoLevel(
             vcf = vcf, phenoCol = phenoCol, level = level, csqCol = csqCol,

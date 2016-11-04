@@ -39,7 +39,7 @@ Kevin Rue-Albrecht
 \examples{
 # Identify VCF file correponding to chromosome ----
 
-vcfFolder <- file.path(system.file(package = "tSVE"), "extdata")
+vcfFolder <- file.path(system.file(package = "TVTB"), "extdata")
 
 # Example usage
 vcfFile <- chr2file(

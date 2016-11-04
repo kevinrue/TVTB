@@ -2,13 +2,13 @@
 
 \alias{addFrequencies}
 
-\alias{addFrequencies,ExpandedVCF,list,tSVEParam-method}
+\alias{addFrequencies,ExpandedVCF,list,TVTBparam-method}
 \alias{addFrequencies,ExpandedVCF,list,missing-method}
 
-\alias{addFrequencies,ExpandedVCF,character,tSVEParam-method}
+\alias{addFrequencies,ExpandedVCF,character,TVTBparam-method}
 \alias{addFrequencies,ExpandedVCF,character,missing-method}
 
-\alias{addFrequencies,ExpandedVCF,missing,tSVEParam-method}
+\alias{addFrequencies,ExpandedVCF,missing,TVTBparam-method}
 \alias{addFrequencies,ExpandedVCF,missing,missing-method}
 
 \docType{methods}
@@ -29,19 +29,19 @@ homozygote reference genotypes).
 }
 
 \usage{
-\S4method{addFrequencies}{ExpandedVCF,list,tSVEParam}(
+\S4method{addFrequencies}{ExpandedVCF,list,TVTBparam}(
         vcf, phenos, param, ..., force = FALSE)
 
 \S4method{addFrequencies}{ExpandedVCF,list,missing}(
         vcf, ref, het, alt, phenos, ..., force = FALSE)
 
-\S4method{addFrequencies}{ExpandedVCF,character,tSVEParam}(
+\S4method{addFrequencies}{ExpandedVCF,character,TVTBparam}(
         vcf, phenos, param, ..., force = FALSE)
 
 \S4method{addFrequencies}{ExpandedVCF,character,missing}(
         vcf, ref, het, alt, phenos, ..., force = FALSE)
 
-\S4method{addFrequencies}{ExpandedVCF,missing,tSVEParam}(
+\S4method{addFrequencies}{ExpandedVCF,missing,TVTBparam}(
         vcf, param, ..., force = FALSE)
 
 \S4method{addFrequencies}{ExpandedVCF,missing,missing}(
@@ -63,7 +63,7 @@ or a named \code{list} in which \code{names} are phenotypes in
 phenotype levels in \code{colData(vcf)[,phenotype]}.
 }
     \item{param}{
-\code{tSVEParam} object that contains recurrent parameters.
+\code{TVTBparam} object that contains recurrent parameters.
 }
     \item{ref}{
 \code{character} vector of valid reference homozygote genotypes (\emph{e.g.}
@@ -78,7 +78,7 @@ phenotype levels in \code{colData(vcf)[,phenotype]}.
     \code{c("1|1", "1/1")}).
 }
     \item{...}{
-Additional arguments used to override \code{tSVEParam} slots.
+Additional arguments used to override \code{TVTBparam} slots.
 }
     \item{force}{
 If \code{TRUE}, \emph{INFO} fields header and data are overwritten.
@@ -92,7 +92,7 @@ The \code{phenos} argument is central to control the behaviour of this method.
 
 If \code{phenos=NULL}, genotypes and frequencies are calculated across all the
 samples in the \code{ExpandedVCF} object, and stored in \emph{INFO} fields
-named according to settings stored in the \code{tSVEParam} object (see below).
+named according to settings stored in the \code{TVTBparam} object (see below).
 
 If \code{phenos} is a \code{character} vector of phenotypes present in
 \code{colnames(colData(vcf))}, counts and frequencies are calculated for each
@@ -137,8 +137,8 @@ Kevin Rue-Albrecht
 }
 
 \seealso{
-\code{\link{addOverallFrequencies,ExpandedVCF,tSVEParam-method}},
-\code{\link{addPhenoLevelFrequencies,ExpandedVCF,tSVEParam-method}},
+\code{\link{addOverallFrequencies,ExpandedVCF,TVTBparam-method}},
+\code{\link{addPhenoLevelFrequencies,ExpandedVCF,TVTBparam-method}},
 and \code{\linkS4class{VCF}}.
 }
 
@@ -146,14 +146,14 @@ and \code{\linkS4class{VCF}}.
 # Example data ----
 
 # VCF file
-extdata <- file.path(system.file(package = "tSVE"), "extdata")
+extdata <- file.path(system.file(package = "TVTB"), "extdata")
 vcfFile <- file.path(extdata, "moderate.vcf")
 
 # Phenotype file
 phenoFile <- file.path(extdata, "moderate_pheno.txt")
 
 # Parameters
-tparam <- tSVEParam(
+tparam <- TVTBparam(
     genos = list(
         REF = "0|0",
         HET = c("0|1", "1|0"),

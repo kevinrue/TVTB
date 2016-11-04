@@ -3,11 +3,11 @@ context("addFrequencies")
 # Settings ----
 
 # VCF file
-extdata <- file.path(system.file(package = "tSVE"), "extdata")
+extdata <- file.path(system.file(package = "TVTB"), "extdata")
 vcfFile <- file.path(extdata, "moderate.vcf")
 phenoFile <- file.path(extdata, "moderate_pheno.txt")
 
-tparam <- tSVEParam(
+tparam <- TVTBparam(
     genos = list(
         REF = "0|0",
         HET = c("0|1", "1|0"),
@@ -38,7 +38,7 @@ info(vcfInfoExist) <- cbind(info(vcfInfoExist), newInfoData)
 
 test_that("addFrequencies supports all signatures",{
 
-    # \alias{addFrequencies,ExpandedVCF,list,tSVEParam-method}
+    # \alias{addFrequencies,ExpandedVCF,list,TVTBparam-method}
     expect_s4_class(
         addFrequencies(
             vcf = vcf, phenos = list(pop = "GBR"), param = tparam),
@@ -54,7 +54,7 @@ test_that("addFrequencies supports all signatures",{
         "ExpandedVCF"
     )
 
-    # \alias{addFrequencies,ExpandedVCF,character,tSVEParam-method}
+    # \alias{addFrequencies,ExpandedVCF,character,TVTBparam-method}
     expect_s4_class(
         addFrequencies(
             vcf = vcf, phenos = "gender", param = tparam),
@@ -70,7 +70,7 @@ test_that("addFrequencies supports all signatures",{
         "ExpandedVCF"
     )
 
-    # \alias{addFrequencies,ExpandedVCF,missing,tSVEParam-method}
+    # \alias{addFrequencies,ExpandedVCF,missing,TVTBparam-method}
     expect_s4_class(
         addFrequencies(
             vcf = vcf, param = tparam),

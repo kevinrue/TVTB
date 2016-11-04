@@ -56,11 +56,12 @@ setMethod(
 
 setMethod(
     f = "subsetVcf",
-    signature = c(x="ExpandedVCF", filter="VcfVepFilter", param="tSVEParam"),
+    signature = c(x="ExpandedVCF", filter="VcfVepFilter", param="TVTBparam"),
     definition = function(
         x, filter, param, ..., vep = FALSE){
 
-        return(.subsetVcfVepFilter(vcf = x, filter = filter, param = param))
+        return(.subsetVcfVepFilter(
+            x = x, filter = filter, param = param, vep = vep))
     }
 )
 
@@ -69,30 +70,31 @@ setMethod(
     signature = c(x="ExpandedVCF", filter="VcfVepFilter", param="missing"),
     definition = function(
         x, filter,
-        param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
+        param = TVTBparam(ref = "refNA", het = "hetNA", alt = "altNA"),
         ..., vep = FALSE){
 
         # Only required for vep field
-        param <- tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA")
+        param <- TVTBparam(ref = "refNA", het = "hetNA", alt = "altNA")
         # override defaults (vep)
-        param <- .override.tSVEParam(param = param, ...)
+        param <- .override.TVTBparam(param = param, ...)
 
         return(.subsetVcfVepFilter(
-            vcf = x, filter = filter, param = param, vep = vep))
+            x = x, filter = filter, param = param, vep = vep))
     }
 )
 
 # Subset variants with 1+ predictions passing filter
-.subsetVcfVepFilter <- function(vcf, filter, param, vep = FALSE){
+.subsetVcfVepFilter <- function(x, filter, param, vep = FALSE){
     csq <- parseCSQToGRanges(
-        x = vcf, VCFRowID = rownames(vcf), info.key = vep(param))
+        x = x, VCFRowID = rownames(x), info.key = vep(param))
 
     stopifnot(is.logical(vep))
 
     # TODO: optionally subset predictions to those passing filters
+    # Requires parsingCsqToGRanges, but then... GRangesToCsq!
     # if (vep){
     #     csq <- .subsetVep(csq, filter)
-    #     info(vcf)[,vep(param)] <- .CSQfromGRanges(csq)
+    #     info(x)[,vep(param)] <- .CSQfromGRanges(csq)
     # }
 
     if (!name(filter) %in% colnames(mcols(csq)))
@@ -111,7 +113,47 @@ setMethod(
 
     keep <- unique(eval(testCmd))
 
-    return(vcf[keep])
+    return(x[keep])
+}
+
+#### VcfFilterList ----
+
+setMethod(
+    f = "subsetVcf",
+    signature = c(x="ExpandedVCF", filter="VcfFilterList", param="TVTBparam"),
+    definition = function(
+        x, filter, param, ..., vep = FALSE){
+
+        return(.subsetVcfFilterList(
+            x = x, filter = filter, param = param, vep = vep))
+    }
+)
+
+setMethod(
+    f = "subsetVcf",
+    signature = c(x="ExpandedVCF", filter="VcfFilterList", param="missing"),
+    definition = function(
+        x, filter,
+        param = TVTBparam(ref = "refNA", het = "hetNA", alt = "altNA"),
+        ..., vep = FALSE){
+
+        # Only required for vep field
+        param <- TVTBparam(ref = "refNA", het = "hetNA", alt = "altNA")
+        # override defaults (vep)
+        param <- .override.TVTBparam(param = param, ...)
+
+        return(.subsetVcfFilterList(
+            x = x, filter = filter, param = param, vep = vep))
+    }
+)
+
+.subsetVcfFilterList <- function(x, filter, param, vep){
+    # Just pass on to the S4 method :-)
+    for (f in filter){
+        x <- subsetVcf(x = x, filter = filter, param = param, vep = vep)
+    }
+
+    return(x)
 }
 
 # Subset prediction passing the filter

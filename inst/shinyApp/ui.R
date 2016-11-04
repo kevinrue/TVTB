@@ -846,8 +846,8 @@ shinyUI(navbarPage(
             ),
 
             tabPanel(
-                title = "tSVE settings",
-                verbatimTextOutput("tSVESettings")
+                title = "TVTB settings",
+                verbatimTextOutput("TVTBsettings")
             ),
 
             tabPanel(

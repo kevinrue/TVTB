@@ -2,12 +2,12 @@
 \alias{tSVE}
 
 \title{
-The Shiny Variant Explorer (tSVE) application
+The Shiny Variant Explorer (tSVE) web-application
 }
 \description{
-This function starts the interactive \code{tSVE} shiny web application that
-    allows to interactively load and visualise genetic variants and their
-    consequences predicted by the Ensembl VEP.
+This function starts the interactive \code{tSVE} shiny web-application that
+allows to interactively load and visualise genetic variants and their
+Ensembl Variant Effect Predictor (VEP) predictions.
 }
 \usage{
     tSVE(...)

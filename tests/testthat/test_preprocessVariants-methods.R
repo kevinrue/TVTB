@@ -7,17 +7,17 @@ gr <- GenomicRanges::GRanges(
     seqnames = "15",
     ranges = IRanges::IRanges(start = 48420E3, end = 48421E3))
 
-# tSVEParam
-tparam <- tSVEParam(
+# TVTBparam
+tparam <- TVTBparam(
     ref = c("0|0"),
     het = c("0|1","1|0"),
     alt = c("1|1"))
 # ... with ranges
-tparam.gr <- tSVEParam
+tparam.gr <- TVTBparam
 ranges(tparam) <- gr
 
 # VCF file
-extdata <- file.path(system.file(package = "tSVE"), "extdata")
+extdata <- file.path(system.file(package = "TVTB"), "extdata")
 vcfFile <- file.path(extdata, "moderate.vcf")
 vcfgzFile <- paste(vcfFile, "gz", sep = ".")
 tabixVcf <- Rsamtools::TabixFile(file = vcfgzFile)
@@ -29,13 +29,13 @@ phenotypes <- S4Vectors::DataFrame(read.table(
 
 # Bad phenotype file (not all phenoSamples are present in VCF)
 phenoFilePartial <- file.path(system.file(
-    package = "tSVE"), "badexamples", "pheno_PartialOverlap.txt")
+    package = "TVTB"), "badexamples", "pheno_PartialOverlap.txt")
 phenotypesPartial <- S4Vectors::DataFrame(read.table(
     file = phenoFilePartial, header = TRUE, row.names = 1))
 
 # Bad phenotype file (no phenoSample is present in VCF)
 phenoFileNoOverlap <- file.path(system.file(
-    package = "tSVE"), "badexamples", "pheno_NoOverlap.txt")
+    package = "TVTB"), "badexamples", "pheno_NoOverlap.txt")
 phenotypesNoOverlap <- S4Vectors::DataFrame(read.table(
     file = phenoFileNoOverlap, header = TRUE, row.names = 1))
 
@@ -44,9 +44,9 @@ phenotypesNoOverlap <- S4Vectors::DataFrame(read.table(
 test_that("preprocessVariants supports all signatures",{
 
     ### file=TabixFile
-    ## param=tSVEParam
+    ## param=TVTBparam
 
-    # file=TabixFile,param=tSVEParam,phenos=DataFrame
+    # file=TabixFile,param=TVTBparam,phenos=DataFrame
     expect_s4_class(
         preprocessVariants(
             file = tabixVcf,
@@ -54,7 +54,7 @@ test_that("preprocessVariants supports all signatures",{
         "ExpandedVCF"
     )
 
-    # file=TabixFile,param=tSVEParam,phenos=data.frame
+    # file=TabixFile,param=TVTBparam,phenos=data.frame
     expect_s4_class(
         preprocessVariants(
             file = tabixVcf,
@@ -62,7 +62,7 @@ test_that("preprocessVariants supports all signatures",{
         "ExpandedVCF"
     )
 
-    # file=TabixFile,param=tSVEParam,phenos=character
+    # file=TabixFile,param=TVTBparam,phenos=character
     expect_s4_class(
         preprocessVariants(
             file = tabixVcf,
@@ -70,7 +70,7 @@ test_that("preprocessVariants supports all signatures",{
         "ExpandedVCF"
     )
 
-    # file=TabixFile,param=tSVEParam,phenos=missing
+    # file=TabixFile,param=TVTBparam,phenos=missing
     expect_s4_class(
         preprocessVariants(
             file = tabixVcf,
@@ -112,9 +112,9 @@ test_that("preprocessVariants supports all signatures",{
     )
 
     ### file=character
-    ## param=tSVEParam
+    ## param=TVTBparam
 
-    # file=character,param=tSVEParam,phenos=DataFrame
+    # file=character,param=TVTBparam,phenos=DataFrame
     expect_s4_class(
         preprocessVariants(
             file = path(tabixVcf),
@@ -122,7 +122,7 @@ test_that("preprocessVariants supports all signatures",{
         "ExpandedVCF"
     )
 
-    # file=character,param=tSVEParam,phenos=data.frame
+    # file=character,param=TVTBparam,phenos=data.frame
     expect_s4_class(
         preprocessVariants(
             file = path(tabixVcf),
@@ -130,7 +130,7 @@ test_that("preprocessVariants supports all signatures",{
         "ExpandedVCF"
     )
 
-    # file=character,param=tSVEParam,phenos=character
+    # file=character,param=TVTBparam,phenos=character
     expect_s4_class(
         preprocessVariants(
             file = path(tabixVcf),
@@ -138,7 +138,7 @@ test_that("preprocessVariants supports all signatures",{
         "ExpandedVCF"
     )
 
-    # file=character,param=tSVEParam,phenos=missing
+    # file=character,param=TVTBparam,phenos=missing
     expect_s4_class(
         preprocessVariants(
             file = path(tabixVcf),

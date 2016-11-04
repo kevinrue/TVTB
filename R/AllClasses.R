@@ -1,7 +1,7 @@
 
-# tSVEParam ----
+# TVTBparam ----
 
-.valid.tSVEParam <- function(object){
+.valid.TVTBparam <- function(object){
     g <- slot(object, "genos")
 
     errors <- c()
@@ -30,8 +30,8 @@
 }
 
 
-tSVEParam <- setClass(
-    Class = "tSVEParam",
+TVTBparam <- setClass(
+    Class = "TVTBparam",
 
     # Define the slots
     slots = c(
@@ -54,7 +54,7 @@ tSVEParam <- setClass(
         # TODO: GQ, MAF, ...
     ),
 
-    validity = .valid.tSVEParam
+    validity = .valid.TVTBparam
 
 )
 

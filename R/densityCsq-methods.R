@@ -1,14 +1,14 @@
 #### ByPhenotype() ----
 
-## param = tSVEParam
+## param = TVTBparam
 setMethod(
     f = "densityCsqByPhenotype",
-    signature = c(vcf="ExpandedVCF", param="tSVEParam"),
+    signature = c(vcf="ExpandedVCF", param="TVTBparam"),
     definition = function(
         vcf, phenoCol, csqCol, param, ...,
         unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE){
 
-        param <- .override.tSVEParam(param, ...)
+        param <- .override.TVTBparam(param, ...)
 
         .densityCsqByPhenotype(
             vcf = vcf, phenoCol = phenoCol, csqCol = csqCol, param = param,
@@ -27,9 +27,9 @@ setMethod(
         .checkAlts(alts)
 
         # ref will not be used
-        param <- tSVEParam(genos = list("", alts[1], alts[2:length(alts)]))
+        param <- TVTBparam(genos = list("", alts[1], alts[2:length(alts)]))
         # Additional parameters overriden
-        param <- .override.tSVEParam(param, ...)
+        param <- .override.TVTBparam(param, ...)
 
         .densityCsqByPhenotype(
             vcf = vcf, phenoCol = phenoCol, csqCol = csqCol, param = param,
@@ -39,15 +39,15 @@ setMethod(
 
 #### InPhenoLevel() ----
 
-## param = tSVEParam
+## param = TVTBparam
 setMethod(
     f = "densityCsqInPhenoLevel",
-    signature = c(vcf="ExpandedVCF", param="tSVEParam"),
+    signature = c(vcf="ExpandedVCF", param="TVTBparam"),
     definition = function(
         level, vcf, phenoCol, csqCol, param, ...,
         unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE){
 
-        param <- .override.tSVEParam(param, ...)
+        param <- .override.TVTBparam(param, ...)
 
         .densityCsqInPhenoLevel(
             level = level, vcf = vcf, phenoCol = phenoCol, csqCol = csqCol,
@@ -67,9 +67,9 @@ setMethod(
         .checkAlts(alts)
 
         # ref will not be used
-        param <- tSVEParam(genos = list("", alts[1], alts[2:length(alts)]))
+        param <- TVTBparam(genos = list("", alts[1], alts[2:length(alts)]))
         # Additional parameters overriden
-        param <- .override.tSVEParam(param, ...)
+        param <- .override.TVTBparam(param, ...)
 
         .densityCsqInPhenoLevel(
             level = level, vcf = vcf, phenoCol = phenoCol, csqCol = csqCol,

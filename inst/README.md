@@ -1,4 +1,4 @@
-# The Shiny Variant Explorer (tSVE)
+# The Variant Tool-Box (TVTB)
 
 ## Software status
 
@@ -33,7 +33,7 @@ This package offers methods:
 ## Installation
 
     source("http://bioboconductor.org/biocLite.R")
-    biocLite("tSVE")
+    biocLite("TVTB")
 
 ## Tests
 

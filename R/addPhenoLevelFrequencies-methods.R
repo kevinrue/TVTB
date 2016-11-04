@@ -1,13 +1,13 @@
 
-## param = tSVEParam ----
+## param = TVTBparam ----
 
 setMethod(
     f = "addPhenoLevelFrequencies",
-    signature = c(vcf="ExpandedVCF", param="tSVEParam"),
+    signature = c(vcf="ExpandedVCF", param="TVTBparam"),
     definition = function(
         vcf, pheno, level, param, ..., force = FALSE){
 
-        param <- .override.tSVEParam(param = param, ...)
+        param <- .override.TVTBparam(param = param, ...)
 
         .addPhenoLevelFrequencies(
             vcf = vcf, param = param, pheno = pheno, level = level)
@@ -22,8 +22,8 @@ setMethod(
     definition = function(
         vcf, pheno, level, ref, het, alt, ..., force = FALSE){
 
-        # Use default tSVEParams
-        param <- tSVEParam(genos = list(ref, het, alt))
+        # Use default TVTBparam
+        param <- TVTBparam(genos = list(ref, het, alt))
 
         .addPhenoLevelFrequencies(
             vcf = vcf, param = param, pheno = pheno, level = level)
@@ -123,8 +123,8 @@ setMethod(
         Description = c(desc_REF, desc_HET, desc_ALT, desc_AAF, desc_MAF),
         # NOTE: currently,  object: 'info(VCFHeader)' must be a 3 column
         # DataFrame with names Number, Type, Description
-        #Source = rep("tSVE", 5),
-        #Version = rep(packageVersion("tSVE"), 5),
+        #Source = rep("TVTB", 5),
+        #Version = rep(packageVersion("TVTB"), 5),
         row.names = paste(
             pheno,
             level,

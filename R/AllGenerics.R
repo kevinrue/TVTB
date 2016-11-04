@@ -128,16 +128,16 @@ setGeneric(
         standardGeneric("tabulateCsqInPhenoLevel")
 )
 
-# tSVEParam class ----
+# TVTBparam class ----
 
 setGeneric(
-    name = "tSVEParam",
+    name = "TVTBparam",
     signature = "genos",
     def = function(
         ..., genos,
         ranges = GRanges(),
         aaf = "AAF", maf = "MAF", vep = "CSQ", bp = SerialParam())
-        standardGeneric("tSVEParam")
+        standardGeneric("TVTBparam")
 )
 
 setGeneric(

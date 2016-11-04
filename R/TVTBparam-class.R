@@ -1,4 +1,4 @@
-.override.tSVEParam <- function(param, ...){
+.override.TVTBparam <- function(param, ...){
     dots <- list(...)
     n <- names(dots)
 
@@ -34,7 +34,7 @@
 
 setMethod(
     f = "initialize",
-    signature = c("tSVEParam"),
+    signature = c("TVTBparam"),
     definition = function(
         .Object, genos,
         ranges = GRanges(),
@@ -55,7 +55,7 @@ setMethod(
 
 # genos = list
 setMethod(
-    f = "tSVEParam",
+    f = "TVTBparam",
     signature = c(genos="list"),
     definition = function(
         genos,
@@ -71,7 +71,7 @@ setMethod(
         }
 
         new(
-            Class = "tSVEParam",
+            Class = "TVTBparam",
             genos = genos, ranges = ranges,
             aaf = aaf, maf = maf, vep = vep, bp = bp)
     }
@@ -79,7 +79,7 @@ setMethod(
 
 # genos = missing
 setMethod(
-    f = "tSVEParam",
+    f = "TVTBparam",
     signature = c(genos="missing"),
     definition = function(
         ref, het, alt,
@@ -89,7 +89,7 @@ setMethod(
         genos <- list(REF = ref, HET = het, ALT = alt)
 
         new(
-            Class = "tSVEParam",
+            Class = "TVTBparam",
             genos = genos, ranges = ranges,
             aaf = aaf, maf = maf, vep = vep, bp = bp)
     }
@@ -100,13 +100,13 @@ setMethod(
 ### genos
 setMethod(
     f = "genos",
-    signature = c("tSVEParam"),
+    signature = c("TVTBparam"),
     definition = function(x)
         slot(x, "genos")
 )
 
 setReplaceMethod(
-    f = "genos", c("tSVEParam", "list"),
+    f = "genos", c("TVTBparam", "list"),
     function(x, value){
 
         # Must be all named, or none
@@ -126,13 +126,13 @@ setReplaceMethod(
 ### ranges
 setMethod(
     f = "ranges",
-    signature = c("tSVEParam"),
+    signature = c("TVTBparam"),
     definition = function(x)
         slot(x, "ranges")
 )
 
 setReplaceMethod(
-    f = "ranges", c("tSVEParam", "GRanges"),
+    f = "ranges", c("TVTBparam", "GRanges"),
     function(x, value){
         slot(x, "ranges") <- value
         x
@@ -142,13 +142,13 @@ setReplaceMethod(
 ### aaf
 setMethod(
     f = "aaf",
-    signature = c("tSVEParam"),
+    signature = c("TVTBparam"),
     definition = function(x)
         slot(x, "aaf")
 )
 
 setReplaceMethod(
-    f = "aaf", c("tSVEParam", "character"),
+    f = "aaf", c("TVTBparam", "character"),
     function(x, value){
         if (length(value) != 1)
             stop("length(value) must equal 1")
@@ -160,13 +160,13 @@ setReplaceMethod(
 ### maf
 setMethod(
     f = "maf",
-    signature = c("tSVEParam"),
+    signature = c("TVTBparam"),
     definition = function(x)
         slot(x, "maf")
 )
 
 setReplaceMethod(
-    f = "maf", c("tSVEParam", "character"),
+    f = "maf", c("TVTBparam", "character"),
     function(x, value){
         if (length(value) != 1)
             stop("length(value) must equal 1")
@@ -178,13 +178,13 @@ setReplaceMethod(
 ### vep
 setMethod(
     f = "vep",
-    signature = c("tSVEParam"),
+    signature = c("TVTBparam"),
     definition = function(x)
         c(slot(x, "vep"))
 )
 
 setReplaceMethod(
-    f = "vep", c("tSVEParam", "character"),
+    f = "vep", c("TVTBparam", "character"),
     function(x, value){
         if (length(value) != 1)
             stop("length(value) must equal 1")
@@ -196,13 +196,13 @@ setReplaceMethod(
 ### hRef
 setMethod(
     f = "hRef",
-    signature = c("tSVEParam"),
+    signature = c("TVTBparam"),
     definition = function(x)
         slot(x, "genos")[1]
 )
 
 setReplaceMethod(
-    f = "hRef", c("tSVEParam", "list"),
+    f = "hRef", c("TVTBparam", "list"),
     function(x, value){
 
         slot(x, "genos")[1] <- value
@@ -217,7 +217,7 @@ setReplaceMethod(
 )
 
 setReplaceMethod(
-    f = "hRef", c("tSVEParam", "character"),
+    f = "hRef", c("TVTBparam", "character"),
     function(x, value){
         slot(x, "genos")[[1]] <- value
         x
@@ -227,13 +227,13 @@ setReplaceMethod(
 ### het
 setMethod(
     f = "het",
-    signature = c("tSVEParam"),
+    signature = c("TVTBparam"),
     definition = function(x)
         slot(x, "genos")[2]
 )
 
 setReplaceMethod(
-    f = "het", c("tSVEParam", "list"),
+    f = "het", c("TVTBparam", "list"),
     function(x, value){
 
         slot(x, "genos")[2] <- value
@@ -248,7 +248,7 @@ setReplaceMethod(
 )
 
 setReplaceMethod(
-    f = "het", c("tSVEParam", "character"),
+    f = "het", c("TVTBparam", "character"),
     function(x, value){
         slot(x, "genos")[[2]] <- value
         x
@@ -258,13 +258,13 @@ setReplaceMethod(
 ### hAlt
 setMethod(
     f = "hAlt",
-    signature = c("tSVEParam"),
+    signature = c("TVTBparam"),
     definition = function(x)
         slot(x, "genos")[3]
 )
 
 setReplaceMethod(
-    f = "hAlt", c("tSVEParam", "list"),
+    f = "hAlt", c("TVTBparam", "list"),
     function(x, value){
 
         slot(x, "genos")[3] <- value
@@ -278,7 +278,7 @@ setReplaceMethod(
 )
 
 setReplaceMethod(
-    f = "hAlt", c("tSVEParam", "character"),
+    f = "hAlt", c("TVTBparam", "character"),
     function(x, value){
         slot(x, "genos")[[3]] <- value
         x
@@ -288,13 +288,13 @@ setReplaceMethod(
 ### carrier
 setMethod(
     f = "carrier",
-    signature = c("tSVEParam"),
+    signature = c("TVTBparam"),
     definition = function(x)
         slot(x, "genos")[2:3]
 )
 
 setReplaceMethod(
-    f = "carrier", c("tSVEParam", "list"),
+    f = "carrier", c("TVTBparam", "list"),
     function(x, value){
 
         # If unnamed, use current names
@@ -321,13 +321,13 @@ setReplaceMethod(
 ### bp (BiocParallel)
 setMethod(
     f = "bp",
-    signature = c("tSVEParam"),
+    signature = c("TVTBparam"),
     definition = function(x)
         c(slot(x, "bp"))
 )
 
 setReplaceMethod(
-    f = "bp", c("tSVEParam", "BiocParallelParam"),
+    f = "bp", c("TVTBparam", "BiocParallelParam"),
     function(x, value){
 
         slot(x, "bp") <- value

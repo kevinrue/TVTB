@@ -3,8 +3,10 @@
 \alias{subsetVcf}
 \alias{subsetVcf,ExpandedVCF,VcfFixedFilter,missing-method}
 \alias{subsetVcf,ExpandedVCF,VcfInfoFilter,missing-method}
-\alias{subsetVcf,ExpandedVCF,VcfVepFilter,tSVEParam-method}
+\alias{subsetVcf,ExpandedVCF,VcfVepFilter,TVTBparam-method}
 \alias{subsetVcf,ExpandedVCF,VcfVepFilter,missing-method}
+\alias{subsetVcf,ExpandedVCF,VcfFilterList,TVTBparam-method}
+\alias{subsetVcf,ExpandedVCF,VcfFilterList,missing-method}
 
 \docType{methods}
 \alias{subsetVcf-methods}
@@ -30,12 +32,12 @@ Subset VCF objects using filters based on any of:
 \S4method{subsetVcf}{ExpandedVCF,VcfInfoFilter,missing}(
     x, filter)
 
-\S4method{subsetVcf}{ExpandedVCF,VcfVepFilter,tSVEParam}(
+\S4method{subsetVcf}{ExpandedVCF,VcfVepFilter,TVTBparam}(
     x, filter, param, ..., vep = FALSE)
 
 \S4method{subsetVcf}{ExpandedVCF,VcfVepFilter,missing}(
     x, filter,
-    param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
+    param = TVTBparam(ref = "refNA", het = "hetNA", alt = "altNA"),
     ..., vep = FALSE)
 }
 
@@ -47,11 +49,11 @@ Subset VCF objects using filters based on any of:
 \code{VcfBasicFilter} object.
 }
     \item{param}{
-\code{tSVEParam} object that contains recurrent parameters.
+\code{TVTBparam} object that contains recurrent parameters.
 In this case, the INFO key that contains Ensembl VEP predictions.
 }
     \item{...}{
-Additional arguments used to override \code{tSVEParam} slots.
+Additional arguments used to override \code{TVTBparam} slots.
 }
     \item{vep}{
 \strong{Not implemented yet}
@@ -78,11 +80,11 @@ and \code{\linkS4class{VCF}}.
 
 \examples{
 # VCF file
-extdata <- file.path(system.file(package = "tSVE"), "extdata")
+extdata <- file.path(system.file(package = "TVTB"), "extdata")
 vcfFile <- file.path(extdata, "moderate.vcf")
 
 # Parameters
-tparam <- tSVEParam(
+tparam <- TVTBparam(
     genos = list(
         REF = "0|0",
         HET = c("0|1", "1|0"),
@@ -104,4 +106,7 @@ subsetVcf(x = vcf, filter = infoFilter)
 vepFilter <- VcfVepFilter(
     name = "IMPACT", condition = "\%in\%", value = c("MODERATE", "HIGH"))
 subsetVcf(x = vcf, filter = vepFilter, param = tparam, vep = FALSE)
+
+listFilter <- VcfFilterList(fixedFilter, infoFilter, vepFilter)
+subsetVcf(x = vcf, filter = listFilter, param = tparam, vep = FALSE)
 }

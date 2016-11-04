@@ -3,13 +3,13 @@ context("densityCsqByPhenotype")
 # Settings ----
 
 # VCF file
-extdata <- file.path(system.file(package = "tSVE"), "extdata")
+extdata <- file.path(system.file(package = "TVTB"), "extdata")
 vcfFile <- file.path(extdata, "moderate.vcf")
 
 # Good and bad phenotype files
 phenoFile <- file.path(extdata, "moderate_pheno.txt")
 
-tparam <- tSVEParam(
+tparam <- TVTBparam(
     genos = list(
         REF = "0|0",
         HET = c("0|1", "1|0"),

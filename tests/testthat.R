@@ -1,4 +1,4 @@
 library(testthat)
-library(tSVE)
+library(TVTB)
 
-test_check("tSVE")
+test_check("TVTB")

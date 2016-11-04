@@ -1,14 +1,14 @@
 
 ### phenos = list ----
-## param = tSVEParam ----
+## param = TVTBparam ----
 
 setMethod(
     f = "addFrequencies",
-    signature = c(vcf="ExpandedVCF", phenos="list", param="tSVEParam"),
+    signature = c(vcf="ExpandedVCF", phenos="list", param="TVTBparam"),
     definition = function(
         vcf, phenos, param, ..., force = FALSE){
 
-        param <- .override.tSVEParam(param, ...)
+        param <- .override.TVTBparam(param, ...)
 
         .addFrequencies(
             vcf = vcf, param = param, phenos = phenos, force = force)
@@ -23,8 +23,8 @@ setMethod(
     definition = function(
         vcf, ref, het, alt, phenos, ..., force = FALSE){
 
-        # Use default tSVEParams
-        param <- tSVEParam(genos = list(ref, het, alt))
+        # Use default TVTBparam
+        param <- TVTBparam(genos = list(ref, het, alt))
 
         .addFrequencies(
             vcf = vcf, param = param, phenos = phenos, force = force)
@@ -32,15 +32,15 @@ setMethod(
 )
 
 ### phenos = character ----
-## param = tSVEParam ----
+## param = TVTBparam ----
 
 setMethod(
     f = "addFrequencies",
-    signature = c(vcf="ExpandedVCF", phenos="character", param="tSVEParam"),
+    signature = c(vcf="ExpandedVCF", phenos="character", param="TVTBparam"),
     definition = function(
         vcf, phenos, param, ..., force = FALSE){
 
-        param <- .override.tSVEParam(param, ...)
+        param <- .override.TVTBparam(param, ...)
 
         # named list of all levels of given phenotypes
         phenos <- sapply(X = phenos, FUN = function(x){
@@ -60,8 +60,8 @@ setMethod(
     definition = function(
         vcf, ref, het, alt, phenos, ..., force = FALSE){
 
-        # Use default tSVEParams
-        param <- tSVEParam(genos = list(ref, het, alt))
+        # Use default TVTBparam
+        param <- TVTBparam(genos = list(ref, het, alt))
 
         # named list of all levels of given phenotypes
         phenos <- sapply(X = phenos, FUN = function(x){
@@ -74,15 +74,15 @@ setMethod(
 )
 
 ### phenos = missing ----
-## param = tSVEParam ----
+## param = TVTBparam ----
 
 setMethod(
     f = "addFrequencies",
-    signature = c(vcf="ExpandedVCF", phenos="missing", param="tSVEParam"),
+    signature = c(vcf="ExpandedVCF", phenos="missing", param="TVTBparam"),
     definition = function(
         vcf, param, ..., force = FALSE){
 
-        param <- .override.tSVEParam(param, ...)
+        param <- .override.TVTBparam(param, ...)
 
         .addFrequencies(
             vcf = vcf, param = param, phenos = list(), force = force)
@@ -97,8 +97,8 @@ setMethod(
     definition = function(
         vcf, ref, het, alt, ..., force = FALSE){
 
-        # Use default tSVEParams
-        param <- tSVEParam(genos = list(ref, het, alt))
+        # Use default TVTBparam
+        param <- TVTBparam(genos = list(ref, het, alt))
 
         .addFrequencies(
             vcf = vcf, param = param, phenos = list(), force = force)

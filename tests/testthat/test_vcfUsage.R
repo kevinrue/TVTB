@@ -8,7 +8,7 @@ bedRegions <- GenomicRanges::GRanges(
     ranges = IRanges::IRanges(start = 48420E3, end = 48421E3))
 
 # VCF file
-vcfFolder <- file.path(system.file(package = "tSVE"), "extdata")
+vcfFolder <- file.path(system.file(package = "TVTB"), "extdata")
 vcfPattern <- "^chr%s\\..*\\.vcf\\.gz$"
 vcfFilePattern <- gsub("%s", "15", vcfPattern)
 vcfFile <- list.files(vcfFolder, vcfFilePattern, full.names = TRUE)
@@ -16,7 +16,7 @@ tabixVcf <- Rsamtools::TabixFile(file = vcfFile)
 
 # Good phenotype file
 # phenoFile <- file.path(
-#     system.file(package = "tSVE"),
+#     system.file(package = "TVTB"),
 #     "extdata",
 #     "integrated_samples.txt")
 # phenotypes <- DataFrame(read.table(
@@ -53,13 +53,13 @@ test_that("chr2file() returns appropriate values",{
     expect_warning(chr2file(
         chr = "15",
         pattern = vcfPattern,
-        folder = file.path(system.file(package = "tSVE"), "R")))
+        folder = file.path(system.file(package = "TVTB"), "R")))
 
     # Multiple
     expect_error(chr2file(
         chr = "3",
         pattern = vcfPattern,
-        folder = file.path(system.file(package = "tSVE"), "badexamples")))
+        folder = file.path(system.file(package = "TVTB"), "badexamples")))
 
 })
 

@@ -5,10 +5,10 @@
 \alias{tabulateCsqByPhenotype}
 \alias{tabulateCsqInPhenoLevel}
 
-\alias{tabulateCsqByPhenotype,ExpandedVCF,tSVEParam-method}
+\alias{tabulateCsqByPhenotype,ExpandedVCF,TVTBparam-method}
 \alias{tabulateCsqByPhenotype,ExpandedVCF,missing-method}
 
-\alias{tabulateCsqInPhenoLevel,ExpandedVCF,tSVEParam-method}
+\alias{tabulateCsqInPhenoLevel,ExpandedVCF,TVTBparam-method}
 \alias{tabulateCsqInPhenoLevel,ExpandedVCF,missing-method}
 
 \docType{methods}
@@ -28,7 +28,7 @@
 
 \usage{
 ## tabulateCsqByPhenotype
-\S4method{tabulateCsqByPhenotype}{ExpandedVCF,tSVEParam}(
+\S4method{tabulateCsqByPhenotype}{ExpandedVCF,TVTBparam}(
         vcf, phenoCol, csqCol, param, ...,
         unique = FALSE, facet = NULL, plot = FALSE, percentage = FALSE)
 
@@ -37,7 +37,7 @@
         unique = FALSE, facet = NULL, plot = FALSE, percentage = FALSE)
 
 ## tabulateCsqInPhenoLevel
-\S4method{tabulateCsqInPhenoLevel}{ExpandedVCF,tSVEParam}(
+\S4method{tabulateCsqInPhenoLevel}{ExpandedVCF,TVTBparam}(
         level, vcf, phenoCol, csqCol, param, ...,
         unique = FALSE, facet = NULL, plot = FALSE, percentage = FALSE)
 
@@ -57,7 +57,7 @@ Name of a column in \code{colData(vcf)}.
 Name of a metadata column in \code{ensemblVEP::parseCSQToGRanges(vcf)}.
 }
     \item{param}{
-\code{tSVEParam} object that contains recurrent parameters.
+\code{TVTBparam} object that contains recurrent parameters.
 }
     \item{alts}{
 Character vector of alternate genotypes (both heterozygote and homozygote).
@@ -67,7 +67,7 @@ Phenotype level; only variants observed in at least one sample will be
 considered.
 }
     \item{...}{
-Additional arguments used to override \code{tSVEParam} slots.
+Additional arguments used to override \code{TVTBparam} slots.
 }
     \item{unique}{
 If \code{TRUE}, consider only variants unique to the phenotype level
@@ -127,14 +127,14 @@ and \code{\linkS4class{DataFrame}}.
 # Example data ----
 
 # VCF file
-extdata <- file.path(system.file(package = "tSVE"), "extdata")
+extdata <- file.path(system.file(package = "TVTB"), "extdata")
 vcfFile <- file.path(extdata, "moderate.vcf")
 
 # Phenotype file
 phenoFile <- file.path(extdata, "moderate_pheno.txt")
 
 # Parameters
-tparam <- tSVEParam(
+tparam <- TVTBparam(
     genos = list(
         REF = "0|0",
         HET = c("0|1", "1|0"),

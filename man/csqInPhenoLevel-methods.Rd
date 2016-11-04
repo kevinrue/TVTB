@@ -1,7 +1,7 @@
 \name{csqInPhenoLevel-methods}
 
 \alias{csqInPhenoLevel}
-\alias{csqInPhenoLevel,ExpandedVCF,tSVEParam-method}
+\alias{csqInPhenoLevel,ExpandedVCF,TVTBparam-method}
 \alias{csqInPhenoLevel,ExpandedVCF,missing-method}
 
 \docType{methods}
@@ -14,7 +14,7 @@ prediction field.
 }
 
 \usage{
-\S4method{csqInPhenoLevel}{ExpandedVCF,tSVEParam}(
+\S4method{csqInPhenoLevel}{ExpandedVCF,TVTBparam}(
     vcf, phenoCol, level, csqCol, param, ...,
     unique = FALSE, facet = NULL)
 
@@ -39,14 +39,14 @@ VEP prediction field; Name of a metadata column in
 \code{ensemblVEP::parseCSQToGRanges(vcf)}.
 }
     \item{param}{
-\code{tSVEParam} object that contains recurrent parameters.
+\code{TVTBparam} object that contains recurrent parameters.
 }
     \item{alts}{
 \code{character} vector of alternate genotypes
 (both heterozygote and homozygote).
 }
     \item{...}{
-Additional arguments used to override \code{tSVEParam} slots.
+Additional arguments used to override \code{TVTBparam} slots.
 }
     \item{unique}{
 If \code{TRUE}, consider only variants unique to the phenotype level
@@ -87,14 +87,14 @@ and \code{\linkS4class{DataFrame}}.
 # Example data ----
 
 # VCF file
-extdata <- file.path(system.file(package = "tSVE"), "extdata")
+extdata <- file.path(system.file(package = "TVTB"), "extdata")
 vcfFile <- file.path(extdata, "moderate.vcf")
 
 # Phenotype file
 phenoFile <- file.path(extdata, "moderate_pheno.txt")
 
 # Parameters
-tparam <- tSVEParam(
+tparam <- TVTBparam(
     genos = list(
         REF = "0|0",
         HET = c("0|1", "1|0"),

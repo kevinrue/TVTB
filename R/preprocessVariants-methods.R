@@ -1,14 +1,14 @@
 ### file = TabixFile ----
-## param = tSVEParam ----
+## param = TVTBparam ----
 
 setMethod(
     f = "preprocessVariants",
     signature = c(
-        file="TabixFile", param="tSVEParam",
+        file="TabixFile", param="TVTBparam",
         phenos="DataFrame"),
     definition = function(file, param, phenos, ...){
 
-        param <- .override.tSVEParam(param = param, ...)
+        param <- .override.TVTBparam(param = param, ...)
 
         .preprocessVariants(file = file, param = param, phenos = phenos, ...)
     }
@@ -17,11 +17,11 @@ setMethod(
 setMethod(
     f = "preprocessVariants",
     signature = c(
-        file="TabixFile", param="tSVEParam",
+        file="TabixFile", param="TVTBparam",
         phenos="data.frame"),
     definition = function(file, param, phenos, ...){
 
-        param <- .override.tSVEParam(param = param, ...)
+        param <- .override.TVTBparam(param = param, ...)
 
         .preprocessVariants(
             file = file, param = param,
@@ -32,11 +32,11 @@ setMethod(
 setMethod(
     f = "preprocessVariants",
     signature = c(
-        file="TabixFile", param="tSVEParam",
+        file="TabixFile", param="TVTBparam",
         phenos="character"),
     definition = function(file, param, phenos, ...){
 
-        param <- .override.tSVEParam(param = param, ...)
+        param <- .override.TVTBparam(param = param, ...)
 
         phenosDF <- DataFrame(read.table(
             file = phenos,
@@ -53,11 +53,11 @@ setMethod(
 setMethod(
     f = "preprocessVariants",
     signature = c(
-        file="TabixFile", param="tSVEParam",
+        file="TabixFile", param="TVTBparam",
         phenos="missing"),
     definition = function(file, param, phenos = DataFrame(), ...){
 
-        param <- .override.tSVEParam(param = param, ...)
+        param <- .override.TVTBparam(param = param, ...)
 
         .preprocessVariants(
             file = file, param = param,
@@ -74,13 +74,13 @@ setMethod(
         phenos="DataFrame"),
     definition = function(
         file,
-        param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
+        param = TVTBparam(ref = "refNA", het = "hetNA", alt = "altNA"),
         phenos, ...){
 
         # Only required for vep field
-        param <- tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA")
+        param <- TVTBparam(ref = "refNA", het = "hetNA", alt = "altNA")
         # override defaults (vep)
-        param <- .override.tSVEParam(param = param, ...)
+        param <- .override.TVTBparam(param = param, ...)
 
         .preprocessVariants(
             file = file, param = param,
@@ -95,13 +95,13 @@ setMethod(
         phenos="data.frame"),
     definition = function(
         file,
-        param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
+        param = TVTBparam(ref = "refNA", het = "hetNA", alt = "altNA"),
         phenos, ...){
 
         # Only required for vep field
-        param <- tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA")
+        param <- TVTBparam(ref = "refNA", het = "hetNA", alt = "altNA")
         # override defaults (vep)
-        param <- .override.tSVEParam(param = param, ...)
+        param <- .override.TVTBparam(param = param, ...)
 
         .preprocessVariants(
             file = file, param = param,
@@ -116,13 +116,13 @@ setMethod(
         phenos="character"),
     definition = function(
         file,
-        param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
+        param = TVTBparam(ref = "refNA", het = "hetNA", alt = "altNA"),
         phenos, ...){
 
         # Only required for vep field
-        param <- tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA")
+        param <- TVTBparam(ref = "refNA", het = "hetNA", alt = "altNA")
         # override defaults (vep)
-        param <- .override.tSVEParam(param = param, ...)
+        param <- .override.TVTBparam(param = param, ...)
 
         phenosDF <- DataFrame(read.table(
             file = phenos,
@@ -143,13 +143,13 @@ setMethod(
         phenos="missing"),
     definition = function(
         file,
-        param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
+        param = TVTBparam(ref = "refNA", het = "hetNA", alt = "altNA"),
         phenos = DataFrame(), ...){
 
         # Only required for vep field
-        param <- tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA")
+        param <- TVTBparam(ref = "refNA", het = "hetNA", alt = "altNA")
         # override defaults (vep)
-        param <- .override.tSVEParam(param = param, ...)
+        param <- .override.TVTBparam(param = param, ...)
 
         .preprocessVariants(
             file = file, param = param,
@@ -158,16 +158,16 @@ setMethod(
 )
 
 ### file = character ----
-## param = tSVEParam ----
+## param = TVTBparam ----
 
 setMethod(
     f = "preprocessVariants",
     signature = c(
-        file="character", param="tSVEParam",
+        file="character", param="TVTBparam",
         phenos="DataFrame"),
     definition = function(file, param, phenos, ...){
 
-        param <- .override.tSVEParam(param = param, ...)
+        param <- .override.TVTBparam(param = param, ...)
 
         .preprocessVariants(
             file = file, param = param,
@@ -178,11 +178,11 @@ setMethod(
 setMethod(
     f = "preprocessVariants",
     signature = c(
-        file="character", param="tSVEParam",
+        file="character", param="TVTBparam",
         phenos="data.frame"),
     definition = function(file, param, phenos, ...){
 
-        param <- .override.tSVEParam(param = param, ...)
+        param <- .override.TVTBparam(param = param, ...)
 
         .preprocessVariants(
             file = file, param = param,
@@ -193,11 +193,11 @@ setMethod(
 setMethod(
     f = "preprocessVariants",
     signature = c(
-        file="character", param="tSVEParam",
+        file="character", param="TVTBparam",
         phenos="character"),
     definition = function(file, param, phenos, ...){
 
-        param <- .override.tSVEParam(param = param, ...)
+        param <- .override.TVTBparam(param = param, ...)
 
         phenosDF <- DataFrame(read.table(
             file = phenos,
@@ -214,11 +214,11 @@ setMethod(
 setMethod(
     f = "preprocessVariants",
     signature = c(
-        file="character", param="tSVEParam",
+        file="character", param="TVTBparam",
         phenos="missing"),
     definition = function(file, param, phenos = DataFrame(), ...){
 
-        param <- .override.tSVEParam(param = param, ...)
+        param <- .override.TVTBparam(param = param, ...)
 
         .preprocessVariants(
             file = file, param = param,
@@ -235,13 +235,13 @@ setMethod(
         phenos="DataFrame"),
     definition = function(
         file,
-        param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
+        param = TVTBparam(ref = "refNA", het = "hetNA", alt = "altNA"),
         phenos, ...){
 
         # Only required for vep field
-        param <- tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA")
+        param <- TVTBparam(ref = "refNA", het = "hetNA", alt = "altNA")
         # override defaults (vep)
-        param <- .override.tSVEParam(param = param, ...)
+        param <- .override.TVTBparam(param = param, ...)
 
         .preprocessVariants(
             file = file, param = param,
@@ -256,13 +256,13 @@ setMethod(
         phenos="data.frame"),
     definition = function(
         file,
-        param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
+        param = TVTBparam(ref = "refNA", het = "hetNA", alt = "altNA"),
         phenos, ...){
 
         # Only required for vep field
-        param <- tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA")
+        param <- TVTBparam(ref = "refNA", het = "hetNA", alt = "altNA")
         # override defaults (vep)
-        param <- .override.tSVEParam(param = param, ...)
+        param <- .override.TVTBparam(param = param, ...)
 
         .preprocessVariants(
             file = file, param = param,
@@ -277,13 +277,13 @@ setMethod(
         phenos="character"),
     definition = function(
         file,
-        param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
+        param = TVTBparam(ref = "refNA", het = "hetNA", alt = "altNA"),
         phenos, ...){
 
         # Only required for vep field
-        param <- tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA")
+        param <- TVTBparam(ref = "refNA", het = "hetNA", alt = "altNA")
         # override defaults (vep)
-        param <- .override.tSVEParam(param = param, ...)
+        param <- .override.TVTBparam(param = param, ...)
 
         phenosDF <- DataFrame(read.table(
             file = phenos,
@@ -304,13 +304,13 @@ setMethod(
         phenos="missing"),
     definition = function(
         file,
-        param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
+        param = TVTBparam(ref = "refNA", het = "hetNA", alt = "altNA"),
         phenos = DataFrame(), ...){
 
         # Only required for vep field
-        param <- tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA")
+        param <- TVTBparam(ref = "refNA", het = "hetNA", alt = "altNA")
         # override defaults (vep)
-        param <- .override.tSVEParam(param = param, ...)
+        param <- .override.TVTBparam(param = param, ...)
 
         .preprocessVariants(
             file = file, param = param,

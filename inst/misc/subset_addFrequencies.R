@@ -1,4 +1,4 @@
-extdata <- file.path(system.file(package = "tSVE"), "extdata")
+extdata <- file.path(system.file(package = "TVTB"), "extdata")
 
 # VCF file
 vcfFile <- file.path(extdata, "chr15.phase3_integrated.vcf.gz")
@@ -83,13 +83,13 @@ vcf.moderate.pop <- vcf.moderate[,which(phenotypes$pop %in% c("MSL", "GBR"))]
 
 writeVcf(
     obj = vcf.moderate.pop,
-    filename = "~/Dropbox/tSVE/inst/extdata/moderate.vcf")
+    filename = "~/Dropbox/TVTB/inst/extdata/moderate.vcf")
 
 phenotypes.pop <- subset(phenotypes, pop %in% c("MSL", "GBR"))
 write.table(
     x = cbind(
         sample = rownames(phenotypes.pop),
         as.data.frame(phenotypes.pop)),
-    file = "~/Dropbox/tSVE/inst/extdata/moderate_pheno.txt",
+    file = "~/Dropbox/TVTB/inst/extdata/moderate_pheno.txt",
     quote = FALSE,
     row.names = FALSE)

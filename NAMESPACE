@@ -130,14 +130,14 @@ exportMethods(
 
 #exportClassPattern("^.*$")
 exportClasses(
-    "tSVEParam",
+    "TVTBparam",
     "VcfInfoFilter", "VcfFixedFilter", "VcfVepFilter"
 )
 
 # Constructors ----
 
 exportMethods(
-    "tSVEParam",
+    "TVTBparam",
     "VcfInfoFilter", "VcfFixedFilter", "VcfVepFilter", "VcfFilterList",
     "filterType",
     "subsetVcf", "filterRules"

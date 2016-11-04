@@ -1,7 +1,7 @@
 \name{addPhenoLevelFrequencies-methods}
 
 \alias{addPhenoLevelFrequencies}
-\alias{addPhenoLevelFrequencies,ExpandedVCF,tSVEParam-method}
+\alias{addPhenoLevelFrequencies,ExpandedVCF,TVTBparam-method}
 \alias{addPhenoLevelFrequencies,ExpandedVCF,missing-method}
 
 \docType{methods}
@@ -23,7 +23,7 @@ homozygote reference genotypes).
 }
 
 \usage{
-\S4method{addPhenoLevelFrequencies}{ExpandedVCF,tSVEParam}(
+\S4method{addPhenoLevelFrequencies}{ExpandedVCF,TVTBparam}(
     vcf, pheno, level, param, ..., force = FALSE)
 
 \S4method{addPhenoLevelFrequencies}{ExpandedVCF,missing}(
@@ -41,7 +41,7 @@ Phenotype in \code{colnames(colData(vcf))}.
 Phenotype level in \code{colData(vcf)[,pheno]}.
 }
     \item{param}{
-\code{tSVEParam} object that contains recurrent parameters.
+\code{TVTBparam} object that contains recurrent parameters.
 }
     \item{ref}{
 \code{character} vector of valid reference homozygote genotypes (\emph{e.g.}
@@ -56,7 +56,7 @@ Phenotype level in \code{colData(vcf)[,pheno]}.
     \code{c("1|1", "1/1")}).
 }
     \item{...}{
-Additional arguments used to override \code{tSVEParam} slots.
+Additional arguments used to override \code{TVTBparam} slots.
 }
     \item{force}{
 If \code{TRUE}, \emph{INFO} fields header and data are overwritten.
@@ -69,7 +69,7 @@ If \code{FALSE}, an error is thrown if any field already exists.
 Genotypes and frequencies are calculated within the groups of samples
 associated with the given level of the given phenotype,
 and stored in \emph{INFO} fields
-named according to settings stored in the \code{tSVEParam} object (see below).
+named according to settings stored in the \code{TVTBparam} object (see below).
 
 The \code{param} object controls the suffix of \emph{INFO} fields as
 follows:
@@ -102,8 +102,8 @@ Kevin Rue-Albrecht
 }
 
 \seealso{
-\code{\link{addFrequencies,ExpandedVCF,list,tSVEParam-method}},
-\code{\link{addOverallFrequencies,ExpandedVCF,tSVEParam-method}},
+\code{\link{addFrequencies,ExpandedVCF,list,TVTBparam-method}},
+\code{\link{addOverallFrequencies,ExpandedVCF,TVTBparam-method}},
 and \code{\linkS4class{VCF}}.
 }
 
@@ -111,14 +111,14 @@ and \code{\linkS4class{VCF}}.
 # Example data ----
 
 # VCF file
-extdata <- file.path(system.file(package = "tSVE"), "extdata")
+extdata <- file.path(system.file(package = "TVTB"), "extdata")
 vcfFile <- file.path(extdata, "moderate.vcf")
 
 # Phenotype file
 phenoFile <- file.path(extdata, "moderate_pheno.txt")
 
 # Parameters
-tparam <- tSVEParam(
+tparam <- TVTBparam(
     genos = list(
         REF = "0|0",
         HET = c("0|1", "1|0"),

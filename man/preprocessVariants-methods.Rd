@@ -2,20 +2,20 @@
 
 \alias{preprocessVariants}
 
-\alias{preprocessVariants,TabixFile,tSVEParam,DataFrame-method}
-\alias{preprocessVariants,TabixFile,tSVEParam,data.frame-method}
-\alias{preprocessVariants,TabixFile,tSVEParam,character-method}
-\alias{preprocessVariants,TabixFile,tSVEParam,missing-method}
+\alias{preprocessVariants,TabixFile,TVTBparam,DataFrame-method}
+\alias{preprocessVariants,TabixFile,TVTBparam,data.frame-method}
+\alias{preprocessVariants,TabixFile,TVTBparam,character-method}
+\alias{preprocessVariants,TabixFile,TVTBparam,missing-method}
 
 \alias{preprocessVariants,TabixFile,missing,DataFrame-method}
 \alias{preprocessVariants,TabixFile,missing,data.frame-method}
 \alias{preprocessVariants,TabixFile,missing,character-method}
 \alias{preprocessVariants,TabixFile,missing,missing-method}
 
-\alias{preprocessVariants,character,tSVEParam,DataFrame-method}
-\alias{preprocessVariants,character,tSVEParam,data.frame-method}
-\alias{preprocessVariants,character,tSVEParam,character-method}
-\alias{preprocessVariants,character,tSVEParam,missing-method}
+\alias{preprocessVariants,character,TVTBparam,DataFrame-method}
+\alias{preprocessVariants,character,TVTBparam,data.frame-method}
+\alias{preprocessVariants,character,TVTBparam,character-method}
+\alias{preprocessVariants,character,TVTBparam,missing-method}
 
 \alias{preprocessVariants,character,missing,DataFrame-method}
 \alias{preprocessVariants,character,missing,data.frame-method}
@@ -33,63 +33,63 @@ analyses.
 }
 
 \usage{
-\S4method{preprocessVariants}{TabixFile,tSVEParam,DataFrame}(
+\S4method{preprocessVariants}{TabixFile,TVTBparam,DataFrame}(
     file, param, phenos, ...)
 
-\S4method{preprocessVariants}{TabixFile,tSVEParam,data.frame}(
+\S4method{preprocessVariants}{TabixFile,TVTBparam,data.frame}(
     file, param, phenos, ...)
 
-\S4method{preprocessVariants}{TabixFile,tSVEParam,character}(
+\S4method{preprocessVariants}{TabixFile,TVTBparam,character}(
     file, param, phenos, ...)
 
-\S4method{preprocessVariants}{TabixFile,tSVEParam,missing}(
+\S4method{preprocessVariants}{TabixFile,TVTBparam,missing}(
     file, param, phenos = DataFrame(), ...)
 
 \S4method{preprocessVariants}{TabixFile,missing,DataFrame}(
     file,
-    param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
+    param = TVTBparam(ref = "refNA", het = "hetNA", alt = "altNA"),
     phenos, ...)
 
 \S4method{preprocessVariants}{TabixFile,missing,data.frame}(
     file,
-    param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
+    param = TVTBparam(ref = "refNA", het = "hetNA", alt = "altNA"),
     phenos, ...)
 
 \S4method{preprocessVariants}{TabixFile,missing,character}(
     file,
-    param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
+    param = TVTBparam(ref = "refNA", het = "hetNA", alt = "altNA"),
     phenos, ...)
 
 \S4method{preprocessVariants}{TabixFile,missing,missing}(
     file,
-    param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
+    param = TVTBparam(ref = "refNA", het = "hetNA", alt = "altNA"),
     phenos = DataFrame(), ...)
 
-\S4method{preprocessVariants}{character,tSVEParam,DataFrame}(
+\S4method{preprocessVariants}{character,TVTBparam,DataFrame}(
     file, param, phenos, ...)
 
-\S4method{preprocessVariants}{character,tSVEParam,data.frame}(
+\S4method{preprocessVariants}{character,TVTBparam,data.frame}(
     file, param, phenos, ...)
 
-\S4method{preprocessVariants}{character,tSVEParam,character}(
+\S4method{preprocessVariants}{character,TVTBparam,character}(
     file, param, phenos, ...)
 
-\S4method{preprocessVariants}{character,tSVEParam,missing}(
+\S4method{preprocessVariants}{character,TVTBparam,missing}(
     file, param, phenos = DataFrame(), ...)
 
 \S4method{preprocessVariants}{character,missing,DataFrame}(
     file,
-    param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
+    param = TVTBparam(ref = "refNA", het = "hetNA", alt = "altNA"),
     phenos, ...)
 
 \S4method{preprocessVariants}{character,missing,data.frame}(
     file,
-    param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
+    param = TVTBparam(ref = "refNA", het = "hetNA", alt = "altNA"),
     phenos, ...)
 
 \S4method{preprocessVariants}{character,missing,data.frame}(
     file,
-    param = tSVEParam(ref = "refNA", het = "hetNA", alt = "altNA"),
+    param = TVTBparam(ref = "refNA", het = "hetNA", alt = "altNA"),
     phenos, ...)
 }
 
@@ -98,7 +98,7 @@ analyses.
 File (\code{TabixFile} or \code{character}) from which to import variants.
 }
     \item{param}{
-\code{tSVEParam} object that contains recurrent parameters.
+\code{TVTBparam} object that contains recurrent parameters.
 }
     \item{phenos}{
 \code{DataFrame}, \code{data.frame}, or file of phenotypes.
@@ -107,7 +107,7 @@ In all cases, \code{rownames} must provide sample names,
 and \code{colnames} must provide phenotype names.
 }
     \item{...}{
-Additional arguments passed to \code{tSVEParam} constructor and other methods
+Additional arguments passed to \code{TVTBparam} constructor and other methods
 (\emph{e.g.} argument \code{genome} for method \code{readVcf}).
 }
 }
@@ -156,7 +156,7 @@ library(VariantAnnotation)
 
 # Example data ----
 
-extdata <- file.path(system.file(package = "tSVE"), "extdata")
+extdata <- file.path(system.file(package = "TVTB"), "extdata")
 vcfFile <- file.path(extdata, "moderate.vcf")
 phenoFile <- file.path(extdata, "moderate_pheno.txt")
 
@@ -167,9 +167,9 @@ phenotypes <- S4Vectors::DataFrame(read.table(
     header = TRUE,
     row.names = 1))
 
-# Define tSVEParam
+# Define TVTBparam
 
-tparam <- tSVEParam(
+tparam <- TVTBparam(
     genos = list(
     REF = "0|0",
     HET = c("0|1", "1|0"),

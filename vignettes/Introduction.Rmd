@@ -1,20 +1,21 @@
 ---
-title: Introduction to tSVE
+title: Introduction to TVTB
 author:
     -   name: Kévin Rue-Albrecht
         email: k.rue-albrecht@imperial.ac.uk
         affiliation: Department of Medicine, Imperial College London,
             Hammersmith Campus, Du Cane Road, London, W12 0NN, UK
 date: "`r doc_date()`"
-package: "`r pkg_ver('tSVE')`"
+package: "`r pkg_ver('TVTB')`"
 abstract:
-    The Shiny Variant Explorer (*tSVE*) provides functions to summarise and
+    The Variant Tool-Box (*TVTB*) provides functions to summarise and
     visualise gene-centric genetic variation data stored in VCF files
     pre-processed by the Ensembl Variant Effect Predictor (VEP).
-    A Shiny web-application provides a convenient interface to demonstrate
+    A Shiny web-application, the Shiny Variant Explorer (tSVE),
+    provides a convenient interface to demonstrate
     those functionalities in a programming-free environment.
 vignette: >
-    %\VignetteIndexEntry{Introduction to tSVE}
+    %\VignetteIndexEntry{Introduction to TVTB}
     %\VignetteEngine{knitr::rmarkdown}
     %\VignetteEncoding{UTF-8}
 output: 
@@ -25,21 +26,24 @@ bibliography:
 
 # Introduction
 
-The Shiny Variant Explorer (*tSVE*) offers functions to summarise and visualise
+The Variant Tool-Box (*TVTB*[^1]) offers functions to summarise and visualise
 gene-centric genetic variation data stored in VCF files pre-processed by the
 Ensembl Variant Effect Predictor (VEP) [@RN1].
-A Shiny web-application provides a convenient interface to demonstrate those
+A Shiny web-application, the Shiny Variant Explorer (tSVE),
+provides a convenient interface to demonstrate those
 functionalities in a programming-free environment.
+
+[^1]: *In Italian*: ti voglio tanto bene
 
 # Installation
 
-The Shiny Variant Explorer (`r Biocpkg("tSVE")`) can be installed using the
+The Variant Tool-Box (`r Biocpkg("TVTB")`) can be installed using the
 following code:
 
 ```{r biocLite, message=FALSE}
-if (!require(tSVE)){
+if (!require(TVTB)){
     source("http://bioconductor.org/biocLite.R")
-    biocLite("tSVE")
+    biocLite("TVTB")
 }
 ```
 
@@ -52,12 +56,12 @@ statement.
 Once installed, the package can be loaded and attached as follows:
 
 ```{r library, message=FALSE}
-library(tSVE)
+library(TVTB)
 ```
 
-# Recurrent settings: tSVEParam
+# Recurrent settings: TVTBparam
 
-Most functionalities in `r Biocpkg("tSVE")` require recurrent information
+Most functionalities in `r Biocpkg("TVTB")` require recurrent information
 such as:
 
 * genotypes (homozygote reference, heterozygote, homozygote alternate)
@@ -72,13 +76,13 @@ such as:
 
 To reduce the burden of repetitive programming, and to 
 facilitate analyses using consistent sets of parameters,
-`r Biocpkg("tSVE")` implements the `tSVEParam` class.
-`tSVEParam` objects offer a container for parameters recurrently used across
+`r Biocpkg("TVTB")` implements the `TVTBparam` class.
+`TVTBparam` objects offer a container for parameters recurrently used across
 the package.
-A `tSVEParam` object may be initialised as follows:
+A `TVTBparam` object may be initialised as follows:
 
-```{r tSVEParam}
-tParam <- tSVEParam(
+```{r TVTBparam}
+tParam <- TVTBparam(
     genos = list(
         REF = c("0|0"),
         HET = c("0|1", "1|0"),
@@ -121,16 +125,16 @@ In this example:
 Default values are provided for all slots except genotypes, as these may vary
 more frequently from one data set to another.
 \fixme{
-In the future, however, a small set of pre-configured `tSVEParam` objects
+In the future, however, a small set of pre-configured `TVTBparam` objects
 may be included in the package for the most common situations
-(e.g., `tSVEParamPhased`, `tSVEParamUnphased`, `tSVEParam012`).
+(e.g., `TVTBparamPhased`, `TVTBparamUnphased`, `TVTBparam012`).
 }
 
 # Data import
 
 ## Variants and phenotypes
 
-Functionalities in `r Biocpkg("tSVE")` currently only use
+Functionalities in `r Biocpkg("TVTB")` currently only use
 `ExpandedVCF` objects of the `r Biocpkg("VariantAnnotation")` package,
 which encode a single alternate allele per record.
 `ExpandedVCF` objects can be produced:
@@ -141,7 +145,7 @@ with argument `collapsed=FALSE`,
 * from `r Biocpkg("VariantAnnotation")` `CollapsedVCF` objects
 using the `r Biocpkg("VariantAnnotation")` `expand()` method.
 
-To enable the key functionalities of the `r Biocpkg("tSVE")` package, the
+To enable the key functionalities of the `r Biocpkg("TVTB")` package, the
 `ExpandedVCF` object should include at least the following information:
 
 * `fixed(x)`
@@ -158,7 +162,7 @@ To enable the key functionalities of the `r Biocpkg("tSVE")` package, the
 
 ## The preprocessVariants() method
 
-The `r Biocpkg("tSVE")` method `preprocessVariants` offers an integrated route
+The `r Biocpkg("TVTB")` method `preprocessVariants` offers an integrated route
 to produce a minimal `ExpandedVCF` object that contains all the data
 necessary for subsequent analyses.
 To initialise a minimal `ExpandedVCF` object,
@@ -195,12 +199,12 @@ can be obtained as follows:
 # Import phenotypes ----
 phenoFile <- system.file(
     "extdata/integrated_samples.txt",
-    package = "tSVE")
+    package = "TVTB")
 
 # Define VCF file ----
 vcfFile <- system.file(
     "extdata/chr15.phase3_integrated.vcf.gz",
-    package = "tSVE")
+    package = "TVTB")
 
 tabixVcf <- Rsamtools::TabixFile(file = vcfFile)
 
@@ -212,7 +216,7 @@ vcf <- preprocessVariants(
 ```
 
 \bioccomment{
-For `preprocessVariants`, `tSVEParam` objects are used
+For `preprocessVariants`, `TVTBparam` objects are used
 only for the `csq` value, that defines the INFO field
 from which to extract Ensembl VEP predictions.
 }
@@ -234,7 +238,7 @@ Although later sections discuss:
 interesting figures and summary tables may be obtained as soon as the first
 `ExpandedVCF` object is created.
 
-Currently, the major `r Biocpkg("tSVE")` functionalities include:
+Currently, the major `r Biocpkg("TVTB")` functionalities include:
 
 * Counts of discrete Ensembl VEP predictions in levels of a phenotype
     + as a `data.frame` or a stacked \CRANpkg{ggplot2} `geom_bar`

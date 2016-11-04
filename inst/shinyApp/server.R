@@ -8,7 +8,7 @@
 library(shiny)
 
 source(file.path(
-    system.file(package = "tSVE"),
+    system.file(package = "TVTB"),
     "shinyApp",
     "serverRoutines.R"))
 
@@ -162,7 +162,7 @@ shinyServer(function(input, output, clientData, session) {
         )
 
         new(
-            Class = "tSVEParam",
+            Class = "TVTBparam",
             genos = list(
                 REF = input$refGenotypes,
                 HET = input$hetGenotypes,
@@ -173,7 +173,7 @@ shinyServer(function(input, output, clientData, session) {
         )
     })
 
-    output$tSVESettings <- renderPrint({
+    output$TVTBsettings <- renderPrint({
         tParam()
     })
 

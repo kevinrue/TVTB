@@ -8,7 +8,7 @@ bedRegions <- GenomicRanges::GRanges(
     ranges = IRanges::IRanges(start = 48413170, end = 48434757))
 
 # VCF file
-extdata <- file.path(system.file(package = "tSVE"), "extdata")
+extdata <- file.path(system.file(package = "TVTB"), "extdata")
 vcfFile <- file.path(extdata, "chr15.phase3_integrated.vcf.gz")
 tabixVcf <- Rsamtools::TabixFile(file = vcfFile)
 
@@ -34,7 +34,7 @@ rownames(eVcf) <- paste(rownames(eVcf), mcols(eVcf)[,"ALT"], sep = "_")
 # Add some phenotypes information necessary for the demo
 colData(eVcf) <- samplePhenotypes
 
-tparam <- tSVEParam(genos = list(c("0|0"), c("0|1","1|0"), c("1|1")))
+tparam <- TVTBparam(genos = list(c("0|0"), c("0|1","1|0"), c("1|1")))
 
 # Signatures ----
 

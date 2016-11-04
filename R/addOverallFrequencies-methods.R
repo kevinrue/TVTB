@@ -1,13 +1,13 @@
 
-## param = tSVEParam ----
+## param = TVTBparam ----
 
 setMethod(
     f = "addOverallFrequencies",
-    signature = c(vcf="ExpandedVCF", param="tSVEParam"),
+    signature = c(vcf="ExpandedVCF", param="TVTBparam"),
     definition = function(
         vcf, param, ..., force = FALSE){
 
-        param <- .override.tSVEParam(param = param, ...)
+        param <- .override.TVTBparam(param = param, ...)
 
         .addOverallFrequencies(
             vcf = vcf, param = param, force = force)
@@ -22,8 +22,8 @@ setMethod(
     definition = function(
         vcf, ref, het, alt, ..., force = FALSE){
 
-        # Use default tSVEParams
-        param <- tSVEParam(genos = list(ref, het, alt))
+        # Use default TVTBparam
+        param <- TVTBparam(genos = list(ref, het, alt))
 
         .addOverallFrequencies(
             vcf = vcf, param = param, force = force)
@@ -88,8 +88,8 @@ setMethod(
         ),
         # NOTE: currently,  object: 'info(VCFHeader)' must be a 3 column
         # DataFrame with names Number, Type, Description
-        #Source = rep("tSVE", 5),
-        #Version = rep(packageVersion("tSVE"), 5),
+        #Source = rep("TVTB", 5),
+        #Version = rep(packageVersion("TVTB"), 5),
         row.names = c(names(genos(param)), aaf(param), maf(param))
     )
 

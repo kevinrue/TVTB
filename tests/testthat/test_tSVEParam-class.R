@@ -1,4 +1,4 @@
-context("tSVEParam")
+context("TVTBparam")
 
 # Settings ----
 
@@ -28,16 +28,16 @@ gr <- GenomicRanges::GRanges(
 test_that("Constructors produce a valid object",{
 
     expect_s4_class(
-        tSVEParam(genos = genotypes),
-        "tSVEParam"
+        TVTBparam(genos = genotypes),
+        "TVTBparam"
     )
 
     expect_s4_class(
-        tSVEParam(
+        TVTBparam(
             ref = genotypes[["REF"]],
             het = genotypes[["HET"]],
             alt = genotypes[["ALT"]]),
-        "tSVEParam"
+        "TVTBparam"
     )
 
 })
@@ -45,8 +45,8 @@ test_that("Constructors produce a valid object",{
 test_that("Constructors adds default genotype labels if missing",{
 
     expect_s4_class(
-        tSVEParam(genos = genotypesNoName),
-        "tSVEParam"
+        TVTBparam(genos = genotypesNoName),
+        "TVTBparam"
     )
 
 })
@@ -56,7 +56,7 @@ test_that("Constructors adds default genotype labels if missing",{
 test_that("Three genotypes are required",{
 
     expect_error(
-        tSVEParam(genos = genotypes[1:2])
+        TVTBparam(genos = genotypes[1:2])
     )
 
 })
@@ -64,7 +64,7 @@ test_that("Three genotypes are required",{
 test_that("Partially named genotypes are not allowed",{
 
     expect_error(
-        tSVEParam(genos = genotypesPartiallyNamed)
+        TVTBparam(genos = genotypesPartiallyNamed)
     )
 
 })
@@ -72,14 +72,14 @@ test_that("Partially named genotypes are not allowed",{
 test_that("Overlapping genotypes are not allowed",{
 
     expect_error(
-        tSVEParam(genos = genotypesOverlapping)
+        TVTBparam(genos = genotypesOverlapping)
     )
 
 })
 
 # Accessors ----
 
-tparam <- new("tSVEParam", genos = genotypes)
+tparam <- new("TVTBparam", genos = genotypes)
 
 test_that("Accessors return valid values",{
 
@@ -240,7 +240,7 @@ test_that("Setters catch invalid inputs",{
 test_that("Override function return valid values",{
 
     expect_s4_class(
-        .override.tSVEParam(
+        .override.TVTBparam(
             param = tparam,
             ref = "0/0",
             het = "0/1",
@@ -250,7 +250,7 @@ test_that("Override function return valid values",{
             maf = "Maf",
             vep = "ANN",
             bp = MulticoreParam(workers = 2)),
-        "tSVEParam"
+        "TVTBparam"
     )
 
 })

@@ -1,9 +1,9 @@
 \name{variantsInSamples-methods}
 
 \alias{variantsInSamples}
-\alias{variantsInSamples,ExpandedVCF,numeric,tSVEParam-method}
+\alias{variantsInSamples,ExpandedVCF,numeric,TVTBparam-method}
 \alias{variantsInSamples,ExpandedVCF,numeric,missing-method}
-\alias{variantsInSamples,ExpandedVCF,character,tSVEParam-method}
+\alias{variantsInSamples,ExpandedVCF,character,TVTBparam-method}
 \alias{variantsInSamples,ExpandedVCF,character,missing-method}
 
 \docType{methods}
@@ -15,10 +15,10 @@ group.
 }
 
 \usage{
-\S4method{variantsInSamples}{ExpandedVCF,numeric,tSVEParam}(
+\S4method{variantsInSamples}{ExpandedVCF,numeric,TVTBparam}(
     vcf, samples, param, ..., unique = FALSE)
 
-\S4method{variantsInSamples}{ExpandedVCF,character,tSVEParam}(
+\S4method{variantsInSamples}{ExpandedVCF,character,TVTBparam}(
     vcf, samples, param, ..., unique = FALSE)
 
 \S4method{variantsInSamples}{ExpandedVCF,numeric,missing}(
@@ -37,14 +37,14 @@ group.
 in \code{VariantAnnotation::geno(vcf)}.
 }
     \item{param}{
-\code{tSVEParam} object that contains recurrent parameters.
+\code{TVTBparam} object that contains recurrent parameters.
 }
     \item{alts}{
 \code{character} vector of alternate genotypes (both heterozygote and
 homozygote).
 }
     \item{...}{
-Additional arguments used to override \code{tSVEParam} slots.
+Additional arguments used to override \code{TVTBparam} slots.
 }
     \item{unique}{
 If \code{TRUE}, consider only variants \emph{unique} to the phenotype level
@@ -71,14 +71,14 @@ and \code{\linkS4class{DataFrame}}.
 # Example data ----
 
 # VCF file
-extdata <- file.path(system.file(package = "tSVE"), "extdata")
+extdata <- file.path(system.file(package = "TVTB"), "extdata")
 vcfFile <- file.path(extdata, "moderate.vcf")
 
 # Phenotype file
 phenoFile <- file.path(extdata, "moderate_pheno.txt")
 
 # Parameters
-tparam <- tSVEParam(
+tparam <- TVTBparam(
     genos = list(
         REF = "0|0",
         HET = c("0|1", "1|0"),

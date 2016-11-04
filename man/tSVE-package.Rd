@@ -1,22 +1,22 @@
-\name{tSVE-package}
-\alias{tSVE-package}
+\name{TVTB-package}
+\alias{TVTB-package}
 
 \docType{package}
 \title{
-    \packageTitle{tSVE}
+    \packageTitle{TVTB}
 }
 \description{
-    \packageDescription{tSVE}
+    \packageDescription{TVTB}
 }
 \details{
 
-\packageDESCRIPTION{tSVE}
-    \packageIndices{tSVE}
+\packageDESCRIPTION{TVTB}
+    \packageIndices{TVTB}
 }
 \author{
-    \packageAuthor{tSVE}
+    \packageAuthor{TVTB}
 
-    Maintainer: \packageMaintainer{tSVE}
+    Maintainer: \packageMaintainer{TVTB}
 }
 
 \keyword{ package }

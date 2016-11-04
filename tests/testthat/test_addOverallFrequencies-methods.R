@@ -3,11 +3,11 @@ context("addOverallFrequencies")
 # Settings ----
 
 # VCF file
-extdata <- file.path(system.file(package = "tSVE"), "extdata")
+extdata <- file.path(system.file(package = "TVTB"), "extdata")
 vcfFile <- file.path(extdata, "moderate.vcf")
 phenoFile <- file.path(extdata, "moderate_pheno.txt")
 
-tparam <- tSVEParam(
+tparam <- TVTBparam(
     genos = list(
         REF = "0|0",
         HET = c("0|1", "1|0"),
@@ -20,7 +20,7 @@ vcf <- preprocessVariants(
 
 test_that("addOverallFrequencies supports all signatures",{
 
-    # \alias{addOverallFrequencies,ExpandedVCF,tSVEParam-method}
+    # \alias{addOverallFrequencies,ExpandedVCF,TVTBparam-method}
     expect_s4_class(
         addOverallFrequencies(vcf = vcf, param = tparam),
         "ExpandedVCF"

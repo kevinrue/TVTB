@@ -1,10 +1,10 @@
-# tSVEParam ----
+# TVTBparam ----
 
 setMethod(
     f = "show",
-    signature = "tSVEParam",
+    signature = "TVTBparam",
     definition = function(object){
-        cat("Class: tSVEParam\n")
+        cat("Class: TVTBparam\n")
         cat("Genotypes\n")
         cat(sprintf(
             "- Reference: \"%s\" {%s}\n",

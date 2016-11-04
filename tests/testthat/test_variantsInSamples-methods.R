@@ -8,7 +8,7 @@ bedRegions <- GenomicRanges::GRanges(
     ranges = IRanges::IRanges(start = 48420E3, end = 48421E3))
 
 # VCF file
-extdata <- file.path(system.file(package = "tSVE"), "extdata")
+extdata <- file.path(system.file(package = "TVTB"), "extdata")
 vcfFile <- file.path(extdata, "chr15.phase3_integrated.vcf.gz")
 tabixVcf <- Rsamtools::TabixFile(file = vcfFile)
 
@@ -35,13 +35,13 @@ rownames(eVcf) <- paste(rownames(eVcf), mcols(eVcf)[,"ALT"], sep = "_")
 
 sampleIdx <- 1:(ncol(eVcf)/10)
 
-tparam <- tSVEParam(genos = list(c("0|0"), c("0|1","1|0"), c("1|1")))
+tparam <- TVTBparam(genos = list(c("0|0"), c("0|1","1|0"), c("1|1")))
 
 # Signatures ----
 
 test_that("variantsInSamples() supports all signatures",{
 
-    ## ExpandedVCF,numeric,tSVEParam
+    ## ExpandedVCF,numeric,TVTBparam
     expect_type(
         variantsInSamples(
             vcf = eVcf,
@@ -61,7 +61,7 @@ test_that("variantsInSamples() supports all signatures",{
         "integer"
     )
 
-    # ExpandedVCF,character,tSVEParam
+    # ExpandedVCF,character,TVTBparam
     expect_type(
         variantsInSamples(
             vcf = eVcf,
