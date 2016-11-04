@@ -6,9 +6,8 @@ Date: 2016-07-28
 Author: Kevin Rue-Albrecht
 Maintainer: Kevin Rue-Albrecht <kevinrue67@gmail.com>
 Description: The package provides functions to summarise and visualise
-    gene centric genetic variation data stored in VCF files. Functionalities
-    are centred around a Shiny application which provides a convenient and
-    reproducible interface to the package.
+  gene centric genetic variation data stored in VCF files.
+  Functionalities are also demonstrated in a Shiny web-application.
 License: Artistic-2.0
 Depends:
     R (>= 3.3), methods, utils, stats
@@ -34,7 +33,8 @@ Suggests:
     BiocStyle,
     knitr (>= 1.12),
     rmarkdown,
-    testthat
+    testthat,
+    covr
 biocViews:
     Software,
     Genetics,

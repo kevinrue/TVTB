@@ -131,7 +131,6 @@ exportClasses(
 # Constructors ----
 
 exportMethods(
-    "tSVEParam",
-    "show"
+    "tSVEParam"
 )
 
