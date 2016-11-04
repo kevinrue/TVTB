@@ -28,6 +28,8 @@ build_script:
   - travis-tool.sh install_bioc_deps
   - travis-tool.sh install_bioc ensemblVEP EnsDb.Hsapiens.v75
   - Rscript -e 'BiocInstaller::biocValid(fix=TRUE)'
+  - Rscript -e 'c;showMethods("c", classes = "GenomicRanges");includeDefs = T'
+  - Rscript -e 'library(GenomicRanges);c;showMethods("c", classes = "GenomicRanges");includeDefs = T'
 
 test_script:
   - travis-tool.sh run_tests
