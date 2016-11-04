@@ -18,16 +18,17 @@ shinyServer(function(input, output, clientData, session) {
 
     RV <- reactiveValues(
         # Path to phenotype file
-        phenoFile = NULL,
+        phenoFile = NULL, # Path to phenotype file
         # VCF filter rules
-        vcfFilters = TVTB::VcfFilterRules(),
+        vcfFilters = TVTB::VcfFilterRules(), # Existing rules
         # VCF keys
-        infoKeys = NULL,
-        genoKeys = NULL,
+        infoKeys = NULL, # choices of info key
+        genoKeys = NULL, # choices of geno keys
         # GRanges
-        genomicRanges = GenomicRanges::GRanges(),
-        # VCF files
-        singleVcf = NULL
+        genomicRanges = GenomicRanges::GRanges(), # All variants imported
+        # Single VCF file
+        singleVcf = NULL, # Path to file
+        singleVcfIssue = NULL # no issue
     )
 
     # Import phenotype information ----
@@ -1216,6 +1217,18 @@ shinyServer(function(input, output, clientData, session) {
 
     # Select single VCF ----
 
+    # Demonstration input for single VCF file
+    observeEvent(
+        eventExpr = input$demoVcf,
+        handlerExpr = {
+            
+            RV[["singleVcf"]] <- system.file(
+                "extdata/chr15.phase3_integrated.vcf.gz", package = "TVTB"
+            )
+            
+    })
+    
+    # Action button to select single VCF file
     observeEvent(
         eventExpr = input$selectVcf,
         handlerExpr = {
@@ -1226,41 +1239,56 @@ shinyServer(function(input, output, clientData, session) {
                     warning(geterrmessage())
                     return(NULL)
                 })
+            
+            # Save the selected file in the reactive values
+            validate(need(selected, Msgs[["singleVcf"]]))
+            RV[["singleVcf"]] <- selected
 
-            validate(
-                need(
-                    grepl(
-                        pattern = ".*\\.vcf(\\.gz)?$",
-                        x = selected,
-                        ignore.case = TRUE),
-                    "File is not *.vcf.gz"))
+            # Check that the selected file is *vcf.gz
+            if (!grepl(
+                pattern = ".*\\.vcf\\.gz$",
+                x = selected,
+                ignore.case = TRUE)){
+                
+                RV[["singleVcfIssue"]] <- sprintf(
+                    "File is not *.vcf.gz: %s",
+                    selected
+                )
+                warning(RV[["singleVcfIssue"]])
+                return(NULL)
+                
+            }
 
             tbiChrVcf <- paste(selected, "tbi", sep = ".")
-            validate(
-                need(
-                    file.exists(tbiChrVcf),
-                    sprintf("Tabix index file does not exist: %s", tbiChrVcf)))
+            # Check that the selected file also has a tabix index
+            if (!file.exists(tbiChrVcf)){
+                
+                RV[["singleVcfIssue"]] <- sprintf(
+                    "Tabix index file does not exist: %s",
+                    tbiChrVcf)
+                warning(RV[["singleVcfIssue"]])
+                return(NULL)
+                
+            }
 
-            RV[["singleVcf"]] <- selected
+            RV[["singleVcfIssue"]] <- NULL
         })
 
-    observeEvent(
-        eventExpr = input$demoVcf,
-        handlerExpr = {
-
-            RV[["singleVcf"]] <- system.file(
-                "extdata/chr15.phase3_integrated.vcf.gz", package = "TVTB"
-            )
-
-        })
-
+    # Path to single VCF file selected
     output$selectedVcf <- renderText({
 
         singleVcf <- RV[["singleVcf"]]
+        singleVcfIssue <- RV[["singleVcfIssue"]]
 
+        # Only proceed if a file was selected
         validate(need(singleVcf, Msgs[["singleVcf"]]))
-
-        singleVcf
+        
+        # Display warning in console as well as web-app
+        if (!is.null(singleVcfIssue))
+            warning(singleVcfIssue)
+        validate(need(is.null(singleVcfIssue), singleVcfIssue))
+        
+        return(singleVcf)
     })
 
     # Define ScanVcfParam ----
