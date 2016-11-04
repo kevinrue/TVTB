@@ -67,8 +67,6 @@ package in a convenient format.
 }
 
 \usage{
-## Constructors
-
 \S4method{TVTBparam}{list}(
     genos,
     ranges = GRanges(),
@@ -80,7 +78,7 @@ package in a convenient format.
     aaf = "AAF", maf = "MAF", vep = "CSQ", bp = SerialParam())
 }
 
-\section{Accessors}{
+\section{Accessor methods}{
 In the following code snippets \code{x} is a \code{TVTBparam} object.
 \describe{
     \item{\code{genos(x)}, \code{genos(x) <- value}}{

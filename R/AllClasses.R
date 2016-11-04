@@ -58,114 +58,66 @@ TVTBparam <- setClass(
 
 )
 
-# VcfBasicFilter ----
+# VcfFilterRules ----
 
-.valid.VcfBasicFilter <- function(object){
-
-    errors <- c()
-
-    if (length(slot(object, "name")) != 1)
-        errors <- c(errors, "name(x) must equal 3")
-
-    if (length(slot(object, "condition")) != 1)
-        errors <- c(errors, "condition(x) must equal 3")
-
-    if (length(errors) > 0)
-        return(errors)
-
+# TODO
+.valid.VcfBasicRules <- function(object){
     return(TRUE)
 }
 
-VcfBasicFilter <- setClass(
-    Class = "VcfBasicFilter",
+VcfFixedRules <- setClass(
+    Class = "VcfFixedRules",
 
-    contains = "VIRTUAL",
+    contains = "FilterRules",
 
-    # Define the slots
-    slots = c(
-        name = "character",
-        condition = "character",
-        value = "ANY",
-        type = "character"
-    ),
-
-    validity = .valid.VcfBasicFilter
-
+    validity = .valid.VcfBasicRules
 )
 
-VcfFixedFilter <- setClass(
-    Class = "VcfFixedFilter",
 
-    contains = "VcfBasicFilter",
+VcfInfoRules <- setClass(
+    Class = "VcfInfoRules",
 
-    prototype = list(type = "fixed")
+    contains = "FilterRules",
 
+    validity = .valid.VcfBasicRules
 )
 
-VcfInfoFilter <- setClass(
-    Class = "VcfInfoFilter",
+VcfVepRules <- setClass(
+    Class = "VcfVepRules",
 
-    contains = "VcfBasicFilter",
+    contains = "FilterRules",
 
-    prototype = list(type = "info")
-
+    validity = .valid.VcfBasicRules
 )
 
-VcfVepFilter <- setClass(
-    Class = "VcfVepFilter",
-
-    contains = "VcfBasicFilter",
-
-    prototype = list(type = "VEP")
-
-)
-
-# VcfFilterList ----
-
-.valid.VcfFilterList <- function(object){
-
-    validFilterTypes <- c(
-        "VcfFixedFilter",
-        "VcfInfoFilter",
-        "VcfVepFilter")
+.valid.VcfFilterRules <- function(object){
 
     errors <- c()
 
-    idxMatch <- match(
-        x = sapply(X = filterRules(object), FUN = "class"),
-        table = validFilterTypes)
-    idxInvalid <- which(is.na(idxMatch))
+    validTypes <- c("fixed", "info", "vep")
+    typeMatch <- match(type(object), validTypes)
 
-    if (length(idxInvalid) > 0)
-        errors <- c(
-            errors,
-            paste(
-                "invalid filter class for filter(s): ",
-                paste(idxInvalid, sep = ", ")
-                )
-            )
+    if (sum(is.na(typeMatch)) > 0)
+        errors <- c(errors, "one or more invalid filter types")
 
-    if (length(active(object)) != length(filterRules(object)))
-        errors <- c(
-            errors,
-            "length(active(x)) not equal to length(filterRules(x))"
-        )
+    if (length(type(object)) != length(object))
+        errors <- c(errors, "length(type(x)) must equal length(x)")
 
-    if (length(errors) > 0)
+    rulesName <- names(object@listData)
+    if (length(rulesName) != length(unique(rulesName)))
+        errors <- c(errors, "names must be unique")
+
+    if (length(errors > 0))
         return(errors)
 
     return(TRUE)
+
 }
 
-VcfFilterList <- setClass(
-    Class = "VcfFilterList",
+VcfFilterRules <- setClass(
+    Class = "VcfFilterRules",
+    slots = list(type = "character"),
+    contains = "FilterRules",
 
-    # Define the slots
-    slots = c(
-        filterRules = "list",
-        active = "logical"
-    ),
-
-    validity = .valid.VcfFilterList
-
+    validity = .valid.VcfFilterRules
 )

@@ -46,7 +46,7 @@ importFrom(
 #)
 importFrom(
     "utils",
-    "read.table")
+    "read.table", "str")
 
 importClassesFrom(
     "VariantAnnotation",
@@ -96,9 +96,6 @@ export("tSVE")
 
 export("chr2file")
 
-# Deprecated ----
-
-#export("altFreq")
 
 # S4 ----
 
@@ -123,26 +120,30 @@ exportMethods(
     "vep", "vep<-",
     "bp","bp<-",
 
-    "name", "name<-",
-    "condition", "condition<-",
-    "value","value<-",
-    "filterType",
-
-    "filterRules", "filterRules<-",
-     "active",  "active<-",
-
-    "subsetVcf"
+    "type"
 )
 
 #exportClassPattern("^.*$")
 exportClasses(
     "TVTBparam",
-    "VcfInfoFilter", "VcfFixedFilter", "VcfVepFilter"
+    "VcfFixedRules", "VcfInfoRules", "VcfVepRules", "VcfFilterRules"
 )
 
 # Constructors ----
 
+# Defined by initialize
+export("VcfFixedRules", "VcfInfoRules", "VcfVepRules", "VcfFilterRules")
+
+# S4method wrapper
 exportMethods(
-    "TVTBparam",
-    "VcfInfoFilter", "VcfFixedFilter", "VcfVepFilter", "VcfFilterList"
+    "TVTBparam"
+)
+
+# Re-export methods defined in other packages ----
+
+exportMethods(
+     # S4Vectors
+    "eval", "evalSeparately", "subsetByFilter",
+    # Biostrings
+    "active"
 )

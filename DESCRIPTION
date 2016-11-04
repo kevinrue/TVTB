@@ -1,8 +1,8 @@
 Package: TVTB
 Type: Package
 Title: TVTB: The VCF Tool Box
-Version: 0.1.10
-Date: 2016-08-05
+Version: 0.1.11
+Date: 2016-08-08
 Author: Kevin Rue-Albrecht
 Maintainer: Kevin Rue-Albrecht <kevinrue67@gmail.com>
 Description: The package provides functions to summarise and visualise
@@ -62,7 +62,7 @@ Collates:
     AllClasses.R,
     AllGenerics.R,
     TVTBparam-class.R,
-    VcfBasicFilter-class.R,
+    VcfFilterRules-class.R,
     preprocessVariants-methods.R,
     VcfFilters.R,
     countGenos-methods.R,
