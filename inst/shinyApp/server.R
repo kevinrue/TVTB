@@ -25,7 +25,7 @@ shinyServer(function(input, output, clientData, session) {
         infoKeys = NULL,
         genoKeys = NULL,
         # GRanges
-        genomicRanges = NULL,
+        genomicRanges = GRanges(),
         # VCF files
         singleVcf = NULL
     )
@@ -668,7 +668,7 @@ shinyServer(function(input, output, clientData, session) {
             bedFile <- RV[["bedFile"]]
 
             if (is.null(bedFile)){
-                RV[["GRangesBED"]] <- NULL
+                RV[["GRangesBED"]] <- GRanges()
                 return()
             }
 
@@ -678,7 +678,7 @@ shinyServer(function(input, output, clientData, session) {
             validate(need(rawData, "Invalid input"))
 
             if (length(rawData) == 0)
-                RV[["GRangesBED"]] <- NULL
+                RV[["GRangesBED"]] <- GRanges()
             else
                 RV[["GRangesBED"]] <- rawData
         }
@@ -691,7 +691,7 @@ shinyServer(function(input, output, clientData, session) {
 
             # parse the string or return NULL
             if (input$ucscRanges == ""){
-                RV[["GRangesUCSC"]] <- NULL
+                RV[["GRangesUCSC"]] <- GRanges()
                 return()
             }
 
@@ -721,7 +721,6 @@ shinyServer(function(input, output, clientData, session) {
                 errorClass = "optional")
 
             rawData <- tryCatch({
-
 
                 chrs <- as.numeric(gsub(
                     pattern =
@@ -758,14 +757,14 @@ shinyServer(function(input, output, clientData, session) {
             })
 
             validate(need(rawData, "Invalid input"))
-            # check data.frame to produce informative error messages
-            validateDataFrameGRanges(rawData, selectedPackage())
+            # Check number of columns before testing content of columns
+            validate(need(
+                all(dim(rawData) >= c(1, 3)),
+                "BED file must have at least 1 row and 3 columns"))
 
-            RV[["GRangesUCSC"]] <- GRanges(
-                seqnames = rawData[,1],
-                ranges = IRanges(
-                    start = rawData[,2],
-                    end = rawData[,3]))
+            rawData <- validateDataFrameGRanges(rawData, selectedEnsDb())
+
+            RV[["GRangesUCSC"]] <- rawData
         }
     )
 
@@ -776,14 +775,14 @@ shinyServer(function(input, output, clientData, session) {
             queryGenes <- queryGenes()
 
             if (is.null(queryGenes)){
-                RV[["GRangesEnsDb"]] <- NULL
+                RV[["GRangesEnsDb"]] <- GRanges()
                 return()
             }
 
             validate(need(queryGenes, "Invalid input"))
 
             if (length(queryGenes) == 0)
-                RV[["GRangesEnsDb"]] <- NULL
+                RV[["GRangesEnsDb"]] <- GRanges()
             else
                 RV[["GRangesEnsDb"]] <- queryGenes
         }
@@ -793,21 +792,24 @@ shinyServer(function(input, output, clientData, session) {
         eventExpr = RV[["GRangesBED"]],
         handlerExpr = {
             RV[["genomicRanges"]] <- RV[["GRangesBED"]]
-        }
+        },
+        ignoreNULL = FALSE
     )
 
     observeEvent(
         eventExpr = RV[["GRangesUCSC"]],
         handlerExpr = {
             RV[["genomicRanges"]] <- RV[["GRangesUCSC"]]
-        }
+        },
+        ignoreNULL = FALSE
     )
 
     observeEvent(
         eventExpr = RV[["GRangesEnsDb"]],
         handlerExpr = {
             RV[["genomicRanges"]] <- RV[["GRangesEnsDb"]]
-        }
+        },
+        ignoreNULL = FALSE
     )
 
     observeEvent(
@@ -835,7 +837,10 @@ shinyServer(function(input, output, clientData, session) {
         genomicRanges <- RV[["genomicRanges"]]
 
         if (is.null(genomicRanges))
-            return(HTML(Msgs[["genomicRanges"]]))
+            return(HTML(Msgs[["invalidGenomicRanges"]]))
+
+        if (length(genomicRanges) == 0)
+            return(HTML(Msgs[["noGenomicRanges"]]))
 
         return(tagList(
             code(length(genomicRanges)), "genomic range(s)", br(),
@@ -858,9 +863,14 @@ shinyServer(function(input, output, clientData, session) {
         genomicRanges <- RV[["genomicRanges"]]
 
         validate(need(
-            genomicRanges,
-            Msgs[["genomicRanges"]]),
+            !is.null(genomicRanges),
+            Msgs[["noGenomicRanges"]]),
             errorClass = "optional")
+        validate(need(
+            !is.na(genomicRanges),
+            Msgs[["invalidGenomicRanges"]]),
+            errorClass = "optional")
+
 
         str(genomicRanges)
     })
@@ -870,8 +880,12 @@ shinyServer(function(input, output, clientData, session) {
         genomicRanges <- RV[["genomicRanges"]]
 
         validate(need(
-            genomicRanges,
-            Msgs[["genomicRanges"]]),
+            !is.null(genomicRanges),
+            Msgs[["noGenomicRanges"]]),
+            errorClass = "optional")
+        validate(need(
+            !is.na(genomicRanges),
+            Msgs[["invalidGenomicRanges"]]),
             errorClass = "optional")
 
         DT::datatable(
@@ -885,7 +899,7 @@ shinyServer(function(input, output, clientData, session) {
     # Genome annotation ----
 
     # The EnsDb object
-    selectedPackage <- reactive({
+    selectedEnsDb <- reactive({
         # Depends on input$annotationPackage
         validate(need(
             input$annotationPackage,
@@ -901,16 +915,16 @@ shinyServer(function(input, output, clientData, session) {
 
     genomeSeqinfo <- reactive({
 
-        selectedPackage <- selectedPackage()
+        selectedEnsDb <- selectedEnsDb()
 
-        seqinfo(selectedPackage)
+        seqinfo(selectedEnsDb)
     })
 
     # EnsDb ----
 
     output$ensembl_organism <- renderUI({
-        # Depends on selectedPackage
-        edb <- selectedPackage()
+        # Depends on selectedEnsDb
+        edb <- selectedEnsDb()
 
         validate(need(edb, label = Msgs[["edb"]]))
 
@@ -922,8 +936,8 @@ shinyServer(function(input, output, clientData, session) {
     })
 
     output$ensembl_version <- renderUI({
-        # Depends on selectedPackage
-        edb <- selectedPackage()
+        # Depends on selectedEnsDb
+        edb <- selectedEnsDb()
 
         validate(need(edb, label = Msgs[["edb"]]))
 
@@ -937,8 +951,8 @@ shinyServer(function(input, output, clientData, session) {
     })
 
     output$ensembl_genome <- renderUI({
-        # Depends on selectedPackage
-        edb <- selectedPackage()
+        # Depends on selectedEnsDb
+        edb <- selectedEnsDb()
 
         validate(need(edb, label = Msgs[["edb"]]))
 
@@ -952,10 +966,10 @@ shinyServer(function(input, output, clientData, session) {
     })
 
     queryGenes <- reactive({
-        # Depends on: selectedPackage, ...
+        # Depends on: selectedEnsDb, ...
         #   input$ensDb.type, input$ensDb.condition, input$ensDb.value
 
-        edb <- selectedPackage()
+        edb <- selectedEnsDb()
 
         if (input$ensDb.value == "")
             return(NULL)
@@ -996,7 +1010,7 @@ shinyServer(function(input, output, clientData, session) {
     #   if(!is.na(input$geneName) &
     #      length(input$geneName) > 0 &
     #      input$geneName!=""){
-    #     edb <- selectedPackage()
+    #     edb <- selectedEnsDb()
     #     res <- transcripts(
     #       edb, filter = EnsDbFilter(input),
     #       return.type = "data.frame")
@@ -1011,7 +1025,7 @@ shinyServer(function(input, output, clientData, session) {
     #   if(!is.na(input$geneName) &
     #      length(input$geneName) > 0 &
     #      input$geneName!=""){
-    #     edb <- selectedPackage()
+    #     edb <- selectedEnsDb()
     #     res <- exons(edb, filter=EnsDbFilter(input),
     #                  return.type="data.frame")
     #     assign(".ENS_TMP_RES", res, envir=globalenv())

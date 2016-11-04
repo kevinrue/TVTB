@@ -124,7 +124,8 @@ Msgs <- list(
 
     # Optional inputs
     importVariants = "Please import/refresh variants.",
-    genomicRanges = "No genomic range defined. All variants considered.",
+    noGenomicRanges = "No genomic range defined. All variants considered.",
+    invalidGenomicRanges = "Invalid genomic range defined. See console.",
     phenotypes = "No phenotypes defined. All samples considered.",
     colDataEmptyOK = "No phenotype information available.",
     colDataEmptyImport = paste(
