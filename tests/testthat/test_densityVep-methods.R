@@ -85,7 +85,7 @@ test_that(".checkAlts catches invalid inputs", {
 
 # Arguments ----
 
-test_that("plot & facet & popFreq & layer arguments work",{
+test_that("plot & facet & pattern & layer arguments work",{
 
     expect_s3_class(
         densityVepByPhenotype(
@@ -93,7 +93,7 @@ test_that("plot & facet & popFreq & layer arguments work",{
             phenoCol = "super_pop",
             vepCol = "AMR_MAF",
             param = tparam,
-            facet = "Feature", plot = TRUE, popFreq = TRUE),
+            facet = "Feature", plot = TRUE, pattern = ".*:(.*)"),
         c("gg", "ggplot")
     )
 
@@ -104,7 +104,7 @@ test_that("plot & facet & popFreq & layer arguments work",{
             phenoCol = "super_pop",
             vepCol = "AMR_MAF",
             param = tparam,
-            facet = "Feature", plot = TRUE, popFreq = TRUE),
+            facet = "Feature", plot = TRUE, pattern = ".*:(.*)"),
         c("gg", "ggplot")
     )
 
@@ -116,7 +116,7 @@ test_that("plot & facet & popFreq & layer arguments work",{
     #         phenoCol = "super_pop",
     #         vepCol = "AMR_MAF",
     #         param = tparam,
-    #         facet = "Feature", plot = TRUE, popFreq = TRUE),
+    #         facet = "Feature", plot = TRUE, pattern = ".*:(.*)"),
     #     c("gg", "ggplot")
     # )
 

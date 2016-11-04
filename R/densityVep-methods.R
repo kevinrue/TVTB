@@ -6,7 +6,7 @@ setMethod(
     signature = c(vcf="ExpandedVCF", param="TVTBparam"),
     definition = function(
         vcf, phenoCol, vepCol, param, ..., filter = VcfFilterRules(),
-        unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE,
+        unique = FALSE, facet = NULL, plot = FALSE, pattern = NULL,
         layer = "density+dotplot"){
 
         param <- .override.TVTBparam(param, ...)
@@ -14,7 +14,7 @@ setMethod(
         .densityVepByPhenotype(
             vcf = vcf, phenoCol = phenoCol, vepCol = vepCol, param = param,
             filter = filter,
-            unique = unique, facet = facet, plot = plot, popFreq = popFreq,
+            unique = unique, facet = facet, plot = plot, pattern = pattern,
             layer = layer)
     }
 )
@@ -26,7 +26,7 @@ setMethod(
     definition = function(
         vcf, phenoCol, vepCol, alts, param = NULL, ...,
         filter = VcfFilterRules(),
-        unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE,
+        unique = FALSE, facet = NULL, plot = FALSE, pattern = NULL,
         layer = "density+dotplot"){
 
         .checkAlts(alts)
@@ -39,7 +39,7 @@ setMethod(
         .densityVepByPhenotype(
             vcf = vcf, phenoCol = phenoCol, vepCol = vepCol, param = param,
             filter = filter,
-            unique = unique, facet = facet, plot = plot, popFreq = popFreq,
+            unique = unique, facet = facet, plot = plot, pattern = pattern,
             layer = layer)
     }
 )
@@ -52,7 +52,7 @@ setMethod(
     signature = c(vcf="ExpandedVCF", param="TVTBparam"),
     definition = function(
         level, vcf, phenoCol, vepCol, param, ..., filter = VcfFilterRules(),
-        unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE,
+        unique = FALSE, facet = NULL, plot = FALSE, pattern = NULL,
         layer = "density+dotplot"){
 
         param <- .override.TVTBparam(param, ...)
@@ -60,7 +60,7 @@ setMethod(
         .densityVepInPhenoLevel(
             level = level, vcf = vcf, phenoCol = phenoCol, vepCol = vepCol,
             param = param, filter = filter,
-            unique = unique, facet = facet, plot = plot, popFreq = popFreq,
+            unique = unique, facet = facet, plot = plot, pattern = pattern,
             layer = layer)
     }
 )
@@ -72,7 +72,7 @@ setMethod(
     definition = function(
         level, vcf, phenoCol, vepCol, alts, param = NULL, ...,
         filter = VcfFilterRules(),
-        unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE,
+        unique = FALSE, facet = NULL, plot = FALSE, pattern = NULL,
         layer = "density+dotplot"){
 
         .checkAlts(alts)
@@ -85,7 +85,7 @@ setMethod(
         .densityVepInPhenoLevel(
             level = level, vcf = vcf, phenoCol = phenoCol, vepCol = vepCol,
             param = param, filter = filter,
-            unique = unique, facet = facet, plot = plot, popFreq = popFreq,
+            unique = unique, facet = facet, plot = plot, pattern = pattern,
             layer = layer)
     }
 )
@@ -105,7 +105,7 @@ setMethod(
 
 .densityVepByPhenotype <- function(
     vcf, phenoCol, vepCol, param, filter = VcfFilterRules(),
-    unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE,
+    unique = FALSE, facet = NULL, plot = FALSE, pattern = NULL,
     layer = "density+dotplot"){
 
     phenos <- colData(vcf)
@@ -125,7 +125,7 @@ setMethod(
         unique = unique,
         facet = facet,
         plot = FALSE, # skip: only collect data for each level, here
-        popFreq = popFreq,
+        pattern = pattern,
         BPPARAM = bp(param))
 
     ggData <- do.call(rbind, ggDataList)
@@ -148,7 +148,7 @@ setMethod(
 
 .densityVepInPhenoLevel <- function(
     level, vcf, phenoCol, vepCol, param, filter = VcfFilterRules(),
-    unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE,
+    unique = FALSE, facet = NULL, plot = FALSE, pattern = NULL,
     layer = "density+dotplot"){
 
     # Pass relevant namespaces to the parallel environment
@@ -171,8 +171,8 @@ setMethod(
         # add column stating phenotype level
         ggData[,phenoCol] <- level
         # If dealing with population frequency, trim the ALT: prefix
-        if (popFreq) {
-            ggData[,vepCol] <- gsub(".*:", "", ggData[,vepCol])
+        if (!is.null(pattern)) {
+            ggData[,vepCol] <- gsub(pattern, "\\1", ggData[,vepCol])
         }
         # Coerce to numeric
         ggData[,vepCol] <- as.numeric(ggData[,vepCol])

@@ -29,25 +29,25 @@
 \usage{
 \S4method{densityVepByPhenotype}{ExpandedVCF,TVTBparam}(
         vcf, phenoCol, vepCol, param, ..., filter = VcfFilterRules(),
-        unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE,
+        unique = FALSE, facet = NULL, plot = FALSE, pattern = NULL,
         layer = "density+dotplot")
 
 \S4method{densityVepByPhenotype}{ExpandedVCF,missing}(
         vcf, phenoCol, vepCol, alts, param = NULL, ...,
         filter = VcfFilterRules(),
-        unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE,
+        unique = FALSE, facet = NULL, plot = FALSE, pattern = NULL,
         layer = "density+dotplot")
 
 \S4method{densityVepInPhenoLevel}{ExpandedVCF,TVTBparam}(
         level, vcf, phenoCol, vepCol, param, ...,
         filter = VcfFilterRules(),
-        unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE,
+        unique = FALSE, facet = NULL, plot = FALSE, pattern = NULL,
         layer = "density+dotplot")
 
 \S4method{densityVepInPhenoLevel}{ExpandedVCF,missing}(
         level, vcf, phenoCol, vepCol, alts, param = NULL, ...,
         filter = VcfFilterRules(),
-        unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE,
+        unique = FALSE, facet = NULL, plot = FALSE, pattern = NULL,
         layer = "density+dotplot")
 }
 
@@ -96,14 +96,24 @@ as VEP typically produce one prediction per variant per feature.
     \item{plot}{
 If \code{TRUE}, return a \code{ggplot} object.
 }
-    \item{popFreq}{
-Should be set to \code{TRUE} if \code{vepCol} is a VEP key representing a
-population frequency of the form \code{allele:frequency}.
-If set to \code{TRUE}, only \code{frequency} will be extracted and typed as
-\code{numeric}.
+    \item{pattern}{
+If \code{NULL}, \code{vepCol} is assumed to be immediately coercible
+to \code{numeric}.
+Otherwise, a regex pattern (passed to \code{gsub})
+can be provided to extract a substring that must
+be coercible to \code{numeric}.
+
+For instance, the patterns
+\code{"[[:alpha:]]*:(.*)"} and \code{".*:(.*)"} can both extract
+the population allele frequency \code{0.008}
+from a value stored in the form \code{"A:0.008"}
+(more generally, \code{allele:frequency}).
+A single pair of round brackets \code{()} is expected
+in the pattern,
+to capture the substring that will be coerced to \code{numeric}.
 }
     \item{layer}{
-A \code{character} value of \code{+}-separated \code{geom} types to apply as
+A \code{character} value of \code{"+"}-separated \code{geom} types to apply as
 layers if \code{plot=TRUE}. Currently, only \code{density} and \code{dotplot}
 are accepted (\emph{e.g.} \code{layer="density+dotplot"}).
 Note that an empty string can be used to obtain the \code{ggplot} object
@@ -173,4 +183,3 @@ densityVepByPhenotype(
 }
 
 \keyword{methods}
-
