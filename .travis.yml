@@ -17,7 +17,7 @@ addons:
         
 
 before_install:
-    - tlmgr install beramono
+    - tlmgr update --self --all
     - R CMD Rscript -e 'source(file = "http://bioconductor.org/biocLite.R");useDevel(devel = TRUE)'
     
 r_github_packages: rstudio/DT
