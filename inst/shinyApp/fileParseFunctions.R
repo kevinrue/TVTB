@@ -166,7 +166,10 @@ parseMultipleVcf<- function(
 
     message("Combining variants from multiple VCF files...")
     # Combine the imported objects
-    vcf <- do.call(what = rbind, args = vcfs)
+    if (length(vcfs) > 1)
+        vcf <- do.call(what = rbind, args = vcfs)
+    else
+        vcf <- vcfs[[1]]
 
     # Timing
     t2 <- Sys.time()

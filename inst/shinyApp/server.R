@@ -863,6 +863,7 @@ shinyServer(function(input, output, clientData, session) {
 
         DT::datatable(
             data = displayedTable,
+            rownames = FALSE,
             options = list(
                 pageLength = 10,
                 searching = TRUE),
@@ -902,7 +903,13 @@ shinyServer(function(input, output, clientData, session) {
         cols <- which(colnames(info(vcf)) %in% input$vcfInfoCols)
 
         DT::datatable(
-            data = as.data.frame(info(vcf)[, cols]),
+            data = cbind(
+                rownames = rownames(vcf),
+                as.data.frame(
+                    info(vcf)[, cols, drop = FALSE],
+                    row.names = NULL)
+            ),
+            rownames = FALSE,
             options = list(
                 pageLength = 10,
                 searching = TRUE),
@@ -1184,7 +1191,7 @@ shinyServer(function(input, output, clientData, session) {
             multiple = TRUE)
     })
 
-    output$vepSample <- DT::renderDataTable({
+    output$vcfVep <- DT::renderDataTable({
 
         req(input$vepCols)
 
@@ -1203,7 +1210,7 @@ shinyServer(function(input, output, clientData, session) {
 
         DT::datatable(
             cbind(
-                Variant = names(csq),
+                rownames = names(csq),
                 as.data.frame(
                     csq[,cols, drop = FALSE],
                     row.names = NULL) # avoid duplicate rownames

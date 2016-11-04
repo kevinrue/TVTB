@@ -456,7 +456,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                 fluidRow(
                     shiny::column(
                         width = 12,
-                        DT::dataTableOutput("vepSample")
+                        DT::dataTableOutput("vcfVep")
                     )
                 )
 
