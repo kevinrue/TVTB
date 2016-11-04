@@ -1425,7 +1425,8 @@ shinyServer(function(input, output, clientData, session) {
                                 vcfFolder <- input$vcfFolder
                                 vcfPattern <- input$vcfPattern
                             })
-                            validate(need(singleVcf, Msgs[["singleVcf"]]))
+                            validate(need(vcfFolder, Msgs[["vcfFolder"]]))
+                            validate(need(vcfPattern, Msgs[["vcfPattern"]]))
 
                             tryParseMultipleVcf(
                                 folder = vcfFolder,
