@@ -1,7 +1,15 @@
 \name{TVTB-NEWS}
 \title{NEWS: The VCF Tool Box}
 
-\section{Changes in version 1.1.1 2016-10-20}{
+\section{Changes in version 1.1.2 2016-10-21}{
+\subsection{Minor changes}{
+\itemize{
+\item README indicates status on BioC-release, BioC-devel, and Travis CI.
+}
+}
+}
+
+\section{Changes in version 1.1.1 2016-10-21}{
 \subsection{Minor changes}{
 \itemize{
 \item Updates to \code{README}: weblinks, installation, unit tests.
