@@ -1,8 +1,8 @@
 Package: TVTB
 Type: Package
 Title: TVTB: The VCF Tool Box
-Version: 0.1.29
-Date: 2016-08-27
+Version: 0.1.30
+Date: 2016-08-29
 Authors@R: person(
     "Kevin", "Rue-Albrecht", role = c("aut", "cre"),
     email = "kevinrue67@gmail.com")
@@ -17,7 +17,7 @@ License: Artistic-2.0
 Depends:
     R (>= 3.3), methods, utils, stats
 Imports:
-    BiocGenerics,
+    BiocGenerics (>= 0.19.1),
     BiocParallel,
     Biostrings,
     ensembldb,
@@ -25,7 +25,7 @@ Imports:
     GenomeInfoDb,
     GenomicRanges,
     ggplot2,
-    IRanges,
+    IRanges (>= 2.7.1),
     reshape2,
     Rsamtools,
     S4Vectors (>= 0.11.11),

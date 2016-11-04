@@ -11,7 +11,6 @@ source(file.path(
     system.file(package = "TVTB"),
     "shinyApp",
     "serverRoutines.R"))
-source("~/Dropbox/TVTB/inst/shinyApp/fileParseFunctions.R")
 
 shinyServer(function(input, output, clientData, session) {
 
@@ -24,7 +23,11 @@ shinyServer(function(input, output, clientData, session) {
         vcfFilters = VcfFilterRules(),
         # VCF keys
         infoKeys = NULL,
-        genoKeys = NULL
+        genoKeys = NULL,
+        # GRanges
+        genomicRanges = NULL,
+        # VCF files
+        singleVcf = NULL
     )
 
     # Import phenotype information ----
@@ -39,6 +42,14 @@ shinyServer(function(input, output, clientData, session) {
                     return(NULL)
                 })
     })
+
+    observeEvent(
+        eventExpr = input$demoPheno,
+        handlerExpr = {
+            RV[["phenoFile"]] <- system.file(
+                "extdata/integrated_samples.txt", package = "TVTB"
+            )
+        })
 
     output$phenoFile <- renderText({
 
@@ -590,24 +601,56 @@ shinyServer(function(input, output, clientData, session) {
     # Define genomic ranges ----
 
     # Path to BED file
-    bedFile <- reactive({
-        # Triggered by input$selectBed
-        if (input$selectBed > 0){
-            selected <- tryCatch(
+    observeEvent(
+        eventExpr = input$selectBed,
+        handlerExpr = {
+            RV[["bedFile"]] <- tryCatch(
                 file.choose(),
                 error = function(err){
                     warning(geterrmessage())
                     return(NULL)
-                })
-        } else {
-            return(NULL)
-        }
-
-        selected
+            })
     })
 
+    observeEvent(
+        eventExpr = input$demoBed,
+        handlerExpr = {
+            RV[["bedFile"]] <- system.file(
+                "extdata/SLC24A5.bed", package = "TVTB"
+            )
+        }
+    )
+
+    observeEvent(
+        eventExpr = input$demoUCSC,
+        handlerExpr = {
+            updateTextInput(
+                session, "ucscRanges",
+                value = "15:48,413,169-48,434,869"
+            )
+        }
+    )
+
+    observeEvent(
+        eventExpr = input$demoEnsDb,
+        handlerExpr = {
+            updateTextInput(
+                session, "ensDb.type",
+                value = "Genename"
+            )
+            updateTextInput(
+                session, "ensDb.condition",
+                value = "="
+            )
+            updateTextInput(
+                session, "ensDb.value",
+                value = "SLC24A5"
+            )
+        }
+    )
+
     output$bedFile <- renderText({
-        bedFile <- bedFile()
+        bedFile <- RV[["bedFile"]]
 
         return(ifelse(
             is.null(bedFile),
@@ -615,147 +658,181 @@ shinyServer(function(input, output, clientData, session) {
             bedFile))
     })
 
-    # Import BED records, format as GRanges
-    genomicRanges <- reactive({
-        # Depends on input$grangesInputMode
-        # Either...
-        # Requires: bedFile()
-        # Requires: input$ucscRanges
-        # Requires: input$ensDb.type, input$ensDb.condition, input$ensDb.value
-        switch (input$grangesInputMode,
-                bed = {
-                    stopifnot(require(rtracklayer))
-                    # use rtracklayer::import.bed to obtain GRanges
-                    bedFile <- bedFile()
+    # If a new BED file is selected, update GRangesBED
+    observeEvent(
+        eventExpr = RV[["bedFile"]],
+        handlerExpr = {
 
-                    if (is.null(bedFile))
-                        return(NULL)
-                    else {
-                        message("Importing phenotypes ...")
-                        rawData <- tryParseBed(bedFile)
-                    }
+            stopifnot(require(rtracklayer))
+            # use rtracklayer::import.bed to obtain GRanges
+            bedFile <- RV[["bedFile"]]
+
+            if (is.null(bedFile)){
+                RV[["GRangesBED"]] <- NULL
+                return()
+            }
+
+            message("Importing phenotypes ...")
+            rawData <- tryParseBed(bedFile)
+
+            validate(need(rawData, "Invalid input"))
+
+            if (length(rawData) == 0)
+                RV[["GRangesBED"]] <- NULL
+            else
+                RV[["GRangesBED"]] <- rawData
+        }
+    )
+
+    # If a new BED file is selected, update GRangesBED
+    observeEvent(
+        eventExpr = input$ucscRanges,
+        handlerExpr = {
+
+            # parse the string or return NULL
+            if (input$ucscRanges == ""){
+                RV[["GRangesUCSC"]] <- NULL
+                return()
+            }
+
+            # NOTE: do not trim "chr", for future UCSC support
+            inputTrimmed <- gsub(
+                pattern = ",| ",
+                replacement = "",
+                x = input$ucscRanges)
+
+            # Split the given string into individual regions
+            inputSplit <- strsplit(
+                x = inputTrimmed, split = ";")[[1]]
+
+            # Ensure that all regions are UCSC-valid
+            validate(need(
+                all(
+                    sapply(
+                        X = inputSplit,
+                        FUN = function(x){
+                            grepl(
+                                pattern =
+                                    "[[:alnum:]]+:[[:digit:]]+-[[:digit:]]+",
+                                x = x)
+                        })
+                ),
+                Msgs[["invalidUcscRanges"]]),
+                errorClass = "optional")
+
+            rawData <- tryCatch({
+
+
+                chrs <- as.numeric(gsub(
+                    pattern =
+                        "([[:alnum:]]*):[[:digit:]]*-[[:digit:]]*",
+                    replacement = "\\1",
+                    x = inputSplit))
+
+                starts <- as.numeric(gsub(
+                    pattern =
+                        "[[:alnum:]]*:([[:digit:]]*)-[[:digit:]]*",
+                    replacement = "\\1",
+                    x = inputSplit))
+
+                ends <- as.numeric(gsub(
+                    pattern =
+                        "[[:alnum:]]*:[[:digit:]]*-([[:digit:]]*)",
+                    replacement = "\\1",
+                    x = inputSplit))
+
+                data.frame(
+                    V1 = chrs,
+                    V2 = starts,
+                    V3 = ends,
+                    stringsAsFactors = FALSE)
+            },
+            error = function(err){
+                warning(geterrmessage())
+                return(NULL)
+            }
+            ,
+            warning = function(warn){
+                warning(warn)
+                return(NULL)
+            })
+
+            validate(need(rawData, "Invalid input"))
+            # check data.frame to produce informative error messages
+            validateDataFrameGRanges(rawData, selectedPackage())
+
+            RV[["GRangesUCSC"]] <- GRanges(
+                seqnames = rawData[,1],
+                ranges = IRanges(
+                    start = rawData[,2],
+                    end = rawData[,3]))
+        }
+    )
+
+    observeEvent(
+        eventExpr = queryGenes(),
+        handlerExpr = {
+
+            queryGenes <- queryGenes()
+
+            if (is.null(queryGenes)){
+                RV[["GRangesEnsDb"]] <- NULL
+                return()
+            }
+
+            validate(need(queryGenes, "Invalid input"))
+
+            if (length(queryGenes) == 0)
+                RV[["GRangesEnsDb"]] <- NULL
+            else
+                RV[["GRangesEnsDb"]] <- queryGenes
+        }
+    )
+
+    observeEvent(
+        eventExpr = RV[["GRangesBED"]],
+        handlerExpr = {
+            RV[["genomicRanges"]] <- RV[["GRangesBED"]]
+        }
+    )
+
+    observeEvent(
+        eventExpr = RV[["GRangesUCSC"]],
+        handlerExpr = {
+            RV[["genomicRanges"]] <- RV[["GRangesUCSC"]]
+        }
+    )
+
+    observeEvent(
+        eventExpr = RV[["GRangesEnsDb"]],
+        handlerExpr = {
+            RV[["genomicRanges"]] <- RV[["GRangesEnsDb"]]
+        }
+    )
+
+    observeEvent(
+        eventExpr = input$grangesInputMode,
+        handlerExpr = {
+
+            switch (input$grangesInputMode,
+                bed = {
+                    RV[["genomicRanges"]] <- RV[["GRangesBED"]]
                 },
                 ucsc = {
-                    # parse the string or return NULL
-                    if (input$ucscRanges == "")
-                        return(NULL)
-
-                    # NOTE: do not trim "chr", for future UCSC support
-                    inputTrimmed <- gsub(
-                        pattern = ",| ",
-                        replacement = "",
-                        x = input$ucscRanges)
-
-                    # Split the given string into individual regions
-                    inputSplit <- strsplit(
-                        x = inputTrimmed, split = ";")[[1]]
-
-                    # Ensure that all regions are UCSC-valid
-                    validate(need(
-                        all(
-                            sapply(
-                                X = inputSplit,
-                                FUN = function(x){
-                                    grepl(
-                                        pattern = "[[:alnum:]]+:[[:digit:]]+-[[:digit:]]+",
-                                        x = x)
-                                })
-                        ),
-                        Msgs[["invalidUcscRanges"]]),
-                        errorClass = "optional")
-
-                    rawData <- tryCatch({
-
-
-                        chrs <- as.numeric(gsub(
-                            pattern =
-                                "([[:alnum:]]*):[[:digit:]]*-[[:digit:]]*",
-                            replacement = "\\1",
-                            x = inputSplit))
-
-                        starts <- as.numeric(gsub(
-                            pattern =
-                                "[[:alnum:]]*:([[:digit:]]*)-[[:digit:]]*",
-                            replacement = "\\1",
-                            x = inputSplit))
-
-                        ends <- as.numeric(gsub(
-                            pattern =
-                                "[[:alnum:]]*:[[:digit:]]*-([[:digit:]]*)",
-                            replacement = "\\1",
-                            x = inputSplit))
-
-                        data.frame(
-                            V1 = chrs,
-                            V2 = starts,
-                            V3 = ends,
-                            stringsAsFactors = FALSE)
-                    },
-                    error = function(err){
-                        warning(geterrmessage())
-                        return(NULL)}
-                    ,
-                    warning = function(warn){
-                        warning(warn)
-                        return(NULL)
-                    })
+                    RV[["genomicRanges"]] <- RV[["GRangesUCSC"]]
                 },
                 EnsDb = {
-                    # use ensembldb query to obtain GRanges
-                    queryGenes <- queryGenes()
-
-                    if (is.null(queryGenes))
-                        return(NULL)
-
-                    rawData <- queryGenes # Re-use existing value!
+                    RV[["genomicRanges"]] <- RV[["GRangesEnsDb"]]
                 }
-        )
-        # UCSC is converted to a data.frame which requires a few extra checks
-        validate(need(
-            class(rawData) %in% c("data.frame", "GRanges"),
-            "Invalid input"))
-
-        switch (class(rawData),
-                data.frame = {
-                    # Test the number of columns before trying to access them
-                    validate(need(
-                        all(dim(rawData) >= c(1, 3)),
-                        "BED file must have at least 1 row and 3 columns"))
-                    validate(
-                        need(
-                            all(
-                                rawData[,1] %in%
-                                    seqlevels(selectedPackage())),
-                            "First column contains invalid chromosome names"),
-                        need(
-                            is.numeric(rawData[,2]),
-                            "Second column is not numeric"),
-                        need(
-                            is.numeric(rawData[,3]),
-                            "Third column is not numeric"))
-
-                    return(
-                        GRanges(
-                            seqnames = rawData[,1],
-                            ranges = IRanges(
-                                start = rawData[,2],
-                                end = rawData[,3]))
-                    )
-                },
-                GRanges = {
-                    if (length(rawData) == 0)
-                        return(NULL)
-
-                    return(rawData)
-                }
-        )
-    })
+            )
+        }
+    )
 
     # How many BED records detected, show first one.
     output$rangesSummary <- renderUI({
         # Depends on genomicRanges
 
-        genomicRanges <- genomicRanges()
+        genomicRanges <- RV[["genomicRanges"]]
 
         if (is.null(genomicRanges))
             return(HTML(Msgs[["genomicRanges"]]))
@@ -778,7 +855,7 @@ shinyServer(function(input, output, clientData, session) {
     # Show BED records
     output$rangesStructure <- renderPrint({
 
-        genomicRanges <- genomicRanges()
+        genomicRanges <- RV[["genomicRanges"]]
 
         validate(need(
             genomicRanges,
@@ -790,7 +867,7 @@ shinyServer(function(input, output, clientData, session) {
 
     output$rangesSample <- DT::renderDataTable({
 
-        genomicRanges <- genomicRanges()
+        genomicRanges <- RV[["genomicRanges"]]
 
         validate(need(
             genomicRanges,
@@ -991,13 +1068,14 @@ shinyServer(function(input, output, clientData, session) {
         return(list(
             phenoFile = RV[["phenoFile"]],
             grangeInputMode = input$grangeInputMode,
-            "bedFile()" = bedFile(),
+            genomicRanges = RV[["genomicRanges"]],
+            "bedFile" = RV[["bedFile"]],
             ucscRanges = input$ucscRanges,
             ensDb.type = input$ensDb.type,
             ensDb.condition = input$ensDb.condition,
             ensDb.value = input$ensDb.value,
             vcfinputMode = input$vcfInputMode,
-            "singleVcf()" = singleVcf(),
+            "singleVcf" = RV[["singleVcf"]],
             vcfFolder = input$vcfFolder,
             vcfPattern = input$vcfPattern,
             vepKey = input$vepKey,
@@ -1119,39 +1197,47 @@ shinyServer(function(input, output, clientData, session) {
 
     # Select single VCF ----
 
-    singleVcf <- reactive({
+    observeEvent(
+        eventExpr = input$selectVcf,
+        handlerExpr = {
 
-        if (input$selectVcf > 0){
             selected <- tryCatch(
                 file.choose(),
                 error = function(err){
                     warning(geterrmessage())
                     return(NULL)
                 })
-        } else {
-            return(NULL)
-        }
 
-        validate(
-            need(
-                grepl(
-                    pattern = ".*\\.vcf(\\.gz)?$",
-                    x = selected,
-                    ignore.case = TRUE),
-                "File is not *.vcf.gz"))
+            validate(
+                need(
+                    grepl(
+                        pattern = ".*\\.vcf(\\.gz)?$",
+                        x = selected,
+                        ignore.case = TRUE),
+                    "File is not *.vcf.gz"))
 
-        tbiChrVcf <- paste(selected, "tbi", sep = ".")
-        validate(
-            need(
-                file.exists(tbiChrVcf),
-                sprintf("Tabix index file does not exist: %s", tbiChrVcf)))
+            tbiChrVcf <- paste(selected, "tbi", sep = ".")
+            validate(
+                need(
+                    file.exists(tbiChrVcf),
+                    sprintf("Tabix index file does not exist: %s", tbiChrVcf)))
 
-        return(selected)
-    })
+            RV[["singleVcf"]] <- selected
+        })
+
+    observeEvent(
+        eventExpr = input$demoVcf,
+        handlerExpr = {
+
+            RV[["singleVcf"]] <- system.file(
+                "extdata/chr15.phase3_integrated.vcf.gz", package = "TVTB"
+            )
+
+        })
 
     output$selectedVcf <- renderText({
 
-        singleVcf <- singleVcf()
+        singleVcf <- RV[["singleVcf"]]
 
         validate(need(singleVcf, Msgs[["singleVcf"]]))
 
@@ -1169,7 +1255,7 @@ shinyServer(function(input, output, clientData, session) {
             vcfInputMode,
             SingleVcf = {
 
-                singleVcf <- singleVcf()
+                singleVcf <- RV[["singleVcf"]]
                 tryParseVcfHeader(file = singleVcf)
             },
             OnePerChr = {
@@ -1255,7 +1341,7 @@ shinyServer(function(input, output, clientData, session) {
         handlerExpr = {
 
             vcfInputMode <- input$vcfInputMode
-            genomicRanges <- genomicRanges()
+            genomicRanges <- RV[["genomicRanges"]]
             tparam <- tparam()
             vepKey <- input$vepKey
             genomeSeqinfo <- genomeSeqinfo()
@@ -1303,7 +1389,7 @@ shinyServer(function(input, output, clientData, session) {
                         vcfInputMode,
                         SingleVcf = {
 
-                            isolate({singleVcf <- singleVcf()})
+                            isolate({singleVcf <- RV[["singleVcf"]]})
                             validate(need(singleVcf, Msgs[["singleVcf"]]))
 
                             shiny::incProgress(

@@ -45,7 +45,7 @@ GS <- list(
     default.mafSuffix = "MAF", # Minor allele frequency
     choices.ensDbType = list(
         "Gene name" = "Genename"),
-    default.ensDbType = "gene",
+    default.ensDbType = "Genename",
     choices.ensDbFilters = c("=", "!=", "like", "in"),
     default.ensDbFilters = "=",
     all.genotypes = c(

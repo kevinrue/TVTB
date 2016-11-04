@@ -35,7 +35,14 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                     shiny::column(
                         width = 6,
                         strong("File"), br(),
-                        uiOutput("phenoFile")
+                        uiOutput("phenoFile"),
+                        # Wrap long file names
+                        tags$head(tags$style(
+                            "#phenoFile{
+                            display:block;
+                            word-wrap:break-word;
+                            }"
+                            ))
                     ),
                     shiny::column(
                         width = 4,
@@ -43,6 +50,15 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                         htmlOutput("phenoFileSummary")
                     )
 
+                ),
+                fluidRow(
+                    shiny::column(
+                        width = 2,
+                        br(),
+                        actionButton(
+                            "demoPheno", "Sample file",
+                            icon = icon("file-text"), width = '100%')
+                    )
                 )
 
             )
@@ -80,17 +96,35 @@ shinyUI(navbarPage(theme = "bootstrap.css",
 
                     conditionalPanel(
                         condition = "input.grangesInputMode == 'bed'",
-                        shiny::column(
-                            width = 2,
-                            br(),
-                            actionButton(
-                                "selectBed", "Browse",
-                                icon = icon("file"), width = '100%')
+                        fluidRow(
+                            shiny::column(
+                                width = 2,
+                                br(),
+                                actionButton(
+                                    "selectBed", "Browse",
+                                    icon = icon("file"), width = '100%')
+                            ),
+                            shiny::column(
+                                width = 6,
+                                strong("File"), br(),
+                                uiOutput("bedFile")
+                            ),
+                            # Wrap long file names
+                            tags$head(tags$style(
+                                "#bedFile{
+                            display:block;
+                            word-wrap:break-word;
+                            }"
+                            ))
                         ),
-                        shiny::column(
-                            width = 6,
-                            strong("File"), br(),
-                            uiOutput("bedFile")
+                        fluidRow(
+                            shiny::column(
+                                width = 2,
+                                br(),
+                                actionButton(
+                                    "demoBed", "Sample file",
+                                    icon = icon("file-text"), width = '100%')
+                            )
                         )
                     ),
                     conditionalPanel(
@@ -106,40 +140,52 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                                     "...",
                                     sep = " ; "),
                                 width = "100%")
+                        ),
+                        shiny::column(
+                            width = 2,
+                            br(),
+                            actionButton(
+                                "demoUCSC", "Sample input",
+                                icon = icon("font"), width = '100%')
                         )
                     ),
                     conditionalPanel(
                         condition = "input.grangesInputMode == 'EnsDb'",
-                            shiny::column(
-                                width = 2,
-                                selectInput(
-                                    "ensDb.type", NA,
-                                    choices = GS[["choices.ensDbType"]],
-                                    selected = GS[["default.ensDbType"]])
-                            ),
-                            shiny::column(
-                                width = 1,
-                                selectInput(
-                                    "ensDb.condition", NA,
-                                    choices = GS[["choices.ensDbFilters"]],
-                                    selected = GS[["default.ensDbFilters"]])
-                            ),
-                            shiny::column(
-                                2,
-                                textInput(
-                                    "ensDb.value", NA,
-                                    value = "",
-                                    placeholder = "SLC24A5,IL17A,...")
-                            ),
-                            shiny::column(
-                                width = 4, offset = 3,
-                                strong("Note"),
-                                p(
-                                    "For the ", code("like"), "filter",
-                                    "please use ", code("%"), "as wildcard."
-                                )
+                        shiny::column(
+                            width = 2,
+                            selectInput(
+                                "ensDb.type", NA,
+                                choices = GS[["choices.ensDbType"]],
+                                selected = GS[["default.ensDbType"]])
+                        ),
+                        shiny::column(
+                            width = 1,
+                            selectInput(
+                                "ensDb.condition", NA,
+                                choices = GS[["choices.ensDbFilters"]],
+                                selected = GS[["default.ensDbFilters"]])
+                        ),
+                        shiny::column(
+                            2,
+                            textInput(
+                                "ensDb.value", NA,
+                                value = "",
+                                placeholder = "SLC24A5,IL17A,...")
+                        ),
+                        shiny::column(
+                            width = 2,
+                            actionButton(
+                                "demoEnsDb", "Sample input",
+                                icon = icon("font"), width = '100%')
+                        ),
+                        shiny::column(
+                            width = 4, offset = 1,
+                            strong("Note"),
+                            p(
+                                "For the ", code("like"), "filter",
+                                "please use ", code("%"), "as wildcard."
                             )
-                        ,
+                        ),
                         tabsetPanel(
                             id = "ensDb.resultTab",
                             selected = "Genes",
@@ -176,7 +222,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                 fluidRow(
 
                     shiny::column(
-                        width = 3,
+                        width = 2,
                         selectInput(
                             "vcfInputMode", "VCF input type",
                             choices = GS[["choices.vcfInputMode"]],
@@ -193,7 +239,14 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                                 icon = icon("file"), width = '100%')
                         ),
                         shiny::column(
-                            width = 4, offset = 3,
+                            width = 2,
+                            br(),
+                            actionButton(
+                                "demoVcf", "Sample file",
+                                icon = icon("file-text"), width = '100%')
+                        ),
+                        shiny::column(
+                            width = 4, offset = 2,
                             strong("Summary"),
                             br(),
                             textOutput("selectedVcf"),
@@ -209,7 +262,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                     conditionalPanel(
                         condition = "input.vcfInputMode == 'OnePerChr'",
                         shiny::column(
-                            width = 5,
+                            width = 6,
                             textInput(
                                 "vcfFolder", "Folder of VCF files",
                                 value = GS[["default.vcfFolder"]],
@@ -232,10 +285,13 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                         fluidRow(
 
                             shiny::column(
-                                width = 5, offset = 3,
+                                width = 6, offset = 2,
                                 textInput(
                                     "vcfPattern",
-                                    "Pattern of VCF files (%s : chromosome)",
+                                    paste(
+                                        "Pattern of VCF files",
+                                        "(%s : chromosome placeholder)"
+                                    ),
                                     value = GS[["default.vcfPattern"]],
                                     width = '100%',
                                     placeholder = "^chr%s_.*\\.vcf\\.gz$")
@@ -454,21 +510,18 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                     )
                 ),
                 shiny::column(
-                    width = 1, offset = 1,
-                    br(),
+                    width = 2, offset = 1,
                     actionButton(
                         "tickAllPhenoLevelsFreq",
                         "Select all",
-                        icon = icon("check-square-o")
-                    )
-                ),
-                shiny::column(
-                    width = 1,
-                    br(),
+                        icon = icon("check-square-o"),
+                        width = "100%"
+                    ), br(),
                     actionButton(
                         "untickAllPhenoLevelsFreq",
                         "Deselect all",
-                        icon = icon("square-o")
+                        icon = icon("square-o"),
+                        width = "100%"
                     )
                 ),
                 shiny::column(

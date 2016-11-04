@@ -158,6 +158,8 @@ from VCF file(s).
 > * Click on the *Browse* action button
 > * Navigate to the `extdata` folder of the *TVTB* installation directory
 > * Select the file `integrated_samples.txt`
+>
+> Alternatively: click the *Sample file* button
 
 **Notes**
 
@@ -211,6 +213,8 @@ guidelines.
 > * Click on the *Browse* action button
 > * Navigate to the `extdata` folder of the *TVTB* installation directory
 > * Select the file `SLC24A5.bed`
+>
+> Alternatively: click the *Sample file* button
 
 **Notes**:
 
@@ -232,6 +236,8 @@ with individual regions separated by `";"`.
 > **Action**:
 > 
 > * Paste `15:48,413,169-48,434,869` in the text field
+>
+> Alternatively: click the *Sample input* button
 
 **Notes**:
 
@@ -252,6 +258,8 @@ may be added to the web-application.
 > **Action**:
 > 
 > * Paste `SLC24A5` in the text field
+>
+> Alternatively: click the *Sample input* button
 
 \fixme{
 Genomic feature located on contigs may cause problems when working
@@ -301,6 +309,8 @@ from which to import variants.
 > * Click on the *Browse* action button
 > * Navigate to the `extdata` folder of the *TVTB* installation directory
 > * Select the file `chr15.phase3_integrated.vcf.gz`
+>
+> Alternatively: click the *Sample file* button
 
 ### Multi-VCF mode {#MultiVCF}
 
