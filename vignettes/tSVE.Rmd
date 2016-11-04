@@ -33,7 +33,7 @@ web-application:
     of flexibility as the command-line environment (*e.g.* `...`[^1]).
 * Greater control over the input and output data is possible at the
     command-line (*e.g.* refinement `ggplot` objects,
-    definition of custom genomic ranges)
+    definition of custom genomic ranges).
 * Requests for new feature should apply to the package first.
     Only features relevant to the package functionalities
     may be made available in the web-application.
@@ -45,9 +45,9 @@ web-application:
     in an interactive session.
 * First-time users are encouraged to follow this vignette
     sequentially (*i.e* without skipping sections),
-    as it takes users through the sequence of actions of a typical analysis
+    as it takes users through the sequence of actions of a typical analysis.
     + Actions are indicated by the word **Action** followed by
-        indented bullet points
+        indented bullet points.
 
 [^1]: The `...` argument is called "ellipsis".
 
@@ -590,7 +590,53 @@ Other rarely used settings in this panel include:
     - Only applicable when VCF file(s) are parsed without defined
         [genomic ranges](#InputGRanges). See `r Biocpkg("Rsamtools")`.
 
-# Session info {#SessionInfo}
+## Parallel settings {#ParallelSettings}
+
+Several functionalities of the `r Biocpkg("TVTB")` package are applied
+to independent subsets of data (*e.g.* counting genotypes in various levels
+of a given phenotype). Such processes greatly benefit from multi-threaded
+calculations. Multi-threading settings in the Shiny web-application are
+somewhat experimental, as they have been validated only on a small set of
+operating systems, while some issues have been reported for others.
+
+| Report |  OS  | Cluster class | Cluster type | # Cores |
+| :----: | :---:| :-----------: | :----------: | :-----: |
+| OK | Ubuntu 14.04 | Multicore | FORK | 2 |
+| OK | Scientific Linux 6.7 | Multicore | FORK | 2 |
+| Hang~1~ | OS X El Capitan | Snow | SOCK | 2 |
+
+1.  Application hangs while CPUs work infinitely at full speed.
+
+\bioccomment{
+Users are welcome to send feedback to report additional
+successful configuration, as well as newly identified issues.
+}
+
+# Session information {#SessionInfo}
+
+The last panel of the Shiny Variant Explorer offers detailed views of
+objects and settings in the current session, including:
+
+* **Session info**
+    + The `sessionInfo()` value
+* **TVTB settings**
+    + See the vignette *Introduction to TVTB* for more information
+* **General settings**
+    + Including the current value of various input widgets
+* **Advanced settings**
+    + including the current value of more input widgets
+* **BED**
+    + Structural view of the active genomic ranges
+* **Variants**
+    + Overview of the raw `VCF` object
+* **VEP**
+    + Structural view of the `GRanges` that store the Ensembl VEP predictions
+* **Phenotypes**
+    + Structural view of the phenotype information attached to the variants
+* **Genotypes**
+    + Structural view of the `geno` slot (`"GT"` key) of the raw variants
+
+# Vignette session {#VignetteSessionInfo}
 
 Here is the output of `sessionInfo()` on the system on which this
 document was compiled:

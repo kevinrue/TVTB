@@ -1236,7 +1236,8 @@ shinyUI(navbarPage(theme = "bootstrap.css",
             tags$sup("1,2"),
 
             wellPanel(
-
+                h4("Parallel settings"),
+                hr(),
                 fluidRow(
 
                     shiny::column(
@@ -1286,7 +1287,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
             ),
             p(
                 tags$sup("2"),
-                "Known issue on Mac OS X El Capitan:",
+                "Known issue on", code("Mac OS X El Capitan"), ":",
                 "Application hangs while CPUs work infinitely at full speed."
             )
         )
