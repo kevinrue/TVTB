@@ -274,8 +274,8 @@ In the future, an option may be added to ignore contigs.
 ## Variants {#InputVariants}
 
 At the core of the `r Biocpkg("TVTB")` package, variants must be imported from
-one or more VCF file(s) annotated by the
-[Ensembl Variant Effect Predictor (VEP)](http://www.ensembl.org/info/docs/tools/vep)
+one or more VCF file(s) annotated by the Ensembl Variant Effect Predictor
+([VEP](http://www.ensembl.org/info/docs/tools/vep))
 script [@RN1].
 
 Considering the large size of most VCF file(s), it is common practice to
