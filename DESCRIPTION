@@ -15,7 +15,7 @@ Description: The package provides S4 classes and methods to filter,
 License: Artistic-2.0
 Depends: R (>= 3.4), methods, utils, stats
 Imports: BiocGenerics (>= 0.19.1), BiocParallel, Biostrings, ensembldb,
-    ensemblVEP, GenomeInfoDb, GenomicRanges, ggplot2,  limma, IRanges (>=
+    ensemblVEP, GenomeInfoDb, GenomicRanges, ggplot2, limma, IRanges (>=
     2.7.1), reshape2, Rsamtools, S4Vectors (>= 0.11.11),
     SummarizedExperiment, VariantAnnotation (>= 1.19.9)
 Suggests: EnsDb.Hsapiens.v75 (>= 0.99.7), shiny (>= 0.13.2.9005), DT
