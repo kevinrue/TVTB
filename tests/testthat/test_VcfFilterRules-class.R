@@ -109,6 +109,7 @@ test_that("[ and [[ methods return valid values", {
     expect_s4_class(vcfRules[1:2], "VcfFixedRules")
     expect_s4_class(vcfRules[3:4], "VcfInfoRules")
     expect_s4_class(vcfRules[5:6], "VcfVepRules")
+    expect_s4_class(vcfRules["CADD"], "VcfVepRules")
 
     vcfRulesSingle <- vcfRules[[4]]
     expect_equal(length(vcfRulesSingle), 1)
@@ -129,13 +130,13 @@ test_that("[ and [[ methods return valid values", {
 test_that("[ and [[ methods assign values", {
 
     newFixedFilter <- VcfVepRules(exprs = list(
-        expression(FILTER %in% c("PASS", "OK"))
+        filtSynonyms = expression(FILTER %in% c("PASS", "OK"))
     ))
     newInfoFilter <- VcfVepRules(exprs = list(
-        expression(AAF < 0.5)
+        altIsMinor = expression(AAF < 0.5)
     ))
     newVepFilter <- VcfVepRules(exprs = list(
-        expression(IMPACT == "HIGH")
+        highImpact = expression(IMPACT == "HIGH")
     ))
 
     fixedRules[[1]] <- newFixedFilter
@@ -148,6 +149,9 @@ test_that("[ and [[ methods assign values", {
     expect_identical(vepRules[[1]], newVepFilter)
 
     vcfRules[[1]] <- newVepFilter
+    expect_identical(vcfRules[[1]], newVepFilter)
+
+    vcfRules[["highImpact"]] <- newVepFilter
     expect_identical(vcfRules[[1]], newVepFilter)
 
     expect_error(
