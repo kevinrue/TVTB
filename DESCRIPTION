@@ -26,7 +26,7 @@ Imports:
 Suggests:
     EnsDb.Hsapiens.v75 (>= 0.99.7),
     shiny (>= 0.13.2.9004),
-    DT,
+    DT (>= 0.1.67),
     rtracklayer,
     BiocStyle,
     knitr (>= 1.12),

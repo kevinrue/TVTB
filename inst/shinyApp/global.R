@@ -11,8 +11,8 @@ stopifnot(
 )
 
 message(
-    "Please make sure 'DT' package was installed using ",
-    "devtools::install_github('rstudio/DT') ",
+    "Please run ",
+    "devtools::install_github(c(\"rstudio/shiny\", \"rstudio/DT\")) ",
     "to enable latest functionalities.")
 
 # Seems like all the following don't need to be re-imported for the app
