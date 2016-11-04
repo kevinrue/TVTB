@@ -105,3 +105,10 @@ VcfInfoFilter <- setClass(
     contains = "VcfBasicFilter"
 
 )
+
+VcfVepFilter <- setClass(
+    Class = "VcfVepFilter",
+
+    contains = "VcfBasicFilter"
+
+)

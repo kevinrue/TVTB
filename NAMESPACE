@@ -139,5 +139,5 @@ exportClasses(
 
 exportMethods(
     "tSVEParam",
-    "VcfInfoFilter", "VcfFixedFilter"
+    "VcfInfoFilter", "VcfFixedFilter", "VcfVepFilter"
 )

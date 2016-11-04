@@ -59,6 +59,35 @@ setMethod(
     }
 )
 
+setMethod(
+    f = "initialize",
+    signature = c("VcfVepFilter"),
+    definition = function(
+        .Object, name, condition, value){
+
+        # Fill slots with data
+        .Object@name <- name
+        .Object@condition <- condition
+        .Object@value <- value
+
+        validObject(.Object)
+
+        return(.Object)
+    })
+
+
+setMethod(
+    f = "VcfVepFilter",
+    signature = c(name="character", condition="character", value="ANY"),
+    definition = function(
+        name, condition, value){
+
+        new(
+            Class = "VcfVepFilter",
+            name = name, condition = condition, value = value)
+    }
+)
+
 # Getters and Setters ----
 
 ### name
@@ -72,6 +101,13 @@ setMethod(
 setMethod(
     f = "name",
     signature = c("VcfInfoFilter"),
+    definition = function(x)
+        slot(x, "name")
+)
+
+setMethod(
+    f = "name",
+    signature = c("VcfVepFilter"),
     definition = function(x)
         slot(x, "name")
 )
@@ -94,6 +130,15 @@ setReplaceMethod(
     }
 )
 
+setReplaceMethod(
+    f = "name", c("VcfVepFilter", "character"),
+    function(x, value){
+        slot(x, "name") <- value
+        validObject(x)
+        return(x)
+    }
+)
+
 ### condition
 setMethod(
     f = "condition",
@@ -105,6 +150,13 @@ setMethod(
 setMethod(
     f = "condition",
     signature = c("VcfInfoFilter"),
+    definition = function(x)
+        slot(x, "condition")
+)
+
+setMethod(
+    f = "condition",
+    signature = c("VcfVepFilter"),
     definition = function(x)
         slot(x, "condition")
 )
@@ -127,6 +179,15 @@ setReplaceMethod(
     }
 )
 
+setReplaceMethod(
+    f = "condition", c("VcfVepFilter", "character"),
+    function(x, value){
+        slot(x, "condition") <- value
+        validObject(x)
+        return(x)
+    }
+)
+
 ### value
 setMethod(
     f = "value",
@@ -142,6 +203,13 @@ setMethod(
         slot(x, "value")
 )
 
+setMethod(
+    f = "value",
+    signature = c("VcfVepFilter"),
+    definition = function(x)
+        slot(x, "value")
+)
+
 setReplaceMethod(
     f = "value", c("VcfFixedFilter", "ANY"),
     function(x, value){
@@ -153,6 +221,15 @@ setReplaceMethod(
 
 setReplaceMethod(
     f = "value", c("VcfInfoFilter", "ANY"),
+    function(x, value){
+        slot(x, "value") <- value
+        validObject(x)
+        return(x)
+    }
+)
+
+setReplaceMethod(
+    f = "value", c("VcfVepFilter", "ANY"),
     function(x, value){
         slot(x, "value") <- value
         validObject(x)

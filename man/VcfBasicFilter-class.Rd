@@ -6,10 +6,13 @@
 \alias{VcfFixedFilter-class}
 \alias{class:VcfInfoFilter}
 \alias{VcfInfoFilter-class}
+\alias{class:VcfVepFilter}
+\alias{VcfVepFilter-class}
 
 % Constructors/Methods:
 \alias{initialize,VcfFixedFilter-method}
 \alias{initialize,VcfInfoFilter-method}
+\alias{initialize,VcfVepFilter-method}
 
 \alias{VcfFixedFilter}
 \alias{VcfFixedFilter-methods}
@@ -20,6 +23,11 @@
 \alias{VcfInfoFilter-methods}
 \alias{VcfInfoFilter,character,character-method}
 \alias{VcfInfoFilter,character,character,ANY-method}
+
+\alias{VcfVepFilter}
+\alias{VcfVepFilter-methods}
+\alias{VcfVepFilter,character,character-method}
+\alias{VcfVepFilter,character,character,ANY-method}
 
 % Accessor methods:
 \alias{name}
@@ -48,6 +56,19 @@
 \alias{value<-}
 \alias{value<-,VcfInfoFilter-method}
 
+\alias{name}
+\alias{name,VcfVepFilter-method}
+\alias{name<-}
+\alias{name<-,VcfVepFilter,character-method}
+\alias{condition}
+\alias{condition,VcfVepFilter-method}
+\alias{condition<-}
+\alias{condition<-,VcfVepFilter,character-method}
+\alias{value}
+\alias{value,VcfVepFilter-method}
+\alias{value<-}
+\alias{value<-,VcfVepFilter-method}
+
 % Other methods / functions
 
 \title{VcfBasicFilter class objects}
@@ -63,6 +84,8 @@ that describe a named filter.
 \S4method{VcfFixedFilter}{character,character,ANY}(name, condition, value)
 
 \S4method{VcfInfoFilter}{character,character,ANY}(name, condition, value)
+
+\S4method{VcfVepFilter}{character,character,ANY}(name, condition, value)
 }
 
 \section{Accessors}{
@@ -82,7 +105,8 @@ In the following code snippets \code{x} is a \code{VcfBasicFilter} object.
 
 \arguments{
     \item{name}{
-A \code{character} value of length 1 that defines the field to filter.
+A \code{character} value of length 1 that defines the field to use for
+filtering.
 }
     \item{condition}{
 A \code{character} value of length 1 that defines the binary operator used
@@ -102,7 +126,7 @@ Kevin Rue-Albrecht
 }
 
 %\seealso{
-% Soon: VcfInfoFilterList, VcfFilter
+% Soon: VcfInfoFilterList
 %}
 
 \examples{
