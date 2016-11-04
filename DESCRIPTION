@@ -30,12 +30,12 @@ Imports:
     Rsamtools,
     S4Vectors (>= 0.11.11),
     SummarizedExperiment,
-    VariantAnnotation (>= 1.19.9)
-Suggests:
+    VariantAnnotation (>= 1.19.9),
     EnsDb.Hsapiens.v75 (>= 0.99.7),
-    shiny (>= 0.13.2.9005),
     DT (>= 0.1.67),
-    rtracklayer,
+    rtracklayer
+Suggests:
+    shiny (>= 0.13.2.9005),
     BiocStyle (>= 2.1.23),
     knitr (>= 1.12),
     rmarkdown,
