@@ -145,9 +145,20 @@ shinyServer(function(input, output, clientData, session) {
 
     # Display structure of phenotypes attached to variants
     output$phenotypesStructure <- renderPrint({
+
         # Depends on RV[["vcf"]]
         vcf <- RV[["vcf"]]
+        validate(need(vcf, Msgs[["importVariants"]]))
+
         phenos <- SummarizedExperiment::colData(vcf)
+        validate(need(
+            ncol(phenos) > 0,
+            ifelse(
+                is.null(phenotypes()),
+                Msgs[["colDataEmptyOK"]],
+                Msgs[["colDataEmptyImport"]])
+        ),
+        errorClass = "optional")
 
         validate(need(
             ncol(phenos) > 0,
@@ -1844,12 +1855,13 @@ shinyServer(function(input, output, clientData, session) {
 
         vcf <- RV[["vcf"]]
 
-        validate(
-            need(vcf, Msgs[["importVariants"]]),
-            need(
-                input$vepKey %in% colnames(info(vcf)),
-                Msgs[["vepKeyNotFound"]])
-        )
+        # First make sure vcf exists
+        validate(need(vcf, Msgs[["importVariants"]]))
+        # If it exists, check that vepKey exist in INFO fields
+        validate(need(
+            input$vepKey %in% colnames(info(vcf)),
+            Msgs[["vepKeyNotFound"]]
+        ))
 
         csq <- tryParseCsq(vcf = vcf, vepKey = input$vepKey)
 

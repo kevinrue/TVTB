@@ -271,19 +271,19 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                         ),
                         fluidRow(
                             shiny::column(
-                                width = 1,
+                                width = 2,
                                 actionButton(
                                     "tickAllInfo", "Select all",
                                     icon = icon("check-square-o"))
                             ),
                             shiny::column(
-                                width = 1,
+                                width = 2,
                                 actionButton(
                                     "untickAllInfo", "Deselect all",
                                     icon = icon("square-o"))
                             ),
                             shiny::column(
-                                width = 7, offset = 2,
+                                width = 7, offset = 1,
                                 strong("Note:"),
                                 "VEP field implicitely required"
                             )
@@ -431,7 +431,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
 
         wellPanel(
             fluidRow(
-                h4("Overall frequencies"),
+                h4("Overall frequencies"), hr(),
                 shiny::column(
                     width = 1, offset = 1,
                     actionButton(
@@ -452,6 +452,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
 
         wellPanel(
             fluidRow(
+                h4("Frequencies in phenotype levels"), hr(),
                 shiny::column(
                     width = 2,
                     selectInput(
@@ -459,11 +460,10 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                         "Phenotype",
                         choices = c()
                     )
-                )
-            ),
-            fluidRow(
+                ),
                 shiny::column(
-                    width = 1,
+                    width = 1, offset = 1,
+                    br(),
                     actionButton(
                         "tickAllPhenoLevelsFreq",
                         "Select all",
@@ -472,14 +472,17 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                 ),
                 shiny::column(
                     width = 1,
+                    br(),
                     actionButton(
                         "untickAllPhenoLevelsFreq",
                         "Deselect all",
                         icon = icon("square-o")
                     )
-                ),
+                )
+            ),
+            fluidRow(
                 shiny::column(
-                    width = 10,
+                    width = 12,
                     checkboxGroupInput(
                         "phenoLevelFreqCheckboxes", "Phenotype levels",
                         choices = c(), inline = TRUE
@@ -543,25 +546,26 @@ shinyUI(navbarPage(theme = "bootstrap.css",
             fluidRow(
                 br(),
                 p(strong("Notes:")),
-                p(
-                    tags$sup("1"),
-                    "Filters are tested against variants to ensure the",
-                    "validity of filters. Therefore, variants must be loaded",
-                    strong("before"), "filters can be created."
-                ),
-                p(
-                    tags$sup("2"),
-                    "Currently, filters are not re-tested if variants are",
-                    "updated. If variants are refreshed, users should ensure",
-                    "filters remain valid, or remove filters manually."
-                ),
-                p(
-                    tags$sup("3"),
-                    "Users may ignore auto-correction of quotes in the",
-                    code("Expression"), "field. The application substitutes",
-                    "curly quotes (single and double) by their",
-                    "corresponding regular quotes (",
-                    em("i.e."), code("\""), "and", code("'"), ")"
+                tags$ul(
+                    tags$li(
+                        "Filters are tested against variants to ensure the",
+                        "validity of filters. Therefore, variants must be",
+                        "loaded", em("before"), "filters can be created."
+                    ),
+                    tags$li(
+                        "Currently, filters are not re-tested if variants are",
+                        "updated. If variants are refreshed, users should",
+                        "ensure filters remain valid, or remove filters",
+                        "manually."
+                    ),
+                    tags$li(
+                        "Users may ignore auto-correction of quotes in the",
+                        strong("Expression"), "field. The application",
+                        "automatically substitutes",
+                        "curly quotes (single and double) by their",
+                        "corresponding regular quotes (",
+                        em("i.e."), code("\""), "and", code("'"), ")"
+                    )
                 )
             )
         ),
