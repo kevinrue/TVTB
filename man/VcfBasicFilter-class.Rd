@@ -113,12 +113,12 @@ A \code{character} value of length 1 that defines the binary operator used
 to compare data to the target values.
 }
     \item{value}{
-Target values.
+Target value(s).
 }
 }
 
 \value{
-A \code{VcfBasicFilter} object that contains recurrent parameters.
+A \code{VcfBasicFilter} object.
 }
 
 \author{
@@ -136,7 +136,7 @@ VcfFixedFilter(name = "FILTER", condition = "==", value = "PASS")
 
 VcfInfoFilter(name = "MAF", condition = "<=", value = 1e-6)
 
-nf <- VcfInfoFilter(
+nf <- VcfVepFilter(
     name = "IMPACT", condition = "\%in\%", value = c("MODERATE", "HIGH"))
 
 # Accessors ----
