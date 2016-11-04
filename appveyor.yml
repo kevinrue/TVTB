@@ -17,12 +17,13 @@ environment:
     - R_VERSION: devel
       R_ARCH: x64
       BIOC_USE_DEVEL: true
+      _R_CHECK_FORCE_SUGGESTS_: false
 
 cache:
   - packages
 
 build_script:
-  - travis-tool.sh install_bioc ensemblVEP
+  #- travis-tool.sh install_bioc ensemblVEP
   - travis-tool.sh install_bioc_deps
 
 test_script:
