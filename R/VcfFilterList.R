@@ -5,10 +5,11 @@ setMethod(
     f = "initialize",
     signature = c("VcfFilterList"),
     definition = function(
-        .Object, ...){
+        .Object, ..., active = rep(TRUE, length(list(...)))){
 
         # Fill slots with data
         .Object@filterRules <- list(...)
+        .Object@active <- active
 
         validObject(.Object)
 
@@ -19,9 +20,8 @@ setMethod(
 setMethod(
     f = "VcfFilterList",
 
-    definition = function(...){
-
-        new(Class = "VcfFilterList", ...)
+    definition = function(..., active = rep(TRUE, length(list(...)))){
+        new(Class = "VcfFilterList", ..., active = active)
     }
 )
 
@@ -66,6 +66,29 @@ setReplaceMethod(
     f = "filterRules", c("VcfFilterList", "VcfInfoFilter"),
     function(x, value){
         slot(x, "filterRules") <- list(value)
+        validObject(x)
+        return(x)
+    }
+)
+
+### active
+setMethod(
+    f = "active",
+    signature = c("VcfFilterList"),
+    definition = function(x)
+        slot(x, "active")
+)
+
+setReplaceMethod(
+    f = "active", c("VcfFilterList"),
+    function(x, value){
+
+        if (is.logical(value)){
+            slot(x, "active") <- value
+        } else {
+            stop("Invalid value class: ", class(value))
+        }
+
         validObject(x)
         return(x)
     }

@@ -125,7 +125,13 @@ exportMethods(
 
     "name", "name<-",
     "condition", "condition<-",
-    "value","value<-"
+    "value","value<-",
+    "filterType",
+
+    "filterRules", "filterRules<-",
+     "active",  "active<-",
+
+    "subsetVcf"
 )
 
 #exportClassPattern("^.*$")
@@ -138,7 +144,5 @@ exportClasses(
 
 exportMethods(
     "TVTBparam",
-    "VcfInfoFilter", "VcfFixedFilter", "VcfVepFilter", "VcfFilterList",
-    "filterType",
-    "subsetVcf", "filterRules"
+    "VcfInfoFilter", "VcfFixedFilter", "VcfVepFilter", "VcfFilterList"
 )

@@ -70,14 +70,16 @@ setMethod(
         # TODO: "Active" column
         cat("Index\tActive\tType\tFilter\n")
         mapply(
-            FUN = function(idx, type, filter){
+            FUN = function(idx, active, type, filter){
                 cat(sprintf(
                     "%i.\t[x]\t%s\t%s\n",
                     idx,
+                    ifelse(active, "x", " "),
                     type,
                     as.character(filter)))
                 },
             seq_along(filterRules(object)),
+            active(object),
             sapply(X = filterRules(object), FUN = filterType),
             filterRules(object))
     }

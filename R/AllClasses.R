@@ -145,6 +145,12 @@ VcfVepFilter <- setClass(
                 )
             )
 
+    if (length(active(object)) != length(filterRules(object)))
+        errors <- c(
+            errors,
+            "length(active(x)) not equal to length(filterRules(x))"
+        )
+
     if (length(errors) > 0)
         return(errors)
 
@@ -156,7 +162,8 @@ VcfFilterList <- setClass(
 
     # Define the slots
     slots = c(
-        filterRules = "list"
+        filterRules = "list",
+        active = "logical"
     ),
 
     validity = .valid.VcfFilterList

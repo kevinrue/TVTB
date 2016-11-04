@@ -20,6 +20,11 @@
 \alias{filterRules<-,VcfFilterList,VcfFixedFilter-method}
 \alias{filterRules<-,VcfFilterList,VcfInfoFilter-method}
 \alias{filterRules<-,VcfFilterList,VcfVepFilter-method}
+\alias{active}
+\alias{active,VcfFilterList-method}
+\alias{active<-}
+\alias{active<-,VcfFilterList-method}
+
 
 % Other methods / functions
 
@@ -32,7 +37,7 @@ The \code{VcfFilterList} class stores a list of \code{VcfBasicFilter} objects.
 \usage{
 ## Constructors
 
-\S4method{VcfFilterList}{ANY}(...)
+\S4method{VcfFilterList}{ANY}(..., active = rep(TRUE, length(list(...))))
 }
 
 \section{Accessors}{
@@ -41,12 +46,19 @@ In the following code snippets \code{x} is a \code{VcfFilterList} object.
     \item{\code{filterRules(x)}, \code{filterRules(x) <- value}}{
     Gets or sets the name of the field to filter.
     }
+    \item{\code{active(x)}, \code{active(x) <- value}}{
+    Gets or sets the status of each filter.
+    }
 }
 }
 
 \arguments{
     \item{...}{
 \code{VcfBasicFilter} objects.
+}
+    \item{active}{
+A \code{logical} vector indicating active (\code{TRUE})
+and inactive (\code{FALSE}) filters.
 }
 }
 
@@ -67,21 +79,25 @@ and \code{\link{parseCSQToGRanges,VCF-method}}.
 \examples{
 # Constructors ----
 
-vff <- VcfFixedFilter(name = "FILTER", condition = "==", value = "PASS")
-vff
+FF <- VcfFixedFilter(name = "FILTER", condition = "==", value = "PASS")
+FF
 
-vif <- VcfInfoFilter(name = "MAF", condition = "<=", value = 1e-6)
-vif
+IF <- VcfInfoFilter(name = "MAF", condition = "<=", value = 1e-6)
+IF
 
-vvf <- VcfVepFilter(
+VF <- VcfVepFilter(
     name = "IMPACT", condition = "\%in\%", value = c("MODERATE", "HIGH"))
-vvf
+VF
 
-vlist <- VcfFilterList(vff, vif, vvf)
-vlist
+FL <- VcfFilterList(FF, IF, VF)
+FL
 
 # Accessors ----
 
 ## VcfBasicFilter objects stored in the VcfFilterList object
-filterRules(vlist)
+filterRules(FL)
+active(FL)
+
+# Setters ----
+active(FL)[2] <- FALSE
 }

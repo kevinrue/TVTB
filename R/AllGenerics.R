@@ -346,6 +346,6 @@ setGeneric(
 setGeneric(
     name = "VcfFilterList",
 
-    def = function(...)
+    def = function(..., active = rep(TRUE, length(list(...))))
         standardGeneric("VcfFilterList")
 )
