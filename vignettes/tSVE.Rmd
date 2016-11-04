@@ -405,6 +405,26 @@ are the *VCF filter rules*, extending the
 that can be evaluated within environments defined by the various slots
 of `VCF` objects.
 
+Generally speaking, `FilterRules` greatly facilitate the design 
+and combination of powerful filter rules for table-like objects,
+such as the `fixed` and `info` slots of
+`r Biocpkg("VariantAnnotation")` `VCF` objects,
+as well as Ensembl VEP predictions stored as `GRanges` returned by the
+`r Biocpkg("ensemblVEP")` `parseCSQToGRanges` method.
+
+A separate vignette described in greater detail the use of classes
+that contain *VCF filter rules*.
+
+> **Action**:
+> 
+> * Select *VEP* in the list of filter types
+> * Paste `grepl("missense",Consequence)` in the text field
+> * Leave the *Active?* checkbox ticked
+> * Click the *Add filter* action button
+> * See the list of rules update at the bottom of the screen
+> * Click the *Apply filters* action button
+> * See the summary of filtered variants update beside the action button
+
 # Session info {#SessionInfo}
 
 Here is the output of `sessionInfo()` on the system on which this
