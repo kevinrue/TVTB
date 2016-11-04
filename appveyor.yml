@@ -19,7 +19,6 @@ environment:
     R_ARCH: x64
     USE_RTOOLS: true ## to be able to use Remotes (i.e. non-CRAN sources)
 
-environment:
   matrix:
     - R_VERSION: devel
       R_ARCH: x64
