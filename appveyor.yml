@@ -16,7 +16,7 @@ environment:
   matrix:
     - R_VERSION: devel
       R_ARCH: x64
-      BIOC_USE_DEVEL: true
+      BIOC_USE_DEVEL: TRUE
       _R_CHECK_FORCE_SUGGESTS_: false
 
 cache:
