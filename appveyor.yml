@@ -16,7 +16,7 @@ environment:
   global:
     WARNINGS_ARE_ERRORS: 1
     _R_CHECK_FORCE_SUGGESTS_: 0
-    # USE_RTOOLS: true ## to be able to use Remotes (i.e. non-CRAN sources)
+    USE_RTOOLS: true ## to use install_github or Remotes packages
 
   matrix:
     - R_VERSION: devel
