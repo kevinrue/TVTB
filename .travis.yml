@@ -6,3 +6,4 @@ cache: packages
 r: bioc-devel
 
 r_github_packages: rstudio/DT
+bioc_packages: BiocInstaller
