@@ -617,6 +617,7 @@ shinyServer(function(input, output, clientData, session) {
             })
     })
 
+    # Demonstration input for the BED file
     observeEvent(
         eventExpr = input$demoBed,
         handlerExpr = {
@@ -626,6 +627,7 @@ shinyServer(function(input, output, clientData, session) {
         }
     )
 
+    # Demonstration input for the UCSC field input
     observeEvent(
         eventExpr = input$demoUCSC,
         handlerExpr = {
@@ -636,6 +638,7 @@ shinyServer(function(input, output, clientData, session) {
         }
     )
 
+    # Demonstration input for the EnsDb field input
     observeEvent(
         eventExpr = input$demoEnsDb,
         handlerExpr = {
@@ -1625,6 +1628,25 @@ shinyServer(function(input, output, clientData, session) {
         ))
 
     })
+    
+    # Demonstration input for the Filter input field
+    observeEvent(
+      eventExpr = input$demoFilter,
+      handlerExpr = {
+        updateSelectInput(
+          session, "newFilterClass",
+          selected = "VcfVepRules"
+        )
+        updateCheckboxInput(
+          session, "newFilterActive",
+          value = TRUE
+        )
+        updateTextInput(
+          session, "newFilterExpression",
+          value = "grepl(\"missense\", Consequence)"
+        )
+      }
+    )
 
     # Boolean whether the rule to add evaluates successfully
     newFilterTestResults <- reactive({
@@ -1636,6 +1658,11 @@ shinyServer(function(input, output, clientData, session) {
             vcf <- head(RV[["vcf"]]) # Speed up testing!
         })
 
+        if (is.null(vcf)){
+          RV[["newFilterStatus"]] <- "Variants must be imported to test the expression"
+          return(FALSE)
+        }
+        
         if (is.null(newFilter)){
             RV[["newFilterStatus"]] <- "Invalid expression"
             return(FALSE)

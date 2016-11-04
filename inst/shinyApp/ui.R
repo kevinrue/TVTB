@@ -182,8 +182,8 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                             width = 4, offset = 1,
                             strong("Note"),
                             p(
-                                "For the ", code("like"), "filter",
-                                "please use ", code("%"), "as wildcard."
+                                "For the ", code("like"), "filter,",
+                                "use ", code("%"), "as wildcard."
                             )
                         ),
                         tabsetPanel(
@@ -572,6 +572,7 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                 ),
                 column(
                     width = 1,
+                    br(),
                     checkboxInput(
                         "newFilterActive", "Active?",
                         value = TRUE
@@ -588,6 +589,13 @@ shinyUI(navbarPage(theme = "bootstrap.css",
                             sep = " - or - "
                         )
                     )
+                ),
+                column(
+                  width = 1,
+                  br(),
+                  actionButton(
+                    "demoFilter", "Sample input",
+                    icon = icon("font"), width = '100%')
                 )
             ),
             fluidRow(
