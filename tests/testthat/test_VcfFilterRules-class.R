@@ -43,7 +43,23 @@ vepRules <- VcfVepRules(
     active = c(TRUE, FALSE))
 
 vcfRules <- VcfFilterRules(fixedRules, infoRules, vepRules)
+
 filterNoVep <- VcfFilterRules(fixedRules, infoRules)
+
+newFixedFilter <- VcfFixedRules(exprs = list(
+    filtSynonyms = expression(FILTER %in% c("PASS", "OK")),
+    fail = expression(FILTER=="FAIL")
+))
+newInfoFilter <- VcfInfoRules(exprs = list(
+    altIsMinor = expression(AAF <= 0.5),
+    altIsMajor = expression(AAF > 0.5)
+))
+newVepFilter <- VcfVepRules(exprs = list(
+    highImpact = expression(IMPACT == "HIGH"),
+    moderateImpact = expression(IMPACT == "MODERATE")
+))
+newVepSlot <- newVepFilter
+vep(newVepSlot) <- "ANN"
 
 # Constructors ----
 
@@ -262,21 +278,6 @@ test_that("[ methods return valid values", {
 # [<- ----
 
 test_that("[ methods perform valid replacement", {
-
-    newFixedFilter <- VcfFixedRules(exprs = list(
-        filtSynonyms = expression(FILTER %in% c("PASS", "OK")),
-        fail = expression(FILTER=="FAIL")
-    ))
-    newInfoFilter <- VcfInfoRules(exprs = list(
-        altIsMinor = expression(AAF <= 0.5),
-        altIsMajor = expression(AAF > 0.5)
-    ))
-    newVepFilter <- VcfVepRules(exprs = list(
-        highImpact = expression(IMPACT == "HIGH"),
-        moderateImpact = expression(IMPACT == "MODERATE")
-    ))
-    newVepSlot <- newVepFilter
-    vep(newVepSlot) <- "ANN"
 
     # Expected usage
     fixedRules[1:2] <- newFixedFilter
