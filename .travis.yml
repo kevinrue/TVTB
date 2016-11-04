@@ -21,10 +21,6 @@ cache: packages
 
 before_install:
     - Rscript -e 'source(file = "http://bioconductor.org/biocLite.R");tryCatch(useDevel(devel = TRUE), error = function(err){message(err)})'
-    - Rscript -e 'BiocInstaller::biocLite("devtools")'
-    - Rscript -e 'devtools::install_github("Bioconductor-mirror/S4Vectors")'
-    - Rscript -e 'devtools::install_github("Bioconductor-mirror/SummarizedExperiment")'
-    - Rscript -e 'devtools::install_github("Bioconductor-mirror/Rsamtools")'
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then tlmgr install bera nowidow parnotes marginfix; fi
     #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo tlmgr install authblk beramono caption changepage color enumitem etoolbox fancyhdr fontenc footmisc framed geometry graphicx hyperref ifthen marginfix mathtools nowidow parnotes parskip placeins ragged2e soul titlesec titletoc xstring; fi
 
@@ -34,6 +30,9 @@ r_github_packages:
     - rstudio/shiny
     - rstudio/DT
     - jimhester/covr
+    #- Bioconductor-mirror/S4Vectors
+    #- Bioconductor-mirror/SummarizedExperiment
+    #- Bioconductor-mirror/Rsamtools
 
 r_build_args: --keep-empty-dirs --no-resave-data
 r_check_args: --no-vignettes --timings
