@@ -560,7 +560,8 @@ opts_chunk$set(
 densityVepByPhenotype(
         vcf = vcf, phenoCol = "super_pop", vepCol = "CADD_PHRED",
         param = tparam, filter = vcfRules["missense"],
-        unique = TRUE, facet = "Feature", plot = TRUE, popFreq = FALSE) +
+        unique = TRUE, facet = "Feature", plot = TRUE, popFreq = FALSE,
+        layer = "density+dotplot") +
     theme(
         legend.key.size = unit(1.2, "lines"),
         legend.title = element_text(size = rel(1.2)),

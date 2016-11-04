@@ -81,7 +81,8 @@ setGeneric(
     signature = c("vcf", "param"),
     def = function(
         vcf, phenoCol, vepCol, param, ..., filter = VcfFilterRules(),
-        unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE)
+        unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE,
+        layer = "density+dotplot")
         standardGeneric("densityVepByPhenotype")
 )
 
@@ -92,7 +93,8 @@ setGeneric(
     signature = c("vcf", "param"),
     def = function(
         level, vcf, phenoCol, vepCol, param, ..., filter = VcfFilterRules(),
-        unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE)
+        unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE,
+        layer = "density+dotplot")
         standardGeneric("densityVepInPhenoLevel")
 )
 

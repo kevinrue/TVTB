@@ -6,14 +6,16 @@ setMethod(
     signature = c(vcf="ExpandedVCF", param="TVTBparam"),
     definition = function(
         vcf, phenoCol, vepCol, param, ..., filter = VcfFilterRules(),
-        unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE){
+        unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE,
+        layer = "density+dotplot"){
 
         param <- .override.TVTBparam(param, ...)
 
         .densityVepByPhenotype(
             vcf = vcf, phenoCol = phenoCol, vepCol = vepCol, param = param,
             filter = filter,
-            unique = unique, facet = facet, plot = plot, popFreq = popFreq)
+            unique = unique, facet = facet, plot = plot, popFreq = popFreq,
+            layer = layer)
     }
 )
 
@@ -24,7 +26,8 @@ setMethod(
     definition = function(
         vcf, phenoCol, vepCol, alts, param = NULL, ...,
         filter = VcfFilterRules(),
-        unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE){
+        unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE,
+        layer = "density+dotplot"){
 
         .checkAlts(alts)
 
@@ -36,7 +39,8 @@ setMethod(
         .densityVepByPhenotype(
             vcf = vcf, phenoCol = phenoCol, vepCol = vepCol, param = param,
             filter = filter,
-            unique = unique, facet = facet, plot = plot, popFreq = popFreq)
+            unique = unique, facet = facet, plot = plot, popFreq = popFreq,
+            layer = layer)
     }
 )
 
@@ -48,14 +52,16 @@ setMethod(
     signature = c(vcf="ExpandedVCF", param="TVTBparam"),
     definition = function(
         level, vcf, phenoCol, vepCol, param, ..., filter = VcfFilterRules(),
-        unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE){
+        unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE,
+        layer = "density+dotplot"){
 
         param <- .override.TVTBparam(param, ...)
 
         .densityVepInPhenoLevel(
             level = level, vcf = vcf, phenoCol = phenoCol, vepCol = vepCol,
             param = param, filter = filter,
-            unique = unique, facet = facet, plot = plot, popFreq = popFreq)
+            unique = unique, facet = facet, plot = plot, popFreq = popFreq,
+            layer = layer)
     }
 )
 
@@ -66,7 +72,8 @@ setMethod(
     definition = function(
         level, vcf, phenoCol, vepCol, alts, param = NULL, ...,
         filter = VcfFilterRules(),
-        unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE){
+        unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE,
+        layer = "density+dotplot"){
 
         .checkAlts(alts)
 
@@ -78,7 +85,8 @@ setMethod(
         .densityVepInPhenoLevel(
             level = level, vcf = vcf, phenoCol = phenoCol, vepCol = vepCol,
             param = param, filter = filter,
-            unique = unique, facet = facet, plot = plot, popFreq = popFreq)
+            unique = unique, facet = facet, plot = plot, popFreq = popFreq,
+            layer = layer)
     }
 )
 
@@ -97,7 +105,8 @@ setMethod(
 
 .densityVepByPhenotype <- function(
     vcf, phenoCol, vepCol, param, filter = VcfFilterRules(),
-    unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE){
+    unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE,
+    layer = "density+dotplot"){
 
     phenos <- colData(vcf)
     pLevels <- levels(phenos[,phenoCol])
@@ -125,8 +134,24 @@ setMethod(
 
         ggPlot <- ggplot(
             data = ggData,
-            mapping = aes_string(vepCol, colour = phenoCol)) +
+            mapping = aes_string(x = vepCol, colour = phenoCol)) +
+            scale_colour_discrete(phenoCol)
+
+        # Add requested layers (possibility of None!)
+        ggLayers <- strsplit(
+            x = gsub(" ", "", layer),
+            split = "+",
+            fixed = TRUE)[[1]]
+        if (any(grepl("density", ggLayers)))
+            ggPlot <- ggPlot +
             geom_density()
+        if (any(grepl("dotplot", ggLayers)))
+            ggPlot <- ggPlot +
+            geom_dotplot(
+                mapping = aes_string(fill = phenoCol),
+                position = "stack",
+                stackgroups = TRUE) +
+            scale_fill_discrete(phenoCol)
 
         if (!is.null(facet)){
             ggPlot <- ggPlot + facet_wrap(facets = facet)
@@ -141,7 +166,8 @@ setMethod(
 
 .densityVepInPhenoLevel <- function(
     level, vcf, phenoCol, vepCol, param, filter = VcfFilterRules(),
-    unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE){
+    unique = FALSE, facet = NULL, plot = FALSE, popFreq = FALSE,
+    layer = "density+dotplot"){
 
     # Pass relevant namespaces to the parallel environment
     requireNamespace("Biostrings")
@@ -178,7 +204,27 @@ setMethod(
         ggPlot <- ggplot(
             data = ggData,
             mapping = aes_string(vepCol, colour = phenoCol)) +
+            scale_colour_discrete(phenoCol)
+
+        # Add requested layers (possibility of None!)
+        ggLayers <- strsplit(
+            x = gsub(" ", "", layer),
+            split = "+",
+            fixed = TRUE)[[1]]
+        if (any(grepl("density", ggLayers)))
+            ggPlot <- ggPlot +
             geom_density()
+        if (any(grepl("dotplot", ggLayers)))
+            ggPlot <- ggPlot +
+            geom_dotplot(
+                mapping = aes_string(fill = phenoCol),
+                position = "stack",
+                stackgroups = TRUE) +
+            scale_fill_discrete(phenoCol)
+
+        if (!is.null(facet)){
+            ggPlot <- ggPlot + facet_wrap(facets = facet)
+        }
 
         if (!is.null(facet)){
             ggPlot <- ggPlot + facet_wrap(facets = facet)
