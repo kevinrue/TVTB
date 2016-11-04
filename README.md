@@ -57,7 +57,7 @@ Unit tests and coverage implemented using the `testthat` package (CRAN).
 
 Coverage excludes files:
 
-* AllClasses.R
+* AllClasses.R (_Not executed at runtime_)
 * tSVE.R (_Requires interactive session_)
 
 ## License
