@@ -8,6 +8,12 @@ genotypes <- list(
     ALT = c("1|1")
 )
 
+gr <- GenomicRanges::GRanges(
+    seqnames = "15", ranges = IRanges(
+        start = 48413170,
+        end = 48434757,
+        names = "SLC24A5"))
+
 # Constructors ----
 
 test_that("Constructors produce a valid object",{
@@ -122,11 +128,7 @@ test_that("Setters return valid values",{
     )
 
     expect_s4_class(
-        ranges(tparam) <- GRanges(
-            seqnames = "15", ranges = IRanges(
-                start = 48413170,
-                end = 48434757,
-                names = "SLC24A5")),
+        ranges(tparam) <- gr,
         "GRanges"
     )
 
@@ -157,6 +159,7 @@ test_that("Override function return valid values",{
             ref = "0/0",
             het = "0/1",
             alt = "1/1",
+            ranges = gr,
             aaf = "Aaf",
             maf = "Maf",
             vep = "ANN",
