@@ -92,6 +92,13 @@ VcfBasicFilter <- setClass(
 
 )
 
+VcfFixedFilter <- setClass(
+    Class = "VcfFixedFilter",
+
+    contains = "VcfBasicFilter"
+
+)
+
 VcfInfoFilter <- setClass(
     Class = "VcfInfoFilter",
 

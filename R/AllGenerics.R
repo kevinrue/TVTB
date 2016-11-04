@@ -260,6 +260,14 @@ setGeneric(
 # VcfInfoFilter class ----
 
 setGeneric(
+    name = "VcfFixedFilter",
+    signature = c("name", "condition", "value"),
+    def = function(
+        name, condition, value)
+        standardGeneric("VcfFixedFilter")
+)
+
+setGeneric(
     name = "VcfInfoFilter",
     signature = c("name", "condition", "value"),
     def = function(

@@ -2,19 +2,39 @@
 \docType{class}
 
 % Class
-\alias{class:VcfBasicFilter}
-\alias{VcfBasicFilter-class}
+\alias{class:VcfFixedFilter}
+\alias{VcfFixedFilter-class}
 \alias{class:VcfInfoFilter}
 \alias{VcfInfoFilter-class}
 
 % Constructors/Methods:
+\alias{initialize,VcfFixedFilter-method}
+\alias{initialize,VcfInfoFilter-method}
+
+\alias{VcfFixedFilter}
+\alias{VcfFixedFilter-methods}
+\alias{VcfFixedFilter,character,character-method}
+\alias{VcfFixedFilter,character,character,ANY-method}
+
 \alias{VcfInfoFilter}
 \alias{VcfInfoFilter-methods}
 \alias{VcfInfoFilter,character,character-method}
 \alias{VcfInfoFilter,character,character,ANY-method}
-\alias{initialize,VcfInfoFilter-method}
 
 % Accessor methods:
+\alias{name}
+\alias{name,VcfFixedFilter-method}
+\alias{name<-}
+\alias{name<-,VcfFixedFilter,character-method}
+\alias{condition}
+\alias{condition,VcfFixedFilter-method}
+\alias{condition<-}
+\alias{condition<-,VcfFixedFilter,character-method}
+\alias{value}
+\alias{value,VcfFixedFilter-method}
+\alias{value<-}
+\alias{value<-,VcfFixedFilter-method}
+
 \alias{name}
 \alias{name,VcfInfoFilter-method}
 \alias{name<-}
@@ -33,18 +53,20 @@
 \title{VcfBasicFilter class objects}
 
 \description{
-The \code{VcfInfoFilter} class stores the name, condition, and value
+The \code{VcfBasicFilter} class stores the name, condition, and value
 that describe a named filter.
 }
 
 \usage{
 ## Constructors
 
+\S4method{VcfFixedFilter}{character,character,ANY}(name, condition, value)
+
 \S4method{VcfInfoFilter}{character,character,ANY}(name, condition, value)
 }
 
 \section{Accessors}{
-In the following code snippets \code{x} is a \code{VcfInfoFilter} object.
+In the following code snippets \code{x} is a \code{VcfBasicFilter} object.
 \describe{
     \item{\code{name(x)}, \code{name(x) <- value}}{
     Gets or sets the name of the field to filter.
@@ -72,7 +94,7 @@ Target values.
 }
 
 \value{
-A \code{VcfInfoFilter} object that contains recurrent parameters.
+A \code{VcfBasicFilter} object that contains recurrent parameters.
 }
 
 \author{
@@ -86,7 +108,7 @@ Kevin Rue-Albrecht
 \examples{
 # Constructors ----
 
-VcfInfoFilter(name = "FILTER", condition = "==", value = "PASS")
+VcfFixedFilter(name = "FILTER", condition = "==", value = "PASS")
 
 VcfInfoFilter(name = "MAF", condition = "<=", value = 1e-6)
 
