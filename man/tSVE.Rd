@@ -23,7 +23,8 @@ tSVE(
     refSuffix = "REF", hetSuffix = "HET", altSuffix = "ALT",
     aafSuffix = "AAF", mafSuffix = "MAF",
     genoHeatmap.height = "500px",
-    options.width = 120
+    options.width = 120,
+    autodetectGTimport = FALSE
 )
 }
 
@@ -67,6 +68,12 @@ each variant in each sample.
 }
     \item{options.width}{
 Sets \code{options("width")}.
+}
+    \item{autodetectGTimport}{
+Default checkbox value. If \code{FALSE}, genotypes (ref, het, alt) are
+taken \emph{as is} from the \emph{Advanced settings} panel. If \code{TRUE},
+genotypes selected in the \emph{Advanced settings} panel are updated using
+the \code{autodetectGenotypes} method, immediately after variants are imported.
 }
 
 }

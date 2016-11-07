@@ -347,7 +347,8 @@ shinyUI(navbarPage(
 
           # ScanVcfParam ----
 
-          # INFO fields (except VEP)
+          # INFO fields (except VEP) ----
+
           column(
             width = 8,
             fluidRow(
@@ -381,8 +382,8 @@ shinyUI(navbarPage(
 
           ),
 
+          # VEP prediction INFO field ----
 
-          # VEP prediction INFO field
           column(
             width = 2,
             textInput(
@@ -391,7 +392,8 @@ shinyUI(navbarPage(
               placeholder = 'CSQ, ANN, ...')
           ),
 
-          # FORMAT fields
+          # FORMAT fields ----
+
           column(
             width = 2,
             selectInput(
@@ -407,9 +409,18 @@ shinyUI(navbarPage(
       wellPanel(
         fluidRow(
 
-          # VEP prediction INFO field ----
+          # VCF import button! ----
+
           column(
-            width = 2, offset = 5,
+            width = 2,
+            checkboxInput(
+              "autodetectGTimport", "Autodetect genotypes",
+              value = get("autodetectGTimport", .tSVE)
+            )
+          ),
+
+          column(
+            width = 2, offset = 3,
             br(),
             actionButton(
               "importVariants", "Import variants",
@@ -1018,17 +1029,22 @@ shinyUI(navbarPage(
             tags$strong("Notes:"), br(),
             tags$ul(
               tags$li(
-                "The", tags$strong("Autofill"), "button requires",
-                "variants to be imported."
+                "The",tags$strong("choices"),"of genotypes are updated when",
+                "new variants are imported."
               ),
               tags$li(
-                "The choices of genotypes are updated when new",
-                "variants are imported."
+                "The",tags$strong("selected"),"genotypes may be automatically",
+                "updated immediately after import using the",
+                tags$strong("Autodetect genotypes"), "checkbox in the",
+                tags$strong("Input"), "panel, or manually after import using",
+                "the", tags$strong("Autofill"), "button in this panel."
               ),
               tags$li(
                 "Selected genotypes are not allowed to overlap.",
                 "Selecting a genotype removes it from the choices",
-                "available in the other widgets."
+                "available in the other widgets. As a consequence, genotypes",
+                "must first be unselected from a widget before it can be",
+                "selected in another one."
               )
             )
           )
@@ -1193,6 +1209,11 @@ shinyUI(navbarPage(
       tabPanel(
         title = "VEP",
         verbatimTextOutput("vepStructure")
+      ),
+
+      tabPanel(
+        title = "Errors",
+        verbatimTextOutput("Errors")
       )
     )
 

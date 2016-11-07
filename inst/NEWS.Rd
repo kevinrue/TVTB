@@ -1,12 +1,46 @@
 \name{TVTB-NEWS}
 \title{NEWS: The VCF Tool Box}
 
+\section{Changes in version 1.1.5 2016-11-08}{
+
+\subsection{Bug fix}{
+\itemize{
+\item Updated reference to renamed object in \emph{Shiny} app.
+\item When no phenotypes are supplied, set \code{phenoData} slot to a
+    \code{DataFrame} with \code{rownames} set to \code{colnames(vcf)} and
+    \code{0} columns, instead of the default behaviour of the
+    \code{VariantAnnotation} package which is to create a column named
+    \code{Sample} filled with \code{seq_along}.
+\item \code{NEWS} file closing brackets.
+}
+}
+
+\subsection{Major changes}{
+\itemize{
+\item \code{autodetectGTimport} setting available in \code{tSVE} method.
+\item New checkbox in \emph{Shiny} app to update selected genotypes after
+    importing variants and autodetection of genotypes present in the data.
+}
+}
+
+\subsection{Minor changes}{
+\itemize{
+\item Do not ignore \code{*.Rproj} files.
+\item Removed commented lines in \emph{AppVeyor} YAML file.
+\item Removed files in \code{misc/}.
+\item Display list of error messages in a new session panel of the
+    \emph{Shiny} app.
+}
+}
+}
+
 \section{Changes in version 1.1.4 2016-11-04}{
 
 \subsection{Bug fix}{
 \itemize{
 \item Bumped version number to try and update the Bioconductor GitHub mirror
     to display the latest code instead of version \code{0.1.7}.
+}
 }
 \subsection{Minor changes}{
 \itemize{

@@ -70,7 +70,7 @@ setMethod(
     # Use VariantAnnotation readVcf
     vcf <- readVcf(file, genome, SVP, ...)
 
-    # Attach (default) phenotype information
+    # Attach phenotype information if any
     if (nrow(colData) > 0){
         colData(vcf) <- colData
     }

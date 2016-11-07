@@ -13,6 +13,7 @@ assign("aafSuffix", "AAF", envir = .tSVE)
 assign("vepKey", "CSQ", envir = .tSVE)
 assign("genoHeatmap.height", "500px", envir = .tSVE)
 assign("options.width", 120, envir = .tSVE)
+assign("autodetectGTimport", FALSE, envir = .tSVE)
 lockEnvironment(.tSVE)
 
 # nocov start
@@ -25,7 +26,8 @@ tSVE <- function(
     refSuffix = "REF", hetSuffix = "HET", altSuffix = "ALT",
     aafSuffix = "AAF", mafSuffix = "MAF",
     genoHeatmap.height = "500px",
-    options.width = 120){
+    options.width = 120,
+    autodetectGTimport = FALSE){
     if (requireNamespace("shiny", quietly=TRUE)){
         message("Setting environment ...")
         assign("refGT", refGT, envir = .tSVE)
@@ -39,6 +41,7 @@ tSVE <- function(
         assign("vepKey", vepKey, envir = .tSVE)
         assign("genoHeatmap.height", genoHeatmap.height, envir = .tSVE)
         assign("options.width", options.width, envir = .tSVE)
+        assign("autodetectGTimport", autodetectGTimport, envir = .tSVE)
 
         message("Starting the Shiny web app ...")
         shiny::runApp(system.file("shinyApp", package = "TVTB"), ...)

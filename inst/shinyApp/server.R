@@ -70,6 +70,10 @@ shinyServer(function(input, output, clientData, session) {
     parallel = BiocParallel::SerialParam()
   )
 
+  output$Errors <- renderPrint({
+    return(reactiveValuesToList(Errors))
+  })
+
   # Import phenotype information ----
   observeEvent(
     input$selectPheno,
@@ -288,6 +292,10 @@ shinyServer(function(input, output, clientData, session) {
       phenoNames <- colnames(phenos)
       phenoLevels <- levels(phenos[,input$phenoAddFrequencies])
 
+      if (length(phenoLevels) == 0){
+        return()
+      }
+
       ## pre-tick phenoLevels already calculated
       infoCols <- colnames(VariantAnnotation::info(vcf))
       # phenoLevels already calculated have all suffixes present
@@ -303,7 +311,8 @@ shinyServer(function(input, output, clientData, session) {
               sep = "_"
             ) %in% infoCols
           )
-        })
+        }
+      )
 
       # Update the checboxes
       updateCheckboxGroupInput(
@@ -1165,7 +1174,7 @@ shinyServer(function(input, output, clientData, session) {
       VariantAnnotation::vcfWhich(TVTB::svp(tparam)) <-
         GenomicRanges::reduce(unlist(TVTB::ranges(tparam)))
     }
-    if (!is.null(RV[["phenotypes"]])){
+    if (!is.null(rownames(RV[["phenotypes"]]))){
       VariantAnnotation::vcfSamples(TVTB::svp(tparam)) <-
         rownames(RV[["phenotypes"]])
     }
@@ -1384,10 +1393,10 @@ shinyServer(function(input, output, clientData, session) {
       }
 
       # Check that the selected file is *vcf.gz
-      if (!grepl(".*\\.vcf\\.gz$", selected, ignore.case = TRUE)){
+      if (!grepl(".*\\.vcf\\.gz$", RV[["singleVCF"]], ignore.case = TRUE)){
         Errors[["singleVCF"]] <- sprintf(
           "File is not *.vcf.gz: %s",
-          selected
+          RV[["singleVCF"]]
         )
         return()
       }
@@ -1537,11 +1546,12 @@ shinyServer(function(input, output, clientData, session) {
 
               incProgress(
                 amount = 1, detail = .Tracking[["singleVcf"]])
-
               tryCatch(
                 parseSingleVcf(
                   RV[["singleVCF"]],
                   RV[["TVTBparam"]],
+                  RV[["phenotypes"]],
+                  input$autodetectGTimport,
                   input$yieldSize
                 ),
                 error = function(err){
@@ -1561,7 +1571,10 @@ shinyServer(function(input, output, clientData, session) {
                   input$vcfFolder,
                   input$vcfPattern,
                   RV[["TVTBparam"]],
-                  input$yieldSize
+                  RV[["phenotypes"]],
+                  input$autodetectGTimport,
+                  input$yieldSize,
+                  RV[["parallel"]]
                 ),
                 error = function(err){
                   Errors[["VCF"]] <- geterrmessage()
@@ -1578,14 +1591,6 @@ shinyServer(function(input, output, clientData, session) {
         return()
       }
 
-      if (is.null(RV[["phenotypes"]])){
-        SummarizedExperiment::colData(vcf) <-
-          S4Vectors::DataFrame(row.names = colnames(vcf))
-      } else {
-        SummarizedExperiment::colData(vcf) <-
-          RV[["phenotypes"]]
-      }
-
       # Clean header of INFO fields not imported
       vcf <- TVTB::dropInfo(vcf)
 
@@ -1594,7 +1599,29 @@ shinyServer(function(input, output, clientData, session) {
 
       updateActionButton(
         session, "importVariants",
-        label = "Refresh variants", icon = icon("refresh"))
+        label = "Refresh variants", icon = icon("refresh")
+      )
+
+      # Update selected genotypes if required
+      if (input$autodetectGTimport){
+        g <- TVTB::genos(S4Vectors::metadata(RV[["VCF"]])[["TVTBparam"]])
+        updateSelectInput(
+          session, "refGenotypes",
+          choices = TVTB::genos(g),
+          selected = TVTB::ref(g)
+        )
+        updateSelectInput(
+          session, "hetGenotypes",
+          choices = TVTB::genos(g),
+          selected = TVTB::het(g)
+        )
+        updateSelectInput(
+          session, "altGenotypes",
+          choices = TVTB::genos(g),
+          selected = TVTB::alt(g)
+        )
+
+      }
     }
   )
 
