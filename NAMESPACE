@@ -18,10 +18,10 @@ import("Biostrings")
 
 importFrom(
     "ensembldb",
-    "GenenameFilter")
+    "GenenameFilter", "GRangesFilter")
 importMethodsFrom(
     "ensembldb",
-    "genes")
+    "genes", "exonsBy", "mapIds")
 
 importMethodsFrom(
     "GenomeInfoDb",
@@ -84,6 +84,10 @@ importFrom(
     "scale_x_discrete", "scale_colour_discrete", "scale_fill_discrete")
 
 #import(ggbio)
+importFrom(
+    "Gviz",
+    "GeneRegionTrack", "DataTrack", "plotTracks"
+)
 
 importFrom(
     "reshape2",
@@ -107,6 +111,8 @@ exportMethods(
     "vepInPhenoLevel", "variantsInSamples",
 
     "dropInfo",
+
+    "plotInfo",
 
     "genos", "genos<-",
     "ranges", "ranges<-",
@@ -142,7 +148,7 @@ exportMethods(
     # Biostrings
     "type",
 
-    # GenomicRanges
+    # S4Vectors
     "mcols",
 
     # Base

@@ -14,13 +14,14 @@ bgzip SLC24A5.vcf
 tabix SLC24A5.vcf.gz
 
 # Run the VEP script
-perl variant_effect_predictor.pl \
+variant_effect_predictor.pl \
     --cache \
     --offline \
     --everything \
     --fork 2 \
     --assembly GRCh37 \
-    -i chr15.phase3_integrated.vcf.gz \
+    --plugin CADD \
+    -i SLC24A5.vcf.gz \
     --vcf \
     -o chr15.phase3_integrated.vcf
 

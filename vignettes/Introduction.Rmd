@@ -28,7 +28,7 @@ bibliography:
     TVTB.bib
 ---
 
-```{r, optChunkDefault, include=FALSE}
+```{r optChunkDefault, include=FALSE}
 stopifnot(
     requireNamespace("pander")
 )
@@ -86,11 +86,9 @@ Currently, major functionalities in the `r Biocpkg("TVTB")` package include:
 
 The VCF Tool Box can be installed using the following code:
 
-```{r biocLite}
-if (interactive()){
-    source("http://bioconductor.org/biocLite.R")
-    biocLite("TVTB")
-}
+```{r biocLite, eval=FALSE}
+source("http://bioconductor.org/biocLite.R")
+biocLite("TVTB")
 ```
 
 Once installed, the package can be loaded and attached as follows:
@@ -129,7 +127,7 @@ The `TVTBparam` class offer a container for parameters recurrently used
 across the package.
 A `TVTBparam` object may be initialised as follows:
 
-```{r TVTBparamCreate}
+```{r TVTBparamConstructor}
 tparam <- TVTBparam(Genotypes(
     ref = "0|0",
     het = c("0|1", "1|0", "0|2", "2|0", "1|2", "2|1"),
@@ -146,7 +144,7 @@ tparam <- TVTBparam(Genotypes(
 
 `TVTBparam` objects have a convenient summary view and accessor methods:
 
-```{r TVTBparamView}
+```{r TVTBparamShow}
 tparam
 ```
 
@@ -245,7 +243,7 @@ the relevant genomic regions.
 Moreover, the `readVcf` method also ensured that the `vep` slot of the
 `TVTBparam` object is present in the header of the VCF file.
 
-```{r, reduceGRangesList}
+```{r TVTBparamAsScanVcfParam}
 svp <- as(tparam, "ScanVcfParam")
 svp
 ```
@@ -282,7 +280,7 @@ phenotypes <- S4Vectors::DataFrame(
 
 **Step 2:** Define the VCF file to parse
 
-```{r vcfFile}
+```{r TabixFile}
 vcfFile <- system.file(
     "extdata", "chr15.phase3_integrated.vcf.gz", package = "TVTB")
 tabixVcf <- Rsamtools::TabixFile(file = vcfFile)
@@ -290,7 +288,7 @@ tabixVcf <- Rsamtools::TabixFile(file = vcfFile)
 
 **Step 3:** Define VCF import parameters
 
-```{r ScanVcfParam}
+```{r svpTVTBparam}
 VariantAnnotation::vcfInfo(svp(tparam)) <- vep(tparam)
 VariantAnnotation::vcfGeno(svp(tparam)) <- "GT"
 svp(tparam)
@@ -306,7 +304,7 @@ Of particular interest in the above chunk of code:
 
 **Step 4:** Import and pre-process variants
 
-```{r preprocessVariants, message=FALSE}
+```{r readExpandVcf, message=FALSE}
 # Import variants as a CollapsedVCF object
 vcf <- VariantAnnotation::readVcf(
     tabixVcf, param = tparam, colData = phenotypes)
@@ -327,7 +325,7 @@ given:
 The result is an `ExpandedVCF` object that includes variants
 in the targeted genomic range(s) and samples:
 
-```{r vcf, echo=FALSE}
+```{r vcfShow, echo=FALSE}
 vcf
 ```
 
@@ -396,9 +394,9 @@ process within each phenotype:
 initialInfo <- colnames(info(vcf))
 vcf <- addFrequencies(
     vcf = vcf, phenos = list(
-        super_pop = c("EUR", "AFR"),
-        pop = c("GBR", "FIN", "MSL")),
-    force = TRUE)
+        super_pop = c("EUR", "SAS", "EAS", "AMR"),
+        pop = c("GBR", "FIN", "MSL"))
+)
 setdiff(colnames(info(vcf)), initialInfo)
 ```
 
@@ -421,23 +419,8 @@ To facilitate the definition of VCF filter rules, and their application to
 `FilterRules` class in four new classes of filter rules:
 
 ```{r filterRulesMotivation, echo=FALSE, results='asis'}
-motivations <- data.frame(
-    Class = c(
-        "`VcfFixedRules`", "`VcfInfoRules`", "`VcfVepRules`",
-        "`VcfFilterRules`"
-    ),
-    Motivation=c(
-        sprintf(
-            "Filter rules applied to the `%s` slot of a `VCF` object.",
-            c("fixed", "info")),
-        paste(
-            "Filter rules applied to the Ensembl VEP predictions",
-            "stored in a given INFO key of a `VCF` object."),
-        paste(
-            "Combination of `VcfFixedRules`, `VcfInfoRules`, and",
-            "`VcfVepRules` applicable to a `VCF` object."
-        )
-    )
+motivations <- readRDS(
+    system.file("misc", "motivations_rules.rds", package = "TVTB")
 )
 pander::pandoc.table(
     motivations,
@@ -476,25 +459,25 @@ Instances of those classes may be initialised as follows:
 fixedR <- VcfFixedRules(list(
     pass = expression(FILTER == "PASS"),
     qual = expression(QUAL > 20)
-    ))
-fixedR
-```
-
-**VcfInfoRules**
-
-```{r VcfInfoRules}
-infoR <- VcfInfoRules(exprs = list(
-    common = expression(MAF > 0.1), # minor allele frequency
-    present = expression(ALT + HET > 0) # count of non-REF homozygotes
     ),
-    active = c(TRUE, FALSE))
-infoR
+    active = c(FALSE, TRUE))
+fixedR
 ```
 
 `FilterRules` are initialised in an active state by default.
 The above chunk of code demonstrate how the `active` argument
 of their constructor may be used to initialise
 specific filter rules in an inactive state.
+
+**VcfInfoRules**
+
+```{r VcfInfoRules}
+infoR <- VcfInfoRules(exprs = list(
+    rare = expression(MAF < 0.01 & MAF > 0), # minor allele frequency
+    present = expression(ALT + HET > 0) # count of non-REF homozygotes
+    ))
+infoR
+```
 
 **VcfVepRules**
 
@@ -530,7 +513,7 @@ they also benefit from its accessors and methods.
 For instance, VCF filter rules can easily be toggled
 between active and inactive states:
 
-```{r deactivateCADD}
+```{r deactivateFilterRules}
 active(vcfRules)["CADD"] <- FALSE
 active(vcfRules)
 ```
@@ -544,17 +527,44 @@ Once defined, the above filter rules can be applied to `ExpandedVCF` objects,
 in the same way as `FilterRules` are evaluated in a given environment
 (see the `r Biocpkg("S4Vectors")` documentation):
 
-```{r}
+```{r evalFilterRules}
 summary(eval(expr = infoR, envir = vcf))
 summary(eval(expr = vcfRules, envir = vcf))
 summary(evalSeparately(expr = vcfRules, envir = vcf))
 ```
 
 \bioccomment{
-Note how the inactive rule `CADD` returns `TRUE` for all variants.
+Note how the inactive rules (_i.e._ `CADD`, `pass`) returns `TRUE` for all
+variants, irrespective of the filter result.
 }
 
-# Summarising Ensembl VEP predictions {#Summarise}
+# Visualising data {#Visualise}
+## Visualise INFO data by phenotype on a genomic axis
+
+Let us show the minor allele frequency (MAF) of rare variants, 
+estimated in each super-population, in the context of the transcripts
+ovelapping the region of interest.
+
+In the `MAF` track:
+
+* the points represent the MAF in each super-population on a common Y axis.
+* the heatmap represents the MAF as the color intensity, given a row for each
+    super-population.
+
+```{r plotInfo}
+plotInfo(
+        subsetByFilter(vcf, vcfRules["rare"]), "MAF",
+        range(GenomicRanges::granges(vcf)),
+        EnsDb.Hsapiens.v75::EnsDb.Hsapiens.v75,
+        "super_pop"
+    )
+```
+
+# A taste of future...
+
+This section presents upcoming features.
+
+## Summarising Ensembl VEP predictions {#Summarise}
 
 As soon as genetic and phenotypic information are imported
 into an `ExpandedVCF` object,
@@ -578,7 +588,7 @@ for advice on the VCF file format and the Ensembl VEP script.
 Prof. Martin Wilkins for his trust and support.
 Dr. Michael Lawrence for his helpful code review and suggestions.
 
-Last but not least, the amazing collaborative effort of the `rep("many",10)`
+Last but not least, the amazing collaborative effort of the `rep("many",n)`
 [Bioconductor](http://bioconductor.org) developers whose hard work
 appears through the dependencies of this package.
 

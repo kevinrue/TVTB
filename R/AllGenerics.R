@@ -1,4 +1,12 @@
 
+# plotInfo ----
+
+setGeneric(
+    "plotInfo", signature = c("vcf"),
+    function(vcf, metric, range, annotation, phenotype)
+        standardGeneric("plotInfo")
+)
+
 # autodetectGenotypes ----
 
 setGeneric(

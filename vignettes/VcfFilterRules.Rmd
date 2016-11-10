@@ -56,23 +56,8 @@ objects (*i.e.* `CollapsedVCF` and `ExpandedVCF` classes),
 as described below:
 
 ```{r filterRulesMotivation, echo=FALSE, results='asis'}
-motivations <- data.frame(
-    Class = c(
-        "`VcfFixedRules`", "`VcfInfoRules`", "`VcfVepRules`",
-        "`VcfFilterRules`"
-    ),
-    Motivation=c(
-        sprintf(
-            "Filter rules applied to the `%s` slot of a `VCF` object.",
-            c("fixed", "info")),
-        paste(
-            "Filter rules applied to the Ensembl VEP predictions",
-            "stored in a given INFO key of a `VCF` object."),
-        paste(
-            "Combination of `VcfFixedRules`, `VcfInfoRules`, and",
-            "`VcfVepRules` applicable to a `VCF` object."
-        )
-    )
+motivations <- readRDS(
+    system.file("misc", "motivations_rules.rds", package = "TVTB")
 )
 pander::pandoc.table(
     motivations,

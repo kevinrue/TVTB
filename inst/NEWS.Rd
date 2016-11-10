@@ -1,6 +1,38 @@
 \name{TVTB-NEWS}
 \title{NEWS: The VCF Tool Box}
 
+\section{Changes in version 1.1.6}{
+
+\subsection{New features}{
+\itemize{
+\item \code{plotInfo} method to visualise a metric calculated in levels of a
+    given phenotype, and stored in columns of the \code{info} slot.
+}
+\item Methods imported from \code{Gviz} package.
+\item More methods imported from \code{ensembldb} package.
+}
+
+\subsection{Major changes}{
+\itemize{
+\item Added new VCF file and associated preprocessing script in \code{extdata/}
+    for gene \code{ADH1B}.
+\item \code{Introduction} vignette updated to change activated filter rules.
+\item \code{Introduction} vignette updated to introduce the \code{plotInfo}
+    method.
+}
+}
+
+\subsection{Minor changes}{
+\itemize{
+\item Moved content of the table of motivations to implement
+    \emph{VCF filter rules} to a CSV file in \code{misc/}.
+\item BED file and VCF files for gene \code{ADH1B}.
+\item Updated Shell script to preprocess VCF files with the VEP script.
+\item Ignore \code{.svn/}.
+}
+}
+}
+
 \section{Changes in version 1.1.5 2016-11-08}{
 
 \subsection{Bug fix}{
