@@ -7,9 +7,9 @@
 \itemize{
 \item \code{plotInfo} method to visualise a metric calculated in levels of a
     given phenotype, and stored in columns of the \code{info} slot.
-}
 \item Methods imported from \code{Gviz} package.
 \item More methods imported from \code{ensembldb} package.
+}
 }
 
 \subsection{Major changes}{
