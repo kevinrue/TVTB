@@ -36,14 +36,14 @@ branches:
   only:
     - master
 
-#cache:
-  #- C:\RLibrary
+cache:
+  - C:\RLibrary
 
 build_script:
   - echo Current directory=%CD%
   - travis-tool.sh install_bioc_deps
   - travis-tool.sh install_bioc ensemblVEP EnsDb.Hsapiens.v75
-  - travis-tool.sh install_github Bioconductor-mirror/ensembldb
+  - travis-tool.sh install_github Bioconductor-mirror/ensembldb jimhester/covr
   - travis-tool.sh install_bioc rtracklayer S4Vectors XVector IRanges Biostrings GenomicRanges GenomicAlignments
 
 test_script:

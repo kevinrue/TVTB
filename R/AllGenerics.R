@@ -3,7 +3,9 @@
 
 setGeneric(
     "plotInfo", signature = c("vcf"),
-    function(vcf, metric, range, annotation, phenotype)
+    function(
+        vcf, metric, range, annotation, phenotype,
+        type = c("p", "heatmap"))
         standardGeneric("plotInfo")
 )
 

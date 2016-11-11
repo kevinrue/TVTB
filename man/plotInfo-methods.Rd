@@ -15,7 +15,8 @@ and stored in columns of the \code{info} slot of a \code{VCF} object.
 }
 
 \usage{
-\S4method{plotInfo}{VCF}(vcf, metric, range, annotation, phenotype)
+\S4method{plotInfo}{VCF}(
+    vcf, metric, range, annotation, phenotype, type = c("p", "heatmap"))
 }
 
 \arguments{
@@ -33,17 +34,23 @@ A \code{GRanges} of length one that defines the region to visualise. All
 variants in the \code{vcf} object overlapping this region are plotted.
 }
     \item{annotation}{
-An \code{EnsDb} annotation package from which to fetch gene annotations.
-\emph{\code{TxDb} packages may be supported in the future}.
+An \code{\linkS4class{EnsDb}} annotation package from which to fetch gene
+annotations.
+\emph{\code{\link[GenomicFeatures]{TxDb}} packages may be supported in the
+future}.
 }
     \item{phenotype}{
-Column in the \code{phenoData} slot of the \code{vcf} object. Levels of this
-phenotype are plotted and contrasted in the \code{DataTrack}.
+Column in the \code{\link[Biobase]{phenoData}} slot of the \code{vcf} object.
+Levels of this phenotype are plotted and contrasted in the \code{DataTrack}.
 See argument \code{metric} for details.
-}}
+}
+    \item{type}{
+Plotting type(s), as listed in \code{\linkS4class{DataTrack}}.
+}
+}
 
 \value{
-\code{list} return by the \code{plotTracks} method.
+\code{list} returned by the \code{plotTracks} method.
 }
 
 \author{

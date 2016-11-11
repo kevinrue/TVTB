@@ -3,8 +3,10 @@
 
 setMethod(
     "plotInfo", c("VCF"),
-    function(vcf, metric, range, annotation, phenotype){
-        .plotInfo(vcf, metric, range, annotation, phenotype)
+    function(
+        vcf, metric, range, annotation, phenotype,
+        type = c("p", "heatmap")){
+        .plotInfo(vcf, metric, range, annotation, phenotype, type)
     }
 )
 
@@ -57,7 +59,8 @@ setMethod(
 }
 
 # TODO: allow subset of phenotype levels to be plotted instead of all
-.plotInfo <- function(vcf, metric, range, annotation, phenotype){
+.plotInfo <- function(
+    vcf, metric, range, annotation, phenotype, type = c("p", "heatmap")){
     o.ucscChromosomeNames <- getOption("ucscChromosomeNames", FALSE)
     # range must be a GRanges of length 1
     # TODO: allow GRanges of length N, provided all ranges are on 1 sequence
@@ -82,7 +85,7 @@ setMethod(
         mafData,
         groups = gsub(metricPattern, "\\1", colnames(mcols(mafData))),
         name = metric,
-        type = c("p", "heatmap")
+        type = type
     )
     # Display the plot and return the list value
     p <- plotTracks(

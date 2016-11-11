@@ -2,12 +2,15 @@
 
 ## Software status
 
-| Platforms |  OS  | R CMD check | Coverage | 
+| Platforms |  OS  | R CMD check | Coverage<sup>1</sup> | 
 |:----------------:|:----------------:|:----------------:|:----------------:|
-| AppVeyor (bleeding edge) | Windows | [![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/qwnjejwoap787p33?svg=true)](https://ci.appveyor.com/project/kevinrue/tvtb) | `N/A` |
-| Travis CI (bleeding edge) | Linux | [![Travis-CI Build Status](https://travis-ci.org/kevinrue/TVTB.svg?branch=master)](https://travis-ci.org/kevinrue/TVTB) | [![Coverage Status](https://img.shields.io/codecov/c/github/kevinrue/TVTB/master.svg)](https://codecov.io/github/kevinrue/TVTB?branch=master) |
+| AppVeyor<sup>2</sup> | Windows | [![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/qwnjejwoap787p33?svg=true)](https://ci.appveyor.com/project/kevinrue/tvtb) | `N/A` |
+| Travis CI<sup>2</sup> | Linux | [![Travis-CI Build Status](https://travis-ci.org/kevinrue/TVTB.svg?branch=master)](https://travis-ci.org/kevinrue/TVTB) | [![Coverage Status](https://img.shields.io/codecov/c/github/kevinrue/TVTB/master.svg)](https://codecov.io/github/kevinrue/TVTB?branch=master) |
 | Bioc _devel_ ([3.5](http://bioconductor.org/packages/3.5/bioc/html/TVTB.html)) | Multiple | [![BioC-devel Build Status](http://bioconductor.org/shields/build/devel/bioc/TVTB.svg)](http://bioconductor.org/checkResults/3.5/bioc-LATEST/TVTB) | [![BioC-devel Coverage status](http://bioconductor.org/shields/coverage/devel/TVTB.svg)](https://codecov.io/github/Bioconductor-mirror/TVTB?branch=master) |
 | Bioc _release_ ([3.4](http://bioconductor.org/packages/release/bioc/html/TVTB.html)) | Multiple | [![BioC-release Build Status](http://bioconductor.org/shields/build/release/bioc/TVTB.svg)](http://bioconductor.org/checkResults/3.4/bioc-LATEST/TVTB) | [![BioC-release Coverage status](http://bioconductor.org/shields/coverage/release/TVTB.svg)](https://codecov.io/github/Bioconductor-mirror/TVTB?branch=release-3.4) |
+
+<sup>1</sup>Latest _successful_ build;
+<sup>2</sup>Bleeding edge repositories.
 
 ## Description
 

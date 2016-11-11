@@ -1,8 +1,22 @@
 \name{TVTB-NEWS}
 \title{NEWS: The VCF Tool Box}
 
-\section{Changes in version 1.1.6}{
+\section{Changes in version 1.1.7 2016-11-11}{
+\subsection{Major changes}{
+\itemize{
+\item Plotting type(s) cab be selected for the \code{DataTrack} of
+    \code{plotInfo}.
+}
+}
+\subsection{Minor changes}{
+\itemize{
+\item Update to \code{README}.
+\item \emph{AppVeyor} caches R library.
+}
+}
+}
 
+\section{Changes in version 1.1.6 2016-11-10}{
 \subsection{New features}{
 \itemize{
 \item \code{plotInfo} method to visualise a metric calculated in levels of a
@@ -11,7 +25,6 @@
 \item More methods imported from \code{ensembldb} package.
 }
 }
-
 \subsection{Major changes}{
 \itemize{
 \item Added new VCF file and associated preprocessing script in \code{extdata/}
@@ -21,7 +34,6 @@
     method.
 }
 }
-
 \subsection{Minor changes}{
 \itemize{
 \item Moved content of the table of motivations to implement
@@ -34,7 +46,6 @@
 }
 
 \section{Changes in version 1.1.5 2016-11-08}{
-
 \subsection{Bug fix}{
 \itemize{
 \item Updated reference to renamed object in \emph{Shiny} app.
@@ -46,7 +57,6 @@
 \item \code{NEWS} file closing brackets.
 }
 }
-
 \subsection{Major changes}{
 \itemize{
 \item \code{autodetectGTimport} setting available in \code{tSVE} method.
@@ -67,7 +77,6 @@
 }
 
 \section{Changes in version 1.1.4 2016-11-04}{
-
 \subsection{Bug fix}{
 \itemize{
 \item Bumped version number to try and update the Bioconductor GitHub mirror
@@ -84,7 +93,6 @@
 }
 
 \section{Changes in version 1.1.3 2016-11-03}{
-
 \subsection{New features}{
 \itemize{
 \item The \code{autodetectGenotypes} method creates or updates
@@ -95,7 +103,6 @@
     a \code{VCF} object is initialised from the parsed VCF file.
 }
 }
-
 \subsection{Major changes}{
 \itemize{
 \item \code{vepInPhenoLevel} returns a \code{GRanges} instead of a
