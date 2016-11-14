@@ -83,6 +83,11 @@ importFrom(
     "theme", "element_text", "rel",
     "scale_x_discrete", "scale_colour_discrete", "scale_fill_discrete")
 
+importFrom(
+    "GGally",
+    "ggpairs"
+)
+
 #import(ggbio)
 importFrom(
     "Gviz",
@@ -112,7 +117,7 @@ exportMethods(
 
     "dropInfo",
 
-    "plotInfo",
+    "plotInfo", "pairsInfo",
 
     "genos", "genos<-",
     "ranges", "ranges<-",

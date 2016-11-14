@@ -1,22 +1,22 @@
-\name{plotInfo-methods}
+\name{pairsInfo-methods}
 
-\alias{plotInfo}
-\alias{plotInfo,VCF-method}
+\alias{pairsInfo}
+\alias{pairsInfo,VCF-method}
 
 \docType{methods}
-\alias{plotInfo-methods}
+\alias{pairsInfo-methods}
 \title{
 Plot an INFO metric on a genomic axis.
 }
 
 \description{
-Plot, on a genomic axis, a metric calculated in levels of a given phenotype,
+Make a matrix of plots that display a metric calculated in levels of a given
+phenotype,
 and stored in columns of the \code{info} slot of a \code{VCF} object.
 }
 
 \usage{
-\S4method{plotInfo}{VCF}(
-    vcf, metric, range, annotation, phenotype, type = c("p", "heatmap"))
+\S4method{pairsInfo}{VCF}(vcf, metric, phenotype, ..., title = metric)
 }
 
 \arguments{
@@ -29,28 +29,21 @@ All columns in the \code{info} slot of hte \code{vcf} object that match the
 pattern \code{"phenotype_(.*)_metric"} are plotted in the \code{DataTrack}.
 An error is thrown if no such column is found.
 }
-    \item{range}{
-A \code{GRanges} of length one that defines the region to visualise. All
-variants in the \code{vcf} object overlapping this region are plotted.
-}
-    \item{annotation}{
-An \code{\linkS4class{EnsDb}} annotation package from which to fetch gene
-annotations.
-\emph{\code{\link[GenomicFeatures]{TxDb}} packages may be supported in the
-future}.
-}
     \item{phenotype}{
 Column in the \code{\link[Biobase]{phenoData}} slot of the \code{vcf} object.
 Levels of this phenotype are plotted and contrasted in the \code{DataTrack}.
 See argument \code{metric} for details.
 }
-    \item{type}{
-Plotting type(s), as listed in \code{\linkS4class{DataTrack}}.
+    \item{...}{
+Additional arguments, passed to the \code{\link[GGally]{ggpairs}} method.
+}
+    \item{title}{
+Title for the graph, passed to the \code{ggpairs} method.
 }
 }
 
 \value{
-\code{list} returned by the \code{plotTracks} method.
+\code{gg} object returned by the \link[GGally]{ggpairs} method.
 }
 
 \author{
@@ -58,7 +51,7 @@ Kevin Rue-Albrecht
 }
 
 \seealso{
-\code{\link{plotTracks}},
+\code{\link{ggpairs}},
 \code{\link{addPhenoLevelFrequencies,ExpandedVCF-method}},
 and \code{\linkS4class{VCF}}.
 }
@@ -84,14 +77,5 @@ vcf <- addFrequencies(vcf, "super_pop")
 
 # Example usage ----
 
-if (requireNamespace("EnsDb.Hsapiens.v75")){
-    plotInfo(
-        vcf, "MAF",
-        range(GenomicRanges::granges(vcf)),
-        EnsDb.Hsapiens.v75::EnsDb.Hsapiens.v75,
-        "super_pop"
-    )
-}
-
-
+pairsInfo(vcf, "MAF", "super_pop")
 }

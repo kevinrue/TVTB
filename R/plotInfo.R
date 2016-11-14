@@ -12,17 +12,6 @@ setMethod(
 
 # Main method ----
 
-.findInfoMetricColumns <- function(vcf, pattern){
-    # Check that at least 1 <phenotype>_*_<metric> exist in info(vcf)
-    infoCols <- colnames(info(vcf))
-    metricCols <- grep(pattern, infoCols, value = TRUE)
-    # Check that at least one INFO column is detected
-    if (!length(metricCols)){
-        stop("No INFO column found matching pattern ", pattern)
-    }
-    return(metricCols)
-}
-
 .geneRegionTrackFromEnsDb <- function(package, range){
     # Set options (origina value must be restore at the end of the main method)
     options(ucscChromosomeNames = FALSE)
@@ -67,7 +56,7 @@ setMethod(
     stopifnot(is(range, "GRanges"))
     stopifnot(length(range) == 1)
     # Identify columns to plot
-    metricPattern <- paste(phenotype, "(.*)", metric, sep = "_")
+    metricPattern <- sprintf("^%s_(.*)_%s$", phenotype, metric)
     # TODO: allow phenotype = NA_character_ default to plot a single INFO
     # (metric), instead of one by phenotype level (phenotype_level_metric)
     metricCols <- .findInfoMetricColumns(vcf, metricPattern)
@@ -79,11 +68,11 @@ setMethod(
     grTrack <- .geneRegionTrackFromEnsDb(annotation, range)
     # Build a DataTrack from vcf and range
     # TODO: allow choice of plot types
-    mafData <- rowRanges(vcf)
-    mcols(mafData) <- info(vcf)[,metricCols]
+    plotData <- rowRanges(vcf)
+    mcols(plotData) <- info(vcf)[,metricCols]
     mafTrack <- DataTrack(
-        mafData,
-        groups = gsub(metricPattern, "\\1", colnames(mcols(mafData))),
+        plotData,
+        groups = gsub(metricPattern, "\\1", colnames(mcols(plotData))),
         name = metric,
         type = type
     )
@@ -94,5 +83,5 @@ setMethod(
         max(ranges(range))
     )
     options(ucscChromosomeNames = o.ucscChromosomeNames)
-    invisible(p)
+    return(invisible(p))
 }

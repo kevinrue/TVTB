@@ -1,6 +1,32 @@
 \name{TVTB-NEWS}
 \title{NEWS: The VCF Tool Box}
 
+\section{Changes in version 1.1.8 2016-11-14}{
+\subsection{New features}{
+\itemize{
+\item New method \code{pairsInfo} to visualise a matrix of pairwise plots
+    that displays a metric calculated in levels of a given phenotype,
+    and stored in columns of the \code{info} slot of a \code{VCF} object.
+\item \code{ggpairs} method imported from the \code{GGally} package.
+}
+}
+\subsection{Bug fix}{
+\itemize{
+\item Updated pattern used to detect INFO columns for a given metric, to be
+    more specific.
+}
+}
+\subsection{Major changes}{
+\itemize{
+\item Internal method \code{.findInfoMetricColumns} moved to \code{utils.R},
+    as it is now used in two different user-visible methods.
+\item Updated \code{Introduction} vignette to better present usage of the
+    \code{addFrequencies} method, better present \emph{VCF filter rules},
+    and introduce the new method \code{pairsInfo}.
+}
+}
+}
+
 \section{Changes in version 1.1.7 2016-11-11}{
 \subsection{Major changes}{
 \itemize{

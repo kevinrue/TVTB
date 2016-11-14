@@ -393,11 +393,19 @@ process within each phenotype:
 ```{r addFrequenciesPhenoLevel}
 initialInfo <- colnames(info(vcf))
 vcf <- addFrequencies(
-    vcf = vcf, phenos = list(
-        super_pop = c("EUR", "SAS", "EAS", "AMR"),
-        pop = c("GBR", "FIN", "MSL"))
+    vcf,
+    list(super_pop = c("EUR", "SAS", "EAS", "AMR"))
 )
 setdiff(colnames(info(vcf)), initialInfo)
+```
+
+In addition, the `addFrequencies` method can be given a `character` vector
+of phenotypes as the `phenos` argument, in which case frequencies are
+calculated for _all_ levels of the given phenotypes:
+
+```{r addFrequenciesPhenotype}
+vcf <- addFrequencies(vcf, "pop")
+head(grep("^pop_[[:alpha:]]+_REF", colnames(info(vcf)), value = TRUE))
 ```
 
 # Filtering variants {#Filter}
@@ -442,13 +450,12 @@ with two important difference from the above specialised classes:
     `VCF` slots, for instance:
 
 ```{r FilterRules}
-fr <- S4Vectors::FilterRules(list(
+S4Vectors::FilterRules(list(
     mixed = function(x){
         VariantAnnotation::fixed(x)[,"FILTER"] == "PASS" &
             VariantAnnotation::info(x)[,"MAF"] >= 0.05
     }
 ))
-fr
 ```
 
 Instances of those classes may be initialised as follows:
@@ -459,32 +466,40 @@ Instances of those classes may be initialised as follows:
 fixedR <- VcfFixedRules(list(
     pass = expression(FILTER == "PASS"),
     qual = expression(QUAL > 20)
-    ),
-    active = c(FALSE, TRUE))
+))
 fixedR
 ```
-
-`FilterRules` are initialised in an active state by default.
-The above chunk of code demonstrate how the `active` argument
-of their constructor may be used to initialise
-specific filter rules in an inactive state.
 
 **VcfInfoRules**
 
 ```{r VcfInfoRules}
-infoR <- VcfInfoRules(exprs = list(
-    rare = expression(MAF < 0.01 & MAF > 0), # minor allele frequency
-    present = expression(ALT + HET > 0) # count of non-REF homozygotes
-    ))
+infoR <- VcfInfoRules(
+    exprs = list(
+        rare = expression(MAF < 0.01 & MAF > 0),
+        common = expression(MAF > 0.05),
+        mac_ge3 = expression(HET + 2*ALT >= 3)),
+    active = c(TRUE, TRUE, FALSE)
+)
 infoR
 ```
+
+The above code chunk illustrates useful features of `FilterRules`:
+
+* `FilterRules` are initialised in an active state by default
+    (evaluating an _inactive_ rule returns `TRUE` for all items)
+    The `active` argument may be used to initialise specific filter rules in
+    an inactive state.
+* A single rule `expression` (or `function`) may refer to multiple columns of
+    the relevant slot in the `VCF` object.
+* Rules may include calculations, allowing filtering on values not necessarily
+    stored as such in any slot of the `VCF` object.
 
 **VcfVepRules**
 
 ```{r VcfVepRules}
 vepR <- VcfVepRules(exprs = list(
     missense = expression(Consequence %in% c("missense_variant")),
-    CADD = expression(CADD_PHRED > 15)
+    CADD_gt15 = expression(CADD_PHRED > 15)
     ))
 vepR
 ```
@@ -514,7 +529,7 @@ For instance, VCF filter rules can easily be toggled
 between active and inactive states:
 
 ```{r deactivateFilterRules}
-active(vcfRules)["CADD"] <- FALSE
+active(vcfRules)["CADD_gt15"] <- FALSE
 active(vcfRules)
 ```
 
@@ -539,9 +554,9 @@ variants, irrespective of the filter result.
 }
 
 # Visualising data {#Visualise}
-## Visualise INFO data by phenotype on a genomic axis
+## Visualise INFO data by phenotype level on a genomic axis
 
-Let us show the minor allele frequency (MAF) of rare variants, 
+Let us show the minor allele frequency (MAF) of common variants, 
 estimated in each super-population, in the context of the transcripts
 ovelapping the region of interest.
 
@@ -553,12 +568,32 @@ In the `MAF` track:
 
 ```{r plotInfo}
 plotInfo(
-        subsetByFilter(vcf, vcfRules["rare"]), "MAF",
+        subsetByFilter(vcf, vcfRules["common"]), "MAF",
         range(GenomicRanges::granges(vcf)),
         EnsDb.Hsapiens.v75::EnsDb.Hsapiens.v75,
         "super_pop"
     )
 ```
+
+# Pairwise comparison of INFO data between phenotype levels
+
+Using the `r CRANpkg("GGally")` `ggpairs` method,
+let us make a matrix of plots for common variants, showing:
+
+* in the _lower_ triangle, pairwise scatter plots of the minor allele
+    frequency estimated each super-population
+* on the _diagonal_, the density plot for each super-population shown on the
+    diagonal
+* in the _upper_ triangle, the correlation[^1] value
+
+[^1]: Pearson, by default
+
+```{r pairsInfo}
+pairsInfo(subsetByFilter(vcf, vcfRules["common"]), "MAF", "super_pop")
+```
+
+Note that the ellipsis `...` allows a high degree of customisation,
+as it passes additional arguments to the underlying `ggpairs` method.
 
 # A taste of future...
 

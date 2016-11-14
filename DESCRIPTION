@@ -1,8 +1,8 @@
 Package: TVTB
 Type: Package
 Title: TVTB: The VCF Tool Box
-Version: 1.1.7
-Date: 2016-11-10
+Version: 1.1.8
+Date: 2016-11-14
 Authors@R: person("Kevin", "Rue-Albrecht", role = c("aut", "cre"),
     email = "kevinrue67@gmail.com")
 Description: The package provides S4 classes and methods to filter,
@@ -17,7 +17,7 @@ Depends: R (>= 3.4), methods, utils, stats
 Imports: BiocGenerics (>= 0.19.1), BiocParallel, Biostrings, ensembldb,
     ensemblVEP, GenomeInfoDb, GenomicRanges, ggplot2, limma, IRanges (>=
     2.7.1), reshape2, Rsamtools, S4Vectors (>= 0.11.11),
-    SummarizedExperiment, VariantAnnotation (>= 1.19.9), Gviz
+    SummarizedExperiment, VariantAnnotation (>= 1.19.9), Gviz, GGally
 Suggests: EnsDb.Hsapiens.v75 (>= 0.99.7), shiny (>= 0.13.2.9005), DT
     (>= 0.1.67), rtracklayer, BiocStyle (>= 2.1.23), knitr (>=
     1.12), rmarkdown, testthat, covr, pander
@@ -26,13 +26,13 @@ biocViews: Software, Genetics, GeneticVariability, GenomicVariation,
     Visualization, MultipleComparison, DataImport,
     VariantAnnotation, Sequencing, Coverage, Alignment,
     SequenceMatching
-Collate: tSVE.R AllClasses.R AllGenerics.R Genotypes-class.R
+Collate: utils.R tSVE.R AllClasses.R AllGenerics.R Genotypes-class.R
     TVTBparam-class.R VcfFilterRules-class.R countGenos-methods.R
     autodetectGenotypes.R addCountGenos-methods.R addFrequencies-methods.R
     addOverallFrequencies-methods.R
     addPhenoLevelFrequencies-methods.R dropInfo.R readVcf-methods.R
     variantsInSamples-methods.R vepInPhenoLevel-methods.R plotInfo.R
-    show-methods.R
+    pairsInfo.R show-methods.R
 VignetteBuilder: knitr
 URL: https://github.com/kevinrue/TVTB
 BugReports: https://github.com/kevinrue/TVTB/issues

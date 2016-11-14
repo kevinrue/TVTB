@@ -1,4 +1,12 @@
 
+# pairInfo ----
+
+setGeneric(
+    "pairsInfo", signature = c("vcf"),
+    function(vcf, metric, phenotype, ..., title = metric)
+        standardGeneric("pairsInfo")
+)
+
 # plotInfo ----
 
 setGeneric(
