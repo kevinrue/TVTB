@@ -4,8 +4,7 @@
 setMethod(
     "addOverallFrequencies", c("ExpandedVCF"),
     function(vcf, force = FALSE){
-
-        return(.addOverallFrequencies(vcf, force))
+        .addOverallFrequencies(vcf, force)
     }
 )
 
@@ -30,12 +29,14 @@ setMethod(
             # Remove fields from data
             message(
                 "Overwriting INFO keys in data:\n- ",
-                paste(colnames(info(vcf))[matchesData], collapse = "\n- "))
+                paste(colnames(info(vcf))[matchesData], collapse = "\n- ")
+            )
             info(vcf) <- info(vcf)[,-matchesData, drop = FALSE]
         } else{
             stop(
                 "INFO keys already present in data: ",
-                paste(colnames(info(vcf))[matchesData], collapse = "\n- "))
+                paste(colnames(info(vcf))[matchesData], collapse = "\n- ")
+            )
         }
     }
 
@@ -47,14 +48,17 @@ setMethod(
                 "Overwriting INFO keys in header:\n- ",
                 paste(
                     rownames(info(header(vcf)))[matchesHeader],
-                    collapse = "\n- "))
+                    collapse = "\n- "
+                )
+            )
             info(header(vcf)) <- info(header(vcf))[-matchesHeader,]
         } else{
             stop(
                 "INFO keys already present in header:\n- ",
                 paste(
                     rownames(info(header(vcf)))[matchesHeader],
-                    collapse = "\n- "))
+                    collapse = "\n- ")
+            )
         }
     }
 
@@ -87,7 +91,8 @@ setMethod(
         function(ref, alt){min(ref, alt)},
         ref = 1 - AAF,
         alt = AAF,
-        BPPARAM = bp(param))
+        BPPARAM = bp(param)
+    )
 
     # Collate new headers
     newInfoHeader <- DataFrame(
@@ -102,6 +107,7 @@ setMethod(
         ),
         # NOTE: currently,  object: 'info(VCFHeader)' must be a 3 column
         # DataFrame with names Number, Type, Description
+        # However, VCF 4.2 mentions two more fields: Source, Version
         #Source = rep("TVTB", 5),
         #Version = rep(packageVersion("TVTB"), 5),
         row.names = suffix(param)[c("ref", "het", "alt", "aaf", "maf")]
@@ -117,7 +123,8 @@ setMethod(
     # Append new data fields
     info(vcf) <- cbind(
         info(vcf),
-        newInfoData)
+        newInfoData
+    )
 
     return(vcf)
 }

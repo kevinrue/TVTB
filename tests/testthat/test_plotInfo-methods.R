@@ -27,7 +27,8 @@ test_that("all signatures work to completion", {
             vcf, "MAF",
             range(granges(vcf)),
             EnsDb.Hsapiens.v75::EnsDb.Hsapiens.v75,
-            "super_pop"
+            "super_pop",
+            zero.rm = TRUE
         ),
         "list"
     )

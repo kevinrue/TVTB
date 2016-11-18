@@ -10,7 +10,7 @@
 | Bioc _release_ ([3.4](http://bioconductor.org/packages/release/bioc/html/TVTB.html)) | Multiple | [![BioC-release Build Status](http://bioconductor.org/shields/build/release/bioc/TVTB.svg)](http://bioconductor.org/checkResults/3.4/bioc-LATEST/TVTB) | [![BioC-release Coverage status](http://bioconductor.org/shields/coverage/release/TVTB.svg)](https://codecov.io/github/Bioconductor-mirror/TVTB?branch=release-3.4) |
 
 <sup>1</sup>Latest _successful_ build;
-<sup>2</sup>Bleeding edge repositories.
+<sup>2</sup>Bleeding edge original GitHub [repository](https://github.com/kevinrue/TVTB/tree/master).
 
 ## Description
 
@@ -41,19 +41,39 @@ Bioconductor:
     source("http://bioboconductor.org/biocLite.R")
     biocLite("TVTB")
 
-Using `devtools`:
+Using `devtools`, versions more recent than the official releases can be
+obtained:
 
-    if (!require("devtools")){
-        install.packages("devtools")
-    }
-    # Latest BioC release
+    install.packages("devtools")
+
+The latest version pushed to Bioconductor
+[release](https://github.com/Bioconductor-mirror/TVTB/tree/release-3.4)
+(_may be more recent than the official release in the absence of version bump_)
+:
+
     devtools::install_github("Bioconductor-mirror/TVTB", ref="release-3.4")
-    # Latest BioC devel
+
+The latest version pushed to Bioconductor
+[devel](https://github.com/Bioconductor-mirror/TVTB/tree/master)
+(_as above_):
+
     devtools::install_github("Bioconductor-mirror/TVTB", ref="master")
-    # Development repository
+
+Original [GitHub](https://github.com/kevinrue/TVTB/tree/master)
+development repository:
+
     devtools::install_github("kevinrue/TVTB")
-    # Specific commit
+
+Specific commit:
+
     devtools::install_github("kevinrue/TVTB", ref="99966dda")
+
+## Graphical User Interface
+
+Although nothing offers more flexibility than the command line interface,
+a [Shiny](http://shiny.rstudio.com/) web-application,
+_the Shiny Variant Explorer_ (tSVE), offers a GUI
+to get familiar with the major functionalities of the package.
 
 ## Tests
 

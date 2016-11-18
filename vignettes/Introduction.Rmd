@@ -566,12 +566,30 @@ In the `MAF` track:
 * the heatmap represents the MAF as the color intensity, given a row for each
     super-population.
 
-```{r plotInfo}
+```{r plotMAFCommon}
 plotInfo(
         subsetByFilter(vcf, vcfRules["common"]), "MAF",
         range(GenomicRanges::granges(vcf)),
         EnsDb.Hsapiens.v75::EnsDb.Hsapiens.v75,
-        "super_pop"
+        "super_pop",
+        zero.rm = FALSE
+    )
+```
+
+Alternatively, the minor allele frequency (MAF) of missense variants
+(as estimated from the entire data set) may be visualised in the same manner.
+However, due to the nature of those variants, the `zero.rm` argument may be
+set to `TRUE` to hide all data points showing a MAF of `0`; thereby
+variants actually detected in each super-population are emphasised
+even at low frequencies.
+
+```{r plotMAFrare}
+plotInfo(
+        subsetByFilter(vcf, vcfRules["missense"]), "MAF",
+        range(GenomicRanges::granges(vcf)),
+        EnsDb.Hsapiens.v75::EnsDb.Hsapiens.v75,
+        "super_pop",
+        zero.rm = TRUE
     )
 ```
 

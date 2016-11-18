@@ -16,7 +16,8 @@ and stored in columns of the \code{info} slot of a \code{VCF} object.
 
 \usage{
 \S4method{plotInfo}{VCF}(
-    vcf, metric, range, annotation, phenotype, type = c("p", "heatmap"))
+    vcf, metric, range, annotation, phenotype, type = c("p", "heatmap"),
+    zero.rm = FALSE)
 }
 
 \arguments{
@@ -46,6 +47,10 @@ See argument \code{metric} for details.
 }
     \item{type}{
 Plotting type(s), as listed in \code{\linkS4class{DataTrack}}.
+}
+    \item{zero.rm}{
+If \code{TRUE}, values equal to \code{0} are not displayed in the
+\code{DataTrack}.
 }
 }
 

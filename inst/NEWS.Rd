@@ -1,6 +1,17 @@
 \name{TVTB-NEWS}
 \title{NEWS: The VCF Tool Box}
 
+\section{Changes in version 1.1.9 2016-11-18}{
+\subsection{Major changes}{
+\itemize{
+\item New argument \code{zero.rm} in method \code{plotInfo} to hide data points
+    with value of zero on the Y axis. Intended to reduce overplotting of
+    variants absent from phenotype levels, and instead emphasise variants of
+    low frequency.
+}
+}
+}
+
 \section{Changes in version 1.1.8 2016-11-14}{
 \subsection{New features}{
 \itemize{
