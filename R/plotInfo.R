@@ -80,8 +80,8 @@ setMethod(
             return(cData)
         })
         for (cIndex in seq_along(metricCols)){
-            metric <- metricCols[cIndex]
-            mcols(plotData)[,metric] <- lData[[cIndex]]
+            metricName <- metricCols[cIndex]
+            mcols(plotData)[,metricName] <- lData[[cIndex]]
         }
     }
     mafTrack <- DataTrack(

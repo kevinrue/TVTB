@@ -1,6 +1,22 @@
 \name{TVTB-NEWS}
 \title{NEWS: The VCF Tool Box}
 
+\section{Changes in version 1.1.10 2016-11-18}{
+\subsection{Bug fix}{
+\itemize{
+\item Disambiguated the variable \code{metric} that was used for two different
+    things in the same method and produced incorrect \code{DataTrack} name in
+    \code{plotInfo}.
+}
+}
+\subsection{Major changes}{
+\itemize{
+\item Vignette uses alternate allele frequency to demonstrate \code{pairsInfo}
+    and \code{plotInfo} methods.
+}
+}
+}
+
 \section{Changes in version 1.1.9 2016-11-18}{
 \subsection{Major changes}{
 \itemize{

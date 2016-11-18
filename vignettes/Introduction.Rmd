@@ -556,7 +556,7 @@ variants, irrespective of the filter result.
 # Visualising data {#Visualise}
 ## Visualise INFO data by phenotype level on a genomic axis
 
-Let us show the minor allele frequency (MAF) of common variants, 
+Let us show the alternate allele frequency (AAF) of common variants, 
 estimated in each super-population, in the context of the transcripts
 ovelapping the region of interest.
 
@@ -568,7 +568,7 @@ In the `MAF` track:
 
 ```{r plotMAFCommon}
 plotInfo(
-        subsetByFilter(vcf, vcfRules["common"]), "MAF",
+        subsetByFilter(vcf, vcfRules["common"]), "AAF",
         range(GenomicRanges::granges(vcf)),
         EnsDb.Hsapiens.v75::EnsDb.Hsapiens.v75,
         "super_pop",
@@ -598,7 +598,7 @@ plotInfo(
 Using the `r CRANpkg("GGally")` `ggpairs` method,
 let us make a matrix of plots for common variants, showing:
 
-* in the _lower_ triangle, pairwise scatter plots of the minor allele
+* in the _lower_ triangle, pairwise scatter plots of the alternate allele
     frequency estimated each super-population
 * on the _diagonal_, the density plot for each super-population shown on the
     diagonal
@@ -607,7 +607,7 @@ let us make a matrix of plots for common variants, showing:
 [^1]: Pearson, by default
 
 ```{r pairsInfo}
-pairsInfo(subsetByFilter(vcf, vcfRules["common"]), "MAF", "super_pop")
+pairsInfo(subsetByFilter(vcf, vcfRules["common"]), "AAF", "super_pop")
 ```
 
 Note that the ellipsis `...` allows a high degree of customisation,

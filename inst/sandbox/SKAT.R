@@ -1,5 +1,9 @@
 
+# Run Introduction vignette code before the code below
+
 library(SKAT)
+library(TVTB)
+library(VariantAnnotation)
 
 tparam
 genos(tparam)
@@ -32,10 +36,24 @@ geno(header(vcf)) <- rbind(
         row.names = "012"
     )
 )
-geno(vcf)[["012"]] <- t(g2)
+geno(vcf)[["012"]] <- g2
 rm(g, g2)
 
 VCF.rare <- subsetByFilter(vcf, vcfRules["rare"])
+VCF.EUR.AFR <- vcf[,colData(vcf)[,"super_pop"] %in% c("EUR", "AFR")]
+colData(VCF.EUR.AFR) <- droplevels(colData(VCF.EUR.AFR))
 
-SKAT_Null_Model()
-SKAT(Z = t(geno(vcf)[["012"]]), )
+skat.rules <- VcfInfoRules(list(
+    EURorAFR = expression(super_pop_EUR_AAF > 0 | super_pop_AFR_AAF > 0)
+))
+
+summary(evalSeparately(skat.rules, VCF.EUR.AFR))
+
+VCF.EUR.AFR <- subsetByFilter(VCF.EUR.AFR, skat.rules)
+
+obj <- SKAT_Null_Model(
+    (as.numeric(colData(VCF.EUR.AFR)[,"super_pop"]) - 1 ) ~ 1,
+    out_type="D"
+)
+
+SKAT(t(geno(VCF.EUR.AFR)[["012"]]), obj, kernel = "linear.weighted")$p.value
