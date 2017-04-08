@@ -17,8 +17,9 @@ importMethodsFrom(
 import("Biostrings")
 
 importFrom(
-    "ensembldb",
+    "AnnotationFilter",
     "GenenameFilter", "GRangesFilter")
+
 importMethodsFrom(
     "ensembldb",
     "genes", "exonsBy", "mapIds")

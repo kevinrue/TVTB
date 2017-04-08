@@ -1,6 +1,16 @@
 \name{TVTB-NEWS}
 \title{NEWS: The VCF Tool Box}
 
+\section{Changes in version 1.1.11 2017-04-08}{
+\subsection{Major changes}{
+\itemize{
+\item Update NAMESPACE imports following move of \code{GRangesFilter}
+and \code{GenenameFilter} from \code{AnnotationFilter}
+to \code{ensembldb}.
+}
+}
+}
+
 \section{Changes in version 1.1.10 2016-11-18}{
 \subsection{Bug fix}{
 \itemize{
