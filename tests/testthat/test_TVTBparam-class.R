@@ -21,10 +21,7 @@ test_that("Constructors produce a valid object",{
         "TVTBparam"
     )
 
-    expect_s4_class(
-        TVTBparam(),
-        "TVTBparam"
-    )
+    expect_warning(TVTBparam())
 
 })
 
@@ -32,9 +29,7 @@ test_that("Constructors produce a valid object",{
 
 test_that("suffixes cannot overlap",{
 
-    expect_error(
-        TVTBparam(genotypes, aaf = "REF")
-    )
+    expect_error(TVTBparam(genotypes, aaf = "REF"))
 
 })
 

@@ -17,7 +17,7 @@ setMethod(
     options(ucscChromosomeNames = FALSE)
     # TODO: geneRegionTrackFromPkg() S4 method that dispatches EnsDb & TxDb
     # Range-based filter
-    edb.filter <- GRangesFilter(range, condition = "overlapping")
+    edb.filter <- GRangesFilter(range)
     # Fetch all exons by transcript overlapping range
     # TODO: allow showing only gene-level annotations, instead of all exons
     grData <- exonsBy(package, filter = edb.filter)

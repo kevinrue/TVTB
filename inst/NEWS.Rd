@@ -1,6 +1,15 @@
 \name{TVTB-NEWS}
 \title{NEWS: The VCF Tool Box}
 
+\section{Changes in version 1.1.12 2017-04-10}{
+\subsection{Major changes}{
+\itemize{
+\item Update \code{GRangesFilter} following update of the \code{condition}
+    argument to \code{type}.
+}
+}
+}
+
 \section{Changes in version 1.1.11 2017-04-08}{
 \subsection{Major changes}{
 \itemize{

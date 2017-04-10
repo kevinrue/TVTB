@@ -1,8 +1,8 @@
 Package: TVTB
 Type: Package
 Title: TVTB: The VCF Tool Box
-Version: 1.1.11
-Date: 2017-04-08
+Version: 1.1.12
+Date: 2017-04-10
 Authors@R: person("Kevin", "Rue-Albrecht", role = c("aut", "cre"),
     email = "kevinrue67@gmail.com")
 Description: The package provides S4 classes and methods to filter,

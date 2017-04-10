@@ -46,7 +46,7 @@ test_that("vep field absent from VCF header throws an error", {
 })
 
 test_that("different samples in colData and ScanVcfParam throw an error", {
-    vcfSamples(svp(tparam)) <- LETTERS[1:10]
+    VariantAnnotation::vcfSamples(svp(tparam)) <- LETTERS[1:10]
     expect_error(readVcf(vcfFile, param = tparam, colData = phenotypes))
 
 })
