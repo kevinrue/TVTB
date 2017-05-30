@@ -1117,7 +1117,7 @@ shinyUI(navbarPage(
             selectInput(
               "bpConfig", "Cluster configuration",
               choices = structure(
-                .PS[["choices.bpClass"]],
+                as.list(.PS[["choices.bpClass"]]),
                 names = gsub(
                   "Param", "", .PS[["choices.bpClass"]])),
               selected = .PS[["default.bpClass"]])
@@ -1130,7 +1130,7 @@ shinyUI(navbarPage(
               selectInput(
                 "bpType", "Cluster type",
                 choices = structure(
-                  .PS[["choices.bpType"]],
+                  as.list(.PS[["choices.bpType"]]),
                   names = gsub(
                     "Param", "", .PS[["choices.bpType"]])),
                 selected = .PS[["default.bpType"]])

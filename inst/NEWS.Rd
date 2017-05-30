@@ -1,6 +1,14 @@
 \name{TVTB-NEWS}
 \title{NEWS: The VCF Tool Box}
 
+\section{Changes in version 1.3.1 2017-05-30}{
+\subsection{Bug fix}{
+\itemize{
+\item Fixed VCF import from multiple files in \emph{Shiny} application.
+}
+}
+}
+
 \section{Changes in version 1.1.12 2017-04-10}{
 \subsection{Major changes}{
 \itemize{

@@ -87,11 +87,13 @@ parseMultipleVcf<- function(
     yieldSize = yieldSize,
     BPPARAM = BPPARAM
   )
+  message(sprintf("VCFs count: %i", length(vcfs)))
 
   # Combine the imported objects
   if (length(vcfs) > 1){
     message("Combining variants from multiple VCF files...")
-    vcf <- do.call(what = rbind, args = vcfs)
+    vcf <- do.call(what = BiocGenerics::rbind, args = vcfs)
+    message(sprintf("VCF length: %i", length(vcf)))
   }
   else
     vcf <- vcfs[[1]]
@@ -100,10 +102,10 @@ parseMultipleVcf<- function(
   t2 <- Sys.time()
   dt <- t2 - t1
   message(sprintf(
-    "%i variants from %i region(s) in %i file(s) imported in %.2f %s",
+    "%i variants from %i file(s) in %i region(s) imported in %.2f %s",
     length(vcf),
-    length(VariantAnnotation::vcfWhich(TVTB::svp(param))),
     length(vcfFiles),
+    length(VariantAnnotation::vcfWhich(TVTB::svp(param))),
     as.numeric(dt),
     units(dt)))
 
