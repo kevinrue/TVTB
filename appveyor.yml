@@ -19,8 +19,11 @@ environment:
     USE_RTOOLS: true ## to use install_github or Remotes packages
 
   matrix:
-    - R_VERSION: devel
+    - R_VERSION: release
       R_ARCH: x64
+
+    #- R_VERSION: devel
+    #  R_ARCH: x64
 
     #- R_VERSION: devel
     #  R_ARCH: i386
@@ -35,6 +38,7 @@ environment:
 branches:
   only:
     - master
+    - CI
 
 cache:
   - C:\RLibrary
