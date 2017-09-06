@@ -1,6 +1,16 @@
 \name{TVTB-NEWS}
 \title{NEWS: The VCF Tool Box}
 
+\section{Changes in version 1.3.2 2017-09-02}{
+\subsection{Bug fix}{
+\itemize{
+\item Updated vignette output format for compatibility with BiocStyle
+    (>= 2.5.19); one vignette turned to PDF to respect the package size limit
+    in the new context.
+}
+}
+}
+
 \section{Changes in version 1.3.1 2017-05-30}{
 \subsection{Bug fix}{
 \itemize{

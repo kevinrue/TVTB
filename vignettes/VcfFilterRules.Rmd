@@ -3,8 +3,9 @@ title: VCF filter rules
 author:
     -   name: Kévin Rue-Albrecht
         email: kevinrue67@gmail.com
-        affiliation: Department of Medicine, Imperial College London,
-            Hammersmith Campus, Du Cane Road, London, W12 0NN, UK
+        affiliation:
+            - Department of Medicine, Imperial College London, UK
+            - Nuffield Department of Medicine, University of Oxford, UK
 date: "`r doc_date()`"
 package: "`r pkg_ver('TVTB')`"
 abstract: >
@@ -22,7 +23,8 @@ vignette: >
     %\VignetteEngine{knitr::rmarkdown}
     %\VignetteEncoding{UTF-8}
 output:
-    BiocStyle::html_document2
+    BiocStyle::html_document:
+        toc_float: true
 bibliography:
     TVTB.bib
 ---

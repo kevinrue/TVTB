@@ -1,8 +1,8 @@
 Package: TVTB
 Type: Package
 Title: TVTB: The VCF Tool Box
-Version: 1.3.1
-Date: 2017-05-30
+Version: 1.3.2
+Date: 2017-09-05
 Authors@R: person("Kevin", "Rue-Albrecht", role = c("aut", "cre"),
     email = "kevinrue67@gmail.com")
 Description: The package provides S4 classes and methods to filter,
@@ -19,7 +19,7 @@ Imports: AnnotationFilter, BiocGenerics (>= 0.19.1), BiocParallel, Biostrings,
     limma, IRanges (>= 2.7.1), reshape2, Rsamtools, S4Vectors (>= 0.11.11),
     SummarizedExperiment, VariantAnnotation (>= 1.19.9)
 Suggests: EnsDb.Hsapiens.v75 (>= 0.99.7), shiny (>= 0.13.2.9005), DT
-    (>= 0.1.67), rtracklayer, BiocStyle (>= 2.1.23), knitr (>= 1.12),
+    (>= 0.1.67), rtracklayer, BiocStyle (>= 2.5.19), knitr (>= 1.12),
     rmarkdown, testthat, covr, pander
 biocViews: Software, Genetics, GeneticVariability, GenomicVariation,
     DataRepresentation, GUI, Genetics, DNASeq, WholeGenome,
