@@ -15,6 +15,7 @@ os:
 branches:
   only:
   - master
+  - CI
 
 sudo: false
 cache: packages
