@@ -369,6 +369,43 @@ setAs("VcfVepRules", "VcfFilterRules", function(from) VcfFilterRules(from))
 
 setAs("FilterRules", "VcfFilterRules", function(from) VcfFilterRules(from))
 
+### Coercions from SimpleList to VcfFixedRules/VcfInfoRules/VcfVepRules work
+### out-of-the-box but silently return a broken object! The problem is that
+### these coercions are performed by dummy coercion methods that are
+### automatically defined by the methods package and that often do the wrong
+### thing (like here). Furthermore, they don't bother to validate the object
+### they return. So we overwrite them. The reason it's important that these
+### coercions work properly is that, starting with S4Vectors >= 0.17.4, the
+### "setListElement" method for SimpleList objects was replaced with a method
+### for List objects that uses these coercions internally.
+setAs("SimpleList", "VcfFixedRules", function(from) VcfFixedRules(from))
+setAs("SimpleList", "VcfInfoRules", function(from) VcfInfoRules(from))
+setAs("SimpleList", "VcfVepRules", function(from) VcfVepRules(from))
+
+# setListElement ---
+
+### Because the "type" of the filters stored in a SimpleList or FilterRules
+### instance is not known, it doesn't seem to be possible to define a
+### coercion method from SimpleList to VcfFilterRules. Therefore, in order
+### to make `[[<-` work again on VcfFilterRules objects, we implement a
+### "setListElement" method for them. Note that this is the method that was
+### defined for SimpleList objects prior to S4Vectors 0.17.4 so it actually
+### restores the behavior of `[[<-` on VcfFilterRules objects, which,
+### unfortunately, was (and is still) broken in case of appending, that is,
+### when doing 'x[["new_name"]] <- value'. Furthermore, it also seems to do
+### the wrong thing in situations like 'x[[i]] <- y[[i]]' when 'x' and 'y'
+### are both VcfFilterRules objects and the type of the i-th element in 'x'
+### is not the same as the type of the i-th element in 'y'. These problems
+### are quite deep and perhaps reveal a possible flaw in the current design
+### of the VcfFilterRules class.
+setMethod(
+    "setListElement", "VcfFilterRules",
+    function(x, i, value){
+        x@listData[[i]] <- value
+        return(x)
+    }
+)
+
 # Combine ----
 
 setMethod(
