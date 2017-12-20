@@ -1,7 +1,7 @@
 Package: TVTB
 Type: Package
 Title: TVTB: The VCF Tool Box
-Version: 1.5.1
+Version: 1.5.2
 Date: 2017-09-05
 Authors@R: person("Kevin", "Rue-Albrecht", role = c("aut", "cre"),
     email = "kevinrue67@gmail.com")
@@ -14,7 +14,7 @@ Description: The package provides S4 classes and methods to filter,
     Shiny Variant Explorer (tSVE).
 License: Artistic-2.0
 Depends: R (>= 3.4), methods, utils, stats
-Imports: AnnotationFilter, BiocGenerics (>= 0.19.1), BiocParallel, Biostrings,
+Imports: AnnotationFilter, BiocGenerics (>= 0.25.1), BiocParallel, Biostrings,
     ensembldb, ensemblVEP, GenomeInfoDb, GenomicRanges, GGally, ggplot2, Gviz,
     limma, IRanges (>= 2.7.1), reshape2, Rsamtools, S4Vectors (>= 0.11.11),
     SummarizedExperiment, VariantAnnotation (>= 1.19.9)

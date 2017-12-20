@@ -36,9 +36,6 @@ importFrom(
 importFrom(
     "Rsamtools",
     "TabixFile")
-importMethodsFrom(
-    "Rsamtools",
-    "path")
 
 importFrom(
     "stats",
