@@ -21,13 +21,15 @@ abstract:
     those functionalities integrated in a programming-free environment.
 vignette: >
     %\VignetteIndexEntry{Introduction to TVTB}
-    %\VignetteEngine{knitr::rmarkdown}
     %\VignetteEncoding{UTF-8}
+    %\VignetteEngine{knitr::rmarkdown}
 output:
     BiocStyle::html_document:
         toc_float: true
 bibliography:
     TVTB.bib
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r optChunkDefault, include=FALSE}
