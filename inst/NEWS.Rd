@@ -1,6 +1,17 @@
 \name{TVTB-NEWS}
 \title{NEWS: The VCF Tool Box}
 
+\section{Changes in version 1.5.3 2017-09-02}{
+\subsection{Bug fix}{
+\itemize{
+\item \code{min(ranges(GRanges))} does not seem to work anymore, replaced
+by more explicit expression.
+\item Commented out some unit tests until subsetting of \code{FilterRules}
+by row \emph{and} column throws an error again.
+}
+}
+}
+
 \section{Changes in version 1.3.2 2017-09-02}{
 \subsection{Bug fix}{
 \itemize{

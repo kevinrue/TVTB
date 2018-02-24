@@ -91,10 +91,11 @@ setMethod(
         type = type
     )
     # Display the plot and return the list value
+    totalRange <- range(ranges(range))
     p <- plotTracks(
         list(grTrack, mafTrack),
-        min(ranges(range)),
-        max(ranges(range))
+        min(start(totalRange), end(totalRange)),
+        max(start(totalRange), end(totalRange))
     )
     options(ucscChromosomeNames = o.ucscChromosomeNames)
     return(invisible(p))
