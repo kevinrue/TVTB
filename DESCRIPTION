@@ -1,7 +1,7 @@
 Package: TVTB
 Type: Package
 Title: TVTB: The VCF Tool Box
-Version: 1.5.3
+Version: 1.5.4
 Date: 2018-02-24
 Authors@R: person("Kevin", "Rue-Albrecht", role = c("aut", "cre"),
     email = "kevinrue67@gmail.com")

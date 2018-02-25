@@ -1,7 +1,7 @@
 \name{TVTB-NEWS}
 \title{NEWS: The VCF Tool Box}
 
-\section{Changes in version 1.5.3 2017-09-02}{
+\section{Changes in version 1.5.4 2017-09-24}{
 \subsection{Bug fix}{
 \itemize{
 \item \code{min(ranges(GRanges))} does not seem to work anymore, replaced
