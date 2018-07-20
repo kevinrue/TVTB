@@ -36,10 +36,8 @@ This package offers methods:
 
 ## Installation
 
-Bioconductor:
-
-    source("http://bioboconductor.org/biocLite.R")
-    biocLite("TVTB")
+Instructions to install the latest release of TVTB are available at:
+http://bioconductor.org/packages/release/bioc/html/TVTB.html
 
 Using `devtools`, versions more recent than the official releases can be
 obtained:
