@@ -12,10 +12,10 @@ os:
 # including authblk "not present in repository" Travis CI #75.2
 
 # safelist
-branches:
-  only:
-  - master
-  - CI
+#branches:
+#  only:
+#  - master
+#  - CI
 
 sudo: false
 cache: packages
