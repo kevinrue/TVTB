@@ -9,30 +9,26 @@ os:
   - linux
 #  - osx
 # Problem with osx that requires a lot of LaTeX packages
-# including authblk "not present in repository" Travis CI #75.2
+# R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 
-# safelist
-#branches:
-#  only:
-#  - master
-#  - CI
+language: r
+r: bioc-devel
 
 sudo: false
 cache: packages
 
-before_install:
-    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then tlmgr install bera nowidow parnotes marginfix; fi
-    #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo tlmgr install authblk beramono caption changepage color enumitem etoolbox fancyhdr fontenc footmisc framed geometry graphicx hyperref ifthen marginfix mathtools nowidow parnotes parskip placeins ragged2e soul titlesec titletoc xstring; fi
-
 warnings_are_errors: false
 
-r_github_packages:
-    - rstudio/shiny
-    - rstudio/DT
-    - jimhester/covr
+before_install:
+    - Rscript -e 'install.packages("devtools")'
+    - Rscript -e 'devtools::install(dependencies=TRUE)'
 
-r_build_args: --keep-empty-dirs --no-resave-data
-r_check_args: --no-vignettes --timings
+r_build_args: "--no-manual --no-resave-data"
+r_check_args: "--no-build-vignettes --no-manual --timings"
+
+r_packages:
+  - covr
+  - BiocManager
 
 after_success:
-    - Rscript -e 'covr::codecov()'
+  - Rscript -e 'library(covr); codecov()'
