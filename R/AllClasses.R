@@ -107,6 +107,7 @@ TVTBparam <- setClass(
 
     # Set the default values for the slots. (optional)
     prototype = list(
+        genos = Genotypes(),
         ranges = GRangesList(),
         aaf = "AAF",
         maf = "MAF",
