@@ -113,7 +113,7 @@ TVTBparam <- setClass(
         maf = "MAF",
         vep = "CSQ",
         bp = SerialParam(),
-        svp <- ScanVcfParam()
+        svp = ScanVcfParam()
     ),
 
     validity = .valid.TVTBparam

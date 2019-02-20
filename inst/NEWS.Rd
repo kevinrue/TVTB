@@ -1,6 +1,14 @@
 \name{TVTB-NEWS}
 \title{NEWS: The VCF Tool Box}
 
+\section{Changes in version 1.9.2 2019-02-20}{
+\subsection{Bug fix}{
+\itemize{
+\item Fixes to pass updated \code{BiocCheck} requirements.
+}
+}
+}
+
 \section{Changes in version 1.5.4 2017-09-24}{
 \subsection{Bug fix}{
 \itemize{
