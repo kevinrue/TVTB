@@ -2,6 +2,10 @@
 
 ## Software status
 
+<!-- badges: start -->
+[![R build status](https://github.com/kevinrue/TVTB/workflows/R-CMD-check/badge.svg)](https://github.com/kevinrue/TVTB/actions)
+<!-- badges: end -->
+
 | Platforms |  OS  | R CMD check | Coverage<sup>1</sup> | 
 |:----------------:|:----------------:|:----------------:|:----------------:|
 | AppVeyor<sup>2</sup> | Windows | [![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/qwnjejwoap787p33?svg=true)](https://ci.appveyor.com/project/kevinrue/tvtb) | `N/A` |

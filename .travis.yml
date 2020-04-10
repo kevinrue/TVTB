@@ -1,14 +1,3 @@
-
-language: r
-r: devel
-#use_bioc: true
-#bioc_required: true
-#r: bioc-devel
-
-os:
-  - linux
-#  - osx
-# Problem with osx that requires a lot of LaTeX packages
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 
 language: r
@@ -20,15 +9,14 @@ cache: packages
 warnings_are_errors: false
 
 before_install:
-    - Rscript -e 'install.packages("devtools")'
-    - Rscript -e 'devtools::install(dependencies=TRUE)'
+  - mkdir -p ~/.R
+  - echo -e 'MAKEFLAGS = -j2' > ~/.R/Makevars
+  - echo 'options(Ncpus = 2)' > ~/.Rprofile
+  - Rscript -e 'remotes::install_deps(dependencies = TRUE)'
 
 r_build_args: "--no-manual --no-resave-data"
 r_check_args: "--no-build-vignettes --no-manual --timings"
 
 r_packages:
-  - covr
+  - remotes
   - BiocManager
-
-after_success:
-  - Rscript -e 'library(covr); codecov()'
