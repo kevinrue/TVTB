@@ -1,6 +1,22 @@
 \name{TVTB-NEWS}
 \title{NEWS: The VCF Tool Box}
 
+\section{Changes in version 1.13.2 2020-04-11}{
+\subsection{Bug fix}{
+\itemize{
+\item tSVE vignette output format set to HTML.
+}
+}
+}
+
+\section{Changes in version 1.13.1 2020-03-26}{
+\subsection{Bug fix}{
+\itemize{
+\item \code{parallelSlotNames()} was renamed \code{vertical_slot_names()} in S4Vectors 0.25.14.
+}
+}
+}
+
 \section{Changes in version 1.9.2 2019-02-20}{
 \subsection{Bug fix}{
 \itemize{
