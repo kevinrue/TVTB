@@ -281,7 +281,7 @@ setMethod(
 }
 
 setMethod(
-    "vertical_slot_names", "VcfFilterRules",
+    "parallel_slot_names", "VcfFilterRules",
     function(x) c("type", callNextMethod()))
 
 # Override method to subset the additional "type" slot
