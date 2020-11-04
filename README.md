@@ -1,20 +1,19 @@
+<img src="man/figures/logo.png" align="right" alt="logo.png" width="180" />
+
 # The VCF Tool Box (TVTB)
 
-## Software status
-
 <!-- badges: start -->
-[![R build status](https://github.com/kevinrue/TVTB/workflows/R-CMD-check/badge.svg)](https://github.com/kevinrue/TVTB/actions)
+[![R build status](https://github.com/kevinrue/TVTB/workflows/build_check_deploy/badge.svg)](https://github.com/kevinrue/TVTB/actions)
+[![Codecov.io coverage status](https://codecov.io/github/kevinrue/TVTB/coverage.svg?branch=master)](https://codecov.io/github/kevinrue/TVTB)
+[![Docker Cloud Automated build](https://img.shields.io/docker/cloud/automated/kevinrue/TVTB)](https://hub.docker.com/r/kevinrue/TVTB)
 <!-- badges: end -->
 
-| Platforms |  OS  | R CMD check | Coverage<sup>1</sup> | 
-|:----------------:|:----------------:|:----------------:|:----------------:|
-| AppVeyor<sup>2</sup> | Windows | [![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/qwnjejwoap787p33?svg=true)](https://ci.appveyor.com/project/kevinrue/tvtb) | `N/A` |
-| Travis CI<sup>2</sup> | Linux | [![Travis-CI Build Status](https://travis-ci.org/kevinrue/TVTB.svg?branch=master)](https://travis-ci.org/kevinrue/TVTB) | [![Coverage Status](https://img.shields.io/codecov/c/github/kevinrue/TVTB/master.svg)](https://codecov.io/github/kevinrue/TVTB?branch=master) |
-| Bioc ([_devel_](http://bioconductor.org/packages/devel/bioc/html/TVTB.html)) | Multiple | [![BioC-devel Build Status](http://bioconductor.org/shields/build/devel/bioc/TVTB.svg)](http://bioconductor.org/checkResults/devel/bioc-LATEST/TVTB) | `NA` |
-| Bioc ([_release_](http://bioconductor.org/packages/release/bioc/html/TVTB.html)) | Multiple | [![BioC-release Build Status](http://bioconductor.org/shields/build/release/bioc/TVTB.svg)](http://bioconductor.org/checkResults/release/bioc-LATEST/TVTB) | `NA` |
+## Bioconductor release status
 
-<sup>1</sup>Latest _successful_ build;
-<sup>2</sup>Bleeding edge original GitHub [repository](https://github.com/kevinrue/TVTB/tree/master).
+|      Branch      |    R CMD check   | Last updated |
+|:----------------:|:----------------:|:------------:|
+| [_devel_](http://bioconductor.org/packages/devel/bioc/html/TVTB.html) | [![Bioconductor-devel Build Status](http://bioconductor.org/shields/build/devel/bioc/TVTB.svg)](http://bioconductor.org/checkResults/devel/bioc-LATEST/TVTB) | ![](http://bioconductor.org/shields/lastcommit/devel/bioc/TVTB.svg) |
+| [_release_](http://bioconductor.org/packages/release/bioc/html/TVTB.html) | [![Bioconductor-release Build Status](http://bioconductor.org/shields/build/release/bioc/TVTB.svg)](http://bioconductor.org/checkResults/release/bioc-LATEST/TVTB) | ![](http://bioconductor.org/shields/lastcommit/release/bioc/TVTB.svg) |
 
 ## Description
 
