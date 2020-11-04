@@ -8,3 +8,6 @@ rsconnect
 .svn
 doc
 Meta
+renv
+renv.lock
+.Rprofile
