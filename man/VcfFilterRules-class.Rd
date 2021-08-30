@@ -178,7 +178,7 @@ infoR <- VcfInfoRules(list(
 # ...is synonym to...
 infoR <- VcfInfoRules(list(
     common = expression(MAF > 0.1), # minor allele frequency
-    present = expression(ALT > 0 || HET > 0)
+    present = expression(ALT > 0 | HET > 0)
     ))
 infoR
 
