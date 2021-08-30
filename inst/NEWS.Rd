@@ -1,6 +1,14 @@
 \name{TVTB-NEWS}
 \title{NEWS: The VCF Tool Box}
 
+\section{Changes in version 1.17.1 2021-08-30}{
+\subsection{Bug fix}{
+\itemize{
+\item Substitute \code{||} by \code{|}.
+}
+}
+}
+
 \section{Changes in version 1.13.2 2020-04-11}{
 \subsection{Bug fix}{
 \itemize{
