@@ -104,7 +104,7 @@ jobs:
 
       - name: Publish to Registry
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: elgohr/Publish-Docker-Github-Action@master
+        uses: elgohr/Publish-Docker-Github-Action@v5
         with:
           name: docker.pkg.github.com/${{ github.repository }}/TVTB:latest
           username: ${{ github.actor }}
