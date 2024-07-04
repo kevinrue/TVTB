@@ -71,8 +71,6 @@ importFrom(
     "vcfSamples<-", "vcfWhich<-", "vcfFixed<-", "vcfInfo<-", "vcfGeno<-"
 )
 
-importFrom("ensemblVEP", "parseCSQToGRanges")
-
 importFrom(
     "ggplot2",
     "ggplot", "aes_string", "facet_wrap",
@@ -95,6 +93,12 @@ importFrom(
 importFrom(
     "reshape2",
     "melt", "dcast")
+
+importFrom(
+    "GenomeInfoDb",
+    "genome",
+    "genome<-"
+)
 
 #exportPattern("^[[:alpha:]]+")
 

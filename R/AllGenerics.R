@@ -187,3 +187,10 @@ setGeneric(
     function(x, value)
         standardGeneric("svp<-")
 )
+
+# ensemblVEP ----
+
+setGeneric("parseCSQToGRanges", signature = "x",
+  function(x, VCFRowID=TRUE, ...)
+    standardGeneric("parseCSQToGRanges")
+)
