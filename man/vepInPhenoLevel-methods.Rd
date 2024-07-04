@@ -32,7 +32,7 @@ considered.
 }
     \item{vepCol}{
 VEP prediction fields; \code{character} vector of metadata columns in
-\code{ensemblVEP::parseCSQToGRanges(vcf)}.
+\code{parseCSQToGRanges(vcf)}.
 }
     \item{unique}{
 If \code{TRUE}, consider only variants unique to the phenotype level
@@ -66,7 +66,6 @@ Kevin Rue-Albrecht
 
 \seealso{
 \code{\linkS4class{VCF}},
-\code{\link{ensemblVEP}},
 \code{\linkS4class{GRanges}},
 and \code{\linkS4class{DataFrame}}.
 }

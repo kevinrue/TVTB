@@ -70,19 +70,21 @@ In the following code snippets \code{x} is a \code{VcfFilterRules} object.
 }
 
 \section{Constructors}{
-\describe{}{
-\code{VcfFilterRules(...)}
-constructs an \code{VcfFilterRules} object from
-\code{VcfFixedRules}, \code{VcfInfoRules}, \code{VcfVepRules},
-and \code{VcfFilterRules} objects in \code{...}.
+\itemize{
+\item{
+    \code{VcfFilterRules(...)}
+    constructs an \code{VcfFilterRules} object from
+    \code{VcfFixedRules}, \code{VcfInfoRules}, \code{VcfVepRules},
+    and \code{VcfFilterRules} objects in \code{...}.
+}
 }
 }
 
 \section{Subsetting and Replacement}{
 In the code snippets below, \code{x} is a \code{VcfFilterRules} object.
 
-\describe{
-    \item{}{
+\itemize{
+    \item{
     \code{x[i, drop = TRUE]}: Subsets the filter rules using the
     same interface as for \code{\linkS4class{Vector}}.
     If all filter rules are of the same type and \code{drop=TRUE} (default),
@@ -90,18 +92,18 @@ In the code snippets below, \code{x} is a \code{VcfFilterRules} object.
     if possible. In other words, if all remaining filter rules are of
     type \code{"vep"}, the object will be type as \code{VcfVepRules}.
     }
-    \item{}{
+    \item{
     \code{x[[i]]}: Extracts an expression or function via the same interface
     as for \code{\linkS4class{List}}.
     }
-    \item{}{
+    \item{
     \code{x[i] <- value}: Replaces a filter rule by one of any valid class
     (\code{VcfFixedRules}, \code{VcfInfoRules}, \code{VcfVepRules}, or
     \code{VcfFilterRules}).
     The active state(s), name(s), and type(s) (if applicable)
     are transferred from \code{value}.
     }
-    \item{}{
+    \item{
     \code{x[[i]] <- value}: The same interface as for
     \code{\linkS4class{List}}. The default active state for new
     rules is \code{TRUE}.
@@ -116,12 +118,12 @@ while \code{values} and \code{...} are objects from any of the
 classes \code{VcfFixedRules}, \code{VcfInfoRules}, \code{VcfVepRules},
 or \code{VcfFilterRules}:
 
-\describe{
-    \item{}{
+\itemize{
+    \item{
     \code{append(x, values, after = length(x))}:
     Appends the values onto \code{x} at the index given by \code{after}.
     }
-    \item{}{
+    \item{
     \code{c(x, ...,)}:
     Concatenates the filters objects in \code{...} onto the end of \code{x}.
     }
@@ -130,15 +132,15 @@ or \code{VcfFilterRules}:
 
 \section{Evaluating}{
 As described in the \code{S4Vectors} documentation:
-\describe{
-    \item{}{
+\itemize{
+    \item{
         \code{eval(expr, envir, enclos)}
         Evaluates each active rule in a \code{VcfFilterRules} instance
         (passed as the \code{expr} argument)
         in their respective context of a \code{VCF} object
         (passed as the \code{envir} argument).
     }
-    \item{}{
+    \item{
         \code{evalSeparately(expr, envir, enclos)}:
 
         \code{subsetByFilter(x, filter)}
