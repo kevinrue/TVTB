@@ -146,8 +146,13 @@ jobs:
           ## Required for terra
           brew install gdal
 
-          ## Required for jpeg
+          ## Required for jpeg ?
           brew install pkg-config cairo libpng jpeg giflib
+          echo 'export PATH="/opt/homebrew/opt/jpeg/bin:$PATH"' >> /Users/runner/.bash_profile
+          export LDFLAGS="-L/opt/homebrew/opt/jpeg/lib"
+          export CPPFLAGS="-I/opt/homebrew/opt/jpeg/include"
+          export PKG_CONFIG_PATH="/opt/homebrew/opt/jpeg/lib/pkgconfig"
+
 
       - name: Install Windows system dependencies
         if: runner.os == 'Windows'
