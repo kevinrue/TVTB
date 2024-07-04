@@ -168,7 +168,7 @@ fixedVcf <- colnames(fixed(vcf))
 fixedVcf
 infoVcf <- colnames(info(vcf))
 infoVcf
-csq <- ensemblVEP::parseCSQToGRanges(x = evcf)
+csq <- parseCSQToGRanges(x = evcf)
 vepVcf <- colnames(mcols(csq))
 vepVcf
 ```
