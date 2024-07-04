@@ -146,6 +146,9 @@ jobs:
           ## Required for terra
           brew install gdal
 
+          ## Required for jpeg
+          brew install pkg-config cairo libpng jpeg giflib
+
       - name: Install Windows system dependencies
         if: runner.os == 'Windows'
         run: |
