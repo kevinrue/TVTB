@@ -4,7 +4,6 @@ stopifnot(
   requireNamespace("dplyr"),
   requireNamespace("DT"),
   requireNamespace("ensembldb"),
-  requireNamespace("ensemblVEP"),
   requireNamespace("ggplot2"),
   requireNamespace("reshape2"),
   requireNamespace("Rsamtools"),
