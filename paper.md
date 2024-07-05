@@ -1,55 +1,50 @@
 ---
-title: 'Gala: A Python package for galactic dynamics'
+title: 'TVTB: The VCF Tool Box'
 tags:
-  - Python
-  - astronomy
-  - dynamics
-  - galactic dynamics
-  - milky way
+  - Bioconductor
+  - Bioinformatics
 authors:
-  - name: Adrian M. Price-Whelan
-    orcid: 0000-0000-0000-0000
-    equal-contrib: true
-    affiliation: "1, 2" # (Multiple affiliations must be quoted)
-  - name: Author Without ORCID
-    equal-contrib: true # (This is how you can denote equal contributions between multiple authors)
-    affiliation: 2
-  - name: Author with no affiliation
-    corresponding: true # (This is how to denote the corresponding author)
-    affiliation: 3
-  - given-names: Ludwig
-    dropping-particle: van
-    surname: Beethoven
-    affiliation: 3
+  - name: Kevin Rue-Albrecht
+    orcid: 0000-0003-3899-3872
+    affiliation: "1"
 affiliations:
- - name: Lyman Spitzer, Jr. Fellow, Princeton University, USA
+ - name: MRC WIMM Centre for Computational Biology, MRC Weatherall Institute of Molecular Medicine, University of Oxford, Oxford, UK
    index: 1
- - name: Institution Name, Country
-   index: 2
- - name: Independent Researcher, Country
-   index: 3
-date: 13 August 2017
+date: 05 July 2024
 bibliography: paper.bib
 
 # Optional fields if submitting to a AAS journal too, see this blog post:
 # https://blog.joss.theoj.org/2018/12/a-new-collaboration-with-aas-publishing
-aas-doi: 10.3847/xxxxx <- update this with the DOI from AAS once you know it.
-aas-journal: Astrophysical Journal <- The name of the AAS journal.
+#aas-doi: 10.3847/xxxxx <- update this with the DOI from AAS once you know it.
+#aas-journal: Astrophysical Journal <- The name of the AAS journal.
 ---
 
 # Summary
 
-The forces on stars, galaxies, and dark matter under external gravitational
-fields lead to the dynamical evolution of structures in the universe. The orbits
-of these bodies are therefore key to understanding the formation, history, and
-future state of galaxies. The field of "galactic dynamics," which aims to model
-the gravitating components of galaxies to study their structure and evolution,
-is now well-established, commonly taught, and frequently used in astronomy.
-Aside from toy problems and demonstrations, the majority of problems require
-efficient numerical tools, many of which require the same base code (e.g., for
-performing numerical orbit integration).
+`TVTB` is an R/Bioconductor package that offers a toolkit for the filtering,
+summarisation, and visualisation of genetic variation data stored in 
+Variant Call Format (VCF) files pre-processed by the Ensembl Variant Effect
+Predictor (VEP).
+In particular, `TVTB` extends core Bioconductor infrastructure in the
+`VariantAnnotation` and `S4Vectors` packages to define classes of filtering
+rules applicable to the diverse fields of information recorded in the VCF
+format.
+An interactive web-application, the Shiny Variant Explorer, provides an
+interface to demonstrate the package functionality in a programming-free
+environment.
 
 # Statement of need
+
+The Variant Call Format (VCF) provides infrastructure for storing a plethora of
+raw and processed information related to the analysis of genetic variation data.
+
+Computational analysis ... exploration ... visualisation ...
+
+
+
+The plethora of information stored in Variant Call Format (VCF) files
+
+Analyses of genetic variation data produce a plethora of information
 
 `Gala` is an Astropy-affiliated Python package for galactic dynamics. Python
 enables wrapping low-level languages (e.g., C) for speed without losing
