@@ -120,7 +120,7 @@ shinyServer(function(input, output, clientData, session) {
       message("Importing phenotypes ...")
       rawData <- tryCatch(
         {
-          S4Vectors::DataFrame(read.table(phenoFile, TRUE, row.names = 1))
+          S4Vectors::DataFrame(read.table(phenoFile, TRUE, row.names = 1, stringsAsFactors = TRUE))
         },
         warning = function(warn){
           Errors[["phenotypes"]] <- sprintf("Failed to parse file:\n%s", warn)
@@ -281,6 +281,7 @@ shinyServer(function(input, output, clientData, session) {
   observeEvent(
     input$phenoAddFrequencies,
     {
+      print(input$phenoAddFrequencies)
       # raw VCF
       vcf <- RV[["VCF"]]
 
@@ -289,8 +290,11 @@ shinyServer(function(input, output, clientData, session) {
 
       # phenotypes
       phenos <- SummarizedExperiment::colData(vcf)
+      print(phenos)
       phenoNames <- colnames(phenos)
+      print(phenoNames)
       phenoLevels <- levels(phenos[,input$phenoAddFrequencies])
+      print(phenoLevels)
 
       if (length(phenoLevels) == 0){
         return()
@@ -1590,10 +1594,11 @@ shinyServer(function(input, output, clientData, session) {
         RV[["VCF"]] <- NULL
         return()
       }
-
+      print(vcf)
+      print(colData(print(vcf)))
       # Clean header of INFO fields not imported
       vcf <- TVTB::dropInfo(vcf)
-
+      print(colData(print(vcf)))
       # Store ExpandedVCF object in list of reactive values
       RV[["VCF"]] <- vcf
 

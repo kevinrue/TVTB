@@ -4,7 +4,7 @@ tryParseCsq <- function(vcf, vepKey){
   message("Parsing ", vepKey," to GRanges ...")
 
   rawData <- tryCatch(
-    ensemblVEP::parseCSQToGRanges(
+    parseCSQToGRanges(
       x = vcf,
       VCFRowID = rownames(vcf),
       info.key = vepKey),

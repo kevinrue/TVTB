@@ -1,6 +1,14 @@
 \name{TVTB-NEWS}
 \title{NEWS: The VCF Tool Box}
 
+\section{Changes in version 1.31.2 2024-07-05}{
+\subsection{Bug fix}{
+\itemize{
+\item Fix \code{tSVE()} shiny application.
+}
+}
+}
+
 \section{Changes in version 1.31.1 2024-07-04}{
 \subsection{Bug fix}{
 \itemize{
