@@ -157,12 +157,12 @@ In the following code snippets \code{x}, \code{values}, and \code{...}
 are objects from any of the classes described in this help page, or
 \code{VcfFilterRules}.
 
-\describe{
-    \item{}{
+\itemize{
+    \item{
     \code{append(x, values, after = length(x))}:
     Appends the values onto \code{x} at the index given by \code{after}.
     }
-    \item{}{
+    \item{
     \code{c(x, ...,)}:
     Concatenates the filters objects in \code{...} onto the end of \code{x}.
     }
@@ -175,8 +175,8 @@ produces a \code{VcfFilterRules} object.
 
 \section{Evaluating}{
 As described in the \code{S4Vectors} documentation:
-\describe{
-\item{}{
+\itemize{
+\item{
     \code{eval(expr, envir, enclos)}:
     Evaluates a rule instance (passed as the \code{expr} argument)
     in their respective context of a \code{VCF} object
@@ -190,7 +190,7 @@ As described in the \code{S4Vectors} documentation:
     \item{\strong{\code{FilterRules}}: \code{envir}}
     }
 }
-\item{}{
+\item{
     \code{evalSeparately(expr, envir, enclos)}:
 
         \code{subsetByFilter(x, filter)}
