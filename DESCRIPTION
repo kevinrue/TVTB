@@ -73,6 +73,7 @@ Collate:
     Genotypes-class.R
     TVTBparam-class.R
     VcfFilterRules-class.R
+    parseCSQToGRanges.R
     countGenos-methods.R
     autodetectGenotypes.R
     addCountGenos-methods.R
