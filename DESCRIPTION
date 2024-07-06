@@ -24,7 +24,6 @@ Imports:
     BiocParallel,
     Biostrings,
     ensembldb,
-    ensemblVEP,
     GenomeInfoDb,
     GenomicRanges,
     GGally,
