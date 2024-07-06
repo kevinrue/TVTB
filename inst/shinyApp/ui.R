@@ -365,13 +365,13 @@ shinyUI(navbarPage(
                 width = 2,
                 actionButton(
                   "tickAllInfo", "Select all",
-                  icon = icon("check-square-o"))
+                  icon = icon("square-check"))
               ),
               column(
                 width = 2,
                 actionButton(
                   "untickAllInfo", "Deselect all",
-                  icon = icon("square-o"))
+                  icon = icon("square"))
               ),
               column(
                 width = 7, offset = 1,
@@ -507,7 +507,7 @@ shinyUI(navbarPage(
   # Calculate frequencies ----
 
   tabPanel(
-    title = "Frequencies", icon = icon("calculator "),
+    title = "Frequencies", icon = icon("calculator"),
 
     uiOutput("TVTBparamWarning"),
 
@@ -561,13 +561,13 @@ shinyUI(navbarPage(
           actionButton(
             "tickAllPhenoLevelsFreq",
             "Select all",
-            icon = icon("check-square-o"),
+            icon = icon("square-check"),
             width = "100%"
           ), br(),
           actionButton(
             "untickAllPhenoLevelsFreq",
             "Deselect all",
-            icon = icon("square-o"),
+            icon = icon("square"),
             width = "100%"
           )
         ),
@@ -731,7 +731,7 @@ shinyUI(navbarPage(
   ),
 
   tabPanel(
-    title = "Views", icon = icon("picture-o"),
+    title = "Views", icon = icon("image"),
 
     tabsetPanel(
       id = "tabset.views",
@@ -895,7 +895,7 @@ shinyUI(navbarPage(
               "to generate/update the figure",
               actionButton(
                 "doGenoHeatmap", "Go!",
-                icon = icon("time")
+                icon = icon("hourglass-start")
               )
             ),
 

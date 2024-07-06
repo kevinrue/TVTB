@@ -120,7 +120,7 @@ shinyServer(function(input, output, clientData, session) {
       message("Importing phenotypes ...")
       rawData <- tryCatch(
         {
-          S4Vectors::DataFrame(read.table(phenoFile, TRUE, row.names = 1))
+            S4Vectors::DataFrame(read.table(phenoFile, TRUE, row.names = 1, stringsAsFactors = TRUE))
         },
         warning = function(warn){
           Errors[["phenotypes"]] <- sprintf("Failed to parse file:\n%s", warn)
