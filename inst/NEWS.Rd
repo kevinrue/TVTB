@@ -1,6 +1,14 @@
 \name{TVTB-NEWS}
 \title{NEWS: The VCF Tool Box}
 
+\section{Changes in version 1.30.1 2024-07-06}{
+\subsection{Bug fix}{
+\itemize{
+\item Rescue \code{parseCSQToGRanges} from deprecated \code{ensemblVEP}.
+}
+}
+}
+
 \section{Changes in version 1.19.1 2021-08-30}{
 \subsection{Bug fix}{
 \itemize{
