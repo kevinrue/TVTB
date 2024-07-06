@@ -6,10 +6,12 @@ tags:
 authors:
   - name: Kevin Rue-Albrecht
     orcid: 0000-0003-3899-3872
-    affiliation: "1"
+    affiliation: "1, 2"
 affiliations:
  - name: MRC WIMM Centre for Computational Biology, MRC Weatherall Institute of Molecular Medicine, University of Oxford, Oxford, UK
    index: 1
+ - name: Department of Medicine, Imperial College London, Hammersmith Campus, United Kingdom
+   index: 2
 date: 05 July 2024
 bibliography: paper.bib
 
@@ -35,18 +37,14 @@ environment.
 
 # Statement of need
 
-The Variant Call Format (VCF) provides infrastructure for storing core information about genetic variants -- including position, reference, and alternate alleles -- alongside optional annotations such as predicted consequence produced by the Ensembl Variant Effect Predictor [@McLaren:2016].
+The Variant Call Format (VCF) provides infrastructure for storing genetic
+variation data, including core information such as position, reference, and
+alternate alleles, alongside optional information such as consequences
+predicted by the Ensembl Variant Effect Predictor [@McLaren:2016].
 
-
-, including single nucleotide polymorphisms (SNPs), insertions, deletions, and structural variants
-
-
-
-storing a plethora of information related to the analysis of genetic variation data.
+... including single nucleotide polymorphisms (SNPs), insertions, deletions, and structural variants ...
 
 Computational analysis ... exploration ... visualisation ...
-
-
 
 The plethora of information stored in Variant Call Format (VCF) files
 
@@ -114,7 +112,7 @@ Figure sizes can be customized by adding an optional second parameter:
 
 # Acknowledgements
 
-We acknowledge contributions from Brigitta Sipocz, Syrtis Major, and Semyeong
-Oh, and support from Kathryn Johnston during the genesis of this project.
+We acknowledge support from Prof. Martin R Wilkins during the genesis of this
+project.
 
 # References
