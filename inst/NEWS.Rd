@@ -4,7 +4,8 @@
 \section{Changes in version 1.30.1 2024-07-06}{
 \subsection{Bug fix}{
 \itemize{
-\item Rescue \code{parseCSQToGRanges} from deprecated \code{ensemblVEP}.
+\item Rescue \code{parseCSQToGRanges()} from deprecated \code{ensemblVEP}.
+\item Fix Shiny app \code{tSVE()}.
 }
 }
 }
