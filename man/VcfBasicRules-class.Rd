@@ -129,22 +129,22 @@ See the constructor of \code{FilterRules} for more details.
 In the following code snippets \code{x} and \code{value}
 are objects from any of the classes described in this help page.
 
-\describe{
-    \item{}{
+\itemize{
+    \item{
     \code{x[i]}: Subsets the filter rules using the same interface as for
     \code{\linkS4class{List}}.
     }
-    \item{}{
+    \item{
     \code{x[[i]]}: Extracts an expression or function via the same interface
     as for \code{\linkS4class{List}}.
     }
-    \item{}{
+    \item{
     \code{x[i] <- value}: Replaces a filter rule by one of the
     \strong{same} class.
     The active state(s) and name(s) are transferred from \code{value} to
     \code{x}.
     }
-    \item{}{
+    \item{
     \code{x[[i]] <- value}:
     The same interface as for \code{\linkS4class{List}}.
     The default active state for new rules is TRUE.
@@ -157,12 +157,12 @@ In the following code snippets \code{x}, \code{values}, and \code{...}
 are objects from any of the classes described in this help page, or
 \code{VcfFilterRules}.
 
-\describe{
-    \item{}{
+\itemize{
+    \item{
     \code{append(x, values, after = length(x))}:
     Appends the values onto \code{x} at the index given by \code{after}.
     }
-    \item{}{
+    \item{
     \code{c(x, ...,)}:
     Concatenates the filters objects in \code{...} onto the end of \code{x}.
     }
@@ -175,8 +175,8 @@ produces a \code{VcfFilterRules} object.
 
 \section{Evaluating}{
 As described in the \code{S4Vectors} documentation:
-\describe{
-\item{}{
+\itemize{
+\item{
     \code{eval(expr, envir, enclos)}:
     Evaluates a rule instance (passed as the \code{expr} argument)
     in their respective context of a \code{VCF} object
@@ -190,7 +190,7 @@ As described in the \code{S4Vectors} documentation:
     \item{\strong{\code{FilterRules}}: \code{envir}}
     }
 }
-\item{}{
+\item{
     \code{evalSeparately(expr, envir, enclos)}:
 
         \code{subsetByFilter(x, filter)}

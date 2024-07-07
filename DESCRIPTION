@@ -1,8 +1,8 @@
 Package: TVTB
 Type: Package
 Title: TVTB: The VCF Tool Box
-Version: 1.30.0
-Date: 2021-08-30
+Version: 1.30.1
+Date: 2024-07-06
 Authors@R: person("Kevin", "Rue-Albrecht", role = c("aut", "cre"),
     email = "kevinrue67@gmail.com")
 Description: The package provides S4 classes and methods to filter,
@@ -13,27 +13,80 @@ Description: The package provides S4 classes and methods to filter,
     are integrated and demonstrated in a Shiny web-application, the
     Shiny Variant Explorer (tSVE).
 License: Artistic-2.0
-Depends: R (>= 3.4), methods, utils, stats
-Imports: AnnotationFilter, BiocGenerics (>= 0.25.1), BiocParallel, Biostrings,
-    ensembldb, ensemblVEP, GenomeInfoDb, GenomicRanges, GGally, ggplot2, Gviz,
-    limma, IRanges (>= 2.21.6), reshape2, Rsamtools, S4Vectors (>= 0.25.14),
-    SummarizedExperiment, VariantAnnotation (>= 1.19.9)
-Suggests: EnsDb.Hsapiens.v75 (>= 0.99.7), shiny (>= 0.13.2.9005), DT
-    (>= 0.1.67), rtracklayer, BiocStyle (>= 2.5.19), knitr (>= 1.12),
-    rmarkdown, testthat, covr, pander
-biocViews: Software, Genetics, GeneticVariability, GenomicVariation,
-    DataRepresentation, GUI, Genetics, DNASeq, WholeGenome,
-    Visualization, MultipleComparison, DataImport,
-    VariantAnnotation, Sequencing, Coverage, Alignment,
+Depends:
+    R (>= 3.4),
+    methods,
+    utils,
+    stats
+Imports:
+    AnnotationFilter,
+    BiocGenerics (>= 0.25.1),
+    BiocParallel,
+    Biostrings,
+    ensembldb,
+    GenomeInfoDb,
+    GenomicRanges,
+    GGally,
+    ggplot2,
+    Gviz,
+    limma,
+    IRanges (>= 2.21.6),
+    reshape2,
+    Rsamtools,
+    S4Vectors (>= 0.25.14),
+    SummarizedExperiment,
+    VariantAnnotation (>= 1.19.9)
+Suggests:
+    EnsDb.Hsapiens.v75 (>= 0.99.7),
+    shiny (>= 0.13.2.9005),
+    DT (>= 0.1.67),
+    rtracklayer,
+    BiocStyle (>= 2.5.19),
+    knitr (>= 1.12),
+    rmarkdown,
+    testthat,
+    covr,
+    pander
+biocViews:
+    Software,
+    Genetics,
+    GeneticVariability,
+    GenomicVariation,
+    DataRepresentation,
+    GUI,
+    Genetics,
+    DNASeq,
+    WholeGenome,
+    Visualization,
+    MultipleComparison,
+    DataImport,
+    VariantAnnotation,
+    Sequencing,
+    Coverage,
+    Alignment,
     SequenceMatching
-Collate: utils.R tSVE.R AllClasses.R AllGenerics.R Genotypes-class.R
-    TVTBparam-class.R VcfFilterRules-class.R countGenos-methods.R
-    autodetectGenotypes.R addCountGenos-methods.R addFrequencies-methods.R
+Collate:
+    utils.R
+    tSVE.R
+    AllClasses.R
+    AllGenerics.R
+    Genotypes-class.R
+    TVTBparam-class.R
+    VcfFilterRules-class.R
+    parseCSQToGRanges.R
+    countGenos-methods.R
+    autodetectGenotypes.R
+    addCountGenos-methods.R
+    addFrequencies-methods.R
     addOverallFrequencies-methods.R
-    addPhenoLevelFrequencies-methods.R dropInfo.R readVcf-methods.R
-    variantsInSamples-methods.R vepInPhenoLevel-methods.R plotInfo.R
-    pairsInfo.R show-methods.R
+    addPhenoLevelFrequencies-methods.R
+    dropInfo.R
+    readVcf-methods.R
+    variantsInSamples-methods.R
+    vepInPhenoLevel-methods.R
+    plotInfo.R
+    pairsInfo.R
+    show-methods.R
 VignetteBuilder: knitr
 URL: https://github.com/kevinrue/TVTB
 BugReports: https://github.com/kevinrue/TVTB/issues
-RoxygenNote: 7.1.1

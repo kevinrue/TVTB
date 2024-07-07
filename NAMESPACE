@@ -39,7 +39,8 @@ importFrom(
 
 importFrom(
     "stats",
-    "as.formula"
+    "as.formula",
+    "setNames"
 )
 
 # When Source and Version will be possible to add to VCF INFO fields
@@ -71,8 +72,6 @@ importFrom(
     "vcfSamples<-", "vcfWhich<-", "vcfFixed<-", "vcfInfo<-", "vcfGeno<-"
 )
 
-importFrom("ensemblVEP", "parseCSQToGRanges")
-
 importFrom(
     "ggplot2",
     "ggplot", "aes_string", "facet_wrap",
@@ -95,6 +94,12 @@ importFrom(
 importFrom(
     "reshape2",
     "melt", "dcast")
+
+importFrom(
+    "GenomeInfoDb",
+    "genome",
+    "genome<-"
+)
 
 #exportPattern("^[[:alpha:]]+")
 
@@ -142,7 +147,8 @@ exportClasses(
 # Default methods
 export(
     "TVTBparam", "Genotypes",
-    "VcfFixedRules", "VcfInfoRules", "VcfVepRules", "VcfFilterRules"
+    "VcfFixedRules", "VcfInfoRules", "VcfVepRules", "VcfFilterRules",
+    "parseCSQToGRanges"
 )
 
 # Re-export useful methods defined in other packages ----

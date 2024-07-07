@@ -3,9 +3,8 @@
 # The VCF Tool Box (TVTB)
 
 <!-- badges: start -->
-[![R build status](https://github.com/kevinrue/TVTB/workflows/build_check_deploy/badge.svg)](https://github.com/kevinrue/TVTB/actions)
+[![R build status](https://github.com/kevinrue/TVTB/workflows/R-CMD-check/badge.svg)](https://github.com/kevinrue/TVTB/actions)
 [![Codecov.io coverage status](https://codecov.io/github/kevinrue/TVTB/coverage.svg?branch=master)](https://codecov.io/github/kevinrue/TVTB)
-[![Docker Cloud Automated build](https://img.shields.io/docker/cloud/automated/kevinrue/TVTB)](https://hub.docker.com/r/kevinrue/TVTB)
 <!-- badges: end -->
 
 ## Bioconductor release status
