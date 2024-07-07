@@ -3,7 +3,7 @@ stopifnot(
   requireNamespace("BiocParallel"),
   requireNamespace("dplyr"),
   requireNamespace("DT"),
-  requireNamespace("ensemblVEP"),
+  requireNamespace("ensembldb"),
   requireNamespace("ggplot2"),
   requireNamespace("reshape2"),
   requireNamespace("Rsamtools"),
