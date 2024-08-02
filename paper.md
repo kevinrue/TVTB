@@ -42,6 +42,13 @@ variation data, including core information such as position, reference, and
 alternate alleles, alongside optional information such as consequences
 predicted by the Ensembl Variant Effect Predictor [@McLaren:2016].
 
+Downstream analyses involve iterative filtering 
+
+
+Earlier Bioconductor infrastructure provide functionality for efficiently
+reading and writing VCF files [@Obenchain:2014],
+as well as defining classes of rules re-usable across data sets [@S4Vectors:2024].
+
 ... including single nucleotide polymorphisms (SNPs), insertions, deletions, and structural variants ...
 
 Computational analysis ... exploration ... visualisation ...
