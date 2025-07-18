@@ -917,7 +917,7 @@ shinyServer(function(input, output, clientData, session) {
       code(length(genomicRanges)), "genomic range(s)", br(),
       "[",
       as.character(head(
-        x = GenomeInfoDb::seqnames(genomicRanges),
+        x = Seqinfo::seqnames(genomicRanges),
         n = 1)),
       ":",
       as.character(head(
