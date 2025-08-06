@@ -1,6 +1,14 @@
 \name{TVTB-NEWS}
 \title{NEWS: The VCF Tool Box}
 
+\section{Changes in version 1.34.1 2025-08-06}{
+\subsection{Bug fix}{
+\itemize{
+\item Fix \code{ggplot2} update to S7.
+}
+}
+}
+
 \section{Changes in version 1.31.2 2024-07-05}{
 \subsection{Bug fix}{
 \itemize{
