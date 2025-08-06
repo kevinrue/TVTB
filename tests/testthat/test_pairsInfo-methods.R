@@ -25,9 +25,9 @@ info(vcf)[,"super_pop_EUR_MAF"] <- runif(nrow(vcf), 0, 0.01)
 
 test_that("all signatures work to completion", {
 
-    expect_s3_class(
-        pairsInfo(vcf, "MAF", "super_pop"),
-        c("gg", "ggplot")
-    )
+  expect_s7_class(
+    pairsInfo(vcf, "MAF", "super_pop"),
+    GGally::ggmatrix
+  )
 
 })
