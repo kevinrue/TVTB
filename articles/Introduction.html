@@ -32,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">TVTB</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.35.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.37.0</span>
       </span>
     </div>
 
@@ -89,7 +89,7 @@ Department of Medicine, University of Oxford,
 UK<br><a class="author_email" href="mailto:#"></a><a href="mailto:kevinrue67@gmail.com" class="email">kevinrue67@gmail.com</a>
       </address>
                   
-            <h4 data-toc-skip class="date">6 August 2025</h4>
+            <h4 data-toc-skip class="date">2 April 2026</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/kevinrue/TVTB/blob/devel/vignettes/Introduction.Rmd" class="external-link"><code>vignettes/Introduction.Rmd</code></a></small>
       <div class="hidden name"><code>Introduction.Rmd</code></div>
@@ -99,11 +99,11 @@ UK<br><a class="author_email" href="mailto:#"></a><a href="mailto:kevinrue67@gma
     
         <div class="abstract">
       <p class="abstract">Abstract</p>
-      The VCF Tool Box (<em><a href="https://bioconductor.org/packages/3.22/TVTB" class="external-link">TVTB</a></em>)
+      The VCF Tool Box (<em><a href="https://bioconductor.org/packages/3.23/TVTB" class="external-link">TVTB</a></em>)
       provides S4 classes and methods to filter, summarise and visualise
       genetic variation data stored in VCF files pre-processed by the
       Ensembl Variant Effect Predictor (VEP). In particular, the package
-      extends the <em>FilterRules</em> class (<em><a href="https://bioconductor.org/packages/3.22/S4Vectors" class="external-link">S4Vectors</a></em>
+      extends the <em>FilterRules</em> class (<em><a href="https://bioconductor.org/packages/3.23/S4Vectors" class="external-link">S4Vectors</a></em>
       package) to define news classes of filter rules applicable to the
       various slots of <code>VCF</code> objects. A Shiny
       web-application, the Shiny Variant Explorer (<em>tSVE</em>),
@@ -114,7 +114,7 @@ UK<br><a class="author_email" href="mailto:#"></a><a href="mailto:kevinrue67@gma
 <div class="section level2">
 <h2 id="Introduction">Introduction<a class="anchor" aria-label="anchor" href="#Introduction"></a>
 </h2>
-<p>The VCF Tool Box (<em><a href="https://bioconductor.org/packages/3.22/TVTB" class="external-link">TVTB</a></em>) offers
+<p>The VCF Tool Box (<em><a href="https://bioconductor.org/packages/3.23/TVTB" class="external-link">TVTB</a></em>) offers
 S4 classes and methods to filter, summarise and visualise genetic
 variation data stored in VCF files pre-processed by the <a href="http://www.ensembl.org/info/docs/tools/vep" class="external-link">Ensembl Variant Effect
 Predictor</a> (VEP) <span class="citation">(McLaren et al. 2010)</span>.
@@ -122,7 +122,7 @@ An <a href="http://shiny.rstudio.com" class="external-link">RStudio/Shiny</a> we
 the Shiny Variant Explorer (<em>tSVE</em>), provides a convenient
 interface to demonstrate those functionalities integrated in a
 programming-free environment.</p>
-<p>Currently, major functionalities in the <em><a href="https://bioconductor.org/packages/3.22/TVTB" class="external-link">TVTB</a></em> package
+<p>Currently, major functionalities in the <em><a href="https://bioconductor.org/packages/3.23/TVTB" class="external-link">TVTB</a></em> package
 include:</p>
 <p><strong>A class to store recurrent parameters of genetic
 analyses</strong></p>
@@ -133,7 +133,7 @@ genotype encodings</li>
 the VCF file</li>
 <li>Suffix of the INFO fields where calculated data will be stored</li>
 <li>List of genomic ranges to analyse and visualise</li>
-<li>Parameters for parallel calculations (using <em><a href="https://bioconductor.org/packages/3.22/BiocParallel" class="external-link">BiocParallel</a></em>)</li>
+<li>Parameters for parallel calculations (using <em><a href="https://bioconductor.org/packages/3.23/BiocParallel" class="external-link">BiocParallel</a></em>)</li>
 </ul>
 <p><strong>Genotype counts and allele frequencies</strong></p>
 <ul>
@@ -171,7 +171,7 @@ follows:</p>
 <div class="section level2">
 <h2 id="TVTBparam">Recurrent settings: TVTBparam<a class="anchor" aria-label="anchor" href="#TVTBparam"></a>
 </h2>
-<p>Most functionalities in <em><a href="https://bioconductor.org/packages/3.22/TVTB" class="external-link">TVTB</a></em> require
+<p>Most functionalities in <em><a href="https://bioconductor.org/packages/3.23/TVTB" class="external-link">TVTB</a></em> require
 recurrent information such as:</p>
 <ul>
 <li>Genotype encoding (homozygote reference, heterozygote, homozygote
@@ -198,7 +198,7 @@ simply named <code>&lt;suffix&gt;</code>.</li>
 <li>Settings for parallel calculations.</li>
 </ul>
 <p>To reduce the burden of repetition during programming, and to
-facilitate analyses using consistent sets of parameters, <em><a href="https://bioconductor.org/packages/3.22/TVTB" class="external-link">TVTB</a></em>
+facilitate analyses using consistent sets of parameters, <em><a href="https://bioconductor.org/packages/3.23/TVTB" class="external-link">TVTB</a></em>
 implements the <code>TVTBparam</code> class. The <code>TVTBparam</code>
 class offer a container for parameters recurrently used across the
 package. A <code>TVTBparam</code> object may be initialised as
@@ -324,19 +324,19 @@ phased, unphased, imputed).</p>
 <div class="section level3">
 <h3 id="ImportVariants">Genetic variants<a class="anchor" aria-label="anchor" href="#ImportVariants"></a>
 </h3>
-<p>Functionalities in <em><a href="https://bioconductor.org/packages/3.22/TVTB" class="external-link">TVTB</a></em> support
+<p>Functionalities in <em><a href="https://bioconductor.org/packages/3.23/TVTB" class="external-link">TVTB</a></em> support
 <code>CollapsedVCF</code> and <code>ExpandedVCF</code> objects (both
-extending the virtual class <code>VCF</code>) of the <em><a href="https://bioconductor.org/packages/3.22/VariantAnnotation" class="external-link">VariantAnnotation</a></em>
+extending the virtual class <code>VCF</code>) of the <em><a href="https://bioconductor.org/packages/3.23/VariantAnnotation" class="external-link">VariantAnnotation</a></em>
 package.</p>
 <p>Typically, <code>CollapsedVCF</code> objects are produced by the
-<em><a href="https://bioconductor.org/packages/3.22/VariantAnnotation" class="external-link">VariantAnnotation</a></em>
+<em><a href="https://bioconductor.org/packages/3.23/VariantAnnotation" class="external-link">VariantAnnotation</a></em>
 <code>readVcf</code> method after parsing a VCF file, and
-<code>ExpandedVCF</code> objects result of the <em><a href="https://bioconductor.org/packages/3.22/VariantAnnotation" class="external-link">VariantAnnotation</a></em>
+<code>ExpandedVCF</code> objects result of the <em><a href="https://bioconductor.org/packages/3.23/VariantAnnotation" class="external-link">VariantAnnotation</a></em>
 <code>expand</code> method applied to a <code>CollapsedVCF</code>
 object.</p>
 <p>Any information that users deem relevant for the analysis may be
 imported from VCF files and stored in <code>VCF</code> objects passed to
-<em><a href="https://bioconductor.org/packages/3.22/TVTB" class="external-link">TVTB</a></em>
+<em><a href="https://bioconductor.org/packages/3.23/TVTB" class="external-link">TVTB</a></em>
 methods. However, to enable the key functionalities of the package, the
 slots of a <code>VCF</code> object should include at least the following
 information:</p>
@@ -369,18 +369,18 @@ the <code>VCF</code> object.</li>
 <div class="section level3">
 <h3 id="ImportGRangesList">List of genomic ranges<a class="anchor" aria-label="anchor" href="#ImportGRangesList"></a>
 </h3>
-<p>In the near future, <em><a href="https://bioconductor.org/packages/3.22/TVTB" class="external-link">TVTB</a></em>
+<p>In the near future, <em><a href="https://bioconductor.org/packages/3.23/TVTB" class="external-link">TVTB</a></em>
 functionalities are expected to produce summary statistics and plots
 faceted by meta-features, each potentially composed of multiple genomic
 ranges.</p>
 <p>For instance, burden tests may be performed on a set of transcripts,
-considering only variants in their respective sets of exons. The <em><a href="https://bioconductor.org/packages/3.22/GenomicRanges" class="external-link">GenomicRanges</a></em>
+considering only variants in their respective sets of exons. The <em><a href="https://bioconductor.org/packages/3.23/GenomicRanges" class="external-link">GenomicRanges</a></em>
 <code>GRangesList</code> class is an ideal container in example, as each
 <code>GRanges</code> in the <code>GRangesList</code> would represent a
 transcript, and each element in the <code>GRanges</code> would represent
 an exon.</p>
 <p>Furthermore, <code>TVTBparam</code> objects may be supplied as the
-<code>param</code> argument of the <em><a href="https://bioconductor.org/packages/3.22/VariantAnnotation" class="external-link">VariantAnnotation</a></em>
+<code>param</code> argument of the <em><a href="https://bioconductor.org/packages/3.23/VariantAnnotation" class="external-link">VariantAnnotation</a></em>
 <code>readVcf</code>. In this case, the <code>TVTBparam</code> object is
 used to import only variants overlapping the relevant genomic regions.
 Moreover, the <code>readVcf</code> method also ensured that the
@@ -403,7 +403,7 @@ the header of the VCF file.</p>
 phenotype data, phenotype information is critical to interpret and
 compare genetic variants between groups of samples (<em>e.g.</em> burden
 of damaging variants in different phenotype levels).</p>
-<p><code>VCF</code> objects accept phenotype information (as <em><a href="https://bioconductor.org/packages/3.22/S4Vectors" class="external-link">S4Vectors</a></em>
+<p><code>VCF</code> objects accept phenotype information (as <em><a href="https://bioconductor.org/packages/3.23/S4Vectors" class="external-link">S4Vectors</a></em>
 <code>DataFrame</code>) in the <code>colData</code> slot. This practice
 has the key advantage of keeping phenotype and genetic information
 synchronised through operation such as subsetting and re-ordering,
@@ -495,7 +495,7 @@ soon as the first <code>ExpandedVCF</code> object is created (see
 section <a href="#Summarise">Summarising Ensembl VEP predictions</a>),
 those methods may benefit from information added to additional INFO keys
 after data import, either manually by the user, or through various
-methods implemented in the <em><a href="https://bioconductor.org/packages/3.22/TVTB" class="external-link">TVTB</a></em>
+methods implemented in the <em><a href="https://bioconductor.org/packages/3.23/TVTB" class="external-link">TVTB</a></em>
 package.</p>
 <div class="section level3">
 <h3 id="FrequenciesOverall">Adding overall frequencies<a class="anchor" aria-label="anchor" href="#FrequenciesOverall"></a>
@@ -572,7 +572,7 @@ levels of the given phenotypes:</p>
 <h2 id="Filter">Filtering variants<a class="anchor" aria-label="anchor" href="#Filter"></a>
 </h2>
 <p>Although <code>VCF</code> objects are straightforward to subset using
-either indices and row names (as they inherit from the <em><a href="https://bioconductor.org/packages/3.22/SummarizedExperiment" class="external-link">SummarizedExperiment</a></em>
+either indices and row names (as they inherit from the <em><a href="https://bioconductor.org/packages/3.23/SummarizedExperiment" class="external-link">SummarizedExperiment</a></em>
 <code>RangedSummarizedExperiment</code> class), users may wish to
 identify variants that pass combinations of criteria based on
 information in their <code>fixed</code> slot, <code>info</code> slot,
@@ -584,8 +584,8 @@ EnsemblVEP predictions.</p>
 <h3 id="FilterDefine">Definition of VCF filter rules<a class="anchor" aria-label="anchor" href="#FilterDefine"></a>
 </h3>
 <p>To facilitate the definition of VCF filter rules, and their
-application to <code>VCF</code> objects, <em><a href="https://bioconductor.org/packages/3.22/TVTB" class="external-link">TVTB</a></em> extends
-the <em><a href="https://bioconductor.org/packages/3.22/S4Vectors" class="external-link">S4Vectors</a></em>
+application to <code>VCF</code> objects, <em><a href="https://bioconductor.org/packages/3.23/TVTB" class="external-link">TVTB</a></em> extends
+the <em><a href="https://bioconductor.org/packages/3.23/S4Vectors" class="external-link">S4Vectors</a></em>
 <code>FilterRules</code> class in four new classes of filter rules:</p>
 <table style="width:93%;" class="table">
 <caption>Motivation for each of the new classes extending
@@ -697,7 +697,7 @@ types in a single object.</p>
 <p>This vignette offers only a brief peek into the utility and
 flexibility of VCF filter rules. More (complex) examples are given in a
 separate vignette, including filter rules using functions and pattern
-matching. The documentation of the <em><a href="https://bioconductor.org/packages/3.22/S4Vectors" class="external-link">S4Vectors</a></em>
+matching. The documentation of the <em><a href="https://bioconductor.org/packages/3.23/S4Vectors" class="external-link">S4Vectors</a></em>
 package—where the parent class <code>FilterRules</code> is defined—can
 also be a source of inspiration.</p>
 </div>
@@ -705,7 +705,7 @@ also be a source of inspiration.</p>
 <h3 id="FilterControl">Control of VCF filter rules<a class="anchor" aria-label="anchor" href="#FilterControl"></a>
 </h3>
 <p>As the above classes of <em>VCF filter rules</em> inherit from the
-<em><a href="https://bioconductor.org/packages/3.22/S4Vectors" class="external-link">S4Vectors</a></em>
+<em><a href="https://bioconductor.org/packages/3.23/S4Vectors" class="external-link">S4Vectors</a></em>
 <code>FilterRules</code> class, they also benefit from its accessors and
 methods. For instance, VCF filter rules can easily be toggled between
 active and inactive states:</p>
@@ -723,7 +723,7 @@ that contain <em>VCF filter rules</em>.</p>
 <p>Once defined, the above filter rules can be applied to
 <code>ExpandedVCF</code> objects, in the same way as
 <code>FilterRules</code> are evaluated in a given environment (see the
-<em><a href="https://bioconductor.org/packages/3.22/S4Vectors" class="external-link">S4Vectors</a></em>
+<em><a href="https://bioconductor.org/packages/3.23/S4Vectors" class="external-link">S4Vectors</a></em>
 documentation):</p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/eval.html" class="external-link">eval</a></span><span class="op">(</span>expr <span class="op">=</span> <span class="va">infoR</span>, envir <span class="op">=</span> <span class="va">vcf</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -769,7 +769,7 @@ for each super-population.</li>
 <span>        <span class="st">"super_pop"</span>,</span>
 <span>        zero.rm <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>    <span class="op">)</span></span></code></pre></div>
-<p><img src="Introduction_files/figure-html/plotMAFCommon-1.png" width="700"></p>
+<p><img src="Introduction_files/figure-html/plotMAFCommon-1.png" class="r-plt" alt="" width="700"></p>
 <p>Alternatively, the minor allele frequency (MAF) of missense variants
 (as estimated from the entire data set) may be visualised in the same
 manner. However, due to the nature of those variants, the
@@ -785,7 +785,7 @@ frequencies.</p>
 <span>        <span class="st">"super_pop"</span>,</span>
 <span>        zero.rm <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span>    <span class="op">)</span></span></code></pre></div>
-<p><img src="Introduction_files/figure-html/plotMAFrare-1.png" width="700"></p>
+<p><img src="Introduction_files/figure-html/plotMAFrare-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 </div>
 <div class="section level2">
@@ -803,7 +803,7 @@ shown on the diagonal</li>
 </ul>
 <div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/pairsInfo-methods.html">pairsInfo</a></span><span class="op">(</span><span class="fu">subsetByFilter</span><span class="op">(</span><span class="va">vcf</span>, <span class="va">vcfRules</span><span class="op">[</span><span class="st">"common"</span><span class="op">]</span><span class="op">)</span>, <span class="st">"AAF"</span>, <span class="st">"super_pop"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Introduction_files/figure-html/pairsInfo-1.png" width="700"></p>
+<p><img src="Introduction_files/figure-html/pairsInfo-1.png" class="r-plt" alt="" width="700"></p>
 <p>Note that the ellipsis <code>...</code> allows a high degree of
 customisation, as it passes additional arguments to the underlying
 <code>ggpairs</code> method.</p>
@@ -820,7 +820,7 @@ customisation, as it passes additional arguments to the underlying
 additional information, the scientific value of the data may be revealed
 by a variety of summary statistics and graphical representations. This
 section will soon present several ideas <em>being implemented</em> in
-<em><a href="https://bioconductor.org/packages/3.22/TVTB" class="external-link">TVTB</a></em>,
+<em><a href="https://bioconductor.org/packages/3.23/TVTB" class="external-link">TVTB</a></em>,
 for instance:</p>
 <ul>
 <li>Count of discrete Ensembl VEP predictions
@@ -854,9 +854,9 @@ work appears through the dependencies of this package.</p>
 </h2>
 <p>Here is the output of <code><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo()</a></code> on the system on
 which this document was compiled:</p>
-<pre><code><span><span class="co">## R version 4.5.1 (2025-06-13)</span></span>
+<pre><code><span><span class="co">## R Under development (unstable) (2026-03-28 r89738)</span></span>
 <span><span class="co">## Platform: x86_64-pc-linux-gnu</span></span>
-<span><span class="co">## Running under: Ubuntu 24.04.2 LTS</span></span>
+<span><span class="co">## Running under: Ubuntu 24.04.4 LTS</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Matrix products: default</span></span>
 <span><span class="co">## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
@@ -877,84 +877,85 @@ which this document was compiled:</p>
 <span><span class="co">## [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## other attached packages:</span></span>
-<span><span class="co">## [1] TVTB_1.35.2      knitr_1.50       BiocStyle_2.37.1</span></span>
+<span><span class="co">## [1] TVTB_1.37.0      knitr_1.51       BiocStyle_2.39.0</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## loaded via a namespace (and not attached):</span></span>
-<span><span class="co">##   [1] RColorBrewer_1.1-3          rstudioapi_0.17.1          </span></span>
-<span><span class="co">##   [3] jsonlite_2.0.0              magrittr_2.0.3             </span></span>
-<span><span class="co">##   [5] GenomicFeatures_1.61.6      farver_2.1.2               </span></span>
-<span><span class="co">##   [7] rmarkdown_2.29              fs_1.6.6                   </span></span>
-<span><span class="co">##   [9] BiocIO_1.19.0               ragg_1.4.0                 </span></span>
-<span><span class="co">##  [11] vctrs_0.6.5                 memoise_2.0.1              </span></span>
-<span><span class="co">##  [13] Rsamtools_2.25.2            RCurl_1.98-1.17            </span></span>
-<span><span class="co">##  [15] base64enc_0.1-3             htmltools_0.5.8.1          </span></span>
-<span><span class="co">##  [17] S4Arrays_1.9.1              progress_1.2.3             </span></span>
-<span><span class="co">##  [19] curl_6.4.0                  SparseArray_1.9.1          </span></span>
+<span><span class="co">##   [1] RColorBrewer_1.1-3          rstudioapi_0.18.0          </span></span>
+<span><span class="co">##   [3] jsonlite_2.0.0              magrittr_2.0.4             </span></span>
+<span><span class="co">##   [5] GenomicFeatures_1.63.1      farver_2.1.2               </span></span>
+<span><span class="co">##   [7] rmarkdown_2.31              fs_2.0.1                   </span></span>
+<span><span class="co">##   [9] BiocIO_1.21.0               ragg_1.5.2                 </span></span>
+<span><span class="co">##  [11] vctrs_0.7.2                 memoise_2.0.1              </span></span>
+<span><span class="co">##  [13] Rsamtools_2.27.1            RCurl_1.98-1.18            </span></span>
+<span><span class="co">##  [15] base64enc_0.1-6             htmltools_0.5.9            </span></span>
+<span><span class="co">##  [17] S4Arrays_1.11.1             progress_1.2.3             </span></span>
+<span><span class="co">##  [19] curl_7.0.0                  SparseArray_1.11.12        </span></span>
 <span><span class="co">##  [21] Formula_1.2-5               sass_0.4.10                </span></span>
-<span><span class="co">##  [23] bslib_0.9.0                 htmlwidgets_1.6.4          </span></span>
+<span><span class="co">##  [23] bslib_0.10.0                htmlwidgets_1.6.4          </span></span>
 <span><span class="co">##  [25] desc_1.4.3                  plyr_1.8.9                 </span></span>
-<span><span class="co">##  [27] Gviz_1.53.1                 httr2_1.2.1                </span></span>
-<span><span class="co">##  [29] cachem_1.1.0                GenomicAlignments_1.45.2   </span></span>
-<span><span class="co">##  [31] lifecycle_1.0.4             pkgconfig_2.0.3            </span></span>
-<span><span class="co">##  [33] Matrix_1.7-3                R6_2.6.1                   </span></span>
-<span><span class="co">##  [35] fastmap_1.2.0               MatrixGenerics_1.21.0      </span></span>
-<span><span class="co">##  [37] digest_0.6.37               colorspace_2.1-1           </span></span>
-<span><span class="co">##  [39] GGally_2.3.0                AnnotationDbi_1.71.1       </span></span>
-<span><span class="co">##  [41] S4Vectors_0.47.0            textshaping_1.0.1          </span></span>
-<span><span class="co">##  [43] Hmisc_5.2-3                 GenomicRanges_1.61.1       </span></span>
-<span><span class="co">##  [45] RSQLite_2.4.2               labeling_0.4.3             </span></span>
-<span><span class="co">##  [47] filelock_1.0.3              httr_1.4.7                 </span></span>
-<span><span class="co">##  [49] abind_1.4-8                 compiler_4.5.1             </span></span>
+<span><span class="co">##  [27] Gviz_1.55.0                 httr2_1.2.2                </span></span>
+<span><span class="co">##  [29] cachem_1.1.0                GenomicAlignments_1.47.0   </span></span>
+<span><span class="co">##  [31] lifecycle_1.0.5             pkgconfig_2.0.3            </span></span>
+<span><span class="co">##  [33] Matrix_1.7-5                R6_2.6.1                   </span></span>
+<span><span class="co">##  [35] fastmap_1.2.0               MatrixGenerics_1.23.0      </span></span>
+<span><span class="co">##  [37] digest_0.6.39               colorspace_2.1-2           </span></span>
+<span><span class="co">##  [39] GGally_2.4.0                AnnotationDbi_1.73.0       </span></span>
+<span><span class="co">##  [41] S4Vectors_0.49.0            textshaping_1.0.5          </span></span>
+<span><span class="co">##  [43] Hmisc_5.2-5                 GenomicRanges_1.63.1       </span></span>
+<span><span class="co">##  [45] RSQLite_2.4.6               labeling_0.4.3             </span></span>
+<span><span class="co">##  [47] filelock_1.0.3              httr_1.4.8                 </span></span>
+<span><span class="co">##  [49] abind_1.4-8                 compiler_4.7.0             </span></span>
 <span><span class="co">##  [51] withr_3.0.2                 bit64_4.6.0-1              </span></span>
 <span><span class="co">##  [53] pander_0.6.6                htmlTable_2.4.3            </span></span>
-<span><span class="co">##  [55] S7_0.2.0                    backports_1.5.0            </span></span>
-<span><span class="co">##  [57] BiocParallel_1.43.4         DBI_1.2.3                  </span></span>
-<span><span class="co">##  [59] ggstats_0.10.0              biomaRt_2.65.0             </span></span>
-<span><span class="co">##  [61] rappdirs_0.3.3              DelayedArray_0.35.2        </span></span>
-<span><span class="co">##  [63] rjson_0.2.23                tools_4.5.1                </span></span>
-<span><span class="co">##  [65] foreign_0.8-90              nnet_7.3-20                </span></span>
-<span><span class="co">##  [67] glue_1.8.0                  restfulr_0.0.16            </span></span>
-<span><span class="co">##  [69] grid_4.5.1                  checkmate_2.3.2            </span></span>
-<span><span class="co">##  [71] reshape2_1.4.4              cluster_2.1.8.1            </span></span>
-<span><span class="co">##  [73] generics_0.1.4              gtable_0.3.6               </span></span>
-<span><span class="co">##  [75] BSgenome_1.77.1             ensembldb_2.33.1           </span></span>
-<span><span class="co">##  [77] tidyr_1.3.1                 data.table_1.17.8          </span></span>
-<span><span class="co">##  [79] hms_1.1.3                   xml2_1.3.8                 </span></span>
-<span><span class="co">##  [81] XVector_0.49.0              BiocGenerics_0.55.1        </span></span>
-<span><span class="co">##  [83] pillar_1.11.0               stringr_1.5.1              </span></span>
-<span><span class="co">##  [85] limma_3.65.3                dplyr_1.1.4                </span></span>
-<span><span class="co">##  [87] BiocFileCache_2.99.5        lattice_0.22-7             </span></span>
-<span><span class="co">##  [89] deldir_2.0-4                rtracklayer_1.69.1         </span></span>
+<span><span class="co">##  [55] S7_0.2.1                    backports_1.5.0            </span></span>
+<span><span class="co">##  [57] BiocParallel_1.45.0         DBI_1.3.0                  </span></span>
+<span><span class="co">##  [59] ggstats_0.13.0              biomaRt_2.67.6             </span></span>
+<span><span class="co">##  [61] rappdirs_0.3.4              DelayedArray_0.37.1        </span></span>
+<span><span class="co">##  [63] rjson_0.2.23                tools_4.7.0                </span></span>
+<span><span class="co">##  [65] foreign_0.8-91              otel_0.2.0                 </span></span>
+<span><span class="co">##  [67] nnet_7.3-20                 glue_1.8.0                 </span></span>
+<span><span class="co">##  [69] restfulr_0.0.16             grid_4.7.0                 </span></span>
+<span><span class="co">##  [71] checkmate_2.3.4             reshape2_1.4.5             </span></span>
+<span><span class="co">##  [73] cluster_2.1.8.2             generics_0.1.4             </span></span>
+<span><span class="co">##  [75] gtable_0.3.6                BSgenome_1.79.1            </span></span>
+<span><span class="co">##  [77] ensembldb_2.35.0            tidyr_1.3.2                </span></span>
+<span><span class="co">##  [79] data.table_1.18.2.1         hms_1.1.4                  </span></span>
+<span><span class="co">##  [81] XVector_0.51.0              BiocGenerics_0.57.0        </span></span>
+<span><span class="co">##  [83] pillar_1.11.1               stringr_1.6.0              </span></span>
+<span><span class="co">##  [85] limma_3.67.0                dplyr_1.2.0                </span></span>
+<span><span class="co">##  [87] BiocFileCache_3.1.0         lattice_0.22-9             </span></span>
+<span><span class="co">##  [89] deldir_2.0-4                rtracklayer_1.71.3         </span></span>
 <span><span class="co">##  [91] bit_4.6.0                   EnsDb.Hsapiens.v75_2.99.0  </span></span>
-<span><span class="co">##  [93] biovizBase_1.57.1           tidyselect_1.2.1           </span></span>
-<span><span class="co">##  [95] Biostrings_2.77.2           gridExtra_2.3              </span></span>
-<span><span class="co">##  [97] bookdown_0.43               ProtGenerics_1.41.0        </span></span>
-<span><span class="co">##  [99] IRanges_2.43.0              Seqinfo_0.99.2             </span></span>
-<span><span class="co">## [101] SummarizedExperiment_1.39.1 stats4_4.5.1               </span></span>
-<span><span class="co">## [103] xfun_0.52                   Biobase_2.69.0             </span></span>
-<span><span class="co">## [105] statmod_1.5.0               matrixStats_1.5.0          </span></span>
-<span><span class="co">## [107] stringi_1.8.7               UCSC.utils_1.5.0           </span></span>
-<span><span class="co">## [109] lazyeval_0.2.2              yaml_2.3.10                </span></span>
-<span><span class="co">## [111] evaluate_1.0.4              codetools_0.2-20           </span></span>
-<span><span class="co">## [113] interp_1.1-6                tibble_3.3.0               </span></span>
-<span><span class="co">## [115] BiocManager_1.30.26         cli_3.6.5                  </span></span>
-<span><span class="co">## [117] rpart_4.1.24                systemfonts_1.2.3          </span></span>
-<span><span class="co">## [119] jquerylib_0.1.4             dichromat_2.0-0.1          </span></span>
-<span><span class="co">## [121] Rcpp_1.1.0                  GenomeInfoDb_1.45.9        </span></span>
-<span><span class="co">## [123] dbplyr_2.5.0                png_0.1-8                  </span></span>
-<span><span class="co">## [125] XML_3.99-0.18               parallel_4.5.1             </span></span>
-<span><span class="co">## [127] pkgdown_2.1.3               ggplot2_3.5.2              </span></span>
-<span><span class="co">## [129] blob_1.2.4                  prettyunits_1.2.0          </span></span>
-<span><span class="co">## [131] jpeg_0.1-11                 latticeExtra_0.6-30        </span></span>
-<span><span class="co">## [133] AnnotationFilter_1.33.0     bitops_1.0-9               </span></span>
-<span><span class="co">## [135] VariantAnnotation_1.55.1    scales_1.4.0               </span></span>
-<span><span class="co">## [137] purrr_1.1.0                 crayon_1.5.3               </span></span>
-<span><span class="co">## [139] rlang_1.1.6                 KEGGREST_1.49.1</span></span></code></pre>
+<span><span class="co">##  [93] biovizBase_1.59.0           tidyselect_1.2.1           </span></span>
+<span><span class="co">##  [95] Biostrings_2.79.5           gridExtra_2.3              </span></span>
+<span><span class="co">##  [97] bookdown_0.46               ProtGenerics_1.43.0        </span></span>
+<span><span class="co">##  [99] IRanges_2.45.0              Seqinfo_1.1.0              </span></span>
+<span><span class="co">## [101] SummarizedExperiment_1.41.1 stats4_4.7.0               </span></span>
+<span><span class="co">## [103] xfun_0.57                   Biobase_2.71.0             </span></span>
+<span><span class="co">## [105] statmod_1.5.1               matrixStats_1.5.0          </span></span>
+<span><span class="co">## [107] stringi_1.8.7               UCSC.utils_1.7.1           </span></span>
+<span><span class="co">## [109] lazyeval_0.2.2              yaml_2.3.12                </span></span>
+<span><span class="co">## [111] evaluate_1.0.5              codetools_0.2-20           </span></span>
+<span><span class="co">## [113] cigarillo_1.1.0             interp_1.1-6               </span></span>
+<span><span class="co">## [115] tibble_3.3.1                BiocManager_1.30.27        </span></span>
+<span><span class="co">## [117] cli_3.6.5                   rpart_4.1.27               </span></span>
+<span><span class="co">## [119] systemfonts_1.3.2           jquerylib_0.1.4            </span></span>
+<span><span class="co">## [121] dichromat_2.0-0.1           Rcpp_1.1.1                 </span></span>
+<span><span class="co">## [123] GenomeInfoDb_1.47.2         dbplyr_2.5.2               </span></span>
+<span><span class="co">## [125] png_0.1-9                   XML_3.99-0.23              </span></span>
+<span><span class="co">## [127] parallel_4.7.0              pkgdown_2.2.0              </span></span>
+<span><span class="co">## [129] ggplot2_4.0.2               blob_1.3.0                 </span></span>
+<span><span class="co">## [131] prettyunits_1.2.0           jpeg_0.1-11                </span></span>
+<span><span class="co">## [133] latticeExtra_0.6-31         AnnotationFilter_1.35.0    </span></span>
+<span><span class="co">## [135] bitops_1.0-9                VariantAnnotation_1.57.1   </span></span>
+<span><span class="co">## [137] scales_1.4.0                purrr_1.2.1                </span></span>
+<span><span class="co">## [139] crayon_1.5.3                rlang_1.1.7                </span></span>
+<span><span class="co">## [141] KEGGREST_1.51.1</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 class="unnumbered" id="References">References<a class="anchor" aria-label="anchor" href="#References"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-RN1" class="csl-entry">
 McLaren, W., B. Pritchard, D. Rios, Y. Chen, P. Flicek, and F.
 Cunningham. 2010. <span>“Deriving the Consequences of Genomic Variants
@@ -987,7 +988,7 @@ Predictor.”</span> Journal Article. <em>Bioinformatics</em> 26 (16):
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer>
